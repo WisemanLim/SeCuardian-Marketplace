@@ -130,7 +130,7 @@ export default function PlaygroundPage() {
         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">최근 실행 이력</h3>
         <table className="w-full text-xs">
           <thead className="text-gray-400">
-            <tr><th className="text-left font-normal py-1">프롬프트</th><th className="text-left font-normal">provider</th><th className="text-left font-normal">지연</th></tr>
+            <tr><th className="text-left font-normal py-1">프롬프트</th><th className="text-left font-normal">provider</th><th className="text-left font-normal">지연</th><th className="text-left font-normal">토큰(in/out)</th></tr>
           </thead>
           <tbody>
             {history.map((r) => (
@@ -138,9 +138,10 @@ export default function PlaygroundPage() {
                 <td className="py-1 truncate max-w-[240px]">{r.prompt}</td>
                 <td>{r.provider}</td>
                 <td>{r.latency_ms}ms</td>
+                <td>{r.input_tokens}/{r.output_tokens}</td>
               </tr>
             ))}
-            {history.length === 0 && <tr><td colSpan={3} className="text-gray-400 py-2">이력이 없습니다.</td></tr>}
+            {history.length === 0 && <tr><td colSpan={4} className="text-gray-400 py-2">이력이 없습니다.</td></tr>}
           </tbody>
         </table>
       </div>

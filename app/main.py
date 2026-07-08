@@ -39,10 +39,12 @@ from app.routers import (
     router_mcp,
     router_mcp_config,
     router_marketplace,   # Marketplace 내장 에이전트 (F-MP)
+    router_marketplace_remote,  # Marketplace 원격 레지스트리 클라이언트 (F-MP E1.5)
     router_workflow,      # Workflow 내장 에이전트 (F-WF)
     router_rag,           # RAG 내장 에이전트 (F-RAG)
     router_playground,    # Playground 내장 에이전트 (F-PG)
     router_guardrails,    # Guardrails 내장 에이전트 (F-GRD)
+    router_dashboard,     # 대시보드 요약/활동 (F-WEB)
 )
 
 
@@ -57,6 +59,8 @@ async def lifespan(app: FastAPI):
     await run_migrations()
     await seed_default_admin()
     await addon_init(app)
+    from app.agents import guardrails_gate
+    guardrails_gate.install()  # F-GRD: orchestrator._exec_api_call 게이트 배선(§7.8.4)
     from app.services import mcp_proxy_server
     await mcp_proxy_server.init_from_db()  # tbl_mcp_configs 기준 MCP proxy 서버 복원
 
@@ -113,10 +117,12 @@ app.include_router(router_a2a.router)        # A2A Protocol v1.0 (F12)
 app.include_router(router_mcp.router)        # MCP JSON-RPC 2.0 (F12)
 app.include_router(router_mcp_config.router) # MCP Proxy 설정 관리 (F12)
 app.include_router(router_marketplace.router)  # Marketplace 내장 에이전트 (F-MP)
+app.include_router(router_marketplace_remote.router)  # 원격 레지스트리 클라이언트 (F-MP E1.5)
 app.include_router(router_workflow.router)      # Workflow 내장 에이전트 (F-WF)
 app.include_router(router_rag.router)           # RAG 내장 에이전트 (F-RAG)
 app.include_router(router_playground.router)    # Playground 내장 에이전트 (F-PG)
 app.include_router(router_guardrails.router)    # Guardrails 내장 에이전트 (F-GRD)
+app.include_router(router_dashboard.router)      # 대시보드 요약/활동 (F-WEB)
 
 
 @app.get("/health")

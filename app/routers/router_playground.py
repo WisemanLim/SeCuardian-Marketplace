@@ -57,21 +57,25 @@ async def run(body: RunRequest, user: dict = Depends(get_current_user)):
             prompt = f"다음 컨텍스트를 참고해 답하세요. 인용 시 [번호]를 사용하세요.\n\n{context}\n\n질문: {body.prompt}"
 
     started = time.monotonic()
+    usage: dict = {}  # call_ollama 가 prompt_eval_count/eval_count 를 누적(관측성, §7.9)
     try:
-        text = await call_ollama([{"role": "user", "content": prompt}], system=system, model=body.model)
+        text = await call_ollama([{"role": "user", "content": prompt}], system=system, model=body.model, usage_out=usage)
         provider = "ollama"
     except Exception as exc:  # noqa: BLE001 — LLM 미구성/장애 → degrade(무중단)
         text = f"[degraded] {body.prompt}"
         provider = "degraded"
         _ = exc
     latency_ms = int((time.monotonic() - started) * 1000)
+    in_tok = int(usage.get("input_tokens", 0))
+    out_tok = int(usage.get("output_tokens", 0))
 
     rid = await execute_insert(
         f"INSERT INTO playground_runs "
-        f"(tenant_id, prompt, system_prompt, model, rag_collection_id, response_text, provider, latency_ms, citations_json, created_by) "
-        f"VALUES ({','.join([_PH] * 10)})",
+        f"(tenant_id, prompt, system_prompt, model, rag_collection_id, response_text, provider, latency_ms, "
+        f"input_tokens, output_tokens, citations_json, created_by) "
+        f"VALUES ({','.join([_PH] * 12)})",
         (tid, body.prompt, system, body.model or settings.ollama_model, body.rag_collection_id,
-         text, provider, latency_ms, json.dumps(citations, ensure_ascii=False),
+         text, provider, latency_ms, in_tok, out_tok, json.dumps(citations, ensure_ascii=False),
          user.get("username") or user.get("sub") or ""),
     )
     return await fetch_one("SELECT * FROM playground_runs WHERE id = " + _PH, (rid,))

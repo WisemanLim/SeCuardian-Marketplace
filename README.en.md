@@ -20,11 +20,12 @@ bases (RAG).
 |---|---|
 | Orchestrator + AI Assistant (F-AI), Setup Wizard (F-SETUP) | ✅ Done |
 | Addon hot-deploy (ZIP upload · live mount) | ✅ Restored |
+| Dashboard (`/dashboard` — server status + agent summary + quick links) | ✅ Done |
 | Marketplace (F-MP: catalog · install · single active version) — backend+frontend | 🟡 |
 | Workflow (F-WF: DAG engine · 7 nodes · retry · HITL · SSE) — backend+a11y form frontend | 🟡 |
 | RAG (F-RAG: chunking · BM25+dense · RRF hybrid search) — backend+frontend | 🟡 |
 | Playground (F-PG: prompt/model/RAG experimentation · A/B) — backend+frontend | 🟡 |
-| Guardrails (F-GRD: PII/financial 13-type real detection · agent toggle) — backend+frontend | 🟡 |
+| Guardrails (F-GRD: PII/financial 13-type real detection · agent toggle · **Orchestrator live gate**) — backend+frontend | 🟡 |
 | Env separation/keys (F-ENV), Web portal (F-WEB), Governance (F-GOV) | 🟡 Partial |
 
 > All 5 built-in agents have working backend+frontend (tests PASS). 🟡 = extension items remain (remote registry, React Flow canvas, pgvector, MCP proxy, etc). Details: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
@@ -130,7 +131,7 @@ make db-fresh       # reset + seed
 |---|---|---|---|
 | Backend API | http://localhost:8100 | `BACKEND_PORT` 8100 → container 8000 | |
 | API docs | http://localhost:8100/docs | | FastAPI Swagger |
-| Frontend | http://localhost:4100 | `FRONTEND_PORT` 4100 | Vite |
+| Frontend | http://localhost:4100 | `FRONTEND_PORT` 4100 | Vite. Root (`/`) redirects to `/dashboard` |
 | PostgreSQL | localhost:5432 | `POSTGRES_PORT` | dev+ |
 | Redis | localhost:6379 | `REDIS_PORT` | |
 | Ollama | localhost:11434 | `OLLAMA_PORT` | local LLM fallback |
@@ -171,6 +172,15 @@ curl -X POST http://localhost:8100/api/marketplace/install/cve-scanner \
 # uninstall
 curl -X DELETE http://localhost:8100/api/marketplace/install/cve-scanner -H "Authorization: Bearer $TOKEN"
 
+# ── Marketplace remote registry (F-MP E1.5) — requires MARKETPLACE_REMOTE_ENABLED=true ──
+curl http://localhost:8100/api/marketplace-remote/ping -H "Authorization: Bearer $TOKEN"
+curl http://localhost:8100/api/marketplace-remote/catalog -H "Authorization: Bearer $TOKEN"   # cached (sync_interval TTL)
+# download remote asset → SHA256 verify → (if valid addon ZIP) live hot-deploy → merge into local catalog
+curl -X POST http://localhost:8100/api/marketplace-remote/install/remote-scanner \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"hot_deploy":true}'
+# → {"registered":true,"deployed":true,"checksum":"<sha256>","asset":{...,"source":"remote"}}
+#   deployed=true → /api/addon/{key}/... is live immediately with no restart (§7.6, reuses upload pipeline in-proc)
+
 # ── Workflow (F-WF) — DAG create·run·HITL ──
 # create workflow (trigger→transform→notify)
 curl -X POST http://localhost:8100/api/workflows -H "Authorization: Bearer $TOKEN" \
@@ -205,10 +215,18 @@ curl -X POST http://localhost:8100/api/playground/run -H "Authorization: Bearer 
 # ── Guardrails (F-GRD) — global PII 13-type detection (Playground integration) ──
 curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' -d '{"text":"email me at secret@corp.com","domain":"global"}'
-# → {"decision":"redact","riskScore":0.2,"matchedRules":["pii.email"],"redactedText":"email me at ****.com",...}
-# per-agent domain toggle (admin/supervisor)
-curl -X PUT http://localhost:8100/api/guardrails/agents/chat/config -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' -d '{"domain_key":"global","enabled":true}'
+# → {"decision":"redact",...}  low-risk PII (email/phone/IP) = masked
+# promotion (impl/11): 1 high-risk category (secret/financial/national-id) → block, 2+ → escalate
+curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"text":"key sk-abcdefghijklmnopqrstuvwx","domain":"global"}'
+# → {"decision":"block","riskScore":0.7,"matchedRules":["secret.api_key"],...}
+#   with agent toggle ON, block/escalate inputs are cut off by the gate (HTTP 403 [BLOCKED]) during Orchestrator calls
+# per-agent domain toggle (admin/supervisor) — actually enforced by the Orchestrator gate below
+curl -X PUT http://localhost:8100/api/guardrails/agents/marketplace/config -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"domain_key":"global","enabled":true,"io_scope":"both"}'
+# once enabled, any Orchestrator call_api invocation against marketplace (e.g. registering an asset whose
+# description contains PII) is intercepted by guardrails_gate.py, which masks it before forwarding and
+# writes a guardrails_decision_log entry.
 ```
 
 ---
@@ -222,10 +240,20 @@ python test/impl/2/test_workflow.py         # F-WF  (fresh sqlite, 21 asserts)
 python test/impl/4/test_rag.py              # F-RAG (fresh sqlite, 15 asserts)
 python test/impl/5/test_playground.py       # F-PG  (fresh sqlite, 13 asserts)
 python test/impl/6/test_guardrails.py       # F-GRD (fresh sqlite, 20 asserts — all 13 detectors verified)
+python test/impl/7/test_guardrails_gate.py  # F-GRD Orchestrator gate (fresh sqlite, 15 asserts)
+python test/impl/9/test_marketplace_remote.py  # F-MP remote registry (fresh sqlite, 14 asserts)
+python test/impl/10/test_remote_hotdeploy.py   # F-MP real ZIP hot-deploy §7.6 (fresh sqlite, 8 asserts)
+python test/impl/11/test_guardrails_escalation.py  # F-GRD block/escalate promotion (fresh sqlite, 14 asserts)
+python test/impl/13/test_guardrails_mcp.py     # F-GRD MCP Server proxy (6 asserts)
+python test/impl/14/test_local_zip_deploy.py   # F-MP local real ZIP deploy (10 asserts)
+python test/impl/15/test_pgvector_adapter.py   # F-RAG pgvector adapter (6 asserts)
+python test/impl/16/test_gpg_mtls.py           # F-MP GPG signature + mTLS (10 asserts, needs gpg binary)
+python test/impl/17/test_dashboard_summary.py  # Dashboard realtime widgets (10 asserts)
+python test/impl/19/test_playground_tokens.py  # F-PG token usage tracking (6 asserts)
 make lint                                   # ruff
 cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # frontend type-check + build
 ```
-Per-iteration scenario·result: `test/impl/<Nth>/{scenario,result}.md`. impl/3 (F-WF Designer + F-MP frontend) is static verification (tsc/build) only.
+Per-iteration scenario·result: `test/impl/<Nth>/{scenario,result}.md`. impl/3 (F-WF Designer + F-MP frontend), impl/8 (dashboard), impl/12 (nav 'Users' moved to bottom) touch no backend code, so they're static verification (tsc/build) only.
 
 ---
 
@@ -244,10 +272,14 @@ Per-iteration scenario·result: `test/impl/<Nth>/{scenario,result}.md`. impl/3 (
 
 ## 10. Next Steps (PRD backlog)
 
-- **Orchestrator gate wiring**: `guardrails_gate.py` — hook F-GRD into the Orchestrator call path (§7.8.4).
-- **F-MP**: remote registry (§7.3, E1.5), real addon ZIP pipeline wiring (§7.6).
-- **F-WF**: React Flow canvas (currently a11y form editor), loop/sub-flow/cron, llm-node Claude integration.
-- **F-RAG**: pgvector/Qdrant migration (§7.5), eval (Recall@10/NDCG@10) benchmarks.
-- **F-PG**: cost tracking (once Claude is wired), eval execution.
-- **F-GRD**: MCP Server proxy integration, 25 industry-domain detectors (out of SeCMP scope, wise-Guardrails' own roadmap).
-- **Dashboard**: `/api/agents` catalog+health summary screen (currently nav entry only).
+The 6 §9.5 backlog items (F-WF canvas · F-RAG pgvector · F-GRD MCP · local real-ZIP · dashboard widgets · GPG/mTLS)
+are **all done in impl/13~18**. What remains is external-infra validation & roadmap:
+
+- **Real-infra validation**: pgvector benchmark (Recall@10≥0.89 · p95≤250ms, PostgreSQL+extension), mTLS handshake (private CA), real wise-Guardrails MCP integration (code & fallback done).
+- **Embedding model swap**: local hashing → sentence-transformers/OpenAI (pin embedding_version).
+- **Editable workflow canvas**: currently read-only visualization (form editor is primary). An editable canvas must ship with a KWCAG alternative editor.
+- **Multi-tenancy namespace/physical, Qdrant, Dify DSL Import** — roadmap (P5).
+- **F-PG cost tracking** (once Claude is wired), eval execution.
+- **Ops docs**: GPG key rotation, mTLS cert issuance procedures.
+
+> Completed: Orchestrator gate (impl/7) · dashboard (impl/8) · block/escalate (impl/11) · MCP proxy (impl/13) · local real-ZIP (impl/14) · pgvector adapter (impl/15) · GPG+mTLS (impl/16) · dashboard widgets (impl/17) · React Flow canvas (impl/18).

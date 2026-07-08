@@ -8,6 +8,7 @@ import UsersPage from "./pages/users/UsersPage";
 import SettingsPage from "./pages/settings/SettingsPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import AddonAgentPage from "./pages/addon/AddonAgentPage";
+import DashboardPage from "./pages/dashboard/DashboardPage";
 import MarketplacePage from "./pages/marketplace/MarketplacePage";
 import WorkflowPage from "./pages/workflow/WorkflowPage";
 import RagPage from "./pages/rag/RagPage";
@@ -50,13 +51,14 @@ export default function App() {
         <Route path="/settings" element={<LayoutRoute><SettingsPage /></LayoutRoute>} />
         <Route path="/profile" element={<LayoutRoute><ProfilePage /></LayoutRoute>} />
         <Route path="/addon/:agentKey" element={<LayoutRoute><AddonAgentPage /></LayoutRoute>} />
+        <Route path="/dashboard" element={<LayoutRoute><DashboardPage /></LayoutRoute>} />
         <Route path="/marketplace" element={<LayoutRoute><MarketplacePage /></LayoutRoute>} />
         <Route path="/workflow" element={<LayoutRoute><WorkflowPage /></LayoutRoute>} />
         <Route path="/rag" element={<LayoutRoute><RagPage /></LayoutRoute>} />
         <Route path="/playground" element={<LayoutRoute><PlaygroundPage /></LayoutRoute>} />
         <Route path="/guardrails" element={<LayoutRoute><GuardrailsPage /></LayoutRoute>} />
-        <Route path="/" element={<Navigate to="/chat" replace />} />
-        <Route path="*" element={<Navigate to="/chat" replace />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
     </Routes>
   );

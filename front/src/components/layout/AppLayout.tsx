@@ -15,6 +15,11 @@ interface ActiveAgent {
 }
 
 /* ── SVG icons ─────────────────────────────────────── */
+const IcDashboard = () => (
+  <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+    <path d="M2 3.5A1.5 1.5 0 013.5 2h4A1.5 1.5 0 019 3.5v4A1.5 1.5 0 017.5 9h-4A1.5 1.5 0 012 7.5v-4zm9 0A1.5 1.5 0 0112.5 2h4A1.5 1.5 0 0118 3.5v4A1.5 1.5 0 0116.5 9h-4A1.5 1.5 0 0111 7.5v-4zm-9 9A1.5 1.5 0 013.5 11h4A1.5 1.5 0 019 12.5v4A1.5 1.5 0 017.5 18h-4A1.5 1.5 0 012 16.5v-4zm9 0a1.5 1.5 0 011.5-1.5h4a1.5 1.5 0 011.5 1.5v4a1.5 1.5 0 01-1.5 1.5h-4a1.5 1.5 0 01-1.5-1.5v-4z" />
+  </svg>
+);
 const IcAI = () => (
   <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
     <path d="M10 2a1 1 0 01.894.553l2.382 4.764 5.26.764a1 1 0 01.555 1.705l-3.806 3.71.898 5.238a1 1 0 01-1.451 1.054L10 17.347l-4.732 2.441a1 1 0 01-1.451-1.054l.898-5.238L.91 9.786a1 1 0 01.555-1.705l5.26-.764L9.106 2.553A1 1 0 0110 2z" />
@@ -160,8 +165,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // 헤더 타이틀 — 현재 메뉴(라우트)별 타이틀 표시, ADDON 은 에이전트명
   const path = location.pathname;
-  let headerTitle = "SeCuardian Platform";
-  if (path.startsWith("/chat")) headerTitle = "AI Assistant";
+  let headerTitle = "SeCuardian Marketplace";
+  if (path.startsWith("/dashboard")) headerTitle = t("nav.dashboard");
+  else if (path.startsWith("/chat")) headerTitle = "AI Assistant";
   else if (path.startsWith("/agents")) headerTitle = t("agent.management");
   else if (path.startsWith("/users")) headerTitle = t("users.title");
   else if (path.startsWith("/settings")) headerTitle = t("settings.title");
@@ -173,7 +179,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   else if (path.startsWith("/guardrails")) headerTitle = t("nav.guardrails");
   else if (path.startsWith("/addon/")) {
     const key = path.split("/")[2];
-    headerTitle = activeAgents.find((a) => a.key === key)?.name ?? "SeCuardian Platform";
+    headerTitle = activeAgents.find((a) => a.key === key)?.name ?? "SeCuardian Marketplace";
   }
 
   const themeLabel  = t(`theme.${theme}`);
@@ -238,7 +244,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </div>
                 <div className="min-w-0">
                   <p className={`text-xs font-bold leading-tight truncate ${sidebar.logo}`}>SeCuardian</p>
-                  <p className={`text-[10px] leading-tight ${sidebar.sub}`}>Platform</p>
+                  <p className={`text-[10px] leading-tight ${sidebar.sub}`}>Marketplace</p>
                 </div>
               </div>
               <button
@@ -262,6 +268,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* ── Nav ─────────────────────────────────────────── */}
         <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto">
+
+          {/* 대시보드 */}
+          <NavLink
+            to="/dashboard"
+            title={collapsed ? t("nav.dashboard") : undefined}
+            className={({ isActive }) => navCls(isActive, false, collapsed)}
+          >
+            <span className="shrink-0"><IcDashboard /></span>
+            {!collapsed && <span>{t("nav.dashboard")}</span>}
+          </NavLink>
 
           {/* AI Assistant */}
           <NavLink
@@ -332,8 +348,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </>
           )}
 
-          {/* 사용자 관리 (supervisor/admin) */}
-          {isAdmin && (
+        </nav>
+
+        {/* 사용자 관리 (supervisor/admin) — 로그인 사용자 블록 바로 위 하단 배치 */}
+        {isAdmin && (
+          <nav className="px-2 pb-1">
             <NavLink
               to="/users"
               title={collapsed ? t("nav.users") : undefined}
@@ -342,8 +361,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <span className="shrink-0"><IcUsers /></span>
               {!collapsed && <span>{t("nav.users")}</span>}
             </NavLink>
-          )}
-        </nav>
+          </nav>
+        )}
 
         {/* ── User block ───────────────────────────────── */}
         <div className={`relative border-t ${sidebar.border} px-2 py-3`}>

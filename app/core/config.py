@@ -85,7 +85,10 @@ class Settings(BaseSettings):
     marketplace_tenant_id: str = ""            # SaaS 멀티테넌시 테넌트 식별자
     marketplace_api_key: str = ""              # Bearer 인증 (시크릿 매니저 권장)
     marketplace_tls_verify: bool = True        # 사설 CA 사용 시 CA 번들 경로로 대체 가능
-    marketplace_tls_ca_bundle: str = ""        # 사설 CA 번들 경로
+    marketplace_tls_ca_bundle: str = ""        # 사설 CA 번들 경로(서버 인증서 검증)
+    marketplace_tls_client_cert: str = ""      # mTLS 클라이언트 인증서 경로(PEM)
+    marketplace_tls_client_key: str = ""       # mTLS 클라이언트 키 경로(PEM)
+    marketplace_gpg_pubkey_path: str = ""      # GPG 서명 검증용 공개키(armored) 경로
     marketplace_sync_interval_sec: int = 3600  # 카탈로그 캐시 갱신 주기(초)
     marketplace_install_verify_checksum: bool = True     # 다운로드 ZIP SHA256 검증 강제
     marketplace_install_require_signature: bool = False  # GPG 서명 검증(엔터프라이즈 옵션)

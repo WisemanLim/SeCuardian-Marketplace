@@ -75,19 +75,41 @@ def redact(text: str, matches: list[Match]) -> str:
     return out
 
 
+# 고위험 카테고리 — 시크릿·신용정보·국가 식별번호. 노출 시 단순 마스킹(redact)을 넘어
+# 콘텐츠 차단(block)/사람 검토(escalate)로 승격한다(PRD §7.8.2 6단계 결정 enum).
+_HIGH_RISK: frozenset[str] = frozenset({
+    "secret.api_key",
+    "financial.card_number", "financial.iban",
+    "pii.national_id_kr", "pii.ssn_us", "pii.my_number_jp",
+    "pii.passport", "pii.driver_license_kr", "pii.business_reg_no_kr",
+})
+
+
 def decide(text: str) -> dict:
-    """PRD §7.8.2 응답 계약과 동일한 형태로 판정 결과를 반환."""
+    """PRD §7.8.2 응답 계약과 동일한 형태로 판정 결과를 반환.
+
+    승격 정책: 저위험 PII(이메일/전화/IP)만 → redact. 고위험 1종 → block.
+    고위험 2종 이상(대량·복합 유출) → escalate(사람 검토).
+    """
     matches = detect_global(text)
     if not matches:
         return {
             "decision": "allow", "riskScore": 0.0, "matchedRules": [], "categories": [],
             "normalizedText": text, "redactedText": text,
         }
+    categories = sorted({m.category for m in matches})
+    high = _HIGH_RISK.intersection(categories)
+    if len(high) >= 2:
+        decision, risk = "escalate", 1.0
+    elif high:
+        decision, risk = "block", round(min(1.0, 0.5 + 0.2 * len(matches)), 4)
+    else:
+        decision, risk = "redact", round(min(1.0, 0.2 * len(matches)), 4)
     return {
-        "decision": "redact",
-        "riskScore": round(min(1.0, 0.2 * len(matches)), 4),
+        "decision": decision,
+        "riskScore": risk,
         "matchedRules": [m.rule_id for m in matches],
-        "categories": sorted({m.category for m in matches}),
+        "categories": categories,
         "normalizedText": text,
         "redactedText": redact(text, matches),
     }

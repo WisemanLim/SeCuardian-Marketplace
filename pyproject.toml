@@ -29,6 +29,9 @@ dependencies = [
   "prometheus-client>=0.20",              # GET /metrics — Prometheus 스크레이프(E06 T06-2 observability)
   # secrets management (E02 T02-2)
   "hvac>=2.3",                            # HashiCorp Vault HTTP API client (BUSL-1.1 aware)
+  "pgvector>=0.5.0",
+  "psycopg[binary]>=3.3.4",
+  "python-gnupg>=0.5.6",
 ]
 
 [dependency-groups]

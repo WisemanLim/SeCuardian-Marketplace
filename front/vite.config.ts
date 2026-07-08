@@ -23,6 +23,10 @@ export default defineConfig(({ mode }) => {
           target: `http://localhost:${backendPort}`,
           changeOrigin: true,
         },
+        "/health": {
+          target: `http://localhost:${backendPort}`,
+          changeOrigin: true,
+        },
       },
     },
   };

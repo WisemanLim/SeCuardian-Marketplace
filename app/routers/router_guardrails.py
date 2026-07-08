@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 from app.core.config import settings
 from app.core.deps import get_current_user, require_role
 from app.db import _PH, execute_insert, execute_write, fetch_all, fetch_one
-from app.services.guardrails_detector import decide
+from app.services.guardrails_mcp import validate
 
 router = APIRouter(prefix="/api/guardrails", tags=["guardrails"])
 
@@ -95,7 +95,7 @@ async def test_text(body: TestRequest, user: dict = Depends(get_current_user)):
             409, f"domain '{body.domain}' is catalog_only — no detector backend yet (PRD §7.8.0), use 'global'"
         )
 
-    result = decide(body.text)
+    result = await validate(body.text, domain=body.domain, tool="validate_input", tenant_id=_tenant())
     decision_id = str(uuid.uuid4())
     result["decisionId"] = decision_id
     result["evaluatedDomains"] = [body.domain]

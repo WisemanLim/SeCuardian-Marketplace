@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   MarketplaceAsset, ASSET_KINDS, listCatalog, registerAsset, installAsset, uninstallAsset,
 } from "../../api/marketplace";
+import { RemoteAsset, remoteCatalog, remoteInstall } from "../../api/marketplaceRemote";
 import { useLocale } from "../../hooks/useLocale";
 
 export default function MarketplacePage() {
@@ -11,11 +12,31 @@ export default function MarketplacePage() {
   const [form, setForm] = useState({ asset_key: "", name: "", kind: "agent", description: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+  // 원격 레지스트리(E1.5) — MARKETPLACE_REMOTE_ENABLED=false 면 409 → 섹션 숨김
+  const [remoteAssets, setRemoteAssets] = useState<RemoteAsset[]>([]);
+  const [remoteEnabled, setRemoteEnabled] = useState(false);
 
   function load() {
     listCatalog().then(setAssets).catch(() => {});
   }
-  useEffect(load, []);
+  function loadRemote() {
+    remoteCatalog().then((r) => { setRemoteAssets(r.assets); setRemoteEnabled(true); })
+      .catch(() => setRemoteEnabled(false));
+  }
+  useEffect(() => { load(); loadRemote(); }, []);
+
+  async function handleRemoteInstall(a: RemoteAsset) {
+    setBusy(`remote:${a.asset_key}`);
+    try {
+      await remoteInstall(a.asset_key, a.checksum);
+      load();
+    } catch (e) {
+      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(msg || "원격 설치 실패");
+    } finally {
+      setBusy(null);
+    }
+  }
 
   async function handleRegister() {
     setError("");
@@ -128,6 +149,35 @@ export default function MarketplacePage() {
           <p className="text-sm text-gray-400 col-span-2">등록된 자산이 없습니다.</p>
         )}
       </div>
+
+      {remoteEnabled && (
+        <section className="mt-8">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            원격 레지스트리 <span className="text-xs font-normal text-gray-400">(다운로드→체크섬 검증→로컬 편입)</span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {remoteAssets.map((a) => {
+              const localHas = assets.some((la) => la.asset_key === a.asset_key);
+              return (
+                <div key={`${a.asset_key}-${a.version}`} className="p-3 rounded border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900">
+                  <div className="flex items-start justify-between">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{a.name}</p>
+                      <p className="text-xs text-gray-400">{a.asset_key} · {a.kind} · v{a.version} · 원격</p>
+                    </div>
+                  </div>
+                  {a.description && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{a.description}</p>}
+                  <button disabled={busy === `remote:${a.asset_key}` || localHas} onClick={() => handleRemoteInstall(a)}
+                    className="mt-2 text-xs px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40">
+                    {localHas ? "로컬에 편입됨" : "다운로드·편입"}
+                  </button>
+                </div>
+              );
+            })}
+            {remoteAssets.length === 0 && <p className="text-sm text-gray-400 col-span-2">원격 자산이 없습니다.</p>}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

@@ -19,11 +19,12 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 |---|---|
 | Orchestrator + AI Assistant (F-AI), Setup Wizard (F-SETUP) | ✅ 완료 |
 | Addon 핫디플로이 (ZIP 업로드·무중단 마운트) | ✅ 복원 |
+| 대시보드 (`/dashboard` — 서버상태+에이전트 요약+빠른링크) | ✅ 완료 |
 | Marketplace (F-MP: 카탈로그·설치·단일활성버전) — 백엔드+프론트 | 🟡 |
 | Workflow (F-WF: DAG 엔진·7노드·retry·HITL·SSE) — 백엔드+a11y 폼 프론트 | 🟡 |
 | RAG (F-RAG: 청킹·BM25+dense·RRF 하이브리드검색) — 백엔드+프론트 | 🟡 |
 | Playground (F-PG: 프롬프트/모델/RAG 실험·A/B) — 백엔드+프론트 | 🟡 |
-| Guardrails (F-GRD: PII/신용정보 13종 실판정·에이전트토글) — 백엔드+프론트 | 🟡 |
+| Guardrails (F-GRD: PII/신용정보 13종 실판정·에이전트토글·**Orchestrator 실시간 게이트**) — 백엔드+프론트 | 🟡 |
 | 환경 분리/키(F-ENV), 웹 포털(F-WEB), 거버넌스(F-GOV) | 🟡 부분 |
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
@@ -129,7 +130,7 @@ make db-fresh       # reset + seed
 |---|---|---|---|
 | Backend API | http://localhost:8100 | `BACKEND_PORT` 8100 → 컨테이너 8000 | |
 | API 문서 | http://localhost:8100/docs | | FastAPI Swagger |
-| Frontend | http://localhost:4100 | `FRONTEND_PORT` 4100 | Vite |
+| Frontend | http://localhost:4100 | `FRONTEND_PORT` 4100 | Vite. 루트(`/`) 접근 시 `/dashboard` 로 리다이렉트 |
 | PostgreSQL | localhost:5432 | `POSTGRES_PORT` | dev+ |
 | Redis | localhost:6379 | `REDIS_PORT` | |
 | Ollama | localhost:11434 | `OLLAMA_PORT` | 로컬 LLM 폴백 |
@@ -170,6 +171,15 @@ curl -X POST http://localhost:8100/api/marketplace/install/cve-scanner \
 # 해제
 curl -X DELETE http://localhost:8100/api/marketplace/install/cve-scanner -H "Authorization: Bearer $TOKEN"
 
+# ── Marketplace 원격 레지스트리 (F-MP E1.5) — MARKETPLACE_REMOTE_ENABLED=true 필요 ──
+curl http://localhost:8100/api/marketplace-remote/ping -H "Authorization: Bearer $TOKEN"
+curl http://localhost:8100/api/marketplace-remote/catalog -H "Authorization: Bearer $TOKEN"   # 캐시(sync_interval TTL)
+# 원격 자산 다운로드→SHA256 검증→(유효 addon ZIP 이면)실 무중단 hot-deploy→로컬 카탈로그 편입
+curl -X POST http://localhost:8100/api/marketplace-remote/install/remote-scanner \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"hot_deploy":true}'
+# → {"registered":true,"deployed":true,"checksum":"<sha256>","asset":{...,"source":"remote"}}
+#   deployed=true → /api/addon/{key}/... 가 재시작 없이 즉시 라이브(§7.6, upload 파이프라인 in-proc 재사용)
+
 # ── Workflow (F-WF) — DAG 생성·실행·HITL ──
 # 워크플로우 생성 (trigger→transform→notify)
 curl -X POST http://localhost:8100/api/workflows -H "Authorization: Bearer $TOKEN" \
@@ -204,10 +214,17 @@ curl -X POST http://localhost:8100/api/playground/run -H "Authorization: Bearer 
 # ── Guardrails (F-GRD) — global PII 13종 판정 (Playground 연계) ──
 curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' -d '{"text":"email me at secret@corp.com","domain":"global"}'
-# → {"decision":"redact","riskScore":0.2,"matchedRules":["pii.email"],"redactedText":"email me at ****.com",...}
-# 에이전트별 도메인 토글 (admin/supervisor)
-curl -X PUT http://localhost:8100/api/guardrails/agents/chat/config -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' -d '{"domain_key":"global","enabled":true}'
+# → {"decision":"redact",...}  저위험 PII(이메일/전화/IP) = 마스킹
+# 승격(impl/11): 고위험 1종(시크릿/신용정보/국가식별번호) → block, 2종+ → escalate
+curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"text":"key sk-abcdefghijklmnopqrstuvwx","domain":"global"}'
+# → {"decision":"block","riskScore":0.7,"matchedRules":["secret.api_key"],...}
+#   에이전트 토글 ON 상태에서 Orchestrator 가 해당 에이전트 호출 시, block/escalate 입력은 게이트가 HTTP 403 [BLOCKED] 로 차단
+# 에이전트별 도메인 토글 (admin/supervisor) — 아래는 Orchestrator 게이트가 실제로 강제하는 설정
+curl -X PUT http://localhost:8100/api/guardrails/agents/marketplace/config -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"domain_key":"global","enabled":true,"io_scope":"both"}'
+# 이후 Orchestrator 가 call_api 로 marketplace 를 호출하면(예: 자산 등록 description 에 PII 포함)
+# guardrails_gate.py 가 orchestrator._exec_api_call 을 가로채 자동으로 마스킹 후 전달 + guardrails_decision_log 기록.
 ```
 
 ---
@@ -221,10 +238,20 @@ python test/impl/2/test_workflow.py         # F-WF  (fresh sqlite, 21 assert)
 python test/impl/4/test_rag.py              # F-RAG (fresh sqlite, 15 assert)
 python test/impl/5/test_playground.py       # F-PG  (fresh sqlite, 13 assert)
 python test/impl/6/test_guardrails.py       # F-GRD (fresh sqlite, 20 assert — 13종 판정기 전수 검증)
+python test/impl/7/test_guardrails_gate.py  # F-GRD Orchestrator 게이트 (fresh sqlite, 15 assert)
+python test/impl/9/test_marketplace_remote.py  # F-MP 원격 레지스트리 (fresh sqlite, 14 assert)
+python test/impl/10/test_remote_hotdeploy.py   # F-MP 실 ZIP hot-deploy §7.6 (fresh sqlite, 8 assert)
+python test/impl/11/test_guardrails_escalation.py  # F-GRD block/escalate 승격 (fresh sqlite, 14 assert)
+python test/impl/13/test_guardrails_mcp.py     # F-GRD MCP Server 프록시 (6 assert)
+python test/impl/14/test_local_zip_deploy.py   # F-MP 로컬 실 ZIP 배포 (10 assert)
+python test/impl/15/test_pgvector_adapter.py   # F-RAG pgvector 어댑터 (6 assert)
+python test/impl/16/test_gpg_mtls.py           # F-MP GPG 서명+mTLS (10 assert, gpg 바이너리 필요)
+python test/impl/17/test_dashboard_summary.py  # 대시보드 실시간 위젯 (10 assert)
+python test/impl/19/test_playground_tokens.py  # F-PG 토큰 사용량 추적 (6 assert)
 make lint                                   # ruff
 cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # 프론트 타입체크+빌드
 ```
-차수별 시나리오·결과: `test/impl/<Nth>/{scenario,result}.md`. impl/3(F-WF Designer+F-MP 프론트)은 정적 검증(tsc/build)만.
+차수별 시나리오·결과: `test/impl/<Nth>/{scenario,result}.md`. impl/3(F-WF Designer+F-MP 프론트)·impl/8(대시보드)·impl/12(nav '사용자' 하단 재배치)는 백엔드 변경 없어 정적 검증(tsc/build)만.
 
 ---
 
@@ -243,10 +270,15 @@ cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # 프론트 타입�
 
 ## 10. 다음 단계 (PRD 잔여)
 
-- **Orchestrator 게이트 배선**: `guardrails_gate.py` — F-GRD 를 Orchestrator 호출 경로에 연결(§7.8.4).
-- **F-MP**: 원격 레지스트리(§7.3, E1.5), 실 addon ZIP 파이프라인 연결(§7.6).
-- **F-WF**: React Flow 캔버스(현재 a11y 폼 편집기), loop/sub-flow/cron, llm 노드 Claude 통합.
-- **F-RAG**: pgvector/Qdrant 전환(§7.5), eval(Recall@10/NDCG@10) 벤치마크.
-- **F-PG**: 비용(cost) 추적(Claude 연동 시), eval 실행.
-- **F-GRD**: MCP Server 프록시 연동, 25종 업종 판정기(SeCMP 책임 밖, wise-Guardrails 별도 로드맵).
-- **대시보드**: `/api/agents` 카탈로그+헬스 요약 화면(현재 nav 만 존재).
+§9.5 잔여 6항목(F-WF 캔버스·F-RAG pgvector·F-GRD MCP·로컬 실ZIP·대시보드 위젯·GPG/mTLS)은 **impl/13~18 로 전부 완료**.
+남은 것은 외부 인프라 실측·로드맵:
+
+- **실 인프라 실측**: pgvector 벤치마크(Recall@10≥0.89·p95≤250ms, PostgreSQL+확장), mTLS 핸드셰이크(사설 CA), 실 wise-Guardrails MCP 통합(코드·폴백 완료).
+- **임베딩 모델 교체**: 로컬 해싱 → sentence-transformers/OpenAI(embedding_version 고정).
+- **편집형 워크플로우 캔버스**: 현재 읽기전용 시각화(폼 편집 1차). 드래그 편집 도입 시 KWCAG 대체편집기 병행.
+- **멀티테넌시 namespace/physical, Qdrant, Dify DSL Import** — 로드맵(P5).
+- **F-PG cost 추적**(Claude 연동 시), eval 실행.
+- **운영 문서**: GPG 키 로테이션·mTLS 인증서 발급 절차.
+
+> ~~Orchestrator 게이트 배선~~ — **완료(impl/7)**. `app/agents/guardrails_gate.py` 참조.
+> ~~대시보드 화면~~ — **완료(impl/8)**. `front/src/pages/dashboard/DashboardPage.tsx`, 루트 랜딩 페이지.

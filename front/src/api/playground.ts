@@ -17,6 +17,8 @@ export interface PlaygroundRun {
   response_text: string;
   provider: "ollama" | "degraded" | "";
   latency_ms: number;
+  input_tokens: number;
+  output_tokens: number;
   citations_json: string;
   created_by: string;
   created_at: string;

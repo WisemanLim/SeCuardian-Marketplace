@@ -536,7 +536,7 @@ _CLASSIFY_SYSTEM = (
 )
 
 _PLATFORM_BASE_SYSTEM = """\
-당신은 SeCuardian Platform의 AI 어시스턴트입니다.
+당신은 SeCuardian Marketplace의 AI 어시스턴트입니다.
 
 ## 역할 및 책임
 - 현재 플랫폼에서 활성화된 에이전트와 기능을 기반으로만 답변합니다.
@@ -556,7 +556,7 @@ _PLATFORM_BASE_SYSTEM = """\
 
 ---
 
-You are the AI assistant of the SeCuardian Platform.
+You are the AI assistant of the SeCuardian Marketplace.
 
 ## Role & Responsibilities
 - Answer ONLY based on features and agents that are currently active on this platform.

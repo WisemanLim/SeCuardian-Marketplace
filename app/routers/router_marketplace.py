@@ -8,7 +8,9 @@ addon(ZIP) 자산의 실제 무중단 마운트는 기존 router_addon_agent upl
 참조: SeCuardian-Marketplace-v0 router/service/model 을 raw-SQL 아키텍처로 이식.
 설치/해제·등록은 admin 이상(require_role). tenant 는 JWT 미포함이라 TENANT_DEFAULT_ID 사용.
 """
-from fastapi import APIRouter, Depends, HTTPException
+import hashlib
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
 from app.core.config import settings
@@ -187,10 +189,70 @@ async def install(
         )
         raise HTTPException(500, f"install failed (rolled back): {exc}") from exc
 
+    # 4) 실 ZIP hot-deploy(§7.6) — 업로드된 ZIP 블롭이 있으면 addon upload 파이프라인 in-proc 재사용.
+    #    없으면(대부분의 메타-only 자산) config upsert seam 까지만(무중단).
+    deployed = False
+    blob_row = await fetch_one(
+        f"SELECT blob FROM marketplace_asset_blobs WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
+        (asset["asset_key"], asset["version"], tid),
+    )
+    if blob_row and blob_row.get("blob"):
+        from app.services.addon_deploy import deploy_zip
+        try:
+            res = await deploy_zip(bytes(blob_row["blob"]), asset["asset_key"], user)
+            deployed = res.get("status_code") in (200, 201)
+        except Exception:  # noqa: BLE001 — 배포 실패가 설치 기록을 무효화하지 않음(무중단)
+            deployed = False
+
     return {
         "id": iid, "asset_key": asset["asset_key"], "version": asset["version"],
-        "status": "installed", "active": True, "agent_config_key": cfg_key,
+        "status": "installed", "active": True, "agent_config_key": cfg_key, "deployed": deployed,
     }
+
+
+@router.post("/catalog/{asset_key}/zip", status_code=201)
+async def upload_asset_zip(
+    asset_key: str,
+    version: str | None = None,
+    file: UploadFile = File(...),
+    user: dict = Depends(require_role("admin", "supervisor")),
+):
+    """등록된 로컬 자산에 addon ZIP 을 첨부(저장) — 이후 install 시 실 hot-deploy 됨(§7.6)."""
+    if not file.filename or not file.filename.endswith(".zip"):
+        raise HTTPException(400, "ZIP 파일만 허용됩니다")
+    tid = _tenant()
+    if version:
+        asset = await fetch_one(
+            f"SELECT asset_key, version FROM marketplace_assets WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
+            (asset_key, version, tid),
+        )
+    else:
+        asset = await fetch_one(
+            f"SELECT asset_key, version FROM marketplace_assets WHERE asset_key = {_PH} AND tenant_id = {_PH} "
+            f"ORDER BY version DESC LIMIT 1",
+            (asset_key, tid),
+        )
+    if not asset:
+        raise HTTPException(404, f"asset {asset_key} not found")
+    raw = await file.read()
+    checksum = hashlib.sha256(raw).hexdigest()
+    await execute_write(
+        f"DELETE FROM marketplace_asset_blobs WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
+        (asset["asset_key"], asset["version"], tid),
+    )
+    await execute_insert(
+        f"INSERT INTO marketplace_asset_blobs (tenant_id, asset_key, version, filename, checksum, blob, uploaded_by) "
+        f"VALUES ({_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH})",
+        (tid, asset["asset_key"], asset["version"], file.filename, checksum, raw,
+         user.get("username") or user.get("sub") or ""),
+    )
+    # 자산 메타의 checksum 동기화
+    await execute_write(
+        f"UPDATE marketplace_assets SET checksum = {_PH}, updated_at = CURRENT_TIMESTAMP "
+        f"WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
+        (checksum, asset["asset_key"], asset["version"], tid),
+    )
+    return {"asset_key": asset["asset_key"], "version": asset["version"], "checksum": checksum, "size": len(raw)}
 
 
 @router.delete("/install/{asset_key}")

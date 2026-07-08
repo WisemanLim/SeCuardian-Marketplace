@@ -29,18 +29,24 @@ def chunk_text(text: str, size: int = 400, overlap: int = 40) -> list[str]:
 
 
 async def index_document(tenant_id: str, collection_id: int, embedding_dim: int, document_id: int, text: str) -> int:
-    """문서를 청킹·임베딩·인덱싱. 생성된 청크 수 반환."""
+    """문서를 청킹·임베딩·인덱싱. 생성된 청크 수 반환.
+
+    pgvector 백엔드 활성 시(§7.5) vector 컬럼에도 임베딩을 기록(로컬은 embedding_json 만).
+    """
+    from app.services import vector_backend
+    await vector_backend.ensure_pg_schema(embedding_dim)
     pieces = chunk_text(text)
     for ordinal, piece in enumerate(pieces):
         vec = embed(piece, embedding_dim)
         tf = term_freq(piece)
-        await execute_insert(
+        cid = await execute_insert(
             f"INSERT INTO rag_chunks "
             f"(tenant_id, collection_id, document_id, ordinal, text, embedding_json, terms_json, token_count, norm) "
             f"VALUES ({','.join([_PH] * 9)})",
             (tenant_id, collection_id, document_id, ordinal, piece,
              json.dumps(vec), json.dumps(tf, ensure_ascii=False), sum(tf.values()), 1.0),
         )
+        await vector_backend.write_embedding(cid, vec)
     return len(pieces)
 
 
@@ -95,10 +101,13 @@ async def hybrid_search(collection_id: int, embedding_dim: int, query: str, top_
         return []
     by_id = {c["id"]: c for c in chunks}
 
-    # dense
+    # dense — pgvector 백엔드 활성 시 SQL ANN, 아니면 파이썬 코사인 폴백(§7.5)
+    from app.services import vector_backend
     q_vec = embed(query, embedding_dim)
-    dense = {c["id"]: cosine(q_vec, json.loads(c.get("embedding_json") or "[]")) for c in chunks}
-    dense = {cid: s for cid, s in dense.items() if s > 0}
+    dense = await vector_backend.dense_scores(collection_id, q_vec, top_k)
+    if dense is None:
+        dense = {c["id"]: cosine(q_vec, json.loads(c.get("embedding_json") or "[]")) for c in chunks}
+        dense = {cid: s for cid, s in dense.items() if s > 0}
 
     # sparse
     bm25 = _bm25_scores(query, chunks)

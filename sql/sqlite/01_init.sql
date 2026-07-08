@@ -201,6 +201,20 @@ CREATE TABLE IF NOT EXISTS marketplace_installs (
 CREATE INDEX IF NOT EXISTS idx_mp_assets_key ON marketplace_assets(tenant_id, asset_key);
 CREATE INDEX IF NOT EXISTS idx_mp_installs_key ON marketplace_installs(tenant_id, asset_key, active);
 
+-- ── Marketplace 로컬 자산 ZIP 저장소 (F-MP §7.6) — 로컬 install 실 hot-deploy 용 ──
+CREATE TABLE IF NOT EXISTS marketplace_asset_blobs (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    tenant_id     VARCHAR(64)  NOT NULL DEFAULT 'default',
+    asset_key     VARCHAR(64)  NOT NULL,
+    version       VARCHAR(32)  NOT NULL DEFAULT '0.1.0',
+    filename      VARCHAR(256) DEFAULT '',
+    checksum      VARCHAR(128) DEFAULT '',
+    blob          BLOB         NOT NULL,
+    uploaded_by   VARCHAR(128) DEFAULT '',
+    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(tenant_id, asset_key, version)
+);
+
 -- ── Workflow (F-WF) — DAG 정의 + 실행 + 노드 실행 기록 (tenant_id 선반영 §7.4) ──
 CREATE TABLE IF NOT EXISTS workflows (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -302,6 +316,8 @@ CREATE TABLE IF NOT EXISTS playground_runs (
     response_text     TEXT         DEFAULT '',
     provider          VARCHAR(16)  DEFAULT '',   -- ollama | degraded
     latency_ms        INTEGER      NOT NULL DEFAULT 0,
+    input_tokens      INTEGER      NOT NULL DEFAULT 0,
+    output_tokens     INTEGER      NOT NULL DEFAULT 0,
     citations_json    TEXT         DEFAULT '[]',
     created_by        VARCHAR(128) DEFAULT '',
     created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP

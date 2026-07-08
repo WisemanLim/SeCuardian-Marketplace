@@ -5,6 +5,7 @@ import {
   approveHitl, cancelRun,
 } from "../../api/workflow";
 import { useLocale } from "../../hooks/useLocale";
+import WorkflowCanvas from "./WorkflowCanvas";
 
 const RUN_STATUS_COLOR: Record<string, string> = {
   pending: "text-gray-500", running: "text-blue-500", waiting_hitl: "text-amber-500",
@@ -297,6 +298,12 @@ export default function WorkflowPage() {
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
           </label>
           <DefinitionEditor nodes={nodes} edges={edges} onChange={(n, e) => { setNodes(n); setEdges(e); }} />
+          {nodes.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs font-semibold text-gray-500 mb-1">DAG 미리보기 (React Flow)</p>
+              <WorkflowCanvas nodes={nodes} edges={edges} />
+            </div>
+          )}
           {error && <p role="alert" className="text-xs text-red-500 mt-2">{error}</p>}
           <button disabled={busy} onClick={handleCreate}
             className="mt-3 text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
