@@ -1,0 +1,7 @@
+Scenario,Component,Role,Notes
+Dify + n8n,Dify,AI app/workflow/chatflow/API backend,"Visual workflows, API publishing, tools/OpenAPI integration"
+Dify + n8n,n8n,System orchestration and enterprise integration,"400+ integrations, self-hosted AI starter kit, approval/retry/batch/event automation"
+Dify + n8n,Vector DB,Qdrant or pgvector typically paired,Knowledge retrieval for RAG
+Langflow + Qdrant,Langflow,Python-based AI app and workflow builder,"Open-source, customizable, vector store agnostic"
+Langflow + Qdrant,Qdrant,High-performance vector store,Reads/writes through Langflow Qdrant bundle
+On-prem pgvector,pgvector,PostgreSQL-based vector extension,Best when DB standardization and low ops matter

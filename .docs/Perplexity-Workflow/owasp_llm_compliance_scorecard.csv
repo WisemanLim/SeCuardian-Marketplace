@@ -1,0 +1,11 @@
+Stack Component,Observed Asset,Control Area,OWASP Risk,Current Score (1-5),Priority Action
+POST /chat/completions,system+user prompts,"prompt injection rules, jailbreak tests",LLM01 Prompt Injection,3,"Add input classifier, retrieval isolation, and tool allow-list"
+POST /rag/search,query + filters,"query validation, keyword abuse detection",LLM06 Sensitive Information Disclosure,4,Add ABAC on collections and redact sensitive fields
+POST /actions/run,tool arguments,"schema validation, approval gate, side-effect policy",LLM08 Excessive Agency,2,Require HITL for write/delete/external send actions
+POST /render,model output html/json,"output escaping, schema validation",LLM02 Insecure Output Handling,3,Sanitize HTML/JSON and block direct execution paths
+POST /ingest/documents,source docs + metadata,"source provenance, malware scan, poison review",LLM03 Training Data Poisoning,3,Add source trust score and ingestion quarantine workflow
+POST /model/infer,token-heavy prompts,"rate limit, max tokens, queue",LLM04 Model DoS,4,Per-tenant token quotas and cache repeat prompts
+CI/CD model plugin deploy,dependencies,"SBOM, image scan, version pinning",LLM05 Supply Chain Vulnerabilities,2,Pin versions and sign images/artifacts
+GET /audit/export,logs and traces,"least privilege, secret redaction",LLM10 Model Theft,3,Restrict export and mask model/API identifiers
+User answer review screen,citations + confidence,human review and exception routing,LLM09 Overreliance,2,Force review for high-impact business decisions
+Plugin connector config,API credentials,secret manager and scoped permissions,LLM07 Insecure Plugin Design,3,Replace static secrets with vault-issued scoped credentials

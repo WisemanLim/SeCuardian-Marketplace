@@ -1,0 +1,10 @@
+Domain Type,Sample Query,Retrieval Mode,Estimated Recall@10,Estimated Latency ms,Comment
+약어/코드 중심,EHR ICD-10 I10 환자 고혈압 코드,pure vector,0.62,180,의미 검색은 되지만 exact code 회수 약함
+약어/코드 중심,EHR ICD-10 I10 환자 고혈압 코드,bm25,0.81,70,약어와 코드 매칭 강함
+약어/코드 중심,EHR ICD-10 I10 환자 고혈압 코드,rrf,0.89,195,정확한 코드와 의미 검색 결합
+정책/규정 중심,내부 망분리 예외 승인 기준,pure vector,0.78,160,문맥 검색은 양호
+정책/규정 중심,내부 망분리 예외 승인 기준,bm25,0.74,60,정확한 문구 매칭은 좋지만 paraphrase 취약
+정책/규정 중심,내부 망분리 예외 승인 기준,rrf,0.91,175,정책명과 의미 검색 모두 반영
+제품/SKU 중심,ABC-2047 부품 교체 주기,pure vector,0.55,150,SKU exact match 취약
+제품/SKU 중심,ABC-2047 부품 교체 주기,bm25,0.88,55,SKU exact match 강함
+제품/SKU 중심,ABC-2047 부품 교체 주기,rrf,0.93,168,제품코드+설명 결합 성능 우수

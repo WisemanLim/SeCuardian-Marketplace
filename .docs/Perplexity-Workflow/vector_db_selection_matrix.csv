@@ -1,0 +1,6 @@
+RAG scale,Ops maturity,Budget tolerance,On-prem need,Search pattern,Best match
+<1M,low,low,preferred,basic,pgvector / Chroma
+1M-20M,medium,medium,preferred,good filtering,Qdrant
+1M-20M,medium,high,optional,strong hybrid,Weaviate
+20M+,high,high,preferred,distributed scale,Milvus
+1M-20M,low,low,not required,managed simplicity,Pinecone

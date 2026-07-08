@@ -1,0 +1,10 @@
+profile,vectors_m,latency_budget_ms,hosting,db,score,why
+Small internal RAG,0.5,500,on-prem,pgvector,4.45,"Reuse PostgreSQL, low ops overhead, strong on-prem fit"
+Small internal RAG,0.5,500,on-prem,Qdrant,4.35,Better retrieval/filtering but more infra than pgvector
+Small internal RAG,0.5,500,managed,Pinecone,3.45,Simple ops but weak fit for on-prem requirement
+Mid-scale enterprise RAG,5.0,250,on-prem,Qdrant,4.65,Best balance for self-hosted performance and metadata filtering
+Mid-scale enterprise RAG,5.0,250,on-prem,pgvector,3.95,Good if PostgreSQL standardization is more important than peak retrieval speed
+Mid-scale enterprise RAG,5.0,250,managed,Pinecone,4.1,Good managed option when data residency allows
+High-scale external RAG,50.0,150,managed,Pinecone,4.55,Managed scaling and operational simplicity for external service
+High-scale external RAG,50.0,150,on-prem,Qdrant,4.2,"Strong self-hosted option, but infra effort rises at scale"
+High-scale external RAG,50.0,150,on-prem,pgvector,3.1,Possible but usually not the best fit at this scale

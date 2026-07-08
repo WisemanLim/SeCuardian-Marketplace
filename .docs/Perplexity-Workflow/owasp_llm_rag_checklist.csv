@@ -1,0 +1,11 @@
+OWASP LLM Risk,Automation / Governance Control
+LLM01 Prompt Injection,"Validate prompts, isolate tools, use allow-lists, add HITL for risky actions"
+LLM02 Insecure Output Handling,"Treat model output as untrusted, sanitize before execution or rendering"
+LLM03 Training Data Poisoning,"Control ingestion sources, review corpus provenance, protect update pipelines"
+LLM04 Model DoS,"Apply rate limits, token budgets, queueing, and caching"
+LLM05 Supply Chain Vulnerabilities,Pin model/runtime/dependency versions and scan images/packages
+LLM06 Sensitive Information Disclosure,"Mask secrets, segment stores, restrict retrieval scope, log redaction"
+LLM07 Insecure Plugin Design,"Least privilege for tools, approval gates, auditable actions"
+LLM08 Excessive Agency,"Constrain autonomous actions, require approvals for external side effects"
+LLM09 Overreliance,"Expose confidence and citations, keep human review for critical decisions"
+LLM10 Model Theft,"Protect weights, APIs, credentials, and usage telemetry"

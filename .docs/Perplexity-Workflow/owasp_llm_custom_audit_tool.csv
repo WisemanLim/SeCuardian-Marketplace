@@ -1,0 +1,9 @@
+Asset,Observed Surface,OWASP Risk,Required Controls,Priority
+POST /chat-messages (Dify),system/user prompt,LLM01 Prompt Injection,"Input validation, retrieval isolation, tool allow-list, output policy",중
+POST /workflows/run (Dify),workflow input/output,LLM02 Insecure Output Handling,"Schema validation, typed outputs, output escaping",중
+OpenAPI tool call (Dify),tool arguments,LLM07 Insecure Plugin Design,"Least privilege, secret manager, scoped credentials",상
+n8n HTTP/Webhook trigger,external payload,LLM06 Sensitive Information Disclosure,"ABAC, field masking, audit logging",상
+n8n action node,write/delete/send side effects,LLM08 Excessive Agency,"Approval gate, HITL, policy engine",상
+Langflow prompt chain,prompt template + user query,LLM01 Prompt Injection,"Prompt hardening, context boundaries, safety classifier",중
+Langflow Qdrant retrieval,query + metadata filter,LLM06 Sensitive Information Disclosure,"Tenant filter, namespace separation, secret redaction",상
+pgvector SQL retrieval,SQL + embeddings,LLM02/06,"Prepared statements, row-level security, masked logs",상

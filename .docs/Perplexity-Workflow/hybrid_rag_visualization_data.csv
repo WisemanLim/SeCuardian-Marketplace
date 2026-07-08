@@ -1,0 +1,7 @@
+Mode,Test Query Type,Estimated Recall@10,Estimated Latency ms,Interpretation
+pure vector,도메인 용어/약어 질의 회수,0.62,160,정확 코드/약어 취약
+bm25,도메인 용어/약어 질의 회수,0.84,70,exact term 매칭 강점
+rrf hybrid,도메인 용어/약어 질의 회수,0.91,185,의미+용어 결합으로 최고 recall
+pure vector,정책 문장 paraphrase 검색,0.8,150,문맥 검색 강점
+bm25,정책 문장 paraphrase 검색,0.68,60,표현이 바뀌면 약화
+rrf hybrid,정책 문장 paraphrase 검색,0.89,175,정확문구+문맥 동시 반영

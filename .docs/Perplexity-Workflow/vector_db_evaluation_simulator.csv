@@ -1,0 +1,25 @@
+scenario,db,roi_fit_score,fit_scale,notes
+Customer-facing AI service / managed,Qdrant,4.35,medium-large,Strong self-hosted RAG and filtering
+Customer-facing AI service / managed,pgvector,4.0,small-medium,Best when PostgreSQL reuse matters
+Customer-facing AI service / managed,Pinecone,3.85,medium-large,Managed service for fast production rollout
+Customer-facing AI service / managed,Chroma,3.8,small,Best for local PoC and simple pipelines
+Customer-facing AI service / managed,Weaviate,3.75,medium-large,Strong hybrid search and ecosystem
+Customer-facing AI service / managed,Milvus,3.4,large,Best for large-scale distributed search
+Internal enterprise RAG / 1M-20M / on-prem,Qdrant,4.55,medium-large,Strong self-hosted RAG and filtering
+Internal enterprise RAG / 1M-20M / on-prem,pgvector,4.3,small-medium,Best when PostgreSQL reuse matters
+Internal enterprise RAG / 1M-20M / on-prem,Chroma,4.05,small,Best for local PoC and simple pipelines
+Internal enterprise RAG / 1M-20M / on-prem,Milvus,3.95,large,Best for large-scale distributed search
+Internal enterprise RAG / 1M-20M / on-prem,Weaviate,3.85,medium-large,Strong hybrid search and ecosystem
+Internal enterprise RAG / 1M-20M / on-prem,Pinecone,2.95,medium-large,Managed service for fast production rollout
+Large-scale RAG / 20M+ vectors,Qdrant,4.5,medium-large,Strong self-hosted RAG and filtering
+Large-scale RAG / 20M+ vectors,pgvector,4.1,small-medium,Best when PostgreSQL reuse matters
+Large-scale RAG / 20M+ vectors,Weaviate,4.0,medium-large,Strong hybrid search and ecosystem
+Large-scale RAG / 20M+ vectors,Milvus,3.9,large,Best for large-scale distributed search
+Large-scale RAG / 20M+ vectors,Chroma,3.65,small,Best for local PoC and simple pipelines
+Large-scale RAG / 20M+ vectors,Pinecone,3.2,medium-large,Managed service for fast production rollout
+PoC / <1M vectors / small team,pgvector,4.3,small-medium,Best when PostgreSQL reuse matters
+PoC / <1M vectors / small team,Chroma,4.3,small,Best for local PoC and simple pipelines
+PoC / <1M vectors / small team,Qdrant,4.3,medium-large,Strong self-hosted RAG and filtering
+PoC / <1M vectors / small team,Weaviate,3.5,medium-large,Strong hybrid search and ecosystem
+PoC / <1M vectors / small team,Pinecone,3.4,medium-large,Managed service for fast production rollout
+PoC / <1M vectors / small team,Milvus,3.3,large,Best for large-scale distributed search
