@@ -1,0 +1,38 @@
+{
+  "name": "보안 알림 케이스 템플릿",
+  "titlePrefix": "[SEC]",
+  "severity": 2,
+  "tags": ["security", "auto-generated"],
+  "tasks": [
+    {
+      "title": "초기 분류 (Triage)",
+      "description": "알림 유형, 영향 범위, 우선순위 결정",
+      "order": 0
+    },
+    {
+      "title": "증거 수집",
+      "description": "관련 로그, 네트워크 플로우, 프로세스 정보 수집",
+      "order": 1
+    },
+    {
+      "title": "영향 평가",
+      "description": "침해 범위, 데이터 노출 여부, 측면 이동 가능성 평가",
+      "order": 2
+    },
+    {
+      "title": "격리 및 봉쇄",
+      "description": "영향 받은 시스템 격리 (Cilium NetworkPolicy 적용)",
+      "order": 3
+    },
+    {
+      "title": "근원 분석 (RCA)",
+      "description": "공격 경로, 초기 침투 벡터, TTP 분석",
+      "order": 4
+    },
+    {
+      "title": "복구 및 보고",
+      "description": "시스템 복구, ISMS-P 컴플라이언스 보고서 생성",
+      "order": 5
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+# DB Zone CiliumNetworkPolicy — E09 T09-2
+# Internal Zone에서만 DB 포트 접근 허용, 아웃바운드 최소화
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: db-isolation
+  namespace: db
+spec:
+  endpointSelector:
+    matchLabels:
+      zone: db
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            zone: internal
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+            - port: "6379"
+              protocol: TCP
+            - port: "27017"
+              protocol: TCP
+  egress:
+    # DB는 아웃바운드 최소화 — DNS만 허용
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"

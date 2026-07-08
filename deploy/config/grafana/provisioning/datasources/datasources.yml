@@ -1,0 +1,33 @@
+# Grafana 데이터소스 자동 프로비저닝 — E06 T06-2
+# License: AGPL-3.0 (Grafana)
+
+apiVersion: 1
+
+datasources:
+  # ── Prometheus (메트릭) ────────────────────────────────────────────────
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 30s
+      httpMethod: POST
+
+  # ── Loki (로그) ────────────────────────────────────────────────────────
+  - name: Loki
+    type: loki
+    uid: loki
+    access: proxy
+    url: http://loki:3100
+    isDefault: false
+    editable: false
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - name: TraceID
+          matcherRegex: '"trace_id":"(\w+)"'
+          url: '$${__value.raw}'
+          datasourceUid: ''

@@ -1,0 +1,159 @@
+# Source: HashiCorp Vault | License: BUSL-1.1 | Usage: internal only
+# E02 T02-1 — Vault Prod Mode (Raft 통합 스토리지 3-node)
+# 기동: docker compose -f deploy/docker/docker-compose.vault.prod.yml --env-file deploy/docker/.env.vault up -d
+# 초기화: bash deploy/scripts/vault_init.sh --prod
+
+services:
+  vault-1:
+    image: hashicorp/vault:1.17.6
+    container_name: secuardian-vault-1
+    restart: unless-stopped
+    ports:
+      - "${VAULT_PORT:-8201}:8200"
+    environment:
+      VAULT_LOG_LEVEL: "${VAULT_LOG_LEVEL:-info}"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault1-data:/vault/data
+    command: >
+      server
+      -config=/vault/config/vault.hcl
+    configs:
+      - source: vault_hcl_1
+        target: /vault/config/vault.hcl
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - vault-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  vault-2:
+    image: hashicorp/vault:1.17.6
+    container_name: secuardian-vault-2
+    restart: unless-stopped
+    environment:
+      VAULT_LOG_LEVEL: "${VAULT_LOG_LEVEL:-info}"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault2-data:/vault/data
+    command: >
+      server
+      -config=/vault/config/vault.hcl
+    configs:
+      - source: vault_hcl_2
+        target: /vault/config/vault.hcl
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - vault-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  vault-3:
+    image: hashicorp/vault:1.17.6
+    container_name: secuardian-vault-3
+    restart: unless-stopped
+    environment:
+      VAULT_LOG_LEVEL: "${VAULT_LOG_LEVEL:-info}"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault3-data:/vault/data
+    command: >
+      server
+      -config=/vault/config/vault.hcl
+    configs:
+      - source: vault_hcl_3
+        target: /vault/config/vault.hcl
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - vault-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+configs:
+  vault_hcl_1:
+    content: |
+      ui = true
+      storage "raft" {
+        path    = "/vault/data"
+        node_id = "vault-1"
+        retry_join { leader_api_addr = "http://vault-2:8200" }
+        retry_join { leader_api_addr = "http://vault-3:8200" }
+      }
+      listener "tcp" {
+        address     = "0.0.0.0:8200"
+        tls_disable = true
+      }
+      api_addr     = "http://vault-1:8200"
+      cluster_addr = "http://vault-1:8201"
+
+  vault_hcl_2:
+    content: |
+      ui = true
+      storage "raft" {
+        path    = "/vault/data"
+        node_id = "vault-2"
+        retry_join { leader_api_addr = "http://vault-1:8200" }
+        retry_join { leader_api_addr = "http://vault-3:8200" }
+      }
+      listener "tcp" {
+        address     = "0.0.0.0:8200"
+        tls_disable = true
+      }
+      api_addr     = "http://vault-2:8200"
+      cluster_addr = "http://vault-2:8201"
+
+  vault_hcl_3:
+    content: |
+      ui = true
+      storage "raft" {
+        path    = "/vault/data"
+        node_id = "vault-3"
+        retry_join { leader_api_addr = "http://vault-1:8200" }
+        retry_join { leader_api_addr = "http://vault-2:8200" }
+      }
+      listener "tcp" {
+        address     = "0.0.0.0:8200"
+        tls_disable = true
+      }
+      api_addr     = "http://vault-3:8200"
+      cluster_addr = "http://vault-3:8201"
+
+networks:
+  vault-net:
+    driver: bridge
+    name: secuardian-vault-net
+
+volumes:
+  vault1-data:
+    name: secuardian-vault1-data
+  vault2-data:
+    name: secuardian-vault2-data
+  vault3-data:
+    name: secuardian-vault3-data

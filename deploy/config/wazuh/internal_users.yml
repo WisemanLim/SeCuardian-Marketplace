@@ -1,0 +1,48 @@
+# Wazuh Indexer 내부 사용자 설정 — E06 T06-1
+# 🔴 패스워드는 bcrypt 해시 — 평문 커밋 금지
+# 해시 생성: docker run --rm wazuh/wazuh-indexer:4.9.2 bash -c "plugins/opensearch-security/tools/hash.sh -p 'YOUR_PASSWORD'"
+# TODO: 운영환경에서 Vault에서 패스워드 주입
+
+---
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+admin:
+  hash: "$2y$12$/gw3SBVBgwXduvzt49c9Q.JYb9o/366kQd3SeyoaDzTWhRNvs9Uwu"  # SecureAdmin123! (실제 대응 해시 — 기존 값은 데모기본 SecretPassword였음)
+  reserved: true
+  backend_roles:
+    - "admin"
+  description: "Wazuh Indexer admin user"
+
+kibanaserver:
+  hash: "$2y$12$NSybxnYWcAC8MGBi6bU6S.GOTYb3iPVK5tKyjCKh1i4wNi.7RiAmS"  # DashBoard@2026!
+  reserved: true
+  description: "OpenSearch Dashboards server user"
+
+kibanaro:
+  hash: "$2y$12$JJSXNfTowz7Uu5ttXfeYpeYE0arACvcwlPBStB1F.MI7f0U9YytrO"
+  reserved: false
+  backend_roles:
+    - "kibanauser"
+    - "readall"
+  description: "OpenSearch Dashboards read-only user"
+
+logstash:
+  hash: "$2y$12$u1ShR4l4uBS3Uv59Pa2y5.1uQuZBrZtmwfqE19jDIN40aJ7AZm3rO"
+  reserved: false
+  backend_roles:
+    - "logstash"
+  description: "Logstash user"
+
+readall:
+  hash: "$2y$12$ae4ycwzwvLtZxwZ82RmiEunBbIPiAmGZduBAjKN0TXdwQFtCwARz2"
+  reserved: false
+  backend_roles:
+    - "readall"
+
+snapshotrestore:
+  hash: "$2y$12$DpwmetHKwgYnorbgdvORCenv4NAK8cPUg8AI6pxpMiUGvM4OHgYKO"
+  reserved: false
+  backend_roles:
+    - "snapshotrestore"

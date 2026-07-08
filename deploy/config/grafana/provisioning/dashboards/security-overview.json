@@ -1,0 +1,318 @@
+{
+  "__inputs": [],
+  "__requires": [
+    {"type": "grafana", "id": "grafana", "name": "Grafana", "version": "11.2.0"},
+    {"type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0"},
+    {"type": "datasource", "id": "loki", "name": "Loki", "version": "1.0.0"},
+    {"type": "panel", "id": "timeseries", "name": "Time series", "version": ""},
+    {"type": "panel", "id": "stat", "name": "Stat", "version": ""},
+    {"type": "panel", "id": "logs", "name": "Logs", "version": ""},
+    {"type": "panel", "id": "grafana-worldmap-panel", "name": "Worldmap Panel", "version": ""}
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {"type": "grafana", "uid": "-- Grafana --"},
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "SeCuardian 6계층 보안 통합 대시보드 — E06 T06-3",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+
+    {
+      "id": 1,
+      "title": "Panel 1: 계층별 보안 이벤트 현황 (L1~L6)",
+      "description": "Loki 로그 기반 — 각 보안 계층 이벤트 발생 빈도",
+      "type": "timeseries",
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 0},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (layer) (count_over_time({layer=\"identity\"} [$__interval]))",
+          "legendFormat": "L1 Identity (Keycloak)",
+          "datasource": {"type": "loki", "uid": "loki"}
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (layer) (count_over_time({layer=\"endpoint\"} [$__interval]))",
+          "legendFormat": "L2 Endpoint (Falco/Harbor)",
+          "datasource": {"type": "loki", "uid": "loki"}
+        },
+        {
+          "refId": "C",
+          "expr": "sum by (layer) (count_over_time({layer=\"network\"} [$__interval]))",
+          "legendFormat": "L3 Network (CrowdSec/Caddy)",
+          "datasource": {"type": "loki", "uid": "loki"}
+        },
+        {
+          "refId": "D",
+          "expr": "sum by (layer) (count_over_time({layer=\"application\"} [$__interval]))",
+          "legendFormat": "L4 Application (SeCuardian)",
+          "datasource": {"type": "loki", "uid": "loki"}
+        },
+        {
+          "refId": "E",
+          "expr": "sum(count_over_time({service=\"wazuh\"} [$__interval]))",
+          "legendFormat": "L5 Detection (Wazuh)",
+          "datasource": {"type": "loki", "uid": "loki"}
+        },
+        {
+          "refId": "F",
+          "expr": "sum(count_over_time({job=\"secuardian\", layer=\"application\"} | json | level=\"ERROR\" [$__interval]))",
+          "legendFormat": "L6 Forensics (이상 응답)",
+          "datasource": {"type": "loki", "uid": "loki"}
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "axisPlacement": "auto",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "never"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum", "max"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      }
+    },
+
+    {
+      "id": 2,
+      "title": "Panel 2: CrowdSec 차단 IP 지리적 분포",
+      "description": "CrowdSec 차단 결정 — 국가별 IP 위협 지도",
+      "type": "grafana-worldmap-panel",
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 9},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (country) (crowdsec_active_decisions{type=\"ban\"})",
+          "legendFormat": "{{country}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "#37872D", "value": null},
+              {"color": "#FA6400", "value": 5},
+              {"color": "#C4162A", "value": 50}
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "mapCenter": "Asia",
+        "mapCenterLatitude": 35,
+        "mapCenterLongitude": 127,
+        "initialZoom": 2,
+        "minCircleSize": 2,
+        "maxCircleSize": 30,
+        "unitSingular": "차단 IP",
+        "unitPlural": "차단 IPs",
+        "showLegend": true,
+        "thresholds": "0,5,50",
+        "colors": ["#37872D", "#FA6400", "#C4162A"],
+        "locationData": "countries",
+        "esMetric": "Count"
+      },
+      "pluginVersion": "1.0.0"
+    },
+
+    {
+      "id": 3,
+      "title": "Panel 3: Falco 런타임 이상 이벤트",
+      "description": "Falco 이상 행위 탐지 로그 — WARNING 이상 실시간 스트림",
+      "type": "logs",
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 9},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{job=\"falco\"} | json | priority=~\"WARNING|ERROR|CRITICAL|ALERT\"",
+          "legendFormat": ""
+        }
+      ],
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      }
+    },
+
+    {
+      "id": 4,
+      "title": "Panel 4: MTTD / MTTR 실시간 추적",
+      "description": "Mean Time to Detect / Respond — Wazuh 알림 기반 SeCuardian API 데이터",
+      "type": "stat",
+      "gridPos": {"h": 6, "w": 12, "x": 0, "y": 19},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.50, rate(secuardian_alert_detection_seconds_bucket[1h]))",
+          "legendFormat": "MTTD p50 (초)"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.50, rate(secuardian_alert_response_seconds_bucket[1h]))",
+          "legendFormat": "MTTR p50 (초)"
+        },
+        {
+          "refId": "C",
+          "expr": "increase(secuardian_alerts_total[24h])",
+          "legendFormat": "24h 알림 수"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 300},
+              {"color": "red", "value": 3600}
+            ]
+          },
+          "unit": "s",
+          "mappings": [
+            {"type": "special", "options": {"match": "null", "result": {"text": "N/A", "color": "text"}}}
+          ]
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "24h 알림 수"},
+            "properties": [
+              {"id": "unit", "value": "short"},
+              {"id": "color", "value": {"mode": "thresholds"}},
+              {"id": "thresholds", "value": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 100}]}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {"calcs": ["lastNotNull"]},
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+
+    {
+      "id": 5,
+      "title": "Panel 5: TruffleHog CI 스캔 결과 트렌드",
+      "description": "GitHub Actions secret-scan 워크플로우 결과 — Loki 로그 기반 시크릿 탐지 이력",
+      "type": "timeseries",
+      "gridPos": {"h": 6, "w": 12, "x": 12, "y": 19},
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({job=\"trufflehog-ci\", result=\"verified\"} [$__interval]))",
+          "legendFormat": "검증된 시크릿 (즉시 차단)"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(count_over_time({job=\"trufflehog-ci\", result=\"unverified\"} [$__interval]))",
+          "legendFormat": "미검증 시크릿 (경고)"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(count_over_time({job=\"trufflehog-ci\", result=\"clean\"} [$__interval]))",
+          "legendFormat": "클린 스캔"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "showPoints": "always",
+            "pointSize": 6
+          },
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "검증된 시크릿 (즉시 차단)"},
+            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "미검증 시크릿 (경고)"},
+            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "orange"}}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "클린 스캔"},
+            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}]
+          }
+        ]
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["sum", "lastNotNull"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      }
+    }
+
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["secuardian", "security", "siem"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Loki 데이터소스",
+        "multi": false,
+        "name": "loki_ds",
+        "options": [],
+        "query": "loki",
+        "refresh": 1,
+        "regex": "",
+        "sort": 0,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "SeCuardian Security Overview",
+  "uid": "secuardian-security-overview",
+  "version": 2,
+  "weekStart": ""
+}

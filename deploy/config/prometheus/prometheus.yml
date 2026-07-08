@@ -1,0 +1,71 @@
+# SeCuardian — Prometheus 스크레이프 설정 (E06 T06-2)
+# License: Apache-2.0
+
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+  scrape_timeout: 10s
+  external_labels:
+    environment: 'secuardian'
+    region: 'local'
+
+# ── 알림 규칙 파일 (추후 추가) ─────────────────────────────────────────────
+rule_files:
+  # - "alert_rules.yml"
+
+# ── 스크레이프 설정 ────────────────────────────────────────────────────────
+scrape_configs:
+
+  # Prometheus 자체 메트릭
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+          layer: 'observability'
+
+  # SeCuardian FastAPI 앱 (호스트 직접 실행)
+  - job_name: 'secuardian-api'
+    static_configs:
+      - targets: ['host.docker.internal:8200']
+        labels:
+          service: 'secuardian'
+          layer: 'application'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+
+  # Grafana 자체 메트릭
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+        labels:
+          service: 'grafana'
+          layer: 'observability'
+
+  # Loki 자체 메트릭
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['loki:3100']
+        labels:
+          service: 'loki'
+          layer: 'observability'
+
+  # CrowdSec LAPI 메트릭 (E04 배포 후 활성화)
+  - job_name: 'crowdsec'
+    static_configs:
+      - targets: ['host.docker.internal:8082']
+        labels:
+          service: 'crowdsec'
+          layer: 'network'
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+
+  # Docker 컨테이너 메트릭 (cAdvisor — 추후 추가 시)
+  # - job_name: 'cadvisor'
+  #   static_configs:
+  #     - targets: ['cadvisor:8080']
+
+  # Node Exporter (호스트 시스템 메트릭 — 추후 추가 시)
+  # - job_name: 'node-exporter'
+  #   static_configs:
+  #     - targets: ['host.docker.internal:9100']

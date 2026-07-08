@@ -1,0 +1,33 @@
+services:
+  behavior-noti:
+    build:
+      context: ../../BehaviorNotiService
+      dockerfile: Dockerfile
+    image: secuardian/behavior-noti:1.0.0
+    container_name: behavior-noti
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8300:8300"
+    volumes:
+      - behavior_db:/var/lib/bns
+      - /var/log:/var/log/host:ro
+      - ../../BehaviorNotiService/config/behavior_noti.yaml:/etc/bns/behavior_noti.yaml:ro
+    environment:
+      - SLACK_WEBHOOK_URL=${BEHAVIOR_SLACK_WEBHOOK_URL:-}
+      - WAZUH_HOST=${WAZUH_HOST:-}
+      - WAZUH_PORT=${WAZUH_PORT:-514}
+    networks:
+      - secuardian-internal
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  behavior_db:
+    driver: local
+
+networks:
+  secuardian-internal:
+    external: true

@@ -1,0 +1,99 @@
+# ISMS-P 통제항목 → 증거 파일 매핑 — E22 T22-1
+# KISA ISMS-P 인증 기준(2023) 기반
+# SeCuardian이 자동 수집하는 증거 소스 정의
+
+version: "2023"
+framework: "ISMS-P"
+issuer: "KISA"
+
+controls:
+  # 2.1 정책의 유지관리
+  - id: "2.1.1"
+    title: "정보보호 정책의 승인 및 공표"
+    evidence_sources:
+      - path: "docs/COMPLIANCE.md"
+        type: document
+    auto_collect: true
+
+  # 2.2 인적 보안
+  - id: "2.5.2"
+    title: "접근통제 — IAM/SSO 적용"
+    evidence_sources:
+      - api: "/api/keycloak/status"
+        type: api_snapshot
+      - api: "/api/teleport/audit"
+        type: api_snapshot
+    auto_collect: true
+
+  # 2.5.3 사용자 인증 (MFA)
+  - id: "2.5.3"
+    title: "사용자 인증 — MFA 적용률"
+    evidence_sources:
+      - api: "/api/keycloak/status"
+        type: api_snapshot
+    auto_collect: true
+
+  # 2.6.2 정보시스템 접근 — 세션 녹화
+  - id: "2.6.2"
+    title: "세션 관리 — 권한계정 세션 녹화"
+    evidence_sources:
+      - api: "/api/teleport/sessions"
+        type: api_snapshot
+    auto_collect: true
+
+  # 2.7.1 암호 정책
+  - id: "2.7.1"
+    title: "암호화 적용 — Vault PKI / TLS"
+    evidence_sources:
+      - api: "/api/vault/status"
+        type: api_snapshot
+    auto_collect: true
+
+  # 2.8.3 시험·개발 환경 보호 — DLP
+  - id: "2.8.3"
+    title: "개인정보 가명처리 — Neosync DLP"
+    evidence_sources:
+      - api: "/api/neosync/status"
+        type: api_snapshot
+    auto_collect: true
+
+  # 2.9.1 변경관리 — CI/CD 게이트
+  - id: "2.9.1"
+    title: "시크릿 누출 방지 — TruffleHog CI/CD"
+    evidence_sources:
+      - path: ".github/workflows/secret-scan.yml"
+        type: document
+    auto_collect: true
+
+  # 2.11.1 보안 사고 대응
+  - id: "2.11.1"
+    title: "보안 사고 대응 — SOAR 플레이북"
+    evidence_sources:
+      - api: "/api/soar/status"
+        type: api_snapshot
+      - api: "/api/dfir/status"
+        type: api_snapshot
+    auto_collect: true
+
+  # 2.11.2 취약점 관리
+  - id: "2.11.2"
+    title: "취약점 점검 — VASCA CVE 스캔"
+    evidence_sources:
+      - api: "/api/vasca/status"
+        type: api_snapshot
+      - api: "/api/vasca/scan-results"
+        type: api_snapshot
+    auto_collect: true
+
+  # 2.12.1 로그·접근기록 관리
+  - id: "2.12.1"
+    title: "SIEM 로그 수집·보존"
+    evidence_sources:
+      - api: "/api/wazuh/status"
+        type: api_snapshot
+    auto_collect: true
+
+report:
+  output_dir: "reports/isms"
+  format: ["json", "markdown"]
+  retention_days: 1825  # 5년 (ISMS-P 요건)

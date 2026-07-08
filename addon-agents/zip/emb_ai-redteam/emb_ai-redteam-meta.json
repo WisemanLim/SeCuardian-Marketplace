@@ -1,0 +1,110 @@
+{
+  "key": "emb_ai-redteam",
+  "name": "AI Red Team",
+  "type": "execution",
+  "epic": "E21",
+  "layer": "L6",
+  "layer_name": "Forensics",
+  "description": "PyRIT·SkillSpector로 LLM 탈옥·프롬프트 인젝션 등 적대적 스캔을 수행하는 AI 레드팀 에이전트입니다. 격리 네트워크와 명시적 옵트인이 필요합니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "description_en": "AI red-team agent using PyRIT and SkillSpector. Performs adversarial LLM scanning (jailbreak, prompt injection, data exfiltration) and agent skill evaluation. Requires an isolation network and explicit opt-in. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
+  "default_enabled": false,
+  "required_role": "supervisor",
+  "isolation_required": true,
+  "env_vars": {
+    "REDTEAM_ENABLED": {
+      "default": "false",
+      "required": true,
+      "description": "Must be set to 'true' to activate all endpoints"
+    },
+    "REDTEAM_NETWORK": {
+      "default": "",
+      "required": true,
+      "description": "Must be set to 'redteam-isolated' — enforces network isolation"
+    },
+    "PYRIT_ENDPOINT": {
+      "default": "",
+      "required": false,
+      "description": "PyRIT service base URL for LLM adversarial scanning. If unset, mock mode is used."
+    },
+    "PYRIT_API_KEY": {
+      "default": "",
+      "required": false,
+      "description": "API key for PyRIT endpoint authentication"
+    },
+    "SKILLSPECTOR_URL": {
+      "default": "",
+      "required": false,
+      "description": "SkillSpector service URL for agent skill evaluation. If unset, mock mode is used."
+    }
+  },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/status",
+      "description": "Show isolation status and report count"
+    },
+    {
+      "method": "POST",
+      "path": "/scan/llm",
+      "description": "Run LLM adversarial scan via PyRIT"
+    },
+    {
+      "method": "POST",
+      "path": "/scan/skill",
+      "description": "Run agent skill evaluation via SkillSpector"
+    },
+    {
+      "method": "GET",
+      "path": "/reports",
+      "description": "List all in-memory reports (max 50)"
+    },
+    {
+      "method": "GET",
+      "path": "/reports/{report_id}",
+      "description": "Retrieve a single report by ID"
+    },
+    {
+      "method": "DELETE",
+      "path": "/reports",
+      "description": "Clear all in-memory reports"
+    },
+    {
+      "method": "GET",
+      "path": "/config",
+      "description": "Show current REDTEAM_* configuration"
+    }
+  ],
+  "report_store": {
+    "type": "in-memory",
+    "implementation": "collections.deque",
+    "maxlen": 50,
+    "persistence": false
+  },
+  "attack_strategies": [
+    "jailbreak",
+    "prompt_injection",
+    "data_exfil",
+    "all"
+  ],
+  "scan_types": [
+    "llm",
+    "skill"
+  ],
+  "risk_levels": [
+    "MOCK",
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "CRITICAL",
+    "ERROR",
+    "UNKNOWN"
+  ],
+  "tags": [
+    "red-team",
+    "adversarial",
+    "pyrit",
+    "skillspector",
+    "llm-security",
+    "forensics"
+  ]
+}

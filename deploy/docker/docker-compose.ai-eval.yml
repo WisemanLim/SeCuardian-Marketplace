@@ -1,0 +1,54 @@
+services:
+  ai-eval-gate:
+    # AI 보안 평가 게이트 — PyRIT (MIT) + SkillSpector 평가 결과 수집 서비스
+    # PyRIT: microsoft/pyrit (MIT) — 프롬프트 인젝션·탈옥 취약점 평가
+    # SkillSpector: NVIDIA/SkillSpector (Apache-2.0) — AI 에이전트 스킬 취약점 스캔
+    # agentshield: affaan-m/agentshield (MIT) — AI 에이전트 취약점 스캐너
+    #
+    # 사용 방법:
+    #   1. PyRIT 로컬 실행: pip install pyrit && python scripts/pyrit_scan.py
+    #   2. 결과를 POST /api/ai-eval/scans 로 전송
+    #   3. GET /api/ai-eval/gate 로 게이트 통과 여부 확인
+    image: python:3.12-slim
+    container_name: ai-eval-gate
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8401:8401"
+    environment:
+      - AI_EVAL_PORT=8401
+      - PYRIT_DBTYPE=duckdb
+      - AI_EVAL_MIN_SEVERITY=${AI_EVAL_MIN_SEVERITY:-high}
+    volumes:
+      - ai_eval_data:/app/data
+    # 다중행 Python을 folded scalar에 임베딩하면 YAML 파싱이 깨지므로 별도 스텁 스크립트를 실행
+    command: ["sh", "-c", "pip install pyrit --quiet 2>/dev/null || true; python /app/health_stub.py"]
+    configs:
+      - source: ai_eval_health_stub
+        target: /app/health_stub.py
+    networks:
+      - secuardian-internal
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+volumes:
+  ai_eval_data:
+    driver: local
+
+networks:
+  secuardian-internal:
+    external: true
+
+configs:
+  ai_eval_health_stub:
+    content: |
+      import http.server, json, os
+      class Handler(http.server.BaseHTTPRequestHandler):
+          def do_GET(self):
+              self.send_response(200); self.end_headers()
+              self.wfile.write(json.dumps({'status':'running','gate':'ai-eval'}).encode())
+          def log_message(self, *a): pass
+      port = int(os.environ.get('AI_EVAL_PORT', 8401))
+      http.server.HTTPServer(('', port), Handler).serve_forever()

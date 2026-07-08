@@ -1,0 +1,55 @@
+# Wazuh Indexer (OpenSearch) 설정 — E06 T06-1
+# License: Apache-2.0
+
+network.host: 0.0.0.0
+
+# arm64 호스트(QEMU 에뮬레이션)에서 seccomp 시스템콜 필터 설치가 불가능해 부트스트랩 검사 실패 →
+# 노드 설정으로 비활성화 (JVM -D 속성으로는 적용되지 않음)
+bootstrap.system_call_filter: false
+
+node.name: wazuh.indexer
+
+cluster.initial_master_nodes:
+  - wazuh.indexer
+
+cluster.name: secuardian-wazuh
+
+# TLS 설정
+plugins.security.ssl.transport.pemcert_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer.pem
+plugins.security.ssl.transport.pemkey_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer-key.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: /usr/share/wazuh-indexer/certs/root-ca.pem
+plugins.security.ssl.http.enabled: true
+plugins.security.ssl.http.pemcert_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer.pem
+plugins.security.ssl.http.pemkey_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer-key.pem
+plugins.security.ssl.http.pemtrustedcas_filepath: /usr/share/wazuh-indexer/certs/root-ca.pem
+plugins.security.allow_default_init_securityindex: true
+
+plugins.security.authcz.admin_dn:
+  - "CN=admin,OU=Wazuh,O=Wazuh,L=California,C=US"
+
+plugins.security.check_snapshot_restore_write_privileges: true
+plugins.security.enable_snapshot_restore_privilege: true
+plugins.security.nodes_dn:
+  - "CN=wazuh.indexer,OU=Wazuh,O=Wazuh,L=California,C=US"
+
+plugins.security.restapi.roles_enabled:
+  - "all_access"
+  - "security_rest_api_access"
+
+plugins.security.system_indices.enabled: true
+plugins.security.system_indices.indices:
+  - ".opendistro-alerting-config"
+  - ".opendistro-alerting-alert*"
+  - ".opendistro-anomaly-results*"
+  - ".opendistro-anomaly-detector*"
+  - ".opendistro-anomaly-checkpoints"
+  - ".opendistro-anomaly-detection-state"
+  - ".opendistro-reports-*"
+  - ".opendistro-notifications-*"
+  - ".opendistro-notebooks"
+  - ".opensearch-observability"
+  - ".wazuh"
+  - ".wazuh-version"
+  - "wazuh-*"
+
+# 로그 보존 — 인덱스 정책은 ISM으로 별도 관리

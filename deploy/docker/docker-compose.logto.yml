@@ -1,0 +1,69 @@
+# Logto SaaS 앱 인증 서비스 — E01 T01-5
+# MPL-2.0 라이선스 | https://github.com/logto-io/logto
+# 이미지: svhd/logto (Docker Hub 공식 미러)
+#
+# 기동: make logto-up
+# Admin Console: http://localhost:3802  (최초 접속 시 관리자 계정 생성 마법사)
+# OIDC Endpoint: http://localhost:3801/oidc
+#
+# 주의: 절대 금지 — .env.logto 파일에 실제 패스워드 커밋
+
+services:
+  logto-db:
+    image: postgres:16.4-alpine
+    container_name: secuardian-logto-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${LOGTO_DB_USER:-logto}
+      POSTGRES_PASSWORD: ${LOGTO_DB_PASSWORD}
+      POSTGRES_DB: ${LOGTO_DB_DATABASE:-logto}
+    volumes:
+      - logto-db-data:/var/lib/postgresql/data
+    networks:
+      - logto-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LOGTO_DB_USER:-logto} -d ${LOGTO_DB_DATABASE:-logto}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  logto:
+    image: svhd/logto:${LOGTO_VERSION:-1.40.1}
+    container_name: secuardian-logto
+    restart: unless-stopped
+    depends_on:
+      logto-db:
+        condition: service_healthy
+    environment:
+      ENDPOINT: http://localhost:${LOGTO_HTTP_PORT:-3801}
+      ADMIN_ENDPOINT: http://localhost:${LOGTO_ADMIN_PORT:-3802}
+      DB_URL: >-
+        postgresql://${LOGTO_DB_USER:-logto}:${LOGTO_DB_PASSWORD}@logto-db:5432/${LOGTO_DB_DATABASE:-logto}
+      NODE_ENV: production
+      TRUST_PROXY_HEADER: "1"
+    ports:
+      - "${LOGTO_HTTP_PORT:-3801}:3001"
+      - "${LOGTO_ADMIN_PORT:-3802}:3002"
+    networks:
+      - logto-net
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        node /etc/logto/packages/cli/bin/logto.js db seed --db-url $$DB_URL || true
+        && node /etc/logto/packages/cli/bin/logto.js db alteration deploy latest --db-url $$DB_URL || true
+        && npm run start
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://localhost:3001/oidc/.well-known/openid-configuration"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+networks:
+  logto-net:
+    name: secuardian-logto-net
+    driver: bridge
+
+volumes:
+  logto-db-data:
+    name: secuardian-logto-db-data

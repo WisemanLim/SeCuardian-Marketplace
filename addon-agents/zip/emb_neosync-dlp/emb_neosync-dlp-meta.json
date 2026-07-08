@@ -1,0 +1,132 @@
+{
+  "agent_key": "emb_neosync-dlp",
+  "agent_type": "service",
+  "epic": "E14",
+  "layer": "L4 Data",
+  "version": "1.0.0",
+  "display_name": "Neosync DLP Monitor",
+  "description": "Neosync DLP 파이프라인 상태를 모니터링하고 Job 실행을 관리하는 데이터 보호 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "description_en": "Data protection agent that monitors Neosync DLP pipeline status and manages job runs. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
+  "capabilities": [
+    {
+      "verb": "monitor",
+      "domain": "dlp.pipeline",
+      "description": "Neosync DLP 파이프라인 상태 및 Job 실행 이력을 모니터링합니다",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "healthy": {
+            "type": "boolean"
+          },
+          "job_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "qos": {
+        "max_latency_ms": 10000,
+        "supports_async": false,
+        "supports_streaming": false
+      }
+    },
+    {
+      "verb": "trigger",
+      "domain": "dlp.job",
+      "description": "Neosync DLP Job 실행을 트리거합니다 (supervisor/admin 전용)",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "sync_options": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "job_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object"
+      },
+      "qos": {
+        "max_latency_ms": 30000,
+        "supports_async": false,
+        "supports_streaming": false
+      }
+    },
+    {
+      "verb": "ingest",
+      "domain": "dlp.run-result",
+      "description": "Neosync로부터 실행 결과를 수신하여 인메모리 스토어에 저장합니다",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "job_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "rows_processed": {
+            "type": "integer"
+          },
+          "errors": {
+            "type": "integer"
+          },
+          "started_at": {
+            "type": "string"
+          },
+          "completed_at": {
+            "type": "string"
+          },
+          "error_message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "job_id",
+          "status",
+          "started_at"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "boolean"
+          },
+          "run_id": {
+            "type": "string"
+          }
+        }
+      },
+      "qos": {
+        "max_latency_ms": 1000,
+        "supports_async": false,
+        "supports_streaming": false
+      }
+    }
+  ],
+  "governance": {
+    "data_classification": "confidential",
+    "human_approval_required": false,
+    "audit_level": "enhanced"
+  },
+  "required_env": [],
+  "optional_env": [
+    "NEOSYNC_API_URL",
+    "NEOSYNC_API_KEY",
+    "NEOSYNC_ACCOUNT_ID"
+  ],
+  "min_platform_version": "2.0.0"
+}

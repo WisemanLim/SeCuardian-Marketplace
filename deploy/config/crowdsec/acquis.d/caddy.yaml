@@ -1,0 +1,27 @@
+# CrowdSec 로그 소스 설정 — E04 T04-2
+# 참조: https://docs.crowdsec.net/docs/data_sources/file
+# 컨테이너 내부 경로 기준 (docker-compose.crowdsec.yml 볼륨 매핑)
+
+# ── Caddy 리버스 프록시 로그 ────────────────────────────────────────────────────
+filenames:
+  - /var/log/caddy/caddy.log
+labels:
+  type: caddy
+
+---
+
+# ── Linux Auth 로그 (syslog) ────────────────────────────────────────────────────
+# 호스트 /var/log/auth.log 마운트 시 활성화
+# filenames:
+#   - /var/log/auth.log
+# labels:
+#   type: syslog
+
+---
+
+# ── 저널 로그 (systemd) ─────────────────────────────────────────────────────────
+# source: journalctl
+# journalctl_filter:
+#   - "_SYSTEMD_UNIT=sshd.service"
+# labels:
+#   type: syslog

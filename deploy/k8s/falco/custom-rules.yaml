@@ -1,0 +1,72 @@
+# Falco Custom Rules — SeCuardian (E03 T03-3)
+# License: Apache-2.0
+# 노이즈 관리: CRITICAL 우선 활성화, WARNING은 단계적 확대
+#
+# 적용: kubectl create configmap falco-custom-rules \
+#         --from-file=custom-rules.yaml=deploy/k8s/falco/custom-rules.yaml \
+#         -n falco
+#       (falco_install.sh 가 자동 처리)
+
+# ── Macro / List 정의 ──────────────────────────────────────────────────────────
+
+- list: shell_binaries
+  items: [bash, sh, zsh, ksh, fish, tcsh]
+
+- list: trusted_images
+  items:
+    - falcosecurity/falco
+    - falcosecurity/falco-driver-loader
+
+- list: trusted_procs
+  items: [useradd, usermod, shadow, chpasswd]
+
+- list: trusted_admin_binaries
+  items: [sudo, su, sshd, systemd, init, cron, crond]
+
+# ── 규칙 ──────────────────────────────────────────────────────────────────────
+
+# 컨테이너 내 터미널 쉘 실행 (exec 등)
+- rule: Terminal shell in container
+  desc: A shell was used as the entrypoint or exec target in a container
+  condition: >
+    container and
+    proc.name in (shell_binaries) and
+    terminal.isatty and
+    not container.image.repository in (trusted_images)
+  output: >
+    Shell opened in container
+    (user=%user.name user_loginuid=%user.loginuid
+     container=%container.name image=%container.image.repository:%container.image.tag
+     shell=%proc.name parent=%proc.pname cmdline=%proc.cmdline)
+  priority: WARNING
+  tags: [container, shell, mitre_execution]
+
+# /etc/passwd 쓰기 — 자격증명 변조 시도
+- rule: Write to /etc/passwd
+  desc: Attempt to write /etc/passwd — possible credential manipulation
+  condition: >
+    open_write and
+    fd.name = /etc/passwd and
+    not proc.name in (trusted_procs)
+  output: >
+    /etc/passwd write attempt
+    (user=%user.name user_loginuid=%user.loginuid
+     process=%proc.name file=%fd.name parent=%proc.pname
+     container=%container.name image=%container.image.repository)
+  priority: CRITICAL
+  tags: [filesystem, credential_access, mitre_credential_access]
+
+# sudo를 통한 권한 상승
+- rule: Privilege escalation via sudo
+  desc: sudo executed by a non-trusted process inside a container
+  condition: >
+    container and
+    proc.name = sudo and
+    not proc.pname in (trusted_admin_binaries)
+  output: >
+    Sudo in container
+    (user=%user.name user_loginuid=%user.loginuid
+     parent=%proc.pname cmdline=%proc.cmdline
+     container=%container.name image=%container.image.repository:%container.image.tag)
+  priority: WARNING
+  tags: [container, privilege_escalation, mitre_privilege_escalation]

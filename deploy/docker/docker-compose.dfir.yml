@@ -1,0 +1,36 @@
+# DFIR Platform — E18 T18-1
+# License: Apache-2.0
+# 역할: 디지털 포렌식·인시던트 대응 / 호스트 아티팩트 수집 / 위협 헌팅
+# 포트: 8889(Velociraptor Web GUI) 8000(gRPC API)
+# Ref: https://github.com/Velocidex/velociraptor
+# 주의: 격리 스테이징 환경 전용 — 프로덕션 직접 실행 금지
+
+services:
+  velociraptor:
+    image: velocidex/velociraptor:v0.72.4
+    container_name: secuardian-velociraptor
+    restart: unless-stopped
+    command: frontend -v
+    ports:
+      - "8889:8889"  # Web GUI (HTTPS self-signed)
+      - "8000:8000"  # gRPC API (클라이언트 연결)
+    volumes:
+      - velociraptor-data:/velociraptor
+      - ./deploy/config/velociraptor:/etc/velociraptor:ro
+    environment:
+      VELOCIRAPTOR_CONFIG: /etc/velociraptor/server.config.yaml
+    labels:
+      secuardian.epic: "E18"
+      secuardian.layer: "L6-Forensics"
+      secuardian.license: "Apache-2.0"
+    networks:
+      - secuardian-net
+
+volumes:
+  velociraptor-data:
+    name: secuardian_velociraptor_data
+
+networks:
+  secuardian-net:
+    external: true
+    name: secuardian_default

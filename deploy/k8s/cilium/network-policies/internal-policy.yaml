@@ -1,0 +1,44 @@
+# Internal Zone CiliumNetworkPolicy — E09 T09-2
+# DMZ에서만 인바운드, DB Zone은 포트 제한
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: internal-isolation
+  namespace: internal
+spec:
+  endpointSelector:
+    matchLabels:
+      zone: internal
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            zone: dmz
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+            - port: "8443"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            zone: internal
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            zone: db
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+            - port: "6379"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"

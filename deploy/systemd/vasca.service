@@ -1,0 +1,44 @@
+# VASCA — Vulnerability Agent Scan Component (SeCuardian E07)
+# Source: SeCuardian 자체 개발 | License: Apache-2.0
+#
+# Install:
+#   sudo cp deploy/systemd/vasca.service /etc/systemd/system/
+#   sudo cp deploy/systemd/vasca.env.example /etc/vasca/vasca.env  # then edit
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now vasca
+
+[Unit]
+Description=VASCA — Vulnerability Agent Scan Component (SeCuardian E07)
+Documentation=https://github.com/edentns/secuardian
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vasca
+Group=vasca
+
+# Run weekly cron scan with JSON output and SeCuardian notification
+ExecStart=/usr/local/bin/vasca scan \
+    --cron-expr "0 2 * * 0" \
+    --format json \
+    --notify \
+    --db-path /var/lib/vasca/vasca.db
+
+Restart=on-failure
+RestartSec=60s
+TimeoutStartSec=30s
+
+# Credentials injected from EnvironmentFile (no secrets in unit file)
+EnvironmentFile=-/etc/vasca/vasca.env
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/vasca
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

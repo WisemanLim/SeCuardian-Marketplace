@@ -1,0 +1,24 @@
+{
+  "key": "emb_ai-eval-gate",
+  "name": "AI Security Eval Gate ⚠️",
+  "type": "service",
+  "epic": "E20",
+  "layer": "L6 AI Security",
+  "description": "AI 배포 전 PyRIT·SkillSpector·agentshield 평가 결과를 수집하고 게이트 통과 여부를 판정하는 AI 보안 평가 에이전트입니다 (내장 router_ai_eval 의 ADDON 판). AI_EVAL_GATE_ENABLED=false 기본 — 활성화 전 보안팀 승인 필요. 전용 화면이 없어 AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "description_en": "AI security evaluation agent that collects PyRIT / SkillSpector / agentshield results and issues a pre-deployment gate verdict (ADDON packaging of the built-in router_ai_eval). AI_EVAL_GATE_ENABLED defaults to false — security-team approval required before enabling. No dedicated screen — use via Q&A through the AI Assistant.",
+  "version": "1.0.0",
+  "endpoints": [
+    {"method": "GET", "path": "/status", "auth": true, "description": "Gate service status"},
+    {"method": "POST", "path": "/scans", "auth": false, "description": "Receive evaluation findings (PyRIT/SkillSpector/agentshield)"},
+    {"method": "GET", "path": "/scans", "auth": true, "description": "List evaluation findings with tool/severity filter"},
+    {"method": "POST", "path": "/gate", "auth": true, "description": "Pre-deployment gate verdict (requires AI_EVAL_GATE_ENABLED=true)"},
+    {"method": "GET", "path": "/gate", "auth": true, "description": "List recent gate verdicts"}
+  ],
+  "env_vars": [
+    {"name": "AI_EVAL_GATE_ENABLED", "default": "false", "description": "Enable gate verdict endpoint (security-team approval required)"},
+    {"name": "AI_EVAL_URL", "default": "http://localhost:9450", "description": "External AI-eval tool base URL"}
+  ],
+  "dependencies": [],
+  "db_tables": [],
+  "base_agent": {"agent_key": "ai-eval-gate", "source": "app/routers/router_ai_eval.py", "platform": "SeCuardian"}
+}

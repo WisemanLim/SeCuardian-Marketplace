@@ -1,0 +1,48 @@
+# Harbor 설정 템플릿 — SeCuardian Dev (HTTP-only)
+# harbor_install.sh 가 이 파일의 플레이스홀더를 치환하여 harbor.yml 생성
+# 생성된 harbor.yml 로 ./prepare 실행 → harbor-config/common/config/ 생성
+
+hostname: localhost
+
+# Dev: HTTP only (HTTPS 프로덕션에서 활성화)
+http:
+  port: 8080  # nginx 내부 포트 — host:8083 으로 노출 (docker-compose.harbor.yml)
+
+# HTTPS 프로덕션 설정 (dev에서 비활성화):
+# https:
+#   port: 8443
+#   certificate: /path/to/cert.pem
+#   private_key: /path/to/key.pem
+
+# 초기 admin 패스워드 (harbor_install.sh 치환 대상)
+harbor_admin_password: HARBOR_ADMIN_PASSWORD_VALUE
+
+# 내부 DB 패스워드
+database:
+  password: HARBOR_DB_PASSWORD_VALUE
+  max_idle_conns: 50
+  max_open_conns: 100
+
+# 데이터 영구 저장 경로 (harbor_install.sh 치환 대상)
+data_volume: HARBOR_DATA_DIR_VALUE
+
+log:
+  level: info
+  local:
+    rotate_count: 50
+    rotate_size: 200M
+    location: HARBOR_LOG_DIR_VALUE
+
+jobservice:
+  max_job_workers: 10
+  job_loggers:
+    - STD_OUTPUT
+    - FILE
+  logger_sweeper_duration: 1
+
+notification:
+  webhook_job_max_retry: 10
+  webhook_job_http_client_timeout: 3
+
+chart:
+  absolute_url: disabled

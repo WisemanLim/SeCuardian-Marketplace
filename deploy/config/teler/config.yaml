@@ -1,0 +1,47 @@
+# teler HTTP IDS 설정 — E11 T11-1
+# License: Apache-2.0
+# 참고: https://github.com/teler-sh/teler
+
+# 위협 데이터셋 자동 갱신 (일 1회)
+threat:
+  auto_update: true
+
+# HTTP 로그 입력 소스 (Caddy JSON 로그)
+log_format: >-
+  $remote_addr $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"
+
+# 알림 채널
+notifications:
+  - provider: slack
+    url: "${TELER_SLACK_WEBHOOK}"
+    severity:
+      - high
+      - critical
+  - provider: webhook
+    url: "http://host.docker.internal:8200/api/teler/events"
+    method: POST
+
+# 탐지 제외 — False Positive 감소
+excludes:
+  status_code:
+    - 200
+    - 304
+  methods:
+    - OPTIONS
+  paths:
+    - /health
+    - /metrics
+    - /api/docs
+    - /api/openapi.json
+
+# 위협 카테고리 활성화
+threat_categories:
+  bad_crawler: true
+  bad_referer: false  # 초기 2주 dry-run
+  common_web_attack: true
+  cve: true
+  directory_bruteforce: true
+
+# 초기 2주: dry-run=true로 운영 (FP 모니터링)
+# 이후 false로 전환
+dry_run: true

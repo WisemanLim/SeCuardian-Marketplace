@@ -1,0 +1,9 @@
+# Istio PeerAuthentication — 전 서비스 mTLS STRICT 모드 — E10 T10-1
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: istio-system
+spec:
+  mtls:
+    mode: STRICT  # 전 서비스 간 mTLS 강제 — Permissive 단계 없이 바로 STRICT

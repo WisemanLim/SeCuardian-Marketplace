@@ -1,0 +1,41 @@
+# Velociraptor 서버 설정 템플릿 — E18 T18-1
+# 실제 배포 시 velociraptor config generate --merge 로 재생성 권장
+# License: Apache-2.0
+
+version:
+  name: velociraptor
+  version: 0.72.4
+  commit: SeCuardian-E18
+
+api:
+  bind_address: 0.0.0.0
+  bind_port: 8000
+  bind_scheme: tcp
+
+frontend:
+  bind_address: 0.0.0.0
+  bind_port: 8889
+  # TLS — 운영 시 cert/key 교체
+  certificate: ""
+  private_key: ""
+  hostname: "velociraptor.internal"
+
+datastore:
+  implementation: FileBaseDataStore
+  location: /velociraptor
+  filestore_directory: /velociraptor/fs
+
+gui:
+  bind_address: 0.0.0.0
+  bind_port: 8889
+  # 최초 접속 후 velociraptor user add admin --role=administrator 실행
+  initial_users:
+    - name: admin
+
+hunt_dispatcher:
+  poll_duration: 60
+
+# SIEM 연동 — Wazuh/OTel 파이프라인
+logging:
+  output_directory: /velociraptor/logs
+  separate_logs_per_component: true

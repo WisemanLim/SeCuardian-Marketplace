@@ -1,0 +1,41 @@
+# Teleport Auth Server 설정 — E17 T17-1
+# 운영 전 auth_service.cluster_name 을 실제 도메인으로 변경
+# License: AGPL-3.0
+
+version: v3
+
+teleport:
+  nodename: teleport.internal
+  data_dir: /var/lib/teleport
+  log:
+    output: stderr
+    severity: INFO
+    format:
+      output: json
+
+auth_service:
+  enabled: true
+  cluster_name: "secuardian.internal"
+  listen_addr: "0.0.0.0:3025"
+  # 세션 녹화 — PAM 핵심 기능 (teleport v3 스키마: auth_service 하위)
+  session_recording: "node"
+  tokens:
+    # 노드 등록용 임시 토큰 — 운영 시 tctl tokens add 로 단기 토큰 발급 사용
+    - "proxy,node:secuardian-join-token-change-me"
+
+proxy_service:
+  enabled: true
+  web_listen_addr: "0.0.0.0:3080"
+  listen_addr: "0.0.0.0:3023"
+  kube_listen_addr: "0.0.0.0:3026"
+  mysql_listen_addr: "0.0.0.0:3036"
+  # ACME(Let's Encrypt) — 외부 도메인 사용 시 주석 해제
+  # acme:
+  #   enabled: true
+  #   email: secops@example.com
+
+ssh_service:
+  enabled: false  # 별도 노드에서 teleport node start
+
+# 감사 로그는 teleport v3 스키마에서 teleport.storage(audit_events_uri) 또는 기본 stdout 사용 —
+# 최상위 audit_log 키는 미지원이므로 제거(기본 stdout 감사 이벤트 유지)

@@ -1,0 +1,81 @@
+# Caddyfile — E04 T04-1 | License: Apache-2.0
+# SeCuardian 내부 서비스 HTTPS 표준화 + SIEM 로그 파이프라인
+#
+# 로컬 개발: HTTP (포트 8280)
+# 내부망:    HTTPS (secuardian.internal → tls internal, /etc/hosts 등록 필요)
+#
+# CrowdSec acquis.yaml이 /logs/caddy.log 감시 — JSON 포맷 유지
+
+# ── 글로벌 설정 ──────────────────────────────────────────────────────────────
+{
+  # 관리 API (도커 컨테이너 내부 전용)
+  admin 0.0.0.0:2019
+
+  # 자동 HTTPS 비활성화 (로컬 개발; 운영 전환 시 제거)
+  auto_https off
+
+  # 로그 (JSON 포맷 → CrowdSec / SIEM 파이프라인)
+  log default {
+    output file /logs/caddy.log {
+      roll_size 100mb
+      roll_keep 5
+    }
+    format json
+    level INFO
+  }
+}
+
+# ── HTTP (로컬 개발 기본) ─────────────────────────────────────────────────────
+:80 {
+  # SeCuardian FastAPI 업스트림
+  reverse_proxy {$CADDY_UPSTREAM:host.docker.internal:8200} {
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+
+  # 보안 응답 헤더
+  header {
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    X-XSS-Protection "1; mode=block"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    -Server
+  }
+
+  # 접근 로그 (JSON, CrowdSec 파이프용)
+  log {
+    output file /logs/caddy.log {
+      roll_size 100mb
+      roll_keep 5
+    }
+    format json
+  }
+}
+
+# ── HTTPS 내부망 (운영/스테이징 — /etc/hosts에 secuardian.internal 등록 필요) ──
+# secuardian.internal {
+#   tls internal  # 내부 CA (Vault PKI 연동 시: tls { issuer acme {...} })
+#
+#   reverse_proxy {$CADDY_UPSTREAM:host.docker.internal:8200} {
+#     header_up X-Forwarded-For {remote_host}
+#     header_up X-Forwarded-Proto {scheme}
+#   }
+#
+#   header {
+#     Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+#     X-Content-Type-Options "nosniff"
+#     X-Frame-Options "DENY"
+#     X-XSS-Protection "1; mode=block"
+#     Referrer-Policy "strict-origin-when-cross-origin"
+#     -Server
+#   }
+#
+#   log {
+#     output file /logs/caddy.log {
+#       roll_size 100mb
+#       roll_keep 5
+#     }
+#     format json
+#   }
+# }

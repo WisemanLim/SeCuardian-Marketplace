@@ -1,0 +1,51 @@
+# K8s Zone CiliumNetworkPolicy — E09 T09-2
+# 서비스 간 mTLS(Istio) 통신 허용, 외부 직접 접근 차단
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: k8s-zone-policy
+  namespace: secuardian
+spec:
+  endpointSelector:
+    matchLabels:
+      zone: k8s
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            zone: k8s
+    - fromEndpoints:
+        - matchLabels:
+            zone: internal
+      toPorts:
+        - ports:
+            - port: "8200"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            zone: k8s
+    - toEndpoints:
+        - matchLabels:
+            zone: db
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"
+    # Falco CRITICAL 이벤트 자동 격리 시 SeCuardian 웹훅
+    - toEndpoints:
+        - matchLabels:
+            app: secuardian
+      toPorts:
+        - ports:
+            - port: "8200"
+              protocol: TCP

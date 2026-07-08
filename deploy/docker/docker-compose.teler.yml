@@ -1,0 +1,35 @@
+# teler HTTP IDS — E11 T11-1
+# License: Apache-2.0
+# Usage: docker compose -f deploy/docker/docker-compose.teler.yml up -d
+services:
+  teler:
+    image: kitabisa/teler:v2.0.0-rc.4
+    container_name: secuardian-teler
+    restart: unless-stopped
+    # teler v2는 입력 로그 소스가 필수 — Caddy 액세스 로그를 tail 하여 분석
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["tail -n0 -F /input/caddy.log | teler -c /etc/teler/config.yaml -x 25"]
+    volumes:
+      - ../../deploy/config/teler/config.yaml:/etc/teler/config.yaml:ro
+      - ../../logs:/input:ro
+      - teler_logs:/logs
+    environment:
+      - SLACK_WEBHOOK=${TELER_SLACK_WEBHOOK:-}  # TODO: Vault에서 주입
+    networks:
+      - secuardian-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+    labels:
+      - "secuardian.epic=E11"
+      - "secuardian.layer=L4-Application"
+
+volumes:
+  teler_logs:
+
+networks:
+  secuardian-net:
+    external: true
+    name: secuardian-net

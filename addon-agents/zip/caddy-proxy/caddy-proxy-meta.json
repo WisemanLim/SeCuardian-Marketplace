@@ -1,0 +1,90 @@
+{
+  "key": "caddy-proxy",
+  "name": "Caddy Proxy Monitor",
+  "type": "tool-proxy",
+  "epic": "E04",
+  "layer": "L3 Network",
+  "description": "Caddy 리버스 프록시를 admin API로 모니터링·관리하며 상태·설정 조회, 라우트 목록, 라이브 설정 리로드 도구를 제공합니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "description_en": "Monitors and manages the Caddy reverse proxy via its admin API. Exposes tools for status, configuration inspection, route listing, and live configuration reload. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
+  "version": "1.0.0",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/tools",
+      "description": "List available tools with input schemas"
+    },
+    {
+      "method": "POST",
+      "path": "/tools/{tool_name}",
+      "description": "Invoke a named tool with arguments"
+    },
+    {
+      "method": "GET",
+      "path": "/status",
+      "description": "Caddy health summary"
+    },
+    {
+      "method": "GET",
+      "path": "/config",
+      "description": "Connection settings (masked)"
+    }
+  ],
+  "tools": [
+    {
+      "name": "caddy_status",
+      "description": "Retrieve Caddy server status via /metrics (falls back to /config).",
+      "roles": [
+        "viewer",
+        "operator",
+        "supervisor",
+        "admin"
+      ]
+    },
+    {
+      "name": "caddy_config",
+      "description": "Retrieve the full current Caddy configuration.",
+      "roles": [
+        "viewer",
+        "operator",
+        "supervisor",
+        "admin"
+      ]
+    },
+    {
+      "name": "caddy_routes",
+      "description": "List all HTTP server routes from Caddy configuration.",
+      "roles": [
+        "viewer",
+        "operator",
+        "supervisor",
+        "admin"
+      ]
+    },
+    {
+      "name": "caddy_reload",
+      "description": "Reload Caddy with a new JSON configuration.",
+      "roles": [
+        "supervisor",
+        "admin"
+      ]
+    }
+  ],
+  "env": [
+    {
+      "key": "CADDY_ADMIN_URL",
+      "default": "http://localhost:2019",
+      "required": false,
+      "description": "Base URL of the Caddy admin API"
+    },
+    {
+      "key": "CADDY_ADMIN_TOKEN",
+      "default": "",
+      "required": false,
+      "description": "Optional Bearer token for Caddy admin API authentication"
+    }
+  ],
+  "dependencies": [
+    "httpx"
+  ],
+  "db_tables": false
+}

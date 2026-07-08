@@ -1,0 +1,75 @@
+# SeCuardian — Promtail 설정 (E06 T06-2)
+# License: AGPL-3.0 (Grafana Promtail) — 내부 사용 OK
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: warn
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchwait: 1s
+    batchsize: 1048576
+    timeout: 10s
+
+scrape_configs:
+
+  # ── Docker 컨테이너 로그 ──────────────────────────────────────────────────
+  - job_name: docker-containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.+)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: 'service'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
+        target_label: 'project'
+    pipeline_stages:
+      - json:
+          expressions:
+            level: level
+            msg: msg
+      - labels:
+          level:
+
+  # ── Falco 이벤트 로그 (E03 T03-3) ───────────────────────────────────────
+  - job_name: falco
+    static_configs:
+      - targets: ['localhost']
+        labels:
+          job: falco
+          layer: endpoint
+          __path__: /var/log/falco*.log
+    pipeline_stages:
+      - json:
+          expressions:
+            priority: priority
+            rule: rule
+            output: output
+      - labels:
+          priority:
+          rule:
+
+  # ── Caddy 액세스 로그 (E04 T04-1) ───────────────────────────────────────
+  - job_name: caddy
+    static_configs:
+      - targets: ['localhost']
+        labels:
+          job: caddy
+          layer: network
+          __path__: /var/log-secuardian/caddy*.log
+
+  # ── SeCuardian 앱 로그 ──────────────────────────────────────────────────
+  - job_name: secuardian-app
+    static_configs:
+      - targets: ['localhost']
+        labels:
+          job: secuardian
+          layer: application
+          __path__: /var/log-secuardian/*.log

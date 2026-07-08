@@ -1,0 +1,42 @@
+# Source: HashiCorp Vault | License: BUSL-1.1 | Usage: internal only
+# E02 T02-1 — Vault Dev Mode (메모리 스토리지, 자동 unseal)
+# 기동: make vault-up
+# ⚠ Dev 모드는 재시작 시 데이터 초기화 — 운영 배포는 docker-compose.vault.prod.yml 사용
+
+name: secuardian-vault
+
+services:
+  vault:
+    image: hashicorp/vault:1.17.6
+    container_name: secuardian-vault
+    restart: unless-stopped
+    ports:
+      - "${VAULT_PORT:-8201}:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "${VAULT_DEV_ROOT_TOKEN:-dev-root-token-secuardian}"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+      VAULT_LOG_LEVEL: "${VAULT_LOG_LEVEL:-info}"
+      # 컨테이너 내 CLI 접근용 (healthcheck, vault_init.sh)
+      VAULT_ADDR: "http://127.0.0.1:8200"
+      VAULT_TOKEN: "${VAULT_DEV_ROOT_TOKEN:-dev-root-token-secuardian}"
+    cap_add:
+      - IPC_LOCK
+    command: server -dev
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - vault-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+networks:
+  vault-net:
+    driver: bridge
+    name: secuardian-vault-net

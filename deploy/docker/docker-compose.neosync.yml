@@ -1,0 +1,84 @@
+# Neosync DLP 파일럿 — E14 T14-1
+# License: NOASSERTION — 🔴 Docker 이미지 실행만, 소스 수정·재배포 금지
+# 법무 검토 완료 전 프로덕션 데이터 처리 금지 (스테이징 DB 한정)
+# Usage: docker compose -f deploy/docker/docker-compose.neosync.yml up -d
+services:
+  neosync-db:
+    image: postgres:16-alpine
+    container_name: secuardian-neosync-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=neosync
+      - POSTGRES_USER=neosync
+      - POSTGRES_PASSWORD=${NEOSYNC_DB_PASSWORD:-changeme}  # TODO: Vault
+    volumes:
+      - neosync_db:/var/lib/postgresql/data
+    networks:
+      - secuardian-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "neosync"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options: {max-size: "50m", max-file: "3"}
+
+  neosync-api:
+    image: ghcr.io/nucleuscloud/neosync/api:0.4.44
+    container_name: secuardian-neosync-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=neosync-db
+      - DB_PORT=5432
+      - DB_NAME=neosync
+      - DB_USER=neosync
+      - DB_PASS=${NEOSYNC_DB_PASSWORD:-changeme}
+      - DB_SSL_DISABLE=true
+      - NUCLEUS_ENV=development
+    depends_on:
+      neosync-db:
+        condition: service_healthy
+    networks:
+      - secuardian-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: json-file
+      options: {max-size: "100m", max-file: "5"}
+    labels:
+      - "secuardian.epic=E14"
+      - "secuardian.layer=L4-Application"
+      - "secuardian.license=NOASSERTION"
+      - "secuardian.restriction=staging-only"
+
+  neosync-app:
+    image: ghcr.io/nucleuscloud/neosync/app:0.4.44
+    container_name: secuardian-neosync-app
+    restart: unless-stopped
+    ports:
+      - "3002:3000"   # 3000은 Grafana(observability)가 사용 중이라 회피
+    environment:
+      - NEOSYNC_API_BASE_URL=http://neosync-api:8080
+      - NEXTAUTH_SECRET=${NEOSYNC_AUTH_SECRET:-changeme}  # TODO: Vault
+      - NEXTAUTH_URL=http://localhost:3002
+    depends_on:
+      - neosync-api
+    networks:
+      - secuardian-net
+    logging:
+      driver: json-file
+      options: {max-size: "50m", max-file: "3"}
+
+volumes:
+  neosync_db:
+
+networks:
+  secuardian-net:
+    external: true
+    name: secuardian-net

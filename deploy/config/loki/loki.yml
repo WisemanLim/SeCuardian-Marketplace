@@ -1,0 +1,68 @@
+# SeCuardian — Loki 설정 (E06 T06-2)
+# License: AGPL-3.0 (Grafana Loki) — 내부 사용 OK
+# 로그 보존: 90일 (ISMS-P 단기 운영 로그 기준)
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+  log_level: warn
+
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+# 스키마 설정 (TSDB — Loki 3.x 기본)
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+# ── 로그 보존 정책 (90일) ──────────────────────────────────────────────────
+limits_config:
+  retention_period: 2160h    # 90일
+  ingestion_rate_mb: 16
+  ingestion_burst_size_mb: 32
+  max_query_series: 5000
+  max_query_parallelism: 4
+
+# 압축 (보존 적용을 위해 필수)
+compactor:
+  working_directory: /loki/compactor
+  compaction_interval: 10m
+  retention_enabled: true
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 150
+  delete_request_store: filesystem
+
+# 청크 캐시
+chunk_store_config:
+  chunk_cache_config:
+    embedded_cache:
+      enabled: true
+      max_size_mb: 100
+
+# 쿼리 최적화
+query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 100
+
+ruler:
+  alertmanager_url: http://localhost:9093

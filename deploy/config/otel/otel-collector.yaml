@@ -1,0 +1,112 @@
+# OpenTelemetry Collector 설정 — E15 T15-1
+# License: Apache-2.0
+# 보안 이벤트 소스 → Loki/Prometheus/Jaeger 파이프라인
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+  filelog:
+    include:
+      - /var/log/caddy*.log
+      - /var/log/falco*.log
+      - /var/log/crowdsec*.log
+    start_at: beginning
+    operators:
+      - type: json_parser
+        if: 'body matches "^\\{"'
+      - type: add
+        field: attributes.source
+        value: secuardian-security
+
+  # Prometheus 스크레이프 (보안 메트릭)
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: secuardian-api
+          scrape_interval: 30s
+          static_configs:
+            - targets: ["host.docker.internal:8200"]
+          metrics_path: /metrics
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1000
+
+  memory_limiter:
+    limit_mib: 512
+    spike_limit_mib: 128
+    check_interval: 5s
+
+  attributes:
+    actions:
+      - key: layer
+        action: insert
+        value: secuardian
+      - key: env
+        action: insert
+        from_attribute: ENVIRONMENT
+
+  # 민감 데이터 마스킹 (PII 보호)
+  transform:
+    log_statements:
+      - context: log
+        statements:
+          - replace_pattern(attributes["email"], ".*@.*", "***@***.***")
+          - replace_pattern(attributes["password"], ".*", "[REDACTED]")
+
+exporters:
+  loki:
+    endpoint: http://loki:3100/loki/api/v1/push
+    default_labels_enabled:
+      exporter: true
+      job: true
+    # 최신 otelcol-contrib의 loki exporter는 exporter 내 'labels' 키를 제거함 —
+    # 라벨은 attributes 프로세서로 hint 처리(loki.attribute.labels)하거나 default_labels만 사용
+
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: secuardian
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  debug:
+    verbosity: basic
+
+service:
+  telemetry:
+    logs:
+      level: warn
+
+  extensions:
+    - health_check
+
+  pipelines:
+    logs:
+      receivers: [filelog, otlp]
+      processors: [memory_limiter, batch, attributes, transform]
+      exporters: [loki, debug]
+
+    metrics:
+      receivers: [prometheus, otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
+
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp/jaeger]
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"

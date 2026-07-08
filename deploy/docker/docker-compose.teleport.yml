@@ -1,0 +1,39 @@
+# Teleport PAM — E17 T17-1
+# License: AGPL-3.0 — 수정 후 네트워크 서비스 제공 시 소스 공개 의무
+# 역할: 인프라 접근 제어(PAM) / SSH·RDP·K8s·DB 단일 엔트리포인트 / JIT 승인 / 세션 녹화
+# 포트: 3023(SSH) 3025(Auth) 3080(Web+HTTPS) 3026(Kube) 3036(MySQL)
+# Ref: https://github.com/gravitational/teleport
+
+services:
+  teleport:
+    image: public.ecr.aws/gravitational/teleport-distroless:15.4.7   # gravitational/teleport 태그 미발행 → distroless 사용
+    container_name: secuardian-teleport
+    hostname: teleport.internal
+    restart: unless-stopped
+    # distroless ENTRYPOINT가 이미 `teleport start -c /etc/teleport/teleport.yaml` 전체이므로 command 불필요
+    ports:
+      - "3023:3023"  # SSH Proxy
+      - "3025:3025"  # Auth Server gRPC
+      - "3080:3080"  # Web UI + HTTPS (ACME)
+      - "3026:3026"  # Kubernetes Proxy
+      - "3036:3036"  # MySQL Proxy
+    volumes:
+      - teleport-data:/var/lib/teleport
+      - ../../deploy/config/teleport/teleport.yaml:/etc/teleport/teleport.yaml:ro
+    environment:
+      TELEPORT_SKIP_VERSION_CHECK: "true"
+    labels:
+      secuardian.epic: "E17"
+      secuardian.layer: "L1-Identity"
+      secuardian.license: "AGPL-3.0"
+    networks:
+      - secuardian-net
+
+volumes:
+  teleport-data:
+    name: secuardian_teleport_data
+
+networks:
+  secuardian-net:
+    external: true
+    name: secuardian_default

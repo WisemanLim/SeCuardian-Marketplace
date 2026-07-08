@@ -1,0 +1,15 @@
+# Grafana 대시보드 프로비저닝 설정 — E06 T06-2
+# License: AGPL-3.0 (Grafana)
+
+apiVersion: 1
+
+providers:
+  - name: SeCuardian Security Dashboards
+    orgId: 1
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

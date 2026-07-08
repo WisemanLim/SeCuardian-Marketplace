@@ -1,0 +1,197 @@
+---
+# SeCuardian — 하드닝 검증 플레이북 (E05 T05-1)
+# License: Apache-2.0 (SeCuardian 자체 구현)
+#
+# 하드닝 적용 결과를 검증하고 결과를 JSON으로 수집
+# SeCuardian POST /api/hardening/report 로 전송 가능
+#
+# 사용법:
+#   ansible-playbook -i inventory/hosts.yml playbooks/audit_hardening.yml
+#   ansible-playbook -i inventory/hosts.yml playbooks/audit_hardening.yml -e "report_to_secuardian=true"
+
+- name: Linux Hardening 검증 (Audit)
+  hosts: secuardian_servers
+  become: true
+  gather_facts: true
+
+  vars:
+    report_to_secuardian: false
+    # TODO: 운영환경에서 Vault에서 주입
+    secuardian_api_url: "http://localhost:8200"
+    secuardian_api_token: ""
+
+    expected_sysctl:
+      kernel.dmesg_restrict: "1"
+      kernel.kptr_restrict: "2"
+      kernel.yama.ptrace_scope: "1"
+      net.ipv4.tcp_syncookies: "1"
+      net.ipv4.conf.all.rp_filter: "1"
+      net.ipv4.conf.all.accept_source_route: "0"
+      net.ipv4.conf.all.accept_redirects: "0"
+      net.ipv4.conf.all.send_redirects: "0"
+      fs.suid_dumpable: "0"
+      kernel.randomize_va_space: "2"
+      kernel.sysrq: "0"
+
+  tasks:
+
+    # ── 1. sysctl 값 검증 ─────────────────────────────────────────────────
+    - name: "[AUDIT] sysctl 값 수집"
+      ansible.builtin.command: "sysctl {{ item.key }}"
+      register: _sysctl_results
+      loop: "{{ expected_sysctl | dict2items }}"
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      tags: sysctl
+
+    - name: "[AUDIT] sysctl 검증 결과 평가"
+      ansible.builtin.set_fact:
+        sysctl_audit: "{{ sysctl_audit | default([]) + [
+          {
+            'param': item.item.key,
+            'expected': item.item.value,
+            'actual': (item.stdout | regex_search('= (.+)$', '\\1') | first | default('NOT_SET')),
+            'pass': (item.stdout | regex_search('= (.+)$', '\\1') | first | default('NOT_SET')) == item.item.value
+          }
+        ] }}"
+      loop: "{{ _sysctl_results.results }}"
+      tags: sysctl
+
+    # ── 2. 서비스 비활성화 검증 ──────────────────────────────────────────────
+    - name: "[AUDIT] 불필요 서비스 상태 확인"
+      ansible.builtin.command: "systemctl is-enabled {{ item }} 2>/dev/null || echo disabled"
+      register: _service_status
+      loop:
+        - avahi-daemon
+        - cups
+        - rpcbind
+        - bluetooth
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      tags: services
+
+    - name: "[AUDIT] 서비스 감사 결과 평가"
+      ansible.builtin.set_fact:
+        service_audit: "{{ service_audit | default([]) + [
+          {
+            'service': item.item,
+            'status': item.stdout | trim,
+            'pass': item.stdout | trim in ['disabled', 'not-found', 'masked', 'static']
+          }
+        ] }}"
+      loop: "{{ _service_status.results }}"
+      tags: services
+
+    # ── 3. umask 검증 ────────────────────────────────────────────────────────
+    - name: "[AUDIT] /etc/login.defs UMASK 확인"
+      ansible.builtin.command: grep -E '^UMASK' /etc/login.defs
+      register: _umask_result
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      tags: umask
+
+    - name: "[AUDIT] umask 평가"
+      ansible.builtin.set_fact:
+        umask_audit:
+          param: "UMASK in /etc/login.defs"
+          actual: "{{ _umask_result.stdout | trim }}"
+          pass: "'027' in _umask_result.stdout"
+      tags: umask
+
+    # ── 4. SSH 설정 검증 ─────────────────────────────────────────────────────
+    - name: "[AUDIT] sshd_config 주요 설정 확인"
+      ansible.builtin.command: "sshd -T 2>/dev/null | grep -i {{ item }}"
+      register: _ssh_results
+      loop:
+        - permitrootlogin
+        - passwordauthentication
+        - x11forwarding
+        - maxauthtries
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      tags: ssh
+
+    # ── 5. 하드닝 스탬프 확인 ────────────────────────────────────────────────
+    - name: "[AUDIT] 하드닝 적용 스탬프 확인"
+      ansible.builtin.stat:
+        path: /etc/secuardian-hardening.stamp
+      register: _stamp_stat
+      check_mode: false
+      tags: always
+
+    - name: "[AUDIT] 스탬프 내용 읽기"
+      ansible.builtin.command: cat /etc/secuardian-hardening.stamp
+      register: _stamp_content
+      when: _stamp_stat.stat.exists
+      changed_when: false
+      check_mode: false
+      tags: always
+
+    # ── 6. 종합 보고서 생성 ──────────────────────────────────────────────────
+    - name: "[AUDIT] 감사 보고서 조립"
+      ansible.builtin.set_fact:
+        audit_report:
+          hostname: "{{ ansible_hostname }}"
+          audited_at: "{{ ansible_date_time.iso8601 }}"
+          distribution: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
+          hardening_stamp_exists: "{{ _stamp_stat.stat.exists }}"
+          sysctl:
+            total: "{{ sysctl_audit | length }}"
+            passed: "{{ sysctl_audit | selectattr('pass', 'equalto', true) | list | length }}"
+            failed: "{{ sysctl_audit | selectattr('pass', 'equalto', false) | list | length }}"
+            details: "{{ sysctl_audit }}"
+          services:
+            total: "{{ service_audit | length }}"
+            passed: "{{ service_audit | selectattr('pass', 'equalto', true) | list | length }}"
+            failed: "{{ service_audit | selectattr('pass', 'equalto', false) | list | length }}"
+            details: "{{ service_audit }}"
+          overall_pass: "{{ (sysctl_audit | selectattr('pass', 'equalto', false) | list | length == 0) and (service_audit | selectattr('pass', 'equalto', false) | list | length == 0) }}"
+      tags: always
+
+    - name: "[AUDIT] 보고서 출력"
+      ansible.builtin.debug:
+        msg: |
+          ══════════════════════════════════════════
+          SeCuardian Hardening Audit Report
+          ══════════════════════════════════════════
+          Host    : {{ audit_report.hostname }}
+          OS      : {{ audit_report.distribution }}
+          Audited : {{ audit_report.audited_at }}
+          Stamp   : {{ '✅ EXISTS' if audit_report.hardening_stamp_exists else '❌ MISSING' }}
+          ──────────────────────────────────────────
+          sysctl  : {{ audit_report.sysctl.passed }}/{{ audit_report.sysctl.total }} PASS
+          services: {{ audit_report.services.passed }}/{{ audit_report.services.total }} PASS
+          ──────────────────────────────────────────
+          OVERALL : {{ '✅ PASS' if audit_report.overall_pass else '❌ FAIL' }}
+          ══════════════════════════════════════════
+      tags: always
+
+    - name: "[AUDIT] 보고서를 로컬 JSON 파일로 저장"
+      ansible.builtin.copy:
+        dest: "/tmp/secuardian-audit-{{ ansible_hostname }}-{{ ansible_date_time.date }}.json"
+        content: "{{ audit_report | to_nice_json }}"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      tags: always
+
+    # ── 7. SeCuardian API 보고 (선택) ────────────────────────────────────────
+    - name: "[AUDIT] SeCuardian POST /api/hardening/report 전송"
+      ansible.builtin.uri:
+        url: "{{ secuardian_api_url }}/api/hardening/report"
+        method: POST
+        body_format: json
+        body: "{{ audit_report }}"
+        headers:
+          Authorization: "Bearer {{ secuardian_api_token }}"
+          Content-Type: "application/json"
+        status_code: [200, 201]
+        timeout: 10
+      when: report_to_secuardian | bool and secuardian_api_token != ""
+      delegate_to: localhost
+      become: false
+      tags: report

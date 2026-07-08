@@ -618,15 +618,15 @@ POST /api/setup/complete       # tbl_settings.setup_completed = true
 |---|---|---|---|
 | **F-AI** AI Assistant/Orchestrator | ✅ | `app/agents/orchestrator.py`·`base_agent.py`, `router_agent.py`, `services/llm_fallback.py`·`ollama_warmup.py`, `rules/keyword_matcher.py`, seed `general`(is_required)+`chat` | 없음(핵심 준용 완료). 공유 `services/llm.py` 는 미분리(orchestrator 내부) |
 | **F-SETUP** Setup Wizard | ✅ | `router_setup.py`(`/api/setup/*`), `front/src/pages/setup/SetupWizard.tsx`, `tbl_users`·`tbl_settings` | 없음 |
-| **F-WEB** 웹 포털 | 🟡 | SPA 존재: Login·Chat·Agents·Users·Settings·Profile·Addon(+modals), `App.tsx` route | 대시보드 + 5개 내장에이전트 nav/화면(마켓·워크플로우·RAG·플레이그라운드·가드레일) 전무 |
+| **F-WEB** 웹 포털 | 🟡 | SPA: Login·Chat·Agents·Users·Settings·Profile·Addon(+modals) **+ Marketplace·Workflow·RAG·Playground·Guardrails(impl/3~6)**, `App.tsx` route 5종 + nav/헤더타이틀/i18n(ko/en) | 대시보드 화면 없음(nav 항목만). Workflow Designer 는 a11y 폼 편집기(1차)뿐, React Flow 캔버스는 로드맵 |
 | **F-OPS** Makefile/DB 초기화 | 🟡 | 코어 타겟 `up/down/local-all/local-stop/dev-be/dev-fe/db-reset/seed/db-fresh/test/lint` + `ecosystem.config.js` + `scripts/{db_reset,seed,seed_local}.py` | ⚠ 삭제된 모니터 타겟(`keycloak-*`/`vault-*`/`harbor-*`/`wazuh-*`/`caddy-*`/`crowdsec-*` 등) 다수 잔존 → 정리 필요 |
-| **F-ENV** 환경 분리 | 🟡 | `.env.{local,dev,staging,prod}` + `.env.example`(코어), `config.py`, `docker-compose*.yml` | §7.3 원격 레지스트리·§7.4 멀티테넌시 `.env` 키 미포함, 신규 테이블 `tenant_id` 선반영 없음 |
+| **F-ENV** 환경 분리 | 🟡 | `.env.{local,dev,staging,prod}` + `.env.example`(코어 **+ MARKETPLACE_*/TENANT_*/GUARDRAILS_*/VECTOR_BACKEND, impl/1**), `config.py`(동일 필드), `docker-compose*.yml`. 신규 marketplace 테이블 `tenant_id` 선반영 | dev/staging/prod `.env.*` 파일에 신규키 반영 확인, 그 외 신규 테이블 `tenant_id` 지속 적용 |
 | **F-GOV** 거버넌스·보안 | 🟡 | `tbl_audit_log` 존재 | HITL 게이트/`tbl_hitl_approvals` 없음, OWASP 스코어카드·시크릿 매니저·SBOM 미구현 |
-| **F-MP** Marketplace | ⬜ | 없음 | `router_marketplace`(+remote), 카탈로그/설치 테이블, 화면 전무. **⚠ 아래 9.3 Deviation 선결정 필요** |
-| **F-WF** Workflow | ⬜ | 없음 | Flow Engine·`workflows`/`workflow_runs`/`workflow_node_runs` 테이블·Designer 전무 |
-| **F-RAG** RAG/지식베이스 | ⬜ | 없음 | 수집·임베딩·pgvector·BM25·RRF·리랭크·eval 전무 |
-| **F-PG** Playground | ⬜ | 없음 | — |
-| **F-GRD** Guardrails | ⬜ | 없음 | `router_guardrails`, 3테이블(`guardrails_domain_catalog`/`agent_guardrail_config`/`guardrails_decision_log`), `guardrails_gate.py` 전무 |
+| **F-MP** Marketplace | 🟡 | **impl/1+impl/3**: `router_marketplace.py`(raw-SQL: catalog·install·uninstall·installs), `marketplace_assets`/`marketplace_installs` DDL(tenant_id), 단일 활성 버전+hot-deploy seam, **프론트**(`pages/marketplace/`, 카탈로그·등록·설치/해제). 시험 20/20 PASS + tsc/build 0오류 | 원격 레지스트리(§7.3 E1.5), 실 addon ZIP 파이프라인 연결(§7.6) 후속 |
+| **F-WF** Workflow | 🟡 | **impl/2+impl/3**: `workflow_engine.py`(async DAG: topo fire/prune·retry·HITL·템플릿), `router_workflow.py`(CRUD·run·nodes·hitl·cancel·SSE), 3테이블(tenant_id), **프론트**(`pages/workflow/`, a11y 폼 노드/엣지 편집기·실행·HITL 승인/거부·취소). 7노드·시험 21/21 PASS + tsc/build 0오류 | React Flow 캔버스(로드맵), loop/sub-flow/cron 유보, llm 노드는 Ollama 폴백만(Claude 미연동) |
+| **F-RAG** RAG/지식베이스 | 🟡 | **impl/4**: `embeddings.py`(로컬 해싱 임베더)+`rag_pipeline.py`(청킹·BM25·RRF k=60)+`router_rag.py`(컬렉션·수집·하이브리드검색), 3테이블(tenant_id), **프론트**(`pages/rag/`). 식별자 질의 BM25 최상위 랭크 실증. 시험 15/15 PASS + tsc 0오류 | pgvector/Qdrant 확장(§7.5 로드맵), eval(Recall@10/NDCG@10) 벤치마크 미실시 |
+| **F-PG** Playground | 🟡 | **impl/5**: `router_playground.py`(공유 LLM 폴백 실호출 + RAG 컨텍스트 주입 + citations + degrade 무중단), `playground_runs` 테이블(tenant_id), **프론트**(`pages/playground/`, A/B 2-variant 동시실행+이력). 시험 13/13 PASS + tsc 0오류 | 비용(cost) 추적 없음(Claude 미연동), eval 실행 로드맵 |
+| **F-GRD** Guardrails | 🟡 | **impl/6**: `guardrails_detector.py`(**global 도메인 PII/신용정보 13종 정규식 판정 — 로컬 재구현**, Luhn 카드검증·마스킹), `router_guardrails.py`(도메인 카탈로그·에이전트 토글·test·decision log), 3테이블(`guardrails_domain_catalog`/`agent_guardrail_config`/`guardrails_decision_log`), **프론트**(`pages/guardrails/`). 13종 전수 실판정 검증. 시험 20/20 PASS + tsc/build 0오류 | Orchestrator 게이트 배선(`guardrails_gate.py`, §7.8.4) 미구현, MCP Server 프록시 연동(로컬 판정이 1차 경로) 미구현. 25종 업종 판정기는 SeCMP 책임 밖 |
 
 ### 9.2 SeCuardian 준용 계약(§3) 상태
 
@@ -635,43 +635,41 @@ POST /api/setup/complete       # tbl_settings.setup_completed = true
 | Orchestrator | ✅ | `app/agents/orchestrator.py` 클론 부팅 검증 |
 | AI Assistant | ✅ | Orchestrator tool-calling 경로 |
 | Agent 관리(4테이블) | ✅ | `tbl_agent_config`·`tbl_addon_agents`·`tbl_addon_agent_capabilities`·`tbl_agent_registry` 잔존 |
-| **Addon Agent 핫디플로이** | ❌ **제거됨** | 2026-07-08 트리밍으로 `router_addon_agent.py`·`app/addon_agent_loader.py`·`addon-agents/` 삭제, `main.py` 의 `addon_init`/`addon_guard` 제거. `tbl_addon_agents` 테이블은 잔존(dead) |
+| **Addon Agent 핫디플로이** | ✅ **복원(impl/1)** | 사용자 결정(A): `router_addon_agent.py`·`app/addon_agent_loader.py`·`addon-agents/` 원본 복원, `main.py` `addon_init`/`addon_guard` 재배선, `router_mcp`/`router_agent_config` addon 연동 원복. Marketplace/Playground/Workflow 가 차후 소비 |
 
-### 9.3 ⚠ 중대한 설계 전제 변경 (Deviation) — 선결정 필요
+### 9.3 ⚠ 설계 전제 변경 (Deviation) — **해결됨(2026-07-08): 옵션 A 채택·완료**
 
-PRD §3 은 Addon 핫디플로이를 **"기본 유지 필수 요구사항"** 으로, §7.6(F-MP)·§7.3 은 Marketplace 설치를
-**기존 `router_addon_agent.py` upload 파이프라인의 함수 재사용**(별도 재구현 금지)으로 명시한다.
-그러나 이번 트리밍으로 해당 파이프라인이 삭제되어 **F-MP(E1)의 구현 전제가 성립하지 않는다.**
-
-두 방향 중 택1 필요(추후 `/wise-dev-standard:recommend`/`implement` 진입 전 확정):
-
-- **옵션 A — Addon 핫디플로이 복원**: 원본 SeCuardian 의 `addon_agent_loader.py`·`router_addon_agent.py`·`addon-agents/` 복원. 준용 원칙 회귀, F-MP 를 원설계대로 진행. `router_mcp`/`router_agent_config` 의 addon 연동도 원복.
-- **옵션 B — Marketplace 재설계**: addon 로더 없이 정적/DB 주도 설치 모델로 F-MP 재설계. PRD §3·§7.3·§7.6 개정 동반(add-only 준용 문구 수정).
-
-> `가정:` 사용자가 addon-agents 제거를 명시적으로 요청했으므로(2026-07-08) 기본 방향은 **옵션 B** 로 추정하나, F-MP 스펙 대폭 개정이 필요하므로 사용자 확정 전까지 미결.
+PRD §3 은 Addon 핫디플로이를 "기본 유지 필수 요구사항"으로 명시했으나, 초기 트리밍 과정에서 해당 파이프라인이
+일시 삭제되어 F-MP(E1) 구현 전제가 흔들린 바 있다. **사용자가 옵션 A(Addon 핫디플로이 복원)를 확정**했고,
+impl/1 에서 `addon_agent_loader.py`·`router_addon_agent.py`·`addon-agents/` 원본을 복원, `router_mcp`/`router_agent_config`
+연동도 원복해 준용 원칙을 회복했다(§9.2). 이후 방향(옵션 B의 취지 — 내장 에이전트가 addon 로드 기능을 소비)은
+impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Playground/Workflow 가 공유 에이전트
+레지스트리(`tbl_agent_config`)를 조회하는 형태로 실현됐다. **후속 결정 불필요 — 해결 완료.**
 
 ### 9.4 Epic 진행 상태(§8.1 대비)
 
 | Epic | 상태 | 근거 |
 |---|---|---|
-| E0 스캐폴드·환경·SQL | 🟡 | 스캐폴드/코어 완료. `.env` 원격·테넌시 키 + 신규테이블 `tenant_id` 미반영 |
-| E1 Marketplace | ⬜ | 9.3 선결정 대기 |
+| E0 스캐폴드·환경·SQL | 🟡 | 스캐폴드/코어 + `.env` 원격·테넌시·RAG·Guardrails 키(impl/1) + 신규테이블 전부 `tenant_id` 선반영. 잔여: dev/staging/prod `.env.*` 개별 반영, Makefile 잔존 모니터 타겟 정리 |
+| E1 Marketplace | 🟡 | impl/1+3: 카탈로그·설치 API+프론트, 단일활성버전+hot-deploy seam(시험 20/20+tsc/build). 잔여: 원격(E1.5)·실 ZIP 연결 |
 | E1.5 원격 레지스트리 | ⬜ | — |
-| E2 Workflow 엔진 | ⬜ | — |
-| E3 Workflow Designer | ⬜ | — |
+| E2 Workflow 엔진 | 🟡 | impl/2+3: DAG 실행기·상태머신·retry·HITL·SSE+3테이블+a11y 폼 프론트(시험 21/21+tsc/build) |
+| E3 Workflow Designer | 🟡 | a11y 폼 노드/엣지 편집기 완료(impl/3, PRD §7.11 1차 요구사항 충족). React Flow 캔버스는 로드맵 확장 |
 | E3.5 Dify Import(P5) | ⬜ | 이연 |
-| E4 RAG | ⬜ | — |
-| E5 Playground | ⬜ | — |
-| E6 거버넌스 | 🟡 | `tbl_audit_log` 만 |
+| E4 RAG | 🟡 | impl/4: 청킹·해싱임베더·BM25·RRF+3테이블+프론트(시험 15/15+tsc). pgvector 확장·eval 로드맵 |
+| E5 Playground | 🟡 | impl/5: LLM 폴백 실행+RAG 컨텍스트 주입+A/B 프론트(시험 13/13+tsc). cost 추적·eval 로드맵 |
+| E6 거버넌스 | 🟡 | `tbl_audit_log` + Guardrails 이중감사(`guardrails_decision_log`, impl/6). HITL 게이트(F-WF 내)는 있으나 별도 `tbl_hitl_approvals`·OWASP 스코어카드 없음 |
 | E7 하드닝 | ⬜ | — |
-| E8 Guardrails | ⬜ | — |
+| E8 Guardrails | 🟡 | impl/6: **global 13종 로컬 판정기**(실동작)+3테이블+토글+decision log+프론트(시험 20/20+tsc/build). 잔여: Orchestrator 게이트 배선, MCP 프록시 연동, 25종 판정기(SeCMP 책임 밖) |
 
 ### 9.5 권장 다음 단계
 
-1. **9.3 Deviation 확정**(옵션 A/B) → 필요 시 §3·§7.6 개정(`/wise-dev-standard:req-update`).
-2. **E0 마무리**: `.env.example` 에 §7.3(`MARKETPLACE_*`)·§7.4(`TENANT_*`) 키 추가, 신규 테이블 DDL 에 `tenant_id` 선반영 규약 확정. Makefile 잔존 모니터 타겟 정리(사용자 예고한 후속 삭제와 연계).
-3. **스택·업종 재확인**: `/wise-dev-standard:recommend`(govtech·security 오버레이) — 이미 PRD §7.9 에 반영됨, 델타만 검토.
-4. **P1 착수**: `/wise-dev-standard:implement F-MP`(9.3 결정 반영) → 이후 P2(F-WF+F-GRD).
+1. **Orchestrator 게이트 배선**(`guardrails_gate.py`, §7.8.4) — F-GRD 를 Orchestrator `_exec_api_call` 앞뒤로 연결(기존 Orchestrator 무변경 원칙 유지하며 얇은 래퍼로).
+2. **F-MP 원격 레지스트리**(E1.5, §7.3) + **실 addon ZIP 파이프라인 연결**(§7.6) — 현재 hot-deploy seam 은 config upsert 까지만.
+3. **F-WF React Flow 캔버스**(E3 확장) — 현재 a11y 폼 편집기는 1차 요구사항 충족, 캔버스는 시각적 편의성 확장.
+4. **F-RAG pgvector 전환**(§7.5) + eval 벤치마크(Recall@10/NDCG@10, P3).
+5. **Makefile/docker-compose 잔존 모니터 타겟 정리**, dev/staging/prod `.env.*` 신규키 전파.
+6. **대시보드 화면** — 현재 nav 만 존재, `/api/agents` 카탈로그+헬스 요약 화면(§7.11) 없음.
 
 ### 9.6 변경 이력
 
@@ -679,6 +677,9 @@ PRD §3 은 Addon 핫디플로이를 **"기본 유지 필수 요구사항"** 으
 |---|---|---|
 | 2026-07-08 | v0.1~v0.3 | 초안·Guardrails 상세 확정(기존 이력) |
 | 2026-07-08 | v0.4 | **구현 현황(§9) 신설** — 복제·트리밍 소스 정적 분석 반영. F-AI·F-SETUP ✅, F-WEB·F-OPS·F-ENV·F-GOV 🟡, F-MP·F-WF·F-RAG·F-PG·F-GRD ⬜. Addon 핫디플로이 제거에 따른 F-MP 설계 전제 변경(§9.3 Deviation) 기록 |
+| 2026-07-08 | v0.5 | **impl/1** — §9.3 옵션 A 확정: Addon 핫디플로이 **복원**(✅). F-ENV 신규 `.env`/config 키 추가. **F-MP 백엔드 이식**(v0 ORM→raw-SQL): marketplace 2테이블·`router_marketplace`·시드, 시험 20/20 PASS |
+| 2026-07-08 | v0.6 | **impl/2** — **F-WF 백엔드 이식**: `workflow_engine.py`(async DAG·retry·HITL·템플릿)+`router_workflow.py`+3테이블+시드. 7노드, 시험 21/21 PASS. dev-env 검증 PASS |
+| 2026-07-08 | v0.7 | **impl/3~6 — F-WF Designer 프론트·F-MP 프론트·F-RAG·F-PG·F-GRD 전체 완료**(사용자 요청 "순차적으로 구현" 일괄 수행). impl/3: WorkflowPage(a11y 폼 편집기)+MarketplacePage+라우트/nav/i18n 5종(tsc+build 0오류). impl/4: F-RAG 백엔드(해싱임베더·BM25·RRF)+프론트, 식별자질의 BM25 최상위랭크 실증(시험 15/15). impl/5: F-PG 백엔드(LLM폴백 실행+RAG 컨텍스트+degrade무중단)+A/B 프론트(시험 13/13). impl/6: F-GRD 백엔드(**global PII/신용정보 13종 정규식 판정기 로컬 재구현** — Luhn카드검증·마스킹·에이전트토글·이중감사)+프론트(13종 전수 실증, 시험 20/20). §9.3 Deviation 완전 해결로 정리. 전체 회귀: boot 24 routes, ruff 신규코드 0오류, 프론트 tsc+build 0오류(2036 modules). F-MP·F-WF·F-RAG·F-PG·F-GRD **전부 🟡(백엔드+프론트 동작, 확장 항목만 잔존)** |
 
 ---
 

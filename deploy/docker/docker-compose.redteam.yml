@@ -1,0 +1,40 @@
+# AI Red Team 인프라 — E19 T19-1
+# ⚠️ 격리 네트워크(redteam-isolated) 전용 — 프로덕션 네트워크 연결 절대 금지
+# ⚠️ 실행 전 deploy/config/redteam/approval-checklist.md 서면 승인 필수
+#
+# pentagi License: MIT  — https://github.com/vxcontrol/pentagi
+# 역할: MITRE ATT&CK 기반 자율 AI 침투 테스트 에이전트 (격리 스테이징 전용)
+
+services:
+  pentagi:
+    image: ghcr.io/vxcontrol/pentagi:v0.5.0
+    container_name: secuardian-pentagi
+    restart: "no"
+    ports:
+      - "127.0.0.1:8088:8088"  # localhost 바인딩 전용 — 외부 노출 금지
+    volumes:
+      - pentagi-data:/app/data
+      - ./deploy/config/redteam:/app/config:ro
+    environment:
+      PENTAGI_CONFIG: /app/config/pentagi.yaml
+      # ANTHROPIC_API_KEY: — Vault 주입 필수, 하드코딩 금지
+    labels:
+      secuardian.epic: "E19"
+      secuardian.layer: "L6-Forensics"
+      secuardian.license: "MIT"
+      secuardian.warning: "ISOLATED-NETWORK-ONLY"
+    networks:
+      - redteam-isolated  # 격리 전용 네트워크 — secuardian-net 연결 금지
+
+volumes:
+  pentagi-data:
+    name: secuardian_pentagi_data
+
+networks:
+  redteam-isolated:
+    name: secuardian_redteam_isolated
+    driver: bridge
+    internal: true  # 외부 인터넷 차단
+    ipam:
+      config:
+        - subnet: "172.30.0.0/24"

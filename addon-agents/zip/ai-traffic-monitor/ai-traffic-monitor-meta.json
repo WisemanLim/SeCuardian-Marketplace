@@ -1,0 +1,95 @@
+{
+  "agent_type": "service",
+  "version": "1.0.0",
+  "display_name": "AI 트래픽 모니터",
+  "description": "브라우저에 자동 연결되는 AI 도우미(Perplexity·Gemini·ChatGPT·Claude·Copilot)의 '대화 내용'이 아닌 '트래픽 사용량(바이트/패킷)'을 CLI 도구로 정량 측정하는 모니터링 에이전트입니다. vnstat(누적)·nethogs(프로세스)·dig+tcpdump+tshark(목적지 IP 집계)를 읽기 전용으로 래핑합니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다. 캡처·스냅샷 등 특권 작업은 supervisor/admin 만 가능합니다.",
+  "description_en": "A monitoring agent that quantifies TRAFFIC USAGE (bytes/packets) — not conversation content — of browser-connected AI assistants (Perplexity, Gemini, ChatGPT, Claude, Copilot). Wraps read-only CLI tools: vnstat (cumulative), nethogs (per-process), and dig+tcpdump+tshark (destination-IP aggregation). It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant. Capture/snapshot privileged actions require supervisor/admin.",
+  "epic": "E15",
+  "layer": "Cross",
+  "base_agent": null,
+  "capabilities": [
+    {
+      "verb": "query",
+      "domain": "observability.ai-traffic.usage",
+      "description": "vnstat 로 인터페이스 누적 트래픽 사용량(일/월/총)을 조회합니다",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "interface": { "type": "string" }
+        },
+        "required": []
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "interface": { "type": "string" },
+          "summary": { "type": "object" }
+        }
+      },
+      "qos": { "max_latency_ms": 10000, "supports_async": false, "supports_streaming": false }
+    },
+    {
+      "verb": "query",
+      "domain": "observability.ai-traffic.resolve",
+      "description": "AI 도우미 도메인을 현재 목적지 IP 집합으로 해석합니다",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "domains": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": []
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resolved": { "type": "object" },
+          "unique_ips": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "qos": { "max_latency_ms": 15000, "supports_async": false, "supports_streaming": false }
+    },
+    {
+      "verb": "inspect",
+      "domain": "observability.ai-traffic.capture",
+      "description": "AI 도메인 IP 로 향하는 HTTPS 트래픽을 tcpdump 로 캡처하고 tshark 로 바이트/패킷을 집계합니다 (supervisor/admin)",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "domains": { "type": "array", "items": { "type": "string" } },
+          "interface": { "type": "string" },
+          "seconds": { "type": "integer" }
+        },
+        "required": []
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "packets": { "type": "integer" },
+          "bytes": { "type": "integer" },
+          "pcap": { "type": "string" }
+        }
+      },
+      "qos": { "max_latency_ms": 120000, "supports_async": false, "supports_streaming": false }
+    }
+  ],
+  "governance": {
+    "data_classification": "internal",
+    "human_approval_required": true,
+    "audit_level": "high"
+  },
+  "required_env": [],
+  "optional_env": [
+    "AITM_INTERFACE",
+    "AITM_DOMAINS",
+    "AITM_CAPTURE_DIR",
+    "AITM_MAX_CAPTURE_SEC",
+    "AITM_MAX_SNAPSHOT_SEC"
+  ],
+  "default_env": {
+    "AITM_INTERFACE": "eth0",
+    "AITM_CAPTURE_DIR": "/tmp/ai-traffic",
+    "AITM_MAX_CAPTURE_SEC": "60",
+    "AITM_MAX_SNAPSHOT_SEC": "30"
+  },
+  "min_platform_version": "2.0.0"
+}

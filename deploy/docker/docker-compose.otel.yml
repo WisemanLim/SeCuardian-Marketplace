@@ -1,0 +1,59 @@
+# OpenTelemetry Collector — E15 T15-1
+# License: Apache-2.0
+# Usage: docker compose -f deploy/docker/docker-compose.otel.yml up -d
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.111.0
+    container_name: secuardian-otel-collector
+    restart: unless-stopped
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8889:8889"   # Prometheus metrics exporter
+      - "13133:13133" # Health check
+    volumes:
+      - ../../deploy/config/otel/otel-collector.yaml:/etc/otelcol-contrib/otel-collector.yaml:ro
+      - /var/log:/var/log/host:ro  # 호스트 로그 (선택)
+    command: ["--config=/etc/otelcol-contrib/otel-collector.yaml"]
+    networks:
+      - secuardian-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:13133/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options: {max-size: "100m", max-file: "5"}
+    labels:
+      - "secuardian.epic=E15"
+      - "secuardian.layer=cross-cutting"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.61.0
+    container_name: secuardian-jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14317:4317"   # OTLP gRPC (충돌 방지 오프셋)
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - SPAN_STORAGE_TYPE=memory
+    networks:
+      - secuardian-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:14269/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options: {max-size: "100m", max-file: "5"}
+    labels:
+      - "secuardian.epic=E15"
+      - "secuardian.layer=cross-cutting"
+
+networks:
+  secuardian-net:
+    external: true
+    name: secuardian-net

@@ -1,0 +1,189 @@
+# Source: Wazuh | License: GPL-2.0 (Wazuh) + Apache-2.0 (OpenSearch)
+# E06 T06-1 — Wazuh SIEM + OpenSearch (단일 노드 개발용)
+# Ref: https://github.com/wazuh/wazuh-docker
+#
+# 기동 순서:
+#   1. make wazuh-certs        # TLS 인증서 생성 (최초 1회)
+#   2. make wazuh-up           # 서비스 기동 (첫 기동 5~10분 소요)
+#   3. make wazuh-status       # 상태 확인
+#
+# 주의:
+#   - 호스트 커널 파라미터 필수: sysctl -w vm.max_map_count=262144
+#   - 초기 패스워드 변경: 기동 후 Wazuh Dashboard 접속 → admin 패스워드 변경 권장
+#   - 실시크릿 절대 커밋 금지: deploy/docker/.env.wazuh 사용
+
+name: secuardian-wazuh
+
+services:
+
+  # ── TLS 인증서 생성 (최초 1회 실행 후 exit) ───────────────────────────────
+  wazuh.certs:
+    image: wazuh/wazuh-certs-generator:0.0.2
+    container_name: secuardian-wazuh-certs
+    volumes:
+      - wazuh-certs:/certificates
+      - ../../deploy/config/wazuh/certs.yml:/config/certs.yml:ro
+    command: /bin/bash -c "bash /scripts/generate-wazuh-certs.sh"
+    profiles:
+      - certs
+
+  # ── Wazuh Manager (HIDS 엔진 + API) ─────────────────────────────────────
+  wazuh.manager:
+    image: wazuh/wazuh-manager:4.9.2
+    container_name: secuardian-wazuh-manager
+    restart: unless-stopped
+    depends_on:
+      wazuh.indexer:
+        condition: service_healthy
+    ports:
+      - "${WAZUH_AGENT_PORT:-1514}:1514/udp"   # 에이전트 syslog
+      - "${WAZUH_ENROLL_PORT:-1515}:1515"       # 에이전트 등록
+      - "${WAZUH_API_PORT:-55000}:55000"         # Wazuh REST API
+    environment:
+      INDEXER_URL: "https://wazuh.indexer:9200"
+      INDEXER_USERNAME: "${WAZUH_INDEXER_USER:-admin}"
+      INDEXER_PASSWORD: "${WAZUH_INDEXER_PASSWORD:-SecureAdmin123!}"
+      FILEBEAT_SSL_VERIFICATION_MODE: "full"
+      SSL_CERTIFICATE_AUTHORITIES: "/etc/ssl/root-ca.pem"
+      # 인증서 생성기가 server 노드를 certs.yml의 이름(wazuh.manager)으로 생성하므로 실제 파일명과 일치시킴
+      SSL_CERTIFICATE: "/etc/ssl/wazuh.manager.pem"
+      SSL_KEY: "/etc/ssl/wazuh.manager-key.pem"
+      API_USERNAME: "${WAZUH_API_USER:-wazuh}"
+      API_PASSWORD: "${WAZUH_API_PASSWORD:-Wazuh@Api2026!}"
+    volumes:
+      - wazuh-api-config:/var/ossec/api/configuration
+      - wazuh-etc:/var/ossec/etc
+      - wazuh-logs:/var/ossec/logs
+      - wazuh-queue:/var/ossec/queue
+      - wazuh-var-multigroups:/var/ossec/var/multigroups
+      - wazuh-integrations:/var/ossec/integrations
+      - wazuh-active-response:/var/ossec/active-response/bin
+      - wazuh-agentless:/var/ossec/agentless
+      - wazuh-wodles:/var/ossec/wodles
+      - wazuh-filebeat:/etc/filebeat
+      # 커스텀 ossec.conf (E06 T06-1 알림 임계값 + 로그 보존 설정)
+      - ../../deploy/config/wazuh/ossec.conf:/var/ossec/etc/ossec.conf:ro
+      # TLS 인증서
+      - wazuh-certs:/etc/ssl:ro
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl -sk https://localhost:55000/ | grep -q 'Wazuh'"]
+      interval: 60s
+      timeout: 30s
+      retries: 5
+      start_period: 120s
+    networks:
+      - wazuh-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # ── Wazuh Indexer (OpenSearch 기반) ──────────────────────────────────────
+  wazuh.indexer:
+    image: wazuh/wazuh-indexer:4.9.2
+    container_name: secuardian-wazuh-indexer
+    restart: unless-stopped
+    ports:
+      - "${WAZUH_INDEXER_PORT:-9200}:9200"
+    environment:
+      # arm64 호스트에서 amd64 이미지를 QEMU 에뮬레이션으로 구동 시 OpenSearch의
+      # seccomp 부트스트랩 시스템콜 필터 검사가 실패하므로 비활성화(공식 문서화된 우회법)
+      OPENSEARCH_JAVA_OPTS: "${OPENSEARCH_JAVA_OPTS:--Xms2g -Xmx2g -Dopensearch.bootstrap.system_call_filter=false}"
+      bootstrap.memory_lock: "true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - wazuh-indexer-data:/var/lib/wazuh-indexer
+      - wazuh-certs:/usr/share/wazuh-indexer/certs:ro
+      - ../../deploy/config/wazuh/wazuh.indexer.yml:/usr/share/wazuh-indexer/opensearch.yml:ro
+      - ../../deploy/config/wazuh/internal_users.yml:/usr/share/wazuh-indexer/opensearch-security/internal_users.yml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sk -u \"${WAZUH_INDEXER_USER:-admin}:${WAZUH_INDEXER_PASSWORD}\" https://localhost:9200/_cluster/health | grep -E '\"status\":\"(green|yellow)\"'"]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+      start_period: 90s
+    networks:
+      - wazuh-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # ── Wazuh Dashboard (OpenSearch Dashboards) ───────────────────────────────
+  wazuh.dashboard:
+    image: wazuh/wazuh-dashboard:4.9.2
+    container_name: secuardian-wazuh-dashboard
+    restart: unless-stopped
+    depends_on:
+      wazuh.indexer:
+        condition: service_healthy
+      wazuh.manager:
+        condition: service_healthy
+    ports:
+      - "${WAZUH_DASHBOARD_PORT:-5601}:5601"
+    environment:
+      INDEXER_USERNAME: "${WAZUH_INDEXER_USER:-admin}"
+      INDEXER_PASSWORD: "${WAZUH_INDEXER_PASSWORD:-SecureAdmin123!}"
+      WAZUH_API_URL: "https://wazuh.manager"
+      DASHBOARD_USERNAME: "${WAZUH_DASHBOARD_USER:-kibanaserver}"
+      DASHBOARD_PASSWORD: "${WAZUH_DASHBOARD_PASSWORD:-DashBoard@2026!}"
+      API_USERNAME: "${WAZUH_API_USER:-wazuh}"
+      API_PASSWORD: "${WAZUH_API_PASSWORD:-Wazuh@Api2026!}"
+    volumes:
+      - wazuh-dashboard-config:/usr/share/wazuh-dashboard/data
+      - wazuh-certs:/usr/share/wazuh-dashboard/certs:ro
+      - ../../deploy/config/wazuh/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sk https://localhost:5601/app/wazuh | grep -q 'wazuh'"]
+      interval: 60s
+      timeout: 30s
+      retries: 5
+      start_period: 180s
+    networks:
+      - wazuh-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+volumes:
+  wazuh-certs:
+    name: secuardian-wazuh-certs
+  wazuh-api-config:
+    name: secuardian-wazuh-api-config
+  wazuh-etc:
+    name: secuardian-wazuh-etc
+  wazuh-logs:
+    name: secuardian-wazuh-logs
+  wazuh-queue:
+    name: secuardian-wazuh-queue
+  wazuh-var-multigroups:
+    name: secuardian-wazuh-var-multigroups
+  wazuh-integrations:
+    name: secuardian-wazuh-integrations
+  wazuh-active-response:
+    name: secuardian-wazuh-active-response
+  wazuh-agentless:
+    name: secuardian-wazuh-agentless
+  wazuh-wodles:
+    name: secuardian-wazuh-wodles
+  wazuh-filebeat:
+    name: secuardian-wazuh-filebeat
+  wazuh-indexer-data:
+    name: secuardian-wazuh-indexer-data
+  wazuh-dashboard-config:
+    name: secuardian-wazuh-dashboard-config
+
+networks:
+  wazuh-net:
+    driver: bridge
+    name: secuardian-wazuh-net

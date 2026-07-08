@@ -1,0 +1,61 @@
+{
+  "name": "Falco CRITICAL Pod 격리 플레이북",
+  "description": "Falco CRITICAL 이벤트 → Pod 격리 + TheHive 케이스 생성",
+  "trigger": "webhook",
+  "steps": [
+    {
+      "id": "trigger",
+      "type": "trigger:webhook",
+      "label": "Falco 이벤트 수신",
+      "input": {
+        "schema": {
+          "priority": "string",
+          "rule": "string",
+          "output_fields": {
+            "container.name": "string",
+            "k8s.pod.name": "string",
+            "k8s.ns.name": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "check_critical",
+      "type": "condition",
+      "label": "CRITICAL 우선순위 확인",
+      "condition": "trigger.priority == 'Critical'"
+    },
+    {
+      "id": "isolate_via_secuardian",
+      "type": "action:http",
+      "label": "SeCuardian Pod 격리 요청",
+      "config": {
+        "url": "http://secuardian:8200/api/cilium/isolate",
+        "method": "POST",
+        "body": {
+          "pod_name": "${trigger.output_fields['k8s.pod.name']}",
+          "namespace": "${trigger.output_fields['k8s.ns.name']}",
+          "reason": "Falco CRITICAL: ${trigger.rule}"
+        }
+      }
+    },
+    {
+      "id": "create_thehive_case",
+      "type": "action:http",
+      "label": "TheHive 인시던트 케이스 생성",
+      "config": {
+        "url": "http://thehive:9000/api/v1/case",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer ${THEHIVE_API_KEY}"
+        },
+        "body": {
+          "title": "Falco CRITICAL: ${trigger.rule}",
+          "severity": 3,
+          "tags": ["falco", "auto-isolate", "k8s"],
+          "description": "Pod: ${trigger.output_fields['k8s.pod.name']}\nNamespace: ${trigger.output_fields['k8s.ns.name']}\nRule: ${trigger.rule}"
+        }
+      }
+    }
+  ]
+}

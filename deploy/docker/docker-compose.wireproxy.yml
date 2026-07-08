@@ -1,0 +1,36 @@
+# WireProxy ZTNA — E12 T12-1
+# License: ISC
+# Usage: docker compose -f deploy/docker/docker-compose.wireproxy.yml up -d
+services:
+  wireproxy:
+    image: ghcr.io/pufferffish/wireproxy:v1.0.9
+    container_name: secuardian-wireproxy
+    restart: unless-stopped
+    volumes:
+      - ./deploy/config/wireproxy/wireproxy.conf:/etc/wireproxy/wireproxy.conf:ro
+    ports:
+      - "127.0.0.1:1080:1080"  # SOCKS5 프록시 — localhost 바인딩
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    networks:
+      - secuardian-net
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "1080"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+    labels:
+      - "secuardian.epic=E12"
+      - "secuardian.layer=L3-Network"
+
+networks:
+  secuardian-net:
+    external: true
+    name: secuardian-net

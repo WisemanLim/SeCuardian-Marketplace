@@ -1,0 +1,54 @@
+# Source: CrowdSec | License: MIT | https://github.com/crowdsecurity/crowdsec
+# E04 T04-2 — CrowdSec Agent + LAPI (크라우드소싱 위협 차단)
+# 기동: make crowdsec-up
+# 전제: make caddy-up (logs/caddy.log 가 존재해야 함)
+# ⚠ 초기 설정: make crowdsec-setup (Bouncer Key 발급 + Simulation 모드 활성화)
+
+name: secuardian-crowdsec
+
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:v1.6.8
+    container_name: secuardian-crowdsec
+    restart: unless-stopped
+    ports:
+      - "${CROWDSEC_LAPI_PORT:-8082}:8080"
+    environment:
+      GID: "${GID:-1000}"
+      COLLECTIONS: "crowdsecurity/caddy crowdsecurity/linux"
+      ENROLL_TAGS: "secuardian docker"
+    volumes:
+      # CrowdSec 메인 설정 (named volume — 컨테이너가 기본값으로 초기화)
+      - crowdsec-config:/etc/crowdsec
+      # acquis.d: 추가 로그 소스 정의 (bind mount — 개별 파일만 오버레이)
+      - ../../deploy/config/crowdsec/acquis.d:/etc/crowdsec/acquis.d
+      # notifications: HTTP webhook 플러그인 설정 (bind mount)
+      - ../../deploy/config/crowdsec/notifications:/etc/crowdsec/notifications
+      # Caddy 로그 감시 (읽기 전용)
+      - ../../logs:/var/log/caddy:ro
+      # CrowdSec 데이터 (SQLite DB, decisions)
+      - crowdsec-db:/var/lib/crowdsec/data
+    healthcheck:
+      test: ["CMD", "cscli", "version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - crowdsec-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+volumes:
+  crowdsec-db:
+    name: secuardian-crowdsec-db
+  crowdsec-config:
+    name: secuardian-crowdsec-config
+
+networks:
+  crowdsec-net:
+    driver: bridge
+    name: secuardian-crowdsec-net

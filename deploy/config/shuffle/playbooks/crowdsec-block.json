@@ -1,0 +1,53 @@
+{
+  "name": "CrowdSec IP 자동 차단 플레이북",
+  "description": "CrowdSec 이벤트 수신 → IP 차단 + TheHive 케이스 생성",
+  "trigger": "webhook",
+  "steps": [
+    {
+      "id": "trigger",
+      "type": "trigger:webhook",
+      "label": "CrowdSec 알림 수신",
+      "input": {
+        "schema": {
+          "ip": "string",
+          "scenario": "string",
+          "severity": "string"
+        }
+      }
+    },
+    {
+      "id": "check_severity",
+      "type": "condition",
+      "label": "심각도 HIGH+ 확인",
+      "condition": "trigger.severity in ['high', 'critical']"
+    },
+    {
+      "id": "notify_secuardian",
+      "type": "action:http",
+      "label": "SeCuardian 이벤트 기록",
+      "config": {
+        "url": "http://secuardian:8200/api/crowdsec/alerts",
+        "method": "POST",
+        "body": "$trigger"
+      }
+    },
+    {
+      "id": "create_thehive_case",
+      "type": "action:http",
+      "label": "TheHive 케이스 생성",
+      "config": {
+        "url": "http://thehive:9000/api/v1/case",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer ${THEHIVE_API_KEY}"
+        },
+        "body": {
+          "title": "CrowdSec: ${trigger.scenario} from ${trigger.ip}",
+          "severity": 2,
+          "tags": ["crowdsec", "auto-block", "${trigger.scenario}"],
+          "description": "자동 차단된 IP: ${trigger.ip}\n시나리오: ${trigger.scenario}"
+        }
+      }
+    }
+  ]
+}

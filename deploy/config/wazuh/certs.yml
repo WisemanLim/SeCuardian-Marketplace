@@ -1,0 +1,19 @@
+# Wazuh TLS 인증서 생성 설정 — E06 T06-1
+# wazuh-certs-generator 에 전달되는 노드 정의
+# 사용: make wazuh-certs (최초 1회)
+
+nodes:
+  # Wazuh Indexer 노드
+  indexer:
+    - name: wazuh.indexer
+      ip: wazuh.indexer
+
+  # Wazuh Server (Manager) 노드
+  server:
+    - name: wazuh.manager
+      ip: wazuh.manager
+
+  # Wazuh Dashboard 노드
+  dashboard:
+    - name: wazuh.dashboard
+      ip: wazuh.dashboard

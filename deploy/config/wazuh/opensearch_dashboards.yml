@@ -1,0 +1,24 @@
+# Wazuh Dashboard (OpenSearch Dashboards) 설정 — E06 T06-1
+
+server.host: 0.0.0.0
+server.port: 5601
+
+# OpenSearch Indexer 연결
+opensearch.hosts: https://wazuh.indexer:9200
+opensearch.ssl.verificationMode: certificate
+opensearch.ssl.certificateAuthorities:
+  - /usr/share/wazuh-dashboard/certs/root-ca.pem
+opensearch.ssl.certificate: /usr/share/wazuh-dashboard/certs/wazuh.dashboard.pem
+opensearch.ssl.key: /usr/share/wazuh-dashboard/certs/wazuh.dashboard-key.pem
+
+# Dashboard TLS
+server.ssl.enabled: true
+server.ssl.certificate: /usr/share/wazuh-dashboard/certs/wazuh.dashboard.pem
+server.ssl.key: /usr/share/wazuh-dashboard/certs/wazuh.dashboard-key.pem
+
+# 세션 및 보안
+opensearch_security.auth.type: basicauth
+uiSettings.overrides.defaultRoute: /app/wazuh
+
+# 로깅
+logging.dest: stdout

@@ -1,0 +1,86 @@
+{
+  "key": "emb_teleport-pam",
+  "name": "Teleport PAM",
+  "type": "service",
+  "epic": "E17",
+  "layer": "L1 Identity",
+  "description": "Teleport 특권 접근(PAM) 감사 이벤트를 수집하고 활성 세션·사용자를 조회하는 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "description_en": "Privileged access monitor for Teleport — ingests webhook audit events, queries live sessions and users, and exposes a filtered in-memory event log. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
+  "version": "1.0.0",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/status",
+      "auth": false,
+      "description": "Ping Teleport proxy (no JWT required)"
+    },
+    {
+      "method": "GET",
+      "path": "/sessions",
+      "auth": true,
+      "description": "List sessions for configured cluster (?active=true/false)"
+    },
+    {
+      "method": "POST",
+      "path": "/audit/events",
+      "auth": false,
+      "description": "Teleport webhook receiver (guarded by TELEPORT_WEBHOOK_ENABLED)"
+    },
+    {
+      "method": "GET",
+      "path": "/audit/events",
+      "auth": true,
+      "description": "List stored audit events (?limit, ?event_type, ?user)"
+    },
+    {
+      "method": "DELETE",
+      "path": "/audit/events",
+      "auth": "admin",
+      "description": "Clear all stored audit events (admin only)"
+    },
+    {
+      "method": "GET",
+      "path": "/users",
+      "auth": true,
+      "description": "List Teleport users"
+    },
+    {
+      "method": "GET",
+      "path": "/config",
+      "auth": true,
+      "description": "Return agent config (token masked)"
+    }
+  ],
+  "env_vars": [
+    {
+      "name": "TELEPORT_PROXY_URL",
+      "default": "https://localhost:3080",
+      "description": "Teleport proxy base URL"
+    },
+    {
+      "name": "TELEPORT_TOKEN",
+      "default": "",
+      "description": "Bearer token for Teleport API calls"
+    },
+    {
+      "name": "TELEPORT_CLUSTER",
+      "default": "localhost",
+      "description": "Teleport cluster name"
+    },
+    {
+      "name": "TELEPORT_AUDIT_MAX",
+      "default": "1000",
+      "description": "Max audit events kept in memory (deque maxlen)"
+    },
+    {
+      "name": "TELEPORT_WEBHOOK_ENABLED",
+      "default": "true",
+      "description": "Enable/disable the webhook receiver endpoint"
+    }
+  ],
+  "notes": [
+    "Teleport API calls use verify=False to handle self-signed certificates.",
+    "Audit events are stored in a deque — they are lost on restart; use a DB sink for persistence.",
+    "POST /audit/events is intentionally unauthenticated — protect it at the network/firewall level."
+  ]
+}

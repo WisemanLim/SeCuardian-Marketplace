@@ -1,0 +1,70 @@
+# Falco Helm Values — SeCuardian dev
+# License: Apache-2.0
+# Chart: falcosecurity/falco
+# 사용: helm upgrade --install falco falcosecurity/falco \
+#         -n falco --create-namespace \
+#         -f deploy/k8s/falco/values.yaml
+#
+# eBPF 드라이버: 커널 5.8+ 필요.
+# 구 커널: driver.kind: module (커널 헤더 필요)
+
+driver:
+  # modern_ebpf(CO-RE/BTF): 커널별 드라이버 다운로드·컴파일 불필요(커널 5.8+/BTF 필요).
+  # 레거시 ebpf는 커널별 prebuilt .o 다운로드가 필요해 LinuxKit 등 비표준 커널에서 404 실패.
+  kind: modern_ebpf
+
+falco:
+  # 기본 룰 + 커스텀 룰 (ConfigMap mount)
+  rulesFiles:
+    - /etc/falco/falco_rules.yaml
+    - /etc/falco/k8s_audit_rules.yaml
+    - /etc/falco/custom-rules.d/custom-rules.yaml
+
+  grpc:
+    enabled: true
+  grpcOutput:
+    enabled: true
+
+falcosidekick:
+  enabled: true
+  config:
+    webhook:
+      address: "http://secuardian.default.svc.cluster.local:8000/api/falco/events"
+      customHeaders: ""
+      minimumpriority: "critical"  # CRITICAL 이상만 전송 (노이즈 감소)
+      mutualtls: false
+      checkcert: false
+    # Slack (선택 — 운영: Vault 주입)
+    slack:
+      webhookurl: ""
+      minimumpriority: "critical"
+
+# Custom rules ConfigMap 마운트 (falco_install.sh 가 생성)
+extraVolumes:
+  - name: custom-rules
+    configMap:
+      name: falco-custom-rules
+extraVolumeMounts:
+  - name: custom-rules
+    mountPath: /etc/falco/custom-rules.d/
+    readOnly: true
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+
+# control-plane + master 노드 포함 (DaemonSet 전체 노드 배포)
+tolerations:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Exists
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+    operator: Exists
+
+# 재시작 정책 — 룰 로드 실패 시 탐지 중단 방지
+podRestartPolicy: Always

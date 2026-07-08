@@ -1,0 +1,25 @@
+# CrowdSec 프로파일 설정 — E04 T04-2
+# CrowdSec v1.6+ : simulation 필드는 profiles.yaml에서 분리됨
+# 시뮬레이션 모드 활성화: make crowdsec-cscli CMD="cscli simulation enable"
+# 시뮬레이션 모드 해제:   make crowdsec-cscli CMD="cscli simulation disable"
+# (시뮬레이션 상태는 /etc/crowdsec/simulation.yaml 로 관리)
+
+name: default_ip_remediation
+filters:
+  - Alert.Remediation == true && Alert.DecisionType != "captcha"
+decisions:
+  - type: ban
+    duration: 4h
+notifications:
+  - secuardian_webhook
+on_success: break
+
+---
+
+name: captcha_remediation
+filters:
+  - Alert.Remediation == true && Alert.DecisionType == "captcha"
+decisions:
+  - type: captcha
+    duration: 4h
+on_success: break

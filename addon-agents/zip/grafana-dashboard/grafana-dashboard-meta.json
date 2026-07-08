@@ -1,0 +1,92 @@
+{
+  "agent_key": "grafana-dashboard",
+  "agent_type": "rag",
+  "version": "1.0.0",
+  "display_name": "Grafana Dashboard RAG Agent",
+  "description": "Grafana 대시보드 패널 정보를 임베딩하고 벡터 검색으로 질의에 답변하는 RAG Agent입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "description_en": "RAG agent that embeds Grafana dashboard panel information and answers queries via vector search. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
+  "epic": null,
+  "layer": "Cross",
+  "capabilities": [
+    {
+      "verb": "retrieve",
+      "domain": "observability.grafana",
+      "description": "Grafana 대시보드 패널 정보에서 관련 내용을 검색하고 출처와 함께 답변합니다",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "top_k": {
+            "type": "integer",
+            "default": 3
+          }
+        },
+        "required": [
+          "question"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string"
+          },
+          "sources": {
+            "type": "array"
+          }
+        }
+      },
+      "qos": {
+        "max_latency_ms": 15000,
+        "supports_async": false,
+        "supports_streaming": true
+      }
+    },
+    {
+      "verb": "sync",
+      "domain": "observability.grafana",
+      "description": "Grafana API를 호출하여 대시보드 패널 정보를 자동으로 인제스트합니다",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "ingested": {
+            "type": "integer"
+          },
+          "documents": {
+            "type": "array"
+          },
+          "errors": {
+            "type": "array"
+          }
+        }
+      },
+      "qos": {
+        "max_latency_ms": 60000,
+        "supports_async": true,
+        "supports_streaming": false
+      }
+    }
+  ],
+  "governance": {
+    "data_classification": "internal",
+    "human_approval_required": false,
+    "audit_level": "standard"
+  },
+  "required_env": [],
+  "optional_env": [
+    "GRAFANA_URL",
+    "GRAFANA_SERVICE_TOKEN",
+    "OLLAMA_BASE_URL"
+  ],
+  "env_defaults": {
+    "GRAFANA_URL": "http://localhost:3000",
+    "OLLAMA_BASE_URL": "http://localhost:11434"
+  },
+  "min_platform_version": "2.0.0"
+}

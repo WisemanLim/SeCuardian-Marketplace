@@ -1,0 +1,220 @@
+---
+# SeCuardian — Wazuh Agent 배포 플레이북 (E06 T06-4)
+# License: Apache-2.0 (SeCuardian) / GPL-2.0 (Wazuh Agent) — 내부 배포 OK
+#
+# 역할: Wazuh Agent 4.9.2 설치 → Manager 등록 → 서비스 기동
+#
+# 사용법:
+#   # Syntax check (연결 없이)
+#   ansible-playbook -i inventory/hosts.yml playbooks/wazuh_agent.yml --syntax-check
+#
+#   # Check mode (dry-run, 변경 없음)
+#   ansible-playbook -i inventory/hosts.yml playbooks/wazuh_agent.yml --check \
+#     -e "wazuh_manager_ip=<MANAGER_IP>"
+#
+#   # 실제 배포
+#   ansible-playbook -i inventory/hosts.yml playbooks/wazuh_agent.yml \
+#     -e "wazuh_manager_ip=<MANAGER_IP>" \
+#     [-e "wazuh_agent_group=linux-servers"]
+#
+#   # SeCuardian 등록 활성화
+#   ansible-playbook ... -e "report_to_secuardian=true" \
+#                        -e "secuardian_url=http://localhost:8200"
+
+- name: Wazuh Agent 4.9.2 배포 및 Manager 등록
+  hosts: "{{ target_hosts | default('secuardian_servers') }}"
+  become: true
+  gather_facts: true
+
+  vars:
+    wazuh_version: "4.9.2"
+    wazuh_manager_ip: "{{ wazuh_manager_ip | default('127.0.0.1') }}"
+    wazuh_manager_port: "{{ wazuh_manager_port | default('1514') }}"
+    wazuh_agent_name: "{{ wazuh_agent_name | default(inventory_hostname) }}"
+    wazuh_agent_group: "{{ wazuh_agent_group | default('default') }}"
+    wazuh_ossec_conf: /var/ossec/etc/ossec.conf
+    wazuh_repo_key_url: "https://packages.wazuh.com/key/GPG-KEY-WAZUH"
+    wazuh_repo_url: "https://packages.wazuh.com/4.x/apt"
+    report_to_secuardian: "{{ report_to_secuardian | default(false) | bool }}"
+    secuardian_url: "{{ secuardian_url | default('http://localhost:8200') }}"
+
+  pre_tasks:
+    - name: "[PRE] OS 지원 확인 — Debian/Ubuntu 전용"
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family == "Debian"
+        fail_msg: "지원 OS: Debian/Ubuntu. 현재: {{ ansible_os_family }}"
+        success_msg: "OS 확인 OK: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+      tags: [PRE]
+
+    - name: "[PRE] 필수 패키지 확인 (apt, systemd)"
+      ansible.builtin.assert:
+        that:
+          - ansible_pkg_mgr == "apt"
+          - ansible_service_mgr == "systemd"
+        fail_msg: "패키지매니저=apt, 서비스매니저=systemd 필요"
+      tags: [PRE]
+
+  tasks:
+    # ── 1. Wazuh APT 저장소 등록 ─────────────────────────────────────────────
+    - name: "[REPO] Wazuh GPG 키 등록"
+      ansible.builtin.apt_key:
+        url: "{{ wazuh_repo_key_url }}"
+        state: present
+      tags: [REPO]
+
+    - name: "[REPO] Wazuh 4.x APT 저장소 추가"
+      ansible.builtin.apt_repository:
+        repo: "deb {{ wazuh_repo_url }} stable main"
+        state: present
+        filename: wazuh
+        update_cache: true
+      tags: [REPO]
+
+    # ── 2. Wazuh Agent 설치 ──────────────────────────────────────────────────
+    - name: "[INSTALL] wazuh-agent={{ wazuh_version }} 설치"
+      ansible.builtin.apt:
+        name: "wazuh-agent={{ wazuh_version }}-*"
+        state: present
+        update_cache: false
+        allow_downgrade: true
+      tags: [INSTALL]
+      notify: restart wazuh-agent
+
+    - name: "[INSTALL] wazuh-agent 버전 고정 (자동 업그레이드 방지)"
+      ansible.builtin.dpkg_selections:
+        name: wazuh-agent
+        selection: hold
+      tags: [INSTALL]
+
+    # ── 3. Agent 설정 ────────────────────────────────────────────────────────
+    - name: "[CONFIG] ossec.conf — Manager 주소 설정"
+      ansible.builtin.lineinfile:
+        path: "{{ wazuh_ossec_conf }}"
+        regexp: '<address>.*</address>'
+        line: "      <address>{{ wazuh_manager_ip }}</address>"
+        state: present
+        backup: true
+      tags: [CONFIG]
+      notify: restart wazuh-agent
+
+    - name: "[CONFIG] ossec.conf — Manager 포트 설정"
+      ansible.builtin.lineinfile:
+        path: "{{ wazuh_ossec_conf }}"
+        regexp: '<port>.*</port>'
+        line: "      <port>{{ wazuh_manager_port }}</port>"
+        state: present
+      tags: [CONFIG]
+      notify: restart wazuh-agent
+
+    - name: "[CONFIG] Agent 이름 설정 (/var/ossec/etc/client.keys 없을 때)"
+      ansible.builtin.lineinfile:
+        path: "{{ wazuh_ossec_conf }}"
+        regexp: '<agent_name>.*</agent_name>'
+        line: "  <agent_name>{{ wazuh_agent_name }}</agent_name>"
+        insertafter: '<client>'
+        state: present
+      tags: [CONFIG]
+      notify: restart wazuh-agent
+
+    - name: "[CONFIG] Agent 그룹 설정"
+      ansible.builtin.lineinfile:
+        path: "{{ wazuh_ossec_conf }}"
+        regexp: '<groups>.*</groups>'
+        line: "  <groups>{{ wazuh_agent_group }}</groups>"
+        insertafter: '<agent_name>'
+        state: present
+      tags: [CONFIG]
+      notify: restart wazuh-agent
+
+    # ── 4. Log 수집 설정 추가 ────────────────────────────────────────────────
+    - name: "[CONFIG] Falco 로그 수집 localfile 추가"
+      ansible.builtin.blockinfile:
+        path: "{{ wazuh_ossec_conf }}"
+        marker: "<!-- {mark} FALCO LOG COLLECTION — SeCuardian E06 T06-4 -->"
+        insertbefore: '</ossec_config>'
+        block: |
+          <localfile>
+            <log_format>json</log_format>
+            <location>/var/log/falco*.log</location>
+            <label key="layer">endpoint</label>
+          </localfile>
+          <localfile>
+            <log_format>json</log_format>
+            <location>/var/log/secuardian/*.log</location>
+            <label key="layer">application</label>
+          </localfile>
+        state: present
+      tags: [CONFIG]
+      notify: restart wazuh-agent
+
+    # ── 5. 서비스 활성화 및 기동 ─────────────────────────────────────────────
+    - name: "[SERVICE] wazuh-agent 서비스 활성화"
+      ansible.builtin.systemd:
+        name: wazuh-agent
+        enabled: true
+        daemon_reload: true
+      tags: [SERVICE]
+
+    - name: "[SERVICE] wazuh-agent 서비스 기동"
+      ansible.builtin.systemd:
+        name: wazuh-agent
+        state: started
+      tags: [SERVICE]
+
+    # ── 6. 검증 ─────────────────────────────────────────────────────────────
+    - name: "[VERIFY] wazuh-agent 서비스 상태 확인"
+      ansible.builtin.command: systemctl is-active wazuh-agent
+      register: _agent_status
+      changed_when: false
+      failed_when: _agent_status.stdout != "active"
+      tags: [VERIFY]
+
+    - name: "[VERIFY] Manager 연결 확인 (/var/ossec/logs/ossec.log)"
+      ansible.builtin.shell: |
+        grep -q "Connected to the server" /var/ossec/logs/ossec.log 2>/dev/null || \
+        grep -q "Connected" /var/ossec/logs/ossec.log 2>/dev/null || \
+        echo "PENDING"
+      register: _conn_check
+      changed_when: false
+      ignore_errors: true
+      tags: [VERIFY]
+
+    - name: "[VERIFY] 배포 결과 출력"
+      ansible.builtin.debug:
+        msg:
+          - "Agent: {{ wazuh_agent_name }}"
+          - "Manager: {{ wazuh_manager_ip }}:{{ wazuh_manager_port }}"
+          - "Group: {{ wazuh_agent_group }}"
+          - "서비스: {{ _agent_status.stdout }}"
+          - "연결: {{ _conn_check.stdout | default('확인 중') }}"
+      tags: [VERIFY]
+
+    # ── 7. SeCuardian 등록 (옵션) ─────────────────────────────────────────────
+    - name: "[REPORT] SeCuardian 에이전트 배포 이벤트 전송"
+      ansible.builtin.uri:
+        url: "{{ secuardian_url }}/api/wazuh/alerts"
+        method: POST
+        body_format: json
+        body:
+          alert_id: "wazuh-agent-deploy-{{ inventory_hostname }}"
+          source: "ansible"
+          level: 3
+          description: "Wazuh Agent {{ wazuh_version }} 배포 완료"
+          agent_name: "{{ wazuh_agent_name }}"
+          manager_ip: "{{ wazuh_manager_ip }}"
+          group: "{{ wazuh_agent_group }}"
+          host: "{{ inventory_hostname }}"
+          timestamp: "{{ ansible_date_time.iso8601 }}"
+        status_code: [200, 201, 202]
+        timeout: 10
+      when: report_to_secuardian
+      ignore_errors: true
+      tags: [REPORT]
+
+  handlers:
+    - name: restart wazuh-agent
+      ansible.builtin.systemd:
+        name: wazuh-agent
+        state: restarted
+        daemon_reload: true

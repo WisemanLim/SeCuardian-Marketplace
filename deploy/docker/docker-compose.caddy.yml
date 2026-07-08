@@ -1,0 +1,49 @@
+# Source: Caddy | License: Apache-2.0 | https://github.com/caddyserver/caddy
+# E04 T04-1 — Caddy HTTPS 리버스 프록시 (내부 서비스 HTTPS 표준화)
+# 기동: make caddy-up
+# ⚠ logs/ 볼륨은 CrowdSec acquis.yaml이 감시 — caddy-down 시 로그 보존
+
+name: secuardian-caddy
+
+services:
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: secuardian-caddy
+    restart: unless-stopped
+    ports:
+      - "${CADDY_HTTP_PORT:-8280}:80"
+      - "${CADDY_HTTPS_PORT:-8443}:443"
+      - "${CADDY_ADMIN_PORT:-2019}:2019"
+    volumes:
+      - ../../deploy/config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+      - ../../logs:/logs
+    environment:
+      CADDY_UPSTREAM: "${CADDY_UPSTREAM:-host.docker.internal:8200}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:2019/config/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - caddy-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+volumes:
+  caddy-data:
+    name: secuardian-caddy-data
+  caddy-config:
+    name: secuardian-caddy-config
+
+networks:
+  caddy-net:
+    driver: bridge
+    name: secuardian-caddy-net

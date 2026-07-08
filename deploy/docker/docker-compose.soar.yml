@@ -1,0 +1,172 @@
+# SOAR 스택 — Shuffle + TheHive + Cortex — E13 T13-1
+# License: Shuffle(Apache-2.0) + TheHive(AGPL-3.0) + Cortex(AGPL-3.0)
+# Usage: docker compose -f deploy/docker/docker-compose.soar.yml up -d
+services:
+  shuffle-backend:
+    image: ghcr.io/shuffle/shuffle-backend:1.4.2
+    container_name: secuardian-shuffle-backend
+    restart: unless-stopped
+    environment:
+      - DATASTORE_EMULATOR_HOST=shuffle-database:8000
+      - SHUFFLE_APP_HOTLOAD_FOLDER=/shuffle-apps
+      - SHUFFLE_FILE_LOCATION=/shuffle-files
+      - BASE_URL=http://localhost:3001
+      - SHUFFLE_ENCRYPTION_MODIFIER=${SHUFFLE_ENCRYPTION_KEY:-changeme}  # TODO: Vault
+      - SHUFFLE_ELASTIC=false
+    volumes:
+      - shuffle_apps:/shuffle-apps
+      - shuffle_files:/shuffle-files
+    depends_on:
+      shuffle-database:
+        condition: service_healthy
+    networks:
+      - secuardian-net
+    logging:
+      driver: json-file
+      options: {max-size: "100m", max-file: "5"}
+
+  shuffle-frontend:
+    image: ghcr.io/shuffle/shuffle-frontend:1.4.2
+    container_name: secuardian-shuffle-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    environment:
+      - BACKEND_HOSTNAME=shuffle-backend
+    depends_on:
+      - shuffle-backend
+    networks:
+      - secuardian-net
+    logging:
+      driver: json-file
+      options: {max-size: "50m", max-file: "3"}
+
+  shuffle-orborus:
+    image: ghcr.io/shuffle/shuffle-orborus:1.4.0   # orborus는 1.4.2 태그 미발행 → 가장 가까운 1.4.0 사용
+    container_name: secuardian-shuffle-orborus
+    restart: unless-stopped
+    environment:
+      - SHUFFLE_APP_SDK_VERSION=1.2.0
+      - ENVIRONMENT_NAME=Shuffle
+      - BASE_URL=http://shuffle-backend:5001
+      - DOCKER_API_VERSION=1.40
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - shuffle-backend
+    networks:
+      - secuardian-net
+    logging:
+      driver: json-file
+      options: {max-size: "50m", max-file: "3"}
+
+  shuffle-database:
+    # Shuffle uses its own embedded database (Datastore emulator)
+    # emulators 번들 이미지 사용 — :alpine 은 beta 에뮬레이터 컴포넌트가 없어 대화형 설치 프롬프트로 실패
+    image: google/cloud-sdk:emulators
+    container_name: secuardian-shuffle-db
+    restart: unless-stopped
+    environment:
+      - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      - CLOUDSDK_CORE_PROJECT=shuffle
+    command: ["gcloud", "beta", "emulators", "datastore", "start", "--host-port=0.0.0.0:8000", "--no-store-on-disk", "--project=shuffle"]
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - secuardian-net
+    volumes:
+      - shuffle_db:/data
+    logging:
+      driver: json-file
+      options: {max-size: "100m", max-file: "5"}
+
+  thehive:
+    image: strangebee/thehive:5.3.3
+    container_name: secuardian-thehive
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      - JVM_OPTS=-Xms512m -Xmx1g
+    volumes:
+      - thehive_data:/opt/thp/thehive/db
+      - thehive_files:/opt/thp/thehive/files
+    depends_on:
+      - cassandra
+    networks:
+      - secuardian-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/api/v1/status"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    logging:
+      driver: json-file
+      options: {max-size: "100m", max-file: "5"}
+    labels:
+      - "secuardian.epic=E13"
+      - "secuardian.layer=L5-Detection"
+
+  cassandra:
+    image: cassandra:4.1.4
+    container_name: secuardian-cassandra
+    restart: unless-stopped
+    environment:
+      - CASSANDRA_CLUSTER_NAME=TheHive
+      - HEAP_NEWSIZE=128M
+      - MAX_HEAP_SIZE=512M
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+      - secuardian-net
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    logging:
+      driver: json-file
+      options: {max-size: "100m", max-file: "5"}
+
+  cortex:
+    image: thehiveproject/cortex:3.1.8
+    container_name: secuardian-cortex
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+    volumes:
+      - cortex_data:/opt/cortex/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - secuardian-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9001/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging:
+      driver: json-file
+      options: {max-size: "100m", max-file: "5"}
+    labels:
+      - "secuardian.epic=E13"
+      - "secuardian.layer=L5-Detection"
+
+volumes:
+  shuffle_apps:
+  shuffle_files:
+  shuffle_db:
+  thehive_data:
+  thehive_files:
+  cassandra_data:
+  cortex_data:
+
+networks:
+  secuardian-net:
+    external: true
+    name: secuardian-net

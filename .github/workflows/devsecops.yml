@@ -1,0 +1,77 @@
+# SeCuardian-Marketplace — DevSecOps 게이트
+# PR 생성/업데이트 시 자동 보안 스캔, Critical 이슈 머지 차단
+#
+# Required GitHub Secrets:
+#   SONAR_TOKEN           — SonarQube 사용자 토큰
+# Required GitHub Variables:
+#   SONAR_HOST_URL        — http://sonar.example.com:9000
+#
+# ⚠️ SonarSource/sonarqube-mcp-server: NOASSERTION — 법무 검토 전 포함 금지. REST API 사용.
+#
+# 실패 조건:
+#   secret-scan   : TruffleHog verified 시크릿 발견 → 즉시 실패
+#   sast          : SonarQube Quality Gate FAILED → 머지 차단
+
+name: DevSecOps Gate
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  # ── 1. Secret Scan (TruffleHog) ─────────────────────────────────────────
+  secret-scan:
+    name: TruffleHog Secret Detection
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog — verified secrets only
+        id: trufflehog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified --fail
+        continue-on-error: true
+
+      - name: Fail on verified secrets
+        if: steps.trufflehog.outcome == 'failure'
+        run: |
+          echo "::error::🔴 검증된 시크릿 발견 — 즉시 로테이션 후 Git 이력에서 제거하세요."
+          exit 1
+
+  # ── 2. SAST (SonarQube) ─────────────────────────────────────────────────
+  sast:
+    name: SonarQube SAST + Quality Gate
+    runs-on: ubuntu-latest
+    needs: secret-scan
+    if: vars.SONAR_HOST_URL != ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        with:
+          args: >-
+            -Dsonar.projectKey=secuardian
+            -Dsonar.qualitygate.wait=true
+
+      - name: Quality Gate Check
+        uses: SonarSource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}

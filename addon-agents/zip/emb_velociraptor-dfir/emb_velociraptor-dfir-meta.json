@@ -1,0 +1,101 @@
+{
+  "key": "emb_velociraptor-dfir",
+  "name": "Velociraptor DFIR",
+  "type": "service",
+  "epic": "E18",
+  "layer": "L6",
+  "layer_name": "Forensics",
+  "description": "Velociraptor 기반 엔드포인트 포렌식 헌팅과 아티팩트 수집을 수행하는 DFIR 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "description_en": "Velociraptor DFIR forensic-hunting integration. Manages hunts, collects artifact results, and proxies the Velociraptor API for endpoint forensics and incident response. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
+  "version": "1.0.0",
+  "author": "SeCuardian",
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/status",
+      "description": "Check Velociraptor server connectivity and version",
+      "auth": false
+    },
+    {
+      "method": "POST",
+      "path": "/hunts",
+      "description": "Create a new forensic hunt (supervisor/admin only)",
+      "auth": true,
+      "roles": [
+        "supervisor",
+        "admin"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/hunts",
+      "description": "List all hunts in memory",
+      "auth": true
+    },
+    {
+      "method": "GET",
+      "path": "/hunts/{hunt_id}",
+      "description": "Get details of a specific hunt",
+      "auth": true
+    },
+    {
+      "method": "POST",
+      "path": "/hunts/{hunt_id}/results",
+      "description": "Receive artifact results from Velociraptor (no JWT — Velociraptor callback)",
+      "auth": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/hunts/{hunt_id}",
+      "description": "Delete a hunt (supervisor/admin only)",
+      "auth": true,
+      "roles": [
+        "supervisor",
+        "admin"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/clients",
+      "description": "Search Velociraptor clients",
+      "auth": true
+    },
+    {
+      "method": "GET",
+      "path": "/config",
+      "description": "Show current configuration (API key masked) — admin only",
+      "auth": true,
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "env_vars": [
+    {
+      "name": "VELOCIRAPTOR_URL",
+      "default": "https://localhost:8000",
+      "description": "Base URL of the Velociraptor server"
+    },
+    {
+      "name": "VELOCIRAPTOR_API_KEY",
+      "default": "",
+      "description": "X-API-Key for Velociraptor REST API authentication"
+    },
+    {
+      "name": "VELOCIRAPTOR_ORG_ID",
+      "default": "root",
+      "description": "Velociraptor organization ID"
+    }
+  ],
+  "dependencies": [
+    "httpx"
+  ],
+  "tags": [
+    "dfir",
+    "forensics",
+    "velociraptor",
+    "hunting",
+    "incident-response",
+    "endpoint"
+  ]
+}

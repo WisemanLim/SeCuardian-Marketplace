@@ -1,0 +1,37 @@
+services:
+  agentic-soc:
+    # FunnyWolf/agentic-soc-platform (MIT)
+    # ⚠️ 공식 Docker 이미지 미발행 — 로컬 빌드 필요:
+    #   git clone https://github.com/FunnyWolf/agentic-soc-platform
+    #   docker build -t secuardian/agentic-soc:0.1.0 .
+    image: secuardian/agentic-soc:0.1.0
+    container_name: agentic-soc
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8400:8400"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - THEHIVE_URL=${THEHIVE_URL:-http://thehive:9000}
+      - THEHIVE_API_KEY=${THEHIVE_API_KEY:-}
+      - WAZUH_API_URL=${WAZUH_API_URL:-https://wazuh:55000}
+      - WAZUH_API_USER=${WAZUH_API_USER:-wazuh}
+      - WAZUH_API_PASSWORD=${WAZUH_API_PASSWORD:-}
+      - PORT=8400
+    volumes:
+      - agentic_soc_data:/app/data
+    networks:
+      - secuardian-internal
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  agentic_soc_data:
+    driver: local
+
+networks:
+  secuardian-internal:
+    external: true

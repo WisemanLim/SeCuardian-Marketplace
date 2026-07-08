@@ -1,0 +1,41 @@
+# DMZ Zone CiliumNetworkPolicy — E09 T09-2
+# 인터넷 인바운드 443 허용, DB Zone 접근 금지
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: dmz-isolation
+  namespace: dmz
+spec:
+  endpointSelector:
+    matchLabels:
+      zone: dmz
+  ingress:
+    - fromCIDR:
+        - "0.0.0.0/0"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            zone: internal
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+            - port: "8443"
+              protocol: TCP
+    # DNS 허용
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"

@@ -1,0 +1,8 @@
+packages:
+  - "."
+# pnpm 11: `pnpm dev/exec` 전 자동 deps-check(내부 install)가 esbuild ignored-build 로
+# exit 1 → pm2 fe 크래시루프 유발. 개발 실행 시 사전 검사 비활성화.
+verifyDepsBeforeRun: false
+onlyBuiltDependencies:
+  - esbuild
+  - "@tailwindcss/oxide"

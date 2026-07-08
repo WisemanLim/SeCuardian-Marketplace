@@ -1,0 +1,944 @@
+import { useEffect, useRef, useState } from "react";
+import {
+  X, ChevronRight, ChevronLeft, ChevronDown, Download, Zap, AlertCircle, CheckCircle2,
+  Upload, Package, BookOpen, Trash2, PackagePlus,
+} from "lucide-react";
+import {
+  scaffoldAgent, uploadAddonAgent, deleteAddonAgent,
+  AddonAgent, AddonTemplate, listAddonAgents, listTemplates, getGuide,
+} from "../../api/addonAgents";
+import { getAuth } from "../../store/auth";
+import { upsertMcpConfig } from "../../api/mcpConfig";
+import { useLocale } from "../../hooks/useLocale";
+
+interface Props {
+  onClose: () => void;
+  onDeployed: () => void;
+  onChanged?: () => void;
+  agentCreateMode?: string;
+}
+
+// ── 9종 Agent 유형 정의 ────────────────────────────────────────────────────────
+
+interface AgentTypeDef {
+  id: string;
+  label: string;
+  emoji: string;
+  desc: string;
+  examples: string;
+  hasTemplate: boolean;
+  defaultDomain: string;
+  previewFiles: string[];
+}
+
+const AGENT_TYPES: AgentTypeDef[] = [
+  {
+    id: "app",
+    label: "App Agent",
+    emoji: "🖥️",
+    desc: "FE + BE + DB 완결형 업무 앱",
+    examples: "게시판, 대시보드, CRM",
+    hasTemplate: true,
+    defaultDomain: "app.default",
+    previewFiles: ["{Name}-app.py", "{Name}-front/index.html", "{Name}-sql.sql", "{Name}-meta.json"],
+  },
+  {
+    id: "service",
+    label: "Service Agent",
+    emoji: "⚙️",
+    desc: "백엔드 비즈니스 로직 전용",
+    examples: "데이터 처리, 분석, 변환",
+    hasTemplate: true,
+    defaultDomain: "service.default",
+    previewFiles: ["{Name}-app.py", "{Name}-meta.json"],
+  },
+  {
+    id: "tool-proxy",
+    label: "Tool Proxy Agent",
+    emoji: "🔌",
+    desc: "외부 REST API → MCP 어댑터",
+    examples: "Slack, Jira, 사내 API 연동",
+    hasTemplate: true,
+    defaultDomain: "tool.default",
+    previewFiles: ["{Name}-app.py", "{Name}-meta.json"],
+  },
+  {
+    id: "rag",
+    label: "RAG Agent",
+    emoji: "📚",
+    desc: "문서 임베딩 + 벡터 검색 Q&A",
+    examples: "지식베이스, 매뉴얼 Q&A, HR 정책",
+    hasTemplate: true,
+    defaultDomain: "knowledge.default",
+    previewFiles: ["{Name}-app.py", "{Name}-sql.sql", "{Name}-meta.json"],
+  },
+  {
+    id: "reviewer",
+    label: "Reviewer Agent",
+    emoji: "🔍",
+    desc: "품질 검수·환각 탐지·승인 게이트",
+    examples: "코드 리뷰, 문서 검수, 사실 확인",
+    hasTemplate: false,
+    defaultDomain: "review.default",
+    previewFiles: ["{Name}-app.py", "{Name}-meta.json"],
+  },
+  {
+    id: "execution",
+    label: "Execution Agent",
+    emoji: "▶️",
+    desc: "코드 실행·배치 잡·자동화 파이프라인",
+    examples: "Python 스크립트, 스케줄 배치, ETL",
+    hasTemplate: false,
+    defaultDomain: "execution.default",
+    previewFiles: ["{Name}-app.py", "{Name}-meta.json"],
+  },
+  {
+    id: "hitl",
+    label: "HITL Agent",
+    emoji: "👤",
+    desc: "사람 승인 게이트웨이 (Human-in-the-Loop)",
+    examples: "지출 결재, 콘텐츠 승인, 배포 확인",
+    hasTemplate: false,
+    defaultDomain: "hitl.default",
+    previewFiles: ["{Name}-app.py", "{Name}-meta.json"],
+  },
+  {
+    id: "memory",
+    label: "Memory Agent",
+    emoji: "🧠",
+    desc: "장기 상태·사용자 선호·컨텍스트 관리",
+    examples: "개인화, 세션 히스토리, 사용자 프로필",
+    hasTemplate: false,
+    defaultDomain: "memory.default",
+    previewFiles: ["{Name}-app.py", "{Name}-sql.sql", "{Name}-meta.json"],
+  },
+  {
+    id: "federation",
+    label: "Federation Agent",
+    emoji: "🌐",
+    desc: "외부 A2A / MCP Agent 연동 브리지",
+    examples: "멀티클라우드 AI, 파트너 Agent 연결",
+    hasTemplate: false,
+    defaultDomain: "federation.default",
+    previewFiles: ["{Name}-app.py", "{Name}-meta.json"],
+  },
+  {
+    id: "shell",
+    label: "Shell Agent",
+    emoji: "🖥️",
+    desc: "서버 상태 점검 CLI/셸 터미널 (읽기 전용)",
+    examples: "docker ps, df -h, free, ps aux",
+    hasTemplate: true,
+    defaultDomain: "ops.server-status",
+    previewFiles: ["{Name}-app.py", "{Name}-front.tsx", "{Name}-meta.json"],
+  },
+];
+
+const NAME_RE = /^[A-Za-z][A-Za-z0-9_-]*$/;
+
+// ── 컴포넌트 ───────────────────────────────────────────────────────────────────
+
+export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agentCreateMode = "both" }: Props) {
+  const { t } = useLocale();
+  const user = getAuth();
+  const isAdmin = user?.role === "supervisor" || user?.role === "admin";
+
+  const [mode, setMode] = useState<"build" | "upload">(agentCreateMode === "upload" ? "upload" : "build");
+
+  // ── build mode state ────────────────────────────────────────────────────────
+  const [step, setStep]             = useState(1);
+  const [selectedType, setSelectedType] = useState<AgentTypeDef | null>(null);
+  const [agentName, setAgentName]   = useState("");
+  const [description, setDesc]      = useState("");
+  const [domain, setDomain]         = useState("");
+  const [nameError, setNameError]   = useState("");
+  const [busy, setBusy]             = useState(false);
+  const [error, setError]           = useState<string | null>(null);
+  const [success, setSuccess]       = useState<string | null>(null);
+
+  // ── MCP Proxy 옵션 (#3) — REST(OpenAPI) → MCP 변환 ────────────────────────────
+  const [enableMcpProxy, setEnableMcpProxy] = useState(false);
+  const [upstreamBaseUrl, setUpstreamBaseUrl] = useState("");
+  const [openapiUrl, setOpenapiUrl] = useState("");
+  const [mcpPort, setMcpPort] = useState("");
+  const [mcpArgs, setMcpArgs] = useState<{ key: string; val: string }[]>([]);
+
+  // ── upload mode state ───────────────────────────────────────────────────────
+  const fileRef                     = useRef<HTMLInputElement>(null);
+  const [addons, setAddons]         = useState<AddonAgent[]>([]);
+  const [templates, setTemplates]   = useState<AddonTemplate[]>([]);
+  const [guideContent, setGuide]    = useState<string | null>(null);
+  const [showGuide, setShowGuide]   = useState(false);
+  const [showDevSection, setShowDevSection] = useState(false);
+  const [uploading, setUploading]   = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadOk, setUploadOk]     = useState<string | null>(null);
+  const [deleteKey, setDeleteKey]   = useState<string | null>(null);
+
+  const userAddons = addons.filter((a) => !a.is_builtin);
+  // .omc 등 dot-prefix 시스템 임시 파일은 표시하지 않음
+  const visibleTemplates = templates.filter((t) => !t.filename.startsWith("."));
+
+  useEffect(() => {
+    listAddonAgents().then(setAddons).catch(() => {});
+    listTemplates().then(setTemplates).catch(() => {});
+  }, []);
+
+  function switchMode(m: "build" | "upload") {
+    setMode(m);
+    setError(null); setSuccess(null);
+    setUploadError(null); setUploadOk(null);
+  }
+
+  // ── build mode helpers ──────────────────────────────────────────────────────
+  function validateName(v: string) {
+    if (!v) return "Agent 이름을 입력하세요.";
+    if (!NAME_RE.test(v)) return "영문자로 시작, 영문·숫자·_·- 만 허용 (PascalCase 권장)";
+    return "";
+  }
+
+  function goStep2(type: AgentTypeDef) {
+    setSelectedType(type);
+    setDomain(type.defaultDomain);
+    setStep(2);
+  }
+
+  function goStep3() {
+    const err = validateName(agentName);
+    if (err) { setNameError(err); return; }
+    setNameError("");
+    setStep(3);
+  }
+
+  function previewFiles() {
+    return (selectedType?.previewFiles ?? []).map((f) => f.replace(/\{Name\}/g, agentName));
+  }
+
+  // MCP proxy 는 tool-proxy 유형 + 토글 ON 일 때만 적용 (#3)
+  const mcpProxyActive = () => selectedType?.id === "tool-proxy" && enableMcpProxy;
+
+  function buildMcpExtraArgs(): string[] {
+    return mcpArgs
+      .map((a) => (a.val.trim() ? `${a.key.trim()}:${a.val.trim()}` : a.key.trim()))
+      .filter((s) => s);
+  }
+
+  function scaffoldPayload() {
+    const base = { agent_name: agentName, agent_type: selectedType!.id, description, domain };
+    if (!mcpProxyActive()) return base;
+    return {
+      ...base,
+      enable_mcp_proxy: true,
+      upstream_base_url: upstreamBaseUrl.trim(),
+      openapi_url: openapiUrl.trim(),
+      mcp_extra_args: buildMcpExtraArgs(),
+    };
+  }
+
+  async function handleDownload() {
+    if (!selectedType) return;
+    setError(null); setBusy(true);
+    try {
+      const blob = await scaffoldAgent(scaffoldPayload());
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${agentName}.zip`; a.click();
+      URL.revokeObjectURL(url);
+      setSuccess(`${agentName}.zip 다운로드 완료`);
+    } catch (e: unknown) {
+      setError((e as Error).message ?? "다운로드 실패");
+    } finally { setBusy(false); }
+  }
+
+  async function handleDeploy() {
+    if (!selectedType) return;
+    setError(null); setBusy(true);
+    try {
+      const blob = await scaffoldAgent(scaffoldPayload());
+      const file = new File([blob], `${agentName}.zip`, { type: "application/zip" });
+      const result = await uploadAddonAgent(file);
+      // MCP proxy 활성 시 배포 직후 MCP 설정 자동 등록 (포트·custom args) — #3
+      if (mcpProxyActive()) {
+        try {
+          await upsertMcpConfig(result.agent_key, {
+            port: mcpPort.trim() ? Number(mcpPort) : undefined,
+            extra_args: buildMcpExtraArgs(),
+          });
+          setSuccess(`'${result.agent_name}' 배포 + MCP 프록시 등록 완료`);
+        } catch {
+          setSuccess(`'${result.agent_name}' 배포 완료 (MCP 등록은 에이전트 관리에서 재시도하세요)`);
+        }
+      } else {
+        setSuccess(`'${result.agent_name}' 배포 완료`);
+      }
+      onDeployed();
+    } catch (e: unknown) {
+      setError((e as Error).message ?? "배포 실패");
+    } finally { setBusy(false); }
+  }
+
+  // ── upload mode helpers ─────────────────────────────────────────────────────
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setUploadError(null); setUploadOk(null); setUploading(true);
+    const okNames: string[] = [];
+    const failMsgs: string[] = [];
+    for (let i = 0; i < files.length; i++) {
+      setUploadProgress(files.length > 1 ? `(${i + 1}/${files.length}) ${files[i].name}` : null);
+      try {
+        const result = await uploadAddonAgent(files[i]);
+        okNames.push(result.agent_name);
+      } catch (err: unknown) {
+        const detail = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail;
+        failMsgs.push(`${files[i].name}: ${detail ?? t("agent.uploadFailed")}`);
+      }
+    }
+    if (okNames.length > 0) {
+      setUploadOk(`'${okNames.join("', '")}' ${t("agent.registrationComplete")}`);
+      const updated = await listAddonAgents().catch(() => null);
+      if (updated) setAddons(updated);
+      onChanged?.();
+    }
+    if (failMsgs.length > 0) setUploadError(failMsgs.join("\n"));
+    setUploading(false);
+    setUploadProgress(null);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  async function handleDeleteAddon(key: string) {
+    try {
+      await deleteAddonAgent(key);
+      const updated = await listAddonAgents();
+      setAddons(updated);
+      setDeleteKey(null);
+      onChanged?.();
+    } catch { /* ignore */ }
+  }
+
+  async function handleTemplateDownload(filename: string) {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`/api/addon-agents/templates/download/${filename.replace(".zip", "")}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleToggleGuide() {
+    if (showGuide) { setShowGuide(false); return; }
+    if (!guideContent) {
+      const content = await getGuide().catch(() => "");
+      setGuide(content);
+    }
+    setShowGuide(true);
+  }
+
+  function fmtDate(s?: string) {
+    return s ? s.slice(0, 16).replace("T", " ") : "";
+  }
+
+  // ── render ──────────────────────────────────────────────────────────────────
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[92vh] flex flex-col">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-3">
+            {mode === "build"
+              ? <Zap size={20} className="text-blue-600" />
+              : <PackagePlus size={20} className="text-blue-500" />
+            }
+            <h2 className="text-base font-bold text-gray-900 dark:text-gray-100">새 Agent 만들기</h2>
+            {mode === "build" && (
+              <div className="flex items-center gap-1 ml-2">
+                {[1, 2, 3, 4].map((n) => (
+                  <div
+                    key={n}
+                    className={`h-1.5 rounded-full transition-all ${
+                      n <= step ? "w-6 bg-blue-600" : "w-3 bg-gray-200 dark:bg-gray-700"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Mode tabs — both 모드일 때만 표시 */}
+        {agentCreateMode === "both" && (
+          <div className="flex px-6 pt-3 gap-1 border-b border-gray-100 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={() => switchMode("build")}
+              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-t-lg transition-colors border-b-2 -mb-px ${
+                mode === "build"
+                  ? "border-blue-600 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/10"
+                  : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+              }`}
+            >
+              <Zap size={13} />
+              스캐폴딩 만들기
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMode("upload")}
+              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-t-lg transition-colors border-b-2 -mb-px ${
+                mode === "upload"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/10"
+                  : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+              }`}
+            >
+              <PackagePlus size={13} />
+              ZIP 업로드 등록
+            </button>
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="overflow-y-auto flex-1 px-6 py-5">
+
+          {/* ── BUILD MODE ──────────────────────────────────────────────────── */}
+          {mode === "build" && (
+            <>
+              {/* Step 1: 유형 선택 */}
+              {step === 1 && (
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Step 1 — Agent 유형 선택</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">목적에 맞는 유형을 선택하면 스캐폴딩 코드를 자동 생성합니다.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {AGENT_TYPES.map((type) => (
+                      <button
+                        key={type.id}
+                        type="button"
+                        onClick={() => goStep2(type)}
+                        className="group text-left p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all"
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl mt-0.5">{type.emoji}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                {type.label}
+                              </span>
+                              {type.hasTemplate && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium">
+                                  템플릿 있음
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{type.desc}</p>
+                            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1 italic">{type.examples}</p>
+                          </div>
+                          <ChevronRight size={16} className="text-gray-300 dark:text-gray-600 group-hover:text-blue-500 shrink-0 mt-1" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: 기본 정보 입력 */}
+              {step === 2 && selectedType && (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Step 2 — 기본 정보 입력</p>
+                    <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 mb-4">
+                      <span>{selectedType.emoji}</span>
+                      <span className="font-medium text-blue-600 dark:text-blue-400">{selectedType.label}</span>
+                      <span>·</span>
+                      <span>{selectedType.desc}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                      Agent 이름 <span className="text-red-400">*</span>
+                      <span className="ml-1 font-normal text-gray-400 dark:text-gray-500">(PascalCase 권장)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={agentName}
+                      onChange={(e) => { setAgentName(e.target.value); setNameError(""); }}
+                      placeholder="예: HrPolicyQa"
+                      className={`w-full text-sm px-3 py-2 rounded-lg border ${
+                        nameError ? "border-red-400 dark:border-red-500" : "border-gray-200 dark:border-gray-600"
+                      } bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400`}
+                    />
+                    {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">설명</label>
+                    <input
+                      type="text"
+                      value={description}
+                      onChange={(e) => setDesc(e.target.value)}
+                      placeholder="예: HR 규정 문서를 검색하고 답변하는 RAG Agent"
+                      className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                      도메인 키워드
+                      <span className="ml-1 font-normal text-gray-400 dark:text-gray-500">(capability taxonomy 분류용)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={domain}
+                      onChange={(e) => setDomain(e.target.value)}
+                      placeholder={selectedType.defaultDomain}
+                      className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    />
+                  </div>
+
+                  {/* MCP Proxy 옵션 — tool-proxy 유형 전용 (#3) */}
+                  {selectedType.id === "tool-proxy" && (
+                    <div className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-900/10 p-3 space-y-3">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={enableMcpProxy}
+                          onChange={(e) => setEnableMcpProxy(e.target.checked)}
+                          className="w-4 h-4 accent-indigo-600"
+                        />
+                        <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
+                          MCP 프록시로 생성 (REST API/OpenAPI → MCP 서버 변환)
+                        </span>
+                      </label>
+                      {enableMcpProxy && (
+                        <div className="space-y-3 pl-1">
+                          <div>
+                            <span className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">Upstream Base URL *</span>
+                            <input
+                              type="text"
+                              value={upstreamBaseUrl}
+                              onChange={(e) => setUpstreamBaseUrl(e.target.value)}
+                              placeholder="예: https://api.example.com"
+                              className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                          </div>
+                          <div>
+                            <span className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">OpenAPI 스펙 URL (선택)</span>
+                            <input
+                              type="text"
+                              value={openapiUrl}
+                              onChange={(e) => setOpenapiUrl(e.target.value)}
+                              placeholder="예: https://api.example.com/openapi.json — operation → MCP tool 자동 도출"
+                              className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                          </div>
+                          <div>
+                            <span className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">MCP 포트 (선택 · 배포 시 자동 등록)</span>
+                            <input
+                              type="number"
+                              value={mcpPort}
+                              onChange={(e) => setMcpPort(e.target.value)}
+                              placeholder="비우면 20000-20019 자동 할당"
+                              className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                          </div>
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[11px] font-semibold text-gray-600 dark:text-gray-400">Custom Args (헤더/설정 · key:val)</span>
+                              <button
+                                type="button"
+                                onClick={() => setMcpArgs((p) => [...p, { key: "", val: "" }])}
+                                className="w-5 h-5 rounded border border-gray-300 dark:border-gray-600 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
+                              >
+                                +
+                              </button>
+                            </div>
+                            {mcpArgs.length === 0 ? (
+                              <p className="text-[11px] text-gray-400 dark:text-gray-500">
+                                예: <code>header.X-Api-Key:secret</code>, <code>Authorization:Bearer ...</code>
+                              </p>
+                            ) : (
+                              <div className="space-y-2">
+                                {mcpArgs.map((a, i) => (
+                                  <div key={i} className="flex items-center gap-1.5">
+                                    <input
+                                      className="rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-400 w-[44%]"
+                                      placeholder="key (예: header.X-Api-Key)"
+                                      value={a.key}
+                                      onChange={(e) => setMcpArgs((p) => p.map((x, j) => (j === i ? { ...x, key: e.target.value } : x)))}
+                                    />
+                                    <span className="text-xs text-gray-400">:</span>
+                                    <input
+                                      className="rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-400 flex-1"
+                                      placeholder="value"
+                                      value={a.val}
+                                      onChange={(e) => setMcpArgs((p) => p.map((x, j) => (j === i ? { ...x, val: e.target.value } : x)))}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => setMcpArgs((p) => p.filter((_, j) => j !== i))}
+                                      className="w-6 h-6 rounded border border-gray-200 dark:border-gray-600 text-xs text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                    >
+                                      −
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 3: 미리보기 */}
+              {step === 3 && selectedType && (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Step 3 — 스캐폴딩 미리보기</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">생성될 ZIP 구조를 확인하세요.</p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg">{selectedType.emoji}</span>
+                      <span className="text-sm font-bold text-gray-800 dark:text-gray-100">{agentName}.zip</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-medium">
+                        {selectedType.id}
+                      </span>
+                    </div>
+                    <ul className="space-y-1.5">
+                      {previewFiles().map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                          <span className="text-gray-300 dark:text-gray-600">📄</span>
+                          <code className="font-mono">{f}</code>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                      meta.json 미리보기
+                    </p>
+                    <pre className="text-xs text-gray-600 dark:text-gray-400 font-mono whitespace-pre-wrap">
+{JSON.stringify({
+  agent_type: selectedType.id,
+  version: "1.0.0",
+  description: description || `${agentName} — ${selectedType.desc}`,
+  capabilities: [{ verb: selectedType.id === "rag" ? "retrieve" : selectedType.id === "tool-proxy" ? "proxy" : "process", domain: domain || selectedType.defaultDomain }],
+}, null, 2)}
+                    </pre>
+                  </div>
+                  {!selectedType.hasTemplate && (
+                    <div className="flex items-start gap-2 text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2.5">
+                      <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                      <span>
+                        <strong>{selectedType.label}</strong> 템플릿은 기본 구조로 생성됩니다.
+                        다운로드 후 비즈니스 로직을 직접 구현하세요.
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 4: 다운로드 / 배포 */}
+              {step === 4 && selectedType && (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Step 4 — 다운로드 또는 즉시 배포</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+                      <strong>{agentName}.zip</strong> 을 로컬에서 개발 후 업로드하거나, 기본 템플릿을 바로 배포할 수 있습니다.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={handleDownload}
+                      disabled={busy}
+                      className="flex flex-col items-center gap-3 p-5 rounded-xl border-2 border-blue-200 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all disabled:opacity-50"
+                    >
+                      <Download size={28} className="text-blue-500 dark:text-blue-400" />
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">ZIP 다운로드</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">로컬에서 개발 후 업로드</p>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDeploy}
+                      disabled={busy}
+                      className="flex flex-col items-center gap-3 p-5 rounded-xl border-2 border-indigo-200 dark:border-indigo-800 hover:border-indigo-400 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-all disabled:opacity-50"
+                    >
+                      <Zap size={28} className="text-indigo-600 dark:text-indigo-400" />
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">바로 배포</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">기본 템플릿으로 즉시 등록</p>
+                      </div>
+                    </button>
+                  </div>
+                  {busy && (
+                    <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500" />
+                      처리 중...
+                    </div>
+                  )}
+                  {error && (
+                    <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg px-3 py-2">
+                      <AlertCircle size={15} />
+                      {error}
+                    </div>
+                  )}
+                  {success && (
+                    <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-lg px-3 py-2">
+                      <CheckCircle2 size={15} />
+                      {success}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── UPLOAD MODE ─────────────────────────────────────────────────── */}
+          {mode === "upload" && (
+            <div className="space-y-5">
+
+              {/* ZIP 업로드 */}
+              {isAdmin && (
+                <section>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                    Agent ZIP {t("common.upload")}
+                  </p>
+                  <div
+                    onClick={() => !uploading && fileRef.current?.click()}
+                    className="border-2 border-dashed border-blue-200 dark:border-blue-800 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors"
+                  >
+                    <Upload size={28} className="mx-auto text-blue-400 dark:text-blue-500 mb-2" />
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("agent.uploadHint")}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t("agent.uploadHintSub")}</p>
+                    <input ref={fileRef} type="file" accept=".zip" multiple className="hidden" onChange={handleFile} disabled={uploading} />
+                  </div>
+                  {uploading && (
+                    <div className="flex items-center gap-2 mt-2 text-sm text-blue-600 dark:text-blue-400">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500" />
+                      {t("agent.uploading")}{uploadProgress ? ` ${uploadProgress}` : ""}
+                    </div>
+                  )}
+                  {uploadError && (
+                    <div className="flex items-start gap-2 mt-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg px-3 py-2 whitespace-pre-line">
+                      <AlertCircle size={15} className="mt-0.5 shrink-0" />
+                      {uploadError}
+                    </div>
+                  )}
+                  {uploadOk && (
+                    <div className="flex items-center gap-2 mt-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-lg px-3 py-2">
+                      <CheckCircle2 size={15} />
+                      {uploadOk}
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {/* 개발 템플릿 다운로드 + 개발 가이드 (접기/펼치기) */}
+              <section className="rounded-xl border border-gray-100 dark:border-gray-700">
+                <button
+                  type="button"
+                  onClick={() => setShowDevSection((v) => !v)}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                >
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    {t("agent.templates")}
+                  </p>
+                  {showDevSection
+                    ? <ChevronDown size={15} className="text-gray-400 dark:text-gray-500" />
+                    : <ChevronRight size={15} className="text-gray-400 dark:text-gray-500" />}
+                </button>
+                {showDevSection && (
+                  <div className="px-4 pb-4 space-y-4">
+                    {visibleTemplates.length > 0 && (
+                      <div className="space-y-1.5">
+                        {visibleTemplates.map((tpl) => (
+                          <div
+                            key={tpl.filename}
+                            className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Package size={15} className="text-gray-500 dark:text-gray-400" />
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{tpl.name}</span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">{tpl.filename}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleTemplateDownload(tpl.filename)}
+                              className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+                            >
+                              <Download size={13} />
+                              {t("agent.download")}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* 개발 가이드 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          {t("agent.guide")}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleToggleGuide}
+                          className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+                        >
+                          <BookOpen size={13} />
+                          {showGuide ? t("agent.guideHide") : t("agent.guideView")}
+                        </button>
+                      </div>
+                      {!showGuide && (
+                        <div className="rounded-xl bg-slate-50 dark:bg-gray-800 px-4 py-3 flex items-center gap-2">
+                          <ChevronRight size={14} className="text-slate-400 dark:text-slate-500 shrink-0" />
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {t("agent.guide")}: <code className="font-mono bg-white dark:bg-gray-700 px-1 rounded text-slate-600 dark:text-slate-300">addon-agents/README.md</code>
+                          </p>
+                        </div>
+                      )}
+                      {showGuide && guideContent !== null && (
+                        <pre className="text-xs text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded-xl p-4 overflow-x-auto whitespace-pre-wrap border border-gray-100 dark:border-gray-700 max-h-64">
+                          {guideContent || "(내용 없음)"}
+                        </pre>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* 등록된 사용자 Agent */}
+              <section>
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                  {t("agent.registered")} ({userAddons.length})
+                </p>
+                {userAddons.length === 0 ? (
+                  <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">{t("agent.noRegistered")}</p>
+                ) : (
+                  <div className="space-y-2">
+                    {userAddons.map((a) => (
+                      <div key={a.agent_key} className="rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">{a.agent_name}</span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">{a.agent_key}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                              {a.has_app && (
+                                <span className="text-xs px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">app</span>
+                              )}
+                              {a.has_front && (
+                                <span className="text-xs px-1.5 py-0.5 rounded bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">front</span>
+                              )}
+                              <span className="text-xs text-gray-400 dark:text-gray-500">{a.api_prefix}</span>
+                            </div>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                              {a.uploaded_by} · {fmtDate(a.uploaded_at)}
+                            </p>
+                          </div>
+                          {isAdmin && (
+                            deleteKey === a.agent_key ? (
+                              <div className="flex items-center gap-1 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteAddon(a.agent_key)}
+                                  className="text-xs px-2.5 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+                                >
+                                  {t("agent.deleteConfirm2")}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setDeleteKey(null)}
+                                  className="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                >
+                                  {t("common.cancel")}
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => setDeleteKey(a.agent_key)}
+                                className="shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                title={t("common.delete")}
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+          <div>
+            {mode === "build" && step > 1 && (
+              <button
+                type="button"
+                onClick={() => { setStep(step - 1); setError(null); setSuccess(null); }}
+                className="flex items-center gap-1 text-sm px-3 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium"
+              >
+                <ChevronLeft size={16} />
+                이전
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-sm px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 font-medium transition-colors"
+            >
+              닫기
+            </button>
+            {mode === "build" && step === 2 && (
+              <button
+                type="button"
+                onClick={goStep3}
+                className="flex items-center gap-1 text-sm px-4 py-2 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-all"
+              >
+                다음
+                <ChevronRight size={16} />
+              </button>
+            )}
+            {mode === "build" && step === 3 && (
+              <button
+                type="button"
+                onClick={() => setStep(4)}
+                className="flex items-center gap-1 text-sm px-4 py-2 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-all"
+              >
+                다음
+                <ChevronRight size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

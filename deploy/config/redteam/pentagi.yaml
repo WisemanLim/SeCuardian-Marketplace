@@ -1,0 +1,28 @@
+# pentagi 설정 템플릿 — E19 T19-1
+# License: MIT  Ref: https://github.com/vxcontrol/pentagi
+# ⚠️ ANTHROPIC_API_KEY 는 Vault 주입 — 이 파일에 하드코딩 금지
+
+server:
+  host: "0.0.0.0"
+  port: 8088
+
+# LLM 설정 — Vault에서 주입
+llm:
+  provider: anthropic
+  model: claude-sonnet-4-6
+  # api_key: Vault → ANTHROPIC_API_KEY 환경변수로 주입
+
+# MITRE ATT&CK 기반 캠페인 설정
+campaign:
+  framework: "MITRE ATT&CK v14"
+  allowed_tactics:
+    - "TA0043"  # Reconnaissance
+    - "TA0001"  # Initial Access (스테이징 전용)
+  max_runtime_seconds: 3600
+  require_human_approval: true
+
+# 격리 제약
+constraints:
+  isolated_only: true
+  allowed_targets: []  # 빈 목록 = 실행 차단, 승인 후 IP 추가
+  block_external_dns: true

@@ -1,0 +1,31 @@
+# CrowdSec HTTP Notification Plugin — E04 T04-3
+# Source: CrowdSec | License: MIT
+# CrowdSec → SeCuardian 알림 전송 설정
+#
+# 사용 방법:
+#   1. CROWDSEC_WEBHOOK_ENABLED=true (.env.crowdsec)
+#   2. make crowdsec-up (컨테이너 재기동 — 알림 플러그인 로드)
+#   3. profiles.yaml에 notifications: [secuardian_webhook] 선언됨
+#
+# host.docker.internal: Docker Desktop(Mac/Windows) → 호스트 접근
+# Linux 환경: SECUARDIAN_HOST 환경변수로 오버라이드 또는 --add-host 사용
+
+type: http
+name: secuardian_webhook
+
+log_level: info
+log_media: stdout
+
+# 전송 포맷: 알림 배열 전체를 JSON으로 직렬화
+format: "{{. | toJson}}"
+
+url: http://host.docker.internal:8200/api/crowdsec/alerts
+method: POST
+
+headers:
+  Content-Type: application/json
+
+timeout: 10s
+group_wait: 30s
+group_threshold: 1
+max_retry: 3
