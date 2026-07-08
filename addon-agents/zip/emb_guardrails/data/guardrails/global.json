@@ -1,0 +1,4359 @@
+{
+ "domain_key": "global",
+ "display_name": "Global PII/신용정보",
+ "display_name_en": "Global PII / Financial",
+ "status": "functional",
+ "required": true,
+ "rule_count": 256,
+ "regex_rule_count": 253,
+ "real_rule_count": 57,
+ "heuristic_rule_count": 196,
+ "rules": [
+  {
+   "rule_id": "PRIV_ID_KR_IN_001",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "national_id_kr",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "주민등록번호 입력 차단",
+   "patterns": [
+    "\\b\\d{6}[- ]?\\d{7}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "주민등록번호는 입력할 수 없습니다.",
+   "message_en": "Korean RRN cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_CONTACT_KR_IN_001",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "phone_kr",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "한국 휴대전화 번호 입력 마스킹",
+   "patterns": [
+    "\\b01[016789][- .]?\\d{3,4}[- .]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "휴대전화 번호는 마스킹 처리됩니다.",
+   "message_en": "Korean mobile phone number is redacted."
+  },
+  {
+   "rule_id": "PRIV_CONTACT_KR_IN_002",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "email",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "이메일 주소 입력 마스킹",
+   "patterns": [
+    "\\b[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "이메일 주소는 마스킹 처리됩니다.",
+   "message_en": "Email address is redacted."
+  },
+  {
+   "rule_id": "PRIV_FIN_KR_IN_001",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "card_number",
+   "severity": "critical",
+   "action": "block",
+   "priority": 900,
+   "description": "신용카드 번호 입력 차단 (Luhn 검증)",
+   "patterns": [
+    "\\b(?:\\d[ -]*?){13,19}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "신용카드 번호는 입력할 수 없습니다.",
+   "message_en": "Card numbers cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_CRED_KR_IN_001",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "api_key",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "API 키/시크릿 형태 입력 차단",
+   "patterns": [
+    "\\b(?:sk|pk|api|key|token)[_-][A-Za-z0-9_-]{16,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "API 키/시크릿은 입력할 수 없습니다.",
+   "message_en": "API keys/secrets cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_BRN_KR_IN_001",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "business_reg_kr",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "사업자등록번호 입력 시 마스킹",
+   "patterns": [
+    "\\b\\d{3}-\\d{2}-\\d{5}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "사업자등록번호는 마스킹 처리됩니다.",
+   "message_en": "Business registration number is redacted."
+  },
+  {
+   "rule_id": "PRIV_LOC_KR_IN_001",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "ip_address",
+   "severity": "low",
+   "action": "warn",
+   "priority": 200,
+   "description": "IPv4 주소 입력 시 일반화 권고",
+   "patterns": [
+    "\\b(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "IP 주소가 포함되어 있습니다. 가능하면 가명화 후 사용하세요.",
+   "message_en": "IP address detected; consider anonymizing."
+  },
+  {
+   "rule_id": "PRIV_ID_KR_OUT_001",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "national_id_kr",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 950,
+   "description": "응답에서 주민등록번호 발견 시 마스킹",
+   "patterns": [
+    "\\b\\d{6}[- ]?\\d{7}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "주민등록번호는 마스킹 처리됩니다.",
+   "message_en": "Korean RRN is redacted."
+  },
+  {
+   "rule_id": "PRIV_FIN_KR_OUT_001",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "card_number",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 900,
+   "description": "응답에서 카드번호 노출 시 마스킹",
+   "patterns": [
+    "\\b(?:\\d[ -]*?){13,19}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "카드 번호는 마스킹됩니다.",
+   "message_en": "Card number is redacted."
+  },
+  {
+   "rule_id": "PRIV_CONTACT_KR_OUT_001",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "phone_kr",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "응답 내 한국 휴대전화 번호 마스킹",
+   "patterns": [
+    "\\b01[016789][- .]?\\d{3,4}[- .]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "연락처는 마스킹 처리됩니다.",
+   "message_en": "Korean mobile number is redacted."
+  },
+  {
+   "rule_id": "PRIV_CRED_KR_OUT_001",
+   "io_type": "output",
+   "category": "credentials",
+   "sub_category": "api_key",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "응답 내 API 키/시크릿 토큰 마스킹",
+   "patterns": [
+    "\\b(?:sk|pk|api|key|token)[_-][A-Za-z0-9_-]{16,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "API 키/시크릿은 마스킹 처리됩니다.",
+   "message_en": "API key/secret is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_001",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "national_id_kr",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "주민등록번호 입력 차단",
+   "patterns": [
+    "\\b\\d{6}[- ]?\\d{7}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "주민등록번호는 입력할 수 없습니다.",
+   "message_en": "Korean RRN cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_KR_002",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "ssn_us",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "미국 SSN 입력 차단",
+   "patterns": [
+    "\\b(?!000|666)[0-8]\\d{2}[- ]\\d{2}[- ]\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "미국 SSN은 입력할 수 없습니다.",
+   "message_en": "Do not enter US SSNs into this assistant."
+  },
+  {
+   "rule_id": "PRIV_KR_003",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "mynumber_jp",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "일본 마이넘버 입력 차단",
+   "patterns": [
+    "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "일본 마이넘버는 입력할 수 없습니다.",
+   "message_en": "Do not enter Japanese My Number identifiers."
+  },
+  {
+   "rule_id": "PRIV_KR_004",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "passport",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 880,
+   "description": "여권번호 입력 차단",
+   "patterns": [
+    "\\b[A-Z]\\d{7,9}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "여권번호는 입력하지 마세요.",
+   "message_en": "Do not share passport numbers here."
+  },
+  {
+   "rule_id": "PRIV_KR_005",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "driver_license_kr",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "한국 운전면허번호 마스킹",
+   "patterns": [
+    "\\b\\d{2}[- ]?\\d{2}[- ]?\\d{6}[- ]?\\d{2}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "운전면허번호는 마스킹 처리됩니다.",
+   "message_en": "Korean driver license number is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_006",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "driver_license_us",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "미국 운전면허번호 마스킹",
+   "patterns": [
+    "(?=.*캘리포니아)(?=.*운전면허)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "운전면허번호는 마스킹 처리됩니다.",
+   "message_en": "US driver license numbers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_007",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "business_reg_kr",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "사업자등록번호 입력 시 마스킹",
+   "patterns": [
+    "\\b\\d{3}-\\d{2}-\\d{5}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "사업자등록번호는 마스킹 처리됩니다.",
+   "message_en": "Business registration number is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_008",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "corporation_no_kr",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "한국 법인등록번호 마스킹",
+   "patterns": [
+    "\\b\\d{6}-\\d{7}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "법인등록번호는 마스킹 처리됩니다.",
+   "message_en": "Corporation registration number is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_009",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "name_plus_id_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "성명 + 식별번호 결합 입력 차단",
+   "patterns": [
+    "(?=.*주민등록번호)(?=.*홍길동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "성명과 식별번호를 함께 입력하지 마세요.",
+   "message_en": "Do not combine real names with ID numbers in input."
+  },
+  {
+   "rule_id": "PRIV_KR_010",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "multiple_ids_bulk",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "여러 사람 식별번호 일괄 입력 차단",
+   "patterns": [
+    "(?=.*붙여넣을게)(?=.*주민등록번호)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "여러 사람의 식별번호를 일괄 입력할 수 없습니다.",
+   "message_en": "Bulk identifier paste is not allowed."
+  },
+  {
+   "rule_id": "PRIV_KR_011",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "id_image_ocr",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "신분증 이미지 OCR 텍스트 입력 차단",
+   "patterns": [
+    "(?=.*주민등록증)(?=.*추출해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "신분증 이미지에서 식별정보를 추출할 수 없습니다.",
+   "message_en": "The assistant cannot extract IDs from document images."
+  },
+  {
+   "rule_id": "PRIV_KR_012",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "resident_alien_kr",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "외국인 등록번호 입력 차단",
+   "patterns": [
+    "(?=.*외국인등록번호)(?=.*부탁)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "외국인 등록번호는 입력하지 마세요.",
+   "message_en": "Do not share Korean alien registration numbers."
+  },
+  {
+   "rule_id": "PRIV_KR_013",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "employee_no_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "실명 + 사번 결합 입력 차단",
+   "patterns": [
+    "(?=.*추가해줘)(?=.*포장라인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "실명과 사번을 함께 입력할 수 없습니다.",
+   "message_en": "Do not combine employee IDs with real names."
+  },
+  {
+   "rule_id": "PRIV_KR_014",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "id_mapping_table",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "ID-실명 매핑 테이블 업로드 차단",
+   "patterns": [
+    "(?=.*붙여넣을게)(?=.*테이블)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "ID와 실명을 매핑한 테이블은 업로드할 수 없습니다.",
+   "message_en": "Do not upload identifier-to-real-name mapping tables."
+  },
+  {
+   "rule_id": "PRIV_KR_015",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "external_id_linking",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 550,
+   "description": "외부 ID와 내부 ID 결합 시 가명화 권고",
+   "patterns": [
+    "(?=.*매핑해)(?=.*구글)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "외부 ID 연동 시 가명처리·암호화를 권고합니다.",
+   "message_en": "External-to-internal ID linking should be pseudonymized."
+  },
+  {
+   "rule_id": "PRIV_KR_016",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "id_in_free_text",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "자유 텍스트 내 식별번호 자동 마스킹",
+   "patterns": [
+    "(?=.*적혀)(?=.*메모)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "텍스트 내 식별번호는 자동 마스킹됩니다.",
+   "message_en": "Detected ID numbers will be redacted automatically."
+  },
+  {
+   "rule_id": "PRIV_KR_017",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "photo_id_description",
+   "severity": "high",
+   "action": "block",
+   "priority": 800,
+   "description": "사진 속 신분증 번호 텍스트 입력 차단",
+   "patterns": [
+    "(?=.*주민등록증)(?=.*텍스트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사진 속 신분증 번호는 언급하지 마세요.",
+   "message_en": "Do not describe ID numbers visible in a photo."
+  },
+  {
+   "rule_id": "PRIV_KR_018",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "historical_id_dataset",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "과거 ID 포함 데이터셋 업로드 차단",
+   "patterns": [
+    "(?=.*포함된)(?=.*SSN)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "실제 ID가 포함된 과거 데이터셋은 가명화 후 사용하세요.",
+   "message_en": "Historical datasets with real IDs must be pseudonymized first."
+  },
+  {
+   "rule_id": "PRIV_KR_019",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "family_ids",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "가족 구성원 식별번호 일괄 입력 차단",
+   "patterns": [
+    "(?=.*알려줄게)(?=.*번에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "가족 구성원의 개인정보를 일괄 입력할 수 없습니다.",
+   "message_en": "Family identifier paste is not allowed."
+  },
+  {
+   "rule_id": "PRIV_KR_020",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "customer_id_bulk",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 820,
+   "description": "고객 ID·이메일·전화 다량 입력 차단",
+   "patterns": [
+    "(?=.*보낼게)(?=.*개와)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "고객 식별정보 다량 입력은 차단됩니다.",
+   "message_en": "Bulk customer identifier paste is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_021",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "id_validation_request",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 500,
+   "description": "ID 검증 API 설계 시 컴플라이언스 안내",
+   "patterns": [
+    "(?=.*확인하)(?=.*유효성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "ID 검증 서비스는 KYC·개인정보 규제를 준수해야 합니다.",
+   "message_en": "ID validation services must follow local KYC and privacy regulations."
+  },
+  {
+   "rule_id": "PRIV_KR_022",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "temporary_id",
+   "severity": "medium",
+   "action": "block_or_redact",
+   "priority": 600,
+   "description": "임시 발급 ID라도 실제 개인 식별 가능 시 차단",
+   "patterns": [
+    "(?=.*임시번호)(?=.*입니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "실제 개인을 특정할 수 있는 임시 ID는 입력하지 마세요.",
+   "message_en": "Temporary identifiers that can identify a person are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_023",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "national_health_no",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "국민건강보험증 번호 입력 차단",
+   "patterns": [
+    "(?=.*건강보험증)(?=.*입력합니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "건강보험증 번호는 입력하지 마세요.",
+   "message_en": "Do not share NHIS card numbers."
+  },
+  {
+   "rule_id": "PRIV_KR_024",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "tax_id_us",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "US ITIN/EIN 입력 차단",
+   "patterns": [
+    "\\b9\\d{2}[- ]\\d{2}[- ]\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "미국 세무 식별번호는 입력하지 마세요.",
+   "message_en": "Do not share US tax identifiers."
+  },
+  {
+   "rule_id": "PRIV_KR_025",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "vat_no_eu",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "EU VAT 번호 마스킹",
+   "patterns": [
+    "\\b[A-Z]{2}\\d{8,12}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "EU VAT 번호는 마스킹 처리됩니다.",
+   "message_en": "EU VAT numbers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_026",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "ic_card_jp",
+   "severity": "high",
+   "action": "block",
+   "priority": 800,
+   "description": "일본 운전면허·재류카드 번호 차단",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "일본 운전면허·재류카드 번호는 입력하지 마세요.",
+   "message_en": "Do not enter Japanese driver license or residence card numbers."
+  },
+  {
+   "rule_id": "PRIV_KR_027",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "government_form_id",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "행정문서 일련번호·접수번호 마스킹",
+   "patterns": [
+    "(?=.*접수번호)(?=.*추적)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정부 행정문서 식별번호는 마스킹 처리됩니다.",
+   "message_en": "Government form identifiers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_028",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "kakao_id",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 550,
+   "description": "메신저 계정 ID (카카오톡 등) 마스킹",
+   "patterns": [
+    "(?=.*gildong)(?=.*카카오톡)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "메신저 계정 ID는 마스킹 처리됩니다.",
+   "message_en": "Messenger account IDs are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_029",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "sns_handle",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "SNS handle 마스킹",
+   "patterns": [
+    "(?=.*account)(?=.*gildong)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "SNS 핸들은 마스킹 처리됩니다.",
+   "message_en": "SNS handles are redacted in this assistant."
+  },
+  {
+   "rule_id": "PRIV_KR_030",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "biometric_passport",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "전자여권 칩 데이터 입력 차단",
+   "patterns": [
+    "(?=.*첨부합니)(?=.*전자여권)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "전자여권 칩 데이터는 입력할 수 없습니다.",
+   "message_en": "Do not paste e-passport biometric chip data."
+  },
+  {
+   "rule_id": "PRIV_KR_031",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "email",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "이메일 주소 입력 마스킹",
+   "patterns": [
+    "\\b[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "이메일 주소는 마스킹 처리됩니다.",
+   "message_en": "Email addresses are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_032",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "email_bulk",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "이메일 대량 붙여넣기 차단",
+   "patterns": [
+    "(?=.*리스트)(?=.*이메일)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이메일을 다량 붙여넣을 수 없습니다.",
+   "message_en": "Bulk email paste is not allowed."
+  },
+  {
+   "rule_id": "PRIV_KR_033",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "phone_kr",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "한국 휴대전화 번호 마스킹",
+   "patterns": [
+    "\\b01[016789][- .]?\\d{3,4}[- .]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "휴대전화 번호는 마스킹 처리됩니다.",
+   "message_en": "Korean mobile numbers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_034",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "phone_us",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "미국 전화번호 마스킹",
+   "patterns": [
+    "\\b(?:\\+?1[- .]?)?\\(?\\d{3}\\)?[- .]?\\d{3}[- .]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "미국 전화번호는 마스킹 처리됩니다.",
+   "message_en": "US phone numbers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_035",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "phone_jp",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "일본 전화번호 마스킹",
+   "patterns": [
+    "\\b0\\d{1,4}[- ]?\\d{1,4}[- ]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "일본 전화번호는 마스킹 처리됩니다.",
+   "message_en": "Japanese phone numbers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_036",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "phone_eu",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "EU 국가코드 전화번호 마스킹",
+   "patterns": [
+    "\\+(?:44|49|33|31|39|34)[\\s.-]?\\d{1,4}[\\s.-]?\\d{3,4}[\\s.-]?\\d{3,4}"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "EU 전화번호는 마스킹 처리됩니다.",
+   "message_en": "EU phone numbers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_037",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "address_kr_full",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "정확한 한국 집 주소 입력 차단",
+   "patterns": [
+    "(?=.*거주합니)(?=.*역삼동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "집 주소 전체를 입력하지 말고 시·구 단위까지만 사용하세요.",
+   "message_en": "Do not paste full Korean home addresses. Use city/district granularity only."
+  },
+  {
+   "rule_id": "PRIV_KR_038",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "address_us_full",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "정확한 미국 거주지 주소 입력 차단",
+   "patterns": [
+    "(?=.*Springfield)(?=.*Main)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정확한 미국 거주지 주소는 입력하지 마세요.",
+   "message_en": "Do not paste precise US residential addresses."
+  },
+  {
+   "rule_id": "PRIV_KR_039",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "address_jp_full",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "정확한 일본 거주지 주소 입력 차단",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "일본 거주지 정확 주소는 입력하지 마세요.",
+   "message_en": "Do not paste precise Japanese residential addresses."
+  },
+  {
+   "rule_id": "PRIV_KR_040",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "address_book_bulk",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "주소록 대량 붙여넣기 차단",
+   "patterns": [
+    "(?=.*붙여넣을게)(?=.*주소록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주소록 전체 붙여넣기는 차단됩니다.",
+   "message_en": "Bulk address book paste is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_041",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "workplace_personal_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "회사명·부서·내선과 실명 결합 시 차단",
+   "patterns": [
+    "(?=.*강남지점)(?=.*내선)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "회사·부서·내선과 실명 결합 입력을 자제하세요.",
+   "message_en": "Do not combine company/department/extension with real names."
+  },
+  {
+   "rule_id": "PRIV_KR_042",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "messenger_id",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 550,
+   "description": "메신저 ID (LINE/WhatsApp 등) 마스킹",
+   "patterns": [
+    "(?=.*gildong)(?=.*LINE)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "메신저 ID는 마스킹 처리됩니다.",
+   "message_en": "Messenger account IDs are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_043",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "fax_number",
+   "severity": "low",
+   "action": "warn",
+   "priority": 200,
+   "description": "팩스 번호 입력 시 안내",
+   "patterns": [
+    "(?=.*팩스)(?=.*송부)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "팩스 번호가 포함되어 있습니다.",
+   "message_en": "Fax number detected."
+  },
+  {
+   "rule_id": "PRIV_KR_044",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "p_o_box",
+   "severity": "low",
+   "action": "warn",
+   "priority": 200,
+   "description": "사서함 정보 입력 시 안내",
+   "patterns": [
+    "(?=.*사서함)(?=.*우체국)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사서함 주소는 마스킹 권고됩니다.",
+   "message_en": "P.O. Box info should be anonymized."
+  },
+  {
+   "rule_id": "PRIV_KR_045",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "emergency_contact",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "비상연락처 (제3자) 정보 차단",
+   "patterns": [
+    "(?=.*비상연락처)(?=.*어머니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "비상연락처(제3자) 정보는 입력하지 마세요.",
+   "message_en": "Do not enter third-party emergency contact info."
+  },
+  {
+   "rule_id": "PRIV_KR_046",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "guardian_contact",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "보호자 연락처 (미성년) 차단",
+   "patterns": [
+    "(?=.*딸의)(?=.*입니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 보호자 연락처는 입력하지 마세요.",
+   "message_en": "Do not paste minor guardian contact info."
+  },
+  {
+   "rule_id": "PRIV_KR_047",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "phone_book_export",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "전화번호부 export 차단",
+   "patterns": [
+    "(?=.*export)(?=.*전화번호부)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "전화번호부 전체 export는 차단됩니다.",
+   "message_en": "Phone book export is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_048",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "address_geocode",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 400,
+   "description": "주소 좌표 변환 요청 시 경고",
+   "patterns": [
+    "(?=.*좌표)(?=.*위경)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "특정인 주소 좌표 변환은 권장되지 않습니다.",
+   "message_en": "Geocoding a specific person's address is discouraged."
+  },
+  {
+   "rule_id": "PRIV_KR_049",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "voice_mail",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 400,
+   "description": "음성메일 전사 내 PII 마스킹",
+   "patterns": [
+    "(?=.*음성메일)(?=.*전사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "음성메일 전사 내 개인정보는 마스킹됩니다.",
+   "message_en": "PII in voicemail transcripts is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_050",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "chat_logs_with_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "채팅 로그 내 PII 자동 마스킹",
+   "patterns": [
+    "(?=.*다수)(?=.*이메일)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "채팅 로그 내 PII는 자동 마스킹됩니다.",
+   "message_en": "PII inside chat log uploads is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_051",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "personal_blog_link",
+   "severity": "low",
+   "action": "warn",
+   "priority": 150,
+   "description": "개인 블로그 링크 + 실명 결합 시 경고",
+   "patterns": [
+    "(?=.*gildong)(?=.*https)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인 블로그 URL과 실명 결합 시 주의하세요.",
+   "message_en": "Personal blog URL plus real name combinations are flagged."
+  },
+  {
+   "rule_id": "PRIV_KR_052",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "private_dms",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "비공개 DM 원문 업로드 차단",
+   "patterns": [
+    "(?=.*붙여넣을게)(?=.*원문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "비공개 DM 원문은 업로드할 수 없습니다.",
+   "message_en": "Private DM transcripts cannot be uploaded."
+  },
+  {
+   "rule_id": "PRIV_KR_053",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "courier_tracking",
+   "severity": "low",
+   "action": "warn",
+   "priority": 200,
+   "description": "택배 송장 번호 + 수령인 정보 결합 시 경고",
+   "patterns": [
+    "(?=.*수령인)(?=.*송장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "택배 송장과 수령인 정보 결합 입력 시 주의.",
+   "message_en": "Courier tracking number plus recipient info is flagged."
+  },
+  {
+   "rule_id": "PRIV_KR_054",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "public_records_combo",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 350,
+   "description": "공개 기록 (졸업·결혼 등) + 실명 결합 시 경고",
+   "patterns": [
+    "(?=.*졸업)(?=.*결혼)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공개 기록과 실명 결합은 재식별 위험이 있습니다.",
+   "message_en": "Combining public records with names risks re-identification."
+  },
+  {
+   "rule_id": "PRIV_KR_055",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "card_number",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "신용카드 번호 입력 차단 (Luhn)",
+   "patterns": [
+    "\\b(?:\\d[ -]*?){13,19}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "카드 번호는 입력할 수 없습니다.",
+   "message_en": "Do not enter card numbers."
+  },
+  {
+   "rule_id": "PRIV_KR_056",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "card_cvv",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "CVV/CVC 입력 차단",
+   "patterns": [
+    "(?=.*CVC)(?=.*저장해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "CVC는 입력하지 마세요.",
+   "message_en": "Do not paste CVV/CVC values."
+  },
+  {
+   "rule_id": "PRIV_KR_057",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "card_expiry",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 820,
+   "description": "카드 유효기간 + 카드번호 결합 차단",
+   "patterns": [
+    "(?=.*유효기간)(?=.*카드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "카드 유효기간은 입력하지 마세요.",
+   "message_en": "Do not enter card expiry alongside card numbers."
+  },
+  {
+   "rule_id": "PRIV_KR_058",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "iban",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "IBAN 마스킹",
+   "patterns": [
+    "\\b[A-Z]{2}\\d{2}[A-Z0-9]{11,30}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "IBAN은 마스킹 처리됩니다.",
+   "message_en": "IBANs are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_059",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "swift_bic",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "SWIFT/BIC 코드 + 계좌 결합 마스킹",
+   "patterns": [
+    "(?=.*DEUTDEFFXXX)(?=.*BIC)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "SWIFT/BIC + 계좌 정보는 마스킹됩니다.",
+   "message_en": "SWIFT/BIC plus account info is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_060",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "bank_account_kr",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "한국 계좌번호 마스킹",
+   "patterns": [
+    "\\b\\d{3}-\\d{2,6}-\\d{2,6}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "한국 계좌번호는 마스킹 처리됩니다.",
+   "message_en": "Korean bank account numbers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_061",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "bank_routing_us",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "미국 routing+account 마스킹",
+   "patterns": [
+    "(?=.*routing)(?=.*account)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미국 라우팅+계좌 결합은 마스킹됩니다.",
+   "message_en": "US routing+account combinations are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_062",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "crypto_wallet",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "암호화폐 지갑 주소 + 실명 결합 마스킹",
+   "patterns": [
+    "(?=.*xAbC)(?=.*ETH)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "암호화폐 지갑 + 실명 결합은 마스킹됩니다.",
+   "message_en": "Crypto wallet + real-name claims are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_063",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "payment_token",
+   "severity": "high",
+   "action": "block",
+   "priority": 800,
+   "description": "결제 토큰 (Stripe/PayPal 등) 입력 차단",
+   "patterns": [
+    "\\btok_[A-Za-z0-9]{16,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "결제 토큰은 입력할 수 없습니다.",
+   "message_en": "Payment gateway tokens cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_KR_064",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "loan_credit_request",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 800,
+   "description": "대출/신용 점수 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*신용점수)(?=.*천만원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "대출/신용 점수와 실명 결합 입력은 차단됩니다.",
+   "message_en": "Credit/loan info paired with real names is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_065",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "savings_balance",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "잔액 + 계좌주 결합 마스킹",
+   "patterns": [
+    "(?=.*천만원)(?=.*잔액)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "잔액과 계좌주 결합은 마스킹 처리됩니다.",
+   "message_en": "Balance + holder name is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_066",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "transaction_csv",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 800,
+   "description": "거래 내역 CSV 업로드 시 가명화 권고",
+   "patterns": [
+    "(?=.*거래내역)(?=.*csv)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "거래 내역은 가명화 후 분석에 사용하세요.",
+   "message_en": "Transaction CSV uploads must be pseudonymized first."
+  },
+  {
+   "rule_id": "PRIV_KR_067",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "pay_id_service",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "페이 서비스 ID (KakaoPay/PayPal 등) 마스킹",
+   "patterns": [
+    "(?=.*kakaopay)(?=.*gildong)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "페이 서비스 ID는 마스킹 처리됩니다.",
+   "message_en": "Payment service IDs are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_068",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "loan_application_form",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 800,
+   "description": "대출 신청서 원본 업로드 차단",
+   "patterns": [
+    "(?=.*그대)(?=.*신청서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "대출 신청서 원본은 업로드할 수 없습니다.",
+   "message_en": "Raw loan application forms cannot be uploaded."
+  },
+  {
+   "rule_id": "PRIV_KR_069",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "invoice_raw_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "송장 원본 PII 마스킹",
+   "patterns": [
+    "(?=.*만원)(?=.*송장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "송장 원본 내 개인정보는 마스킹됩니다.",
+   "message_en": "PII inside invoice text is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_070",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "tax_return_raw",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 800,
+   "description": "세금신고서 원문 업로드 차단",
+   "patterns": [
+    "(?=.*세금신고서)(?=.*PDF)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "세금신고서 원문은 업로드할 수 없습니다.",
+   "message_en": "Raw tax returns cannot be uploaded."
+  },
+  {
+   "rule_id": "PRIV_KR_071",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "insurance_claim_raw",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 800,
+   "description": "보험 청구서 원본 + PII 차단",
+   "patterns": [
+    "(?=.*PDF)(?=.*청구서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 청구서 원본은 차단됩니다.",
+   "message_en": "Raw insurance claim forms are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_072",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "salary_disclosure",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "급여 정보 + 실명 결합 마스킹",
+   "patterns": [
+    "(?=.*백만원)(?=.*연봉)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "급여 정보와 실명 결합은 마스킹됩니다.",
+   "message_en": "Salary plus real-name combinations are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_073",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "debit_card_pin",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "체크카드 PIN 입력 차단",
+   "patterns": [
+    "(?=.*체크카드)(?=.*PIN)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "체크카드 PIN은 입력할 수 없습니다.",
+   "message_en": "Do not paste debit card PINs."
+  },
+  {
+   "rule_id": "PRIV_KR_074",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "crypto_seed_phrase",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "암호화폐 시드 구문 입력 차단",
+   "patterns": [
+    "(?=.*abandon)(?=.*시드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "시드 구문은 절대 입력하지 마세요.",
+   "message_en": "Never paste wallet seed phrases."
+  },
+  {
+   "rule_id": "PRIV_KR_075",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "loyalty_card",
+   "severity": "low",
+   "action": "warn",
+   "priority": 200,
+   "description": "멤버십/포인트 카드 + 실명 결합 경고",
+   "patterns": [
+    "(?=.*마트)(?=.*카드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "멤버십 카드 + 실명 결합은 권장되지 않습니다.",
+   "message_en": "Loyalty card + real name combinations are flagged."
+  },
+  {
+   "rule_id": "PRIV_KR_076",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "payslip_pdf",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 800,
+   "description": "급여명세서 PDF 업로드 차단",
+   "patterns": [
+    "(?=.*급여명세서)(?=.*PDF)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "급여명세서 PDF는 업로드할 수 없습니다.",
+   "message_en": "Raw payslip PDFs cannot be uploaded."
+  },
+  {
+   "rule_id": "PRIV_KR_077",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "financial_kyc_doc",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "KYC 서류 (신분증+계좌) 업로드 차단",
+   "patterns": [
+    "(?=.*주민증)(?=.*통장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "KYC 서류는 업로드할 수 없습니다.",
+   "message_en": "KYC documents cannot be uploaded."
+  },
+  {
+   "rule_id": "PRIV_KR_078",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "investment_portfolio",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "투자 포트폴리오 + 실명 결합 마스킹",
+   "patterns": [
+    "(?=.*채권)(?=.*주식)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "투자 포트폴리오 + 실명은 마스킹됩니다.",
+   "message_en": "Investment portfolio + real-name combos are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_079",
+   "io_type": "input",
+   "category": "financial",
+   "sub_category": "debt_collection_list",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "채권 추심 명단 + PII 업로드 차단",
+   "patterns": [
+    "(?=.*금액)(?=.*추심)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "채권 추심 명단은 업로드할 수 없습니다.",
+   "message_en": "Debt-collection lists with PII are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_080",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "password",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "비밀번호 입력 차단",
+   "patterns": [
+    "(?=.*Abc)(?=.*비밀번호)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "비밀번호는 입력하지 마세요.",
+   "message_en": "Do not paste passwords here."
+  },
+  {
+   "rule_id": "PRIV_KR_081",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "otp_2fa",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "OTP / 2FA 코드 입력 차단",
+   "patterns": [
+    "\\b\\d{6}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "OTP/2FA 코드는 입력하지 마세요.",
+   "message_en": "Do not paste OTP / 2FA codes."
+  },
+  {
+   "rule_id": "PRIV_KR_082",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "recovery_code",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "복구 코드 입력 차단",
+   "patterns": [
+    "(?=.*EFGH)(?=.*IJKL)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "복구 코드는 입력할 수 없습니다.",
+   "message_en": "Recovery codes cannot be pasted."
+  },
+  {
+   "rule_id": "PRIV_KR_083",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "api_key",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "API 키 / 시크릿 토큰 입력 차단",
+   "patterns": [
+    "\\b(?:sk|pk|api|key|token)[_-][A-Za-z0-9_-]{16,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "API 키/시크릿은 입력할 수 없습니다.",
+   "message_en": "Do not paste API keys or secrets."
+  },
+  {
+   "rule_id": "PRIV_KR_084",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "aws_key",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "AWS Access Key ID 입력 차단",
+   "patterns": [
+    "\\bAKIA[0-9A-Z]{16}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "AWS Access Key ID는 입력할 수 없습니다.",
+   "message_en": "Do not paste AWS access key IDs."
+  },
+  {
+   "rule_id": "PRIV_KR_085",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "gcp_key",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "GCP service-account JSON 입력 차단",
+   "patterns": [
+    "(?=.*account)(?=.*private)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "GCP 서비스 계정 JSON은 입력할 수 없습니다.",
+   "message_en": "Do not paste GCP service-account JSONs."
+  },
+  {
+   "rule_id": "PRIV_KR_086",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "github_token",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "GitHub PAT 입력 차단",
+   "patterns": [
+    "\\bghp_[A-Za-z0-9]{36,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "GitHub PAT는 입력할 수 없습니다.",
+   "message_en": "Do not paste GitHub PATs."
+  },
+  {
+   "rule_id": "PRIV_KR_087",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "ssh_private_key",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "SSH 개인키 입력 차단",
+   "patterns": [
+    "(?=.*PRIVATE)(?=.*OPENSSH)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "SSH 개인키는 입력할 수 없습니다.",
+   "message_en": "Do not paste SSH private keys."
+  },
+  {
+   "rule_id": "PRIV_KR_088",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "tls_private_key",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "TLS 인증서 개인키 입력 차단",
+   "patterns": [
+    "(?=.*PRIVATE)(?=.*BEGIN)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "TLS 개인키는 입력할 수 없습니다.",
+   "message_en": "Do not paste TLS private keys."
+  },
+  {
+   "rule_id": "PRIV_KR_089",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "db_conn_string",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "DB 연결 문자열 (자격증명 포함) 차단",
+   "patterns": [
+    "\\b(?:postgres|mysql|mongodb)://[^\\s]+:[^\\s]+@[^\\s]+"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "자격증명 포함 DB 연결 문자열은 차단됩니다.",
+   "message_en": "DB connection strings with credentials are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_090",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "kubeconfig",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "kubeconfig 파일 (토큰 포함) 입력 차단",
+   "patterns": [
+    "(?=.*apiVersion)(?=.*ncontexts)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "kubeconfig 파일은 입력할 수 없습니다.",
+   "message_en": "Do not paste kubeconfig files."
+  },
+  {
+   "rule_id": "PRIV_KR_091",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "oauth_refresh_token",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "OAuth refresh token 입력 차단",
+   "patterns": [
+    "(?=.*gabcdefghijklmnopqrst)(?=.*refresh)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "OAuth refresh token은 입력할 수 없습니다.",
+   "message_en": "Do not paste OAuth refresh tokens."
+  },
+  {
+   "rule_id": "PRIV_KR_092",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "jwt_token",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "JWT 토큰 입력 차단",
+   "patterns": [
+    "\\beyJ[A-Za-z0-9_=-]+\\.[A-Za-z0-9_=-]+\\.[A-Za-z0-9_=-]+\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "JWT 토큰은 입력할 수 없습니다.",
+   "message_en": "Do not paste JWT bearer tokens."
+  },
+  {
+   "rule_id": "PRIV_KR_093",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "session_cookie",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "세션 쿠키 입력 차단",
+   "patterns": [
+    "(?=.*Cookie)(?=.*AbCdEf)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "세션 쿠키는 마스킹 처리됩니다.",
+   "message_en": "Session cookies are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_094",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "env_dump",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 820,
+   "description": "전체 환경변수 dump 차단",
+   "patterns": [
+    "(?=.*nexport)(?=.*ACCESS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "환경변수 전체 dump는 차단됩니다.",
+   "message_en": "Full env-var dumps are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_095",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "password_hint",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 300,
+   "description": "비밀번호 힌트 입력 시 경고",
+   "patterns": [
+    "(?=.*강아지)(?=.*비밀번호)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "비밀번호 힌트 입력에 주의하세요.",
+   "message_en": "Be careful when sharing password hints."
+  },
+  {
+   "rule_id": "PRIV_KR_096",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "save_login_request",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "로그인 정보 저장 요청 차단",
+   "patterns": [
+    "(?=.*GitHub)(?=.*저장해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "로그인 정보를 저장해 둘 수 없습니다.",
+   "message_en": "Cannot store login credentials."
+  },
+  {
+   "rule_id": "PRIV_KR_097",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "smtp_password",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "SMTP 비밀번호 입력 차단",
+   "patterns": [
+    "(?=.*Secret)(?=.*smtp)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "SMTP 비밀번호는 입력할 수 없습니다.",
+   "message_en": "Do not paste SMTP passwords."
+  },
+  {
+   "rule_id": "PRIV_KR_098",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "ftp_password",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "FTP/SFTP 비밀번호 입력 차단",
+   "patterns": [
+    "(?=.*Secret)(?=.*host)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "FTP 비밀번호는 입력할 수 없습니다.",
+   "message_en": "Do not paste FTP credentials."
+  },
+  {
+   "rule_id": "PRIV_KR_099",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "encryption_key_raw",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "AES/RSA 원시 키 입력 차단",
+   "patterns": [
+    "(?=.*abcdef)(?=.*key)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "AES/RSA 원시 키는 입력할 수 없습니다.",
+   "message_en": "Do not paste raw AES / RSA keys."
+  },
+  {
+   "rule_id": "PRIV_KR_100",
+   "io_type": "input",
+   "category": "credentials",
+   "sub_category": "personal_pin_codes",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "도어록·금고 등 개인 PIN 입력 차단",
+   "patterns": [
+    "(?=.*현관문)(?=.*도어록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "도어록/금고 PIN은 입력할 수 없습니다.",
+   "message_en": "Do not paste door-lock / safe PINs."
+  },
+  {
+   "rule_id": "PRIV_KR_101",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "patient_record",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 920,
+   "description": "환자 의료 기록 원본 입력 차단",
+   "patterns": [
+    "(?=.*기록입니)(?=.*홍길동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "환자 의료 기록 원본은 입력할 수 없습니다.",
+   "message_en": "Do not paste full identifiable medical records."
+  },
+  {
+   "rule_id": "PRIV_KR_102",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "diagnosis_with_name",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "진단명 + 환자 이름 결합 입력 차단",
+   "patterns": [
+    "(?=.*진단되었습니)(?=.*당뇨)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "진단명과 환자 이름 결합 입력을 자제하세요.",
+   "message_en": "Do not combine diagnoses with patient names."
+  },
+  {
+   "rule_id": "PRIV_KR_103",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "medication_with_name",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "복용 약물 + 환자 이름 결합 입력 차단",
+   "patterns": [
+    "(?=.*메트포르민)(?=.*복용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "환자명과 처방 약물 결합 입력을 자제하세요.",
+   "message_en": "Do not combine prescriptions with patient names."
+  },
+  {
+   "rule_id": "PRIV_KR_104",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "mental_health_with_name",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 920,
+   "description": "정신건강 상태 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*년째)(?=.*약을)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정신건강 정보와 실명 결합 입력을 차단합니다.",
+   "message_en": "Mental health info paired with identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_105",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "medical_record_no",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "의료기록번호(MRN) 입력 차단",
+   "patterns": [
+    "(?=.*MRN)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "MRN은 입력할 수 없습니다.",
+   "message_en": "Do not paste MRNs."
+  },
+  {
+   "rule_id": "PRIV_KR_106",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "lab_result_raw",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "검사 결과 + 환자 정보 결합 차단",
+   "patterns": [
+    "(?=.*HbA)(?=.*LDL)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "검사결과 + 환자 정보 결합 입력 차단.",
+   "message_en": "Lab results plus patient info are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_107",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "genetic_info",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "유전자 정보 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*BRCA)(?=.*변이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "유전자 정보와 실명 결합은 차단됩니다.",
+   "message_en": "Genetic info + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_108",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "prescription_pdf",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "처방전 PDF 원본 업로드 차단",
+   "patterns": [
+    "(?=.*PDF)(?=.*처방전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "처방전 PDF 원본은 업로드할 수 없습니다.",
+   "message_en": "Raw prescription PDFs cannot be uploaded."
+  },
+  {
+   "rule_id": "PRIV_KR_109",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "vaccination_record",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "백신 접종 기록 마스킹",
+   "patterns": [
+    "(?=.*부스터)(?=.*코로)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "백신 접종 기록은 마스킹됩니다.",
+   "message_en": "Vaccination records are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_110",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "self_harm_method",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "자살·자해 구체 방법 요청 차단",
+   "patterns": [
+    "(?=.*죽을)(?=.*확실히)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "안전을 위해 해당 정보는 제공할 수 없습니다.",
+   "message_en": "We cannot provide that information. Please reach out to support."
+  },
+  {
+   "rule_id": "PRIV_KR_111",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "off_label_use",
+   "severity": "high",
+   "action": "sanitize",
+   "priority": 800,
+   "description": "의약품 적응증 외 사용 안내 요청 제한",
+   "patterns": [
+    "(?=.*병에)(?=.*항암제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "의약품은 첨부문서·의사 지시를 따라야 합니다.",
+   "message_en": "Medication use must follow the label and physician guidance."
+  },
+  {
+   "rule_id": "PRIV_KR_112",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "clinical_trial_subject",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "임상시험 피험자 식별정보 차단",
+   "patterns": [
+    "(?=.*Subject)(?=.*KIM)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "임상시험 피험자 식별정보는 차단됩니다.",
+   "message_en": "Clinical trial subject identifiers are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_113",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "hospital_visit_log",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "병원 방문 기록 + 환자명 마스킹",
+   "patterns": [
+    "(?=.*외래)(?=.*병원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "병원 방문 기록은 마스킹 처리됩니다.",
+   "message_en": "Hospital visit logs are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_114",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "disability_status",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "장애 등급 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*홍길동)(?=.*장애)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "장애 정보 + 실명 결합 입력을 자제하세요.",
+   "message_en": "Disability info paired with identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_115",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "pregnancy_status",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 830,
+   "description": "임신 정보 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*주차)(?=.*임신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "임신 정보와 실명 결합은 차단됩니다.",
+   "message_en": "Pregnancy info + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_116",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "rare_disease_combo",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 900,
+   "description": "희귀병 진단 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*희귀병)(?=.*ALS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "희귀병 진단과 실명 결합은 차단됩니다.",
+   "message_en": "Rare disease + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_117",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "substance_use",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 830,
+   "description": "알코올/약물 의존 + 실명 차단",
+   "patterns": [
+    "(?=.*의존)(?=.*알코올)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "약물·알코올 의존 + 실명 결합은 차단됩니다.",
+   "message_en": "Substance abuse + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_118",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "infectious_disease",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "감염병 (HIV 등) + 실명 결합 차단",
+   "patterns": [
+    "(?=.*HIV)(?=.*양성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "감염병 + 실명 결합 입력은 차단됩니다.",
+   "message_en": "Infectious-disease status + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_119",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "medical_imaging_meta",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "의료 영상 메타데이터 (DICOM) 마스킹",
+   "patterns": [
+    "(?=.*PatientName)(?=.*HONGGILDONG)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "DICOM 메타데이터는 마스킹됩니다.",
+   "message_en": "DICOM patient metadata is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_120",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "therapy_session_note",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 870,
+   "description": "심리상담 세션 기록 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*세션)(?=.*감정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "상담 세션 기록 + 실명 결합은 차단됩니다.",
+   "message_en": "Therapy notes + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_121",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "ehr_export",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 920,
+   "description": "EMR/EHR 전체 export 차단",
+   "patterns": [
+    "(?=.*export)(?=.*FHIR)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "EMR/EHR 전체 export는 차단됩니다.",
+   "message_en": "Whole EMR/EHR exports are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_122",
+   "io_type": "input",
+   "category": "health",
+   "sub_category": "medication_in_summary",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "요약 응답에 특정 환자 약물 노출 차단",
+   "patterns": [
+    "(?=.*항우울제)(?=.*복용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "요약 응답에 특정 환자 약물 노출은 마스킹됩니다.",
+   "message_en": "Patient-specific meds in summaries are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_123",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "home_address_combo",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "정확한 집 주소 + 이름 결합 차단",
+   "patterns": [
+    "(?=.*서울시)(?=.*강남구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정확한 집 주소와 이름은 함께 입력할 수 없습니다.",
+   "message_en": "Do not combine precise home address with names."
+  },
+  {
+   "rule_id": "PRIV_KR_124",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "gps_coord_with_name",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "GPS 좌표 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*홍길동)(?=.*위치)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "GPS 좌표와 실명 결합 입력은 차단됩니다.",
+   "message_en": "GPS coordinates plus a name is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_125",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "travel_itinerary",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "개인 여행 일정 + 실명 결합 마스킹",
+   "patterns": [
+    "(?=.*출장)(?=.*도쿄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인 여행 일정 + 실명 결합은 마스킹됩니다.",
+   "message_en": "Travel itinerary + name combos are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_126",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "location_history_dump",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 820,
+   "description": "Google Timeline 등 위치 이력 dump 차단",
+   "patterns": [
+    "(?=.*Timeline)(?=.*Google)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "위치 이력 dump는 가명화 후 사용하세요.",
+   "message_en": "Location-history dumps must be pseudonymized first."
+  },
+  {
+   "rule_id": "PRIV_KR_127",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "school_address_minor",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "미성년자 학교명·주소 입력 차단",
+   "patterns": [
+    "(?=.*초등학교)(?=.*다니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 학교명·주소는 입력할 수 없습니다.",
+   "message_en": "Minor school name/address cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_KR_128",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "workplace_address_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "직장 주소 + 실명 결합 마스킹",
+   "patterns": [
+    "(?=.*근무처)(?=.*강남구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "직장 주소 + 실명 결합은 마스킹됩니다.",
+   "message_en": "Workplace address + real name is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_129",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "frequent_route",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 400,
+   "description": "출퇴근 경로 (시각 포함) 입력 시 경고",
+   "patterns": [
+    "(?=.*강남역)(?=.*출발해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "출퇴근 경로 + 시각 정보 입력에 주의하세요.",
+   "message_en": "Commute route + time info is flagged."
+  },
+  {
+   "rule_id": "PRIV_KR_130",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "vacation_home",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 400,
+   "description": "별장/세컨하우스 주소 입력 시 경고",
+   "patterns": [
+    "(?=.*강원)(?=.*별장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "별장 주소 입력에 주의하세요.",
+   "message_en": "Vacation home addresses are flagged."
+  },
+  {
+   "rule_id": "PRIV_KR_131",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "childs_pickup_location",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "자녀 등하원 장소 입력 차단",
+   "patterns": [
+    "(?=.*하원)(?=.*장소)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자녀 등하원 장소는 입력할 수 없습니다.",
+   "message_en": "Child pickup-location info cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_KR_132",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "hotel_room_no",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "호텔 룸 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*호텔)(?=.*투숙)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "호텔 객실 + 실명 결합은 차단됩니다.",
+   "message_en": "Hotel room + real-name combos are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_133",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "license_plate",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "차량 번호판 + 실명 결합 마스킹",
+   "patterns": [
+    "(?=.*홍길동)(?=.*차량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "번호판 + 실명 결합은 마스킹됩니다.",
+   "message_en": "License plates with names are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_134",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "home_wifi_ssid",
+   "severity": "low",
+   "action": "warn",
+   "priority": 200,
+   "description": "집 Wi-Fi SSID + 위치 결합 경고",
+   "patterns": [
+    "(?=.*SSID)(?=.*home)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "Wi-Fi SSID와 정확한 위치 결합은 식별 위험.",
+   "message_en": "Home Wi-Fi SSID + precise location risks identification."
+  },
+  {
+   "rule_id": "PRIV_KR_135",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "court_visit",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "법원 방문/일정 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*지방법원)(?=.*출석)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "법원 방문 + 실명 결합은 차단됩니다.",
+   "message_en": "Court appearance + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_136",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "immigration_status_location",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 830,
+   "description": "체류 자격 + 거주 위치 결합 차단",
+   "patterns": [
+    "(?=.*강남구)(?=.*거주지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "체류 자격 + 거주 위치 결합은 차단됩니다.",
+   "message_en": "Immigration status + residence info is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_137",
+   "io_type": "input",
+   "category": "location",
+   "sub_category": "real_time_location",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "실시간 위치 공유 요청 차단",
+   "patterns": [
+    "(?=.*분마)(?=.*현재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "실시간 위치 공유 요청은 차단됩니다.",
+   "message_en": "Real-time location-sharing requests are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_138",
+   "io_type": "input",
+   "category": "biometrics",
+   "sub_category": "face_embedding",
+   "severity": "high",
+   "action": "aggregate_only",
+   "priority": 850,
+   "description": "얼굴 임베딩 벡터 업로드 차단",
+   "patterns": [
+    "(?=.*csv)(?=.*임베딩)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "식별 가능한 얼굴 임베딩은 업로드할 수 없습니다.",
+   "message_en": "Do not upload identifiable face embeddings."
+  },
+  {
+   "rule_id": "PRIV_KR_139",
+   "io_type": "input",
+   "category": "biometrics",
+   "sub_category": "fingerprint_template",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "지문 템플릿 데이터 입력 차단",
+   "patterns": [
+    "(?=.*INCITS)(?=.*ANSI)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "지문 템플릿 데이터는 입력할 수 없습니다.",
+   "message_en": "Fingerprint template data cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_KR_140",
+   "io_type": "input",
+   "category": "biometrics",
+   "sub_category": "iris_pattern",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "홍채 코드 데이터 입력 차단",
+   "patterns": [
+    "(?=.*IrisCode)(?=.*홍채)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "홍채 코드 데이터는 입력할 수 없습니다.",
+   "message_en": "Iris-pattern data cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_KR_141",
+   "io_type": "input",
+   "category": "biometrics",
+   "sub_category": "voice_print",
+   "severity": "high",
+   "action": "aggregate_only",
+   "priority": 850,
+   "description": "음성 지문 벡터 업로드 차단",
+   "patterns": [
+    "(?=.*임베딩)(?=.*고객별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "음성 지문 벡터는 업로드할 수 없습니다.",
+   "message_en": "Voice-print vectors cannot be uploaded."
+  },
+  {
+   "rule_id": "PRIV_KR_142",
+   "io_type": "input",
+   "category": "biometrics",
+   "sub_category": "dna_sequence",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "DNA 시퀀스 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*WGS)(?=.*VCF)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "DNA 시퀀스 + 실명 결합은 차단됩니다.",
+   "message_en": "DNA sequence + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_143",
+   "io_type": "input",
+   "category": "biometrics",
+   "sub_category": "gait_pattern",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 400,
+   "description": "보행 패턴 데이터 + 실명 결합 경고",
+   "patterns": [
+    "(?=.*임베딩)(?=.*보행)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보행 패턴 + 실명 결합 입력은 주의가 필요합니다.",
+   "message_en": "Gait pattern + identity is flagged."
+  },
+  {
+   "rule_id": "PRIV_KR_144",
+   "io_type": "input",
+   "category": "biometrics",
+   "sub_category": "biometric_reid_request",
+   "severity": "critical",
+   "action": "refuse",
+   "priority": 970,
+   "description": "익명 생체 데이터 재식별 요청 차단",
+   "patterns": [
+    "(?=.*익명화된)(?=.*임베딩)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "익명 생체 데이터 재식별 요청은 거부됩니다.",
+   "message_en": "Biometric re-identification requests are refused."
+  },
+  {
+   "rule_id": "PRIV_KR_145",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "political_affiliation",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 880,
+   "description": "정치 성향 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*지지자)(?=.*홍길동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정치 성향 + 실명 결합은 차단됩니다.",
+   "message_en": "Political affiliation + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_146",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "religion_with_name",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 880,
+   "description": "종교 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*신자)(?=.*홍길동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "종교 + 실명 결합은 차단됩니다.",
+   "message_en": "Religion + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_147",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "union_membership",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "노조 가입 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*노조)(?=.*홍길동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "노조 가입 + 실명 결합은 차단됩니다.",
+   "message_en": "Union membership + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_148",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "sexual_orientation",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 880,
+   "description": "성적 지향 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*성적)(?=.*지향)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "성적 지향 + 실명 결합은 차단됩니다.",
+   "message_en": "Sexual orientation + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_149",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "gender_identity",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 880,
+   "description": "성별 정체성 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*정체성)(?=.*성별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "성별 정체성 + 실명 결합은 차단됩니다.",
+   "message_en": "Gender identity + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_150",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "race_ethnicity",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 880,
+   "description": "인종·민족 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*인종)(?=.*홍길동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "인종·민족 + 실명 결합은 차단됩니다.",
+   "message_en": "Race/ethnicity + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_151",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "philosophical_belief",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "철학적 신념 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*철학적)(?=.*신념)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "철학적 신념 + 실명 결합은 차단됩니다.",
+   "message_en": "Philosophical beliefs + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_152",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "criminal_record",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 920,
+   "description": "범죄 기록 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*전과)(?=.*홍길동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "범죄 기록 + 실명 결합은 차단됩니다.",
+   "message_en": "Criminal records + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_153",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "political_donation_combo",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "정치 후원금 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*당에)(?=.*기부)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정치 후원금 + 실명 결합은 차단됩니다.",
+   "message_en": "Political donations + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_154",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "sensitive_attr_inference",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 880,
+   "description": "텍스트로부터 민감 속성 추론 요청 거부",
+   "patterns": [
+    "(?=.*정당)(?=.*글을)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 속성 추론 요청은 거부됩니다.",
+   "message_en": "Sensitive-attribute inference requests are refused."
+  },
+  {
+   "rule_id": "PRIV_KR_155",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "sexual_attr_inference",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 880,
+   "description": "텍스트로부터 성적 지향 추론 요청 거부",
+   "patterns": [
+    "(?=.*글에서)(?=.*성적)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "성적 지향 추론 요청은 거부됩니다.",
+   "message_en": "Sexual-orientation inference requests are refused."
+  },
+  {
+   "rule_id": "PRIV_KR_156",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "religion_attr_inference",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 880,
+   "description": "텍스트로부터 종교 추론 요청 거부",
+   "patterns": [
+    "(?=.*글에서)(?=.*종교)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "종교 추론 요청은 거부됩니다.",
+   "message_en": "Religion-inference requests are refused."
+  },
+  {
+   "rule_id": "PRIV_KR_157",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "ethnic_attr_inference",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 880,
+   "description": "텍스트로부터 인종·민족 추론 요청 거부",
+   "patterns": [
+    "(?=.*글에서)(?=.*인종)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "인종·민족 추론 요청은 거부됩니다.",
+   "message_en": "Race/ethnicity-inference requests are refused."
+  },
+  {
+   "rule_id": "PRIV_KR_158",
+   "io_type": "input",
+   "category": "sensitive",
+   "sub_category": "political_view_in_image",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 880,
+   "description": "이미지로부터 정치 성향 추론 거부",
+   "patterns": [
+    "(?=.*지지일지)(?=.*추측해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이미지 기반 정치 성향 추론은 거부됩니다.",
+   "message_en": "Image-based political inference is refused."
+  },
+  {
+   "rule_id": "PRIV_KR_159",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_full_id",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "미성년자 실명+학교+주소 결합 차단",
+   "patterns": [
+    "(?=.*초등학교)(?=.*강남구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 신상정보 결합 입력은 차단됩니다.",
+   "message_en": "Minor identifying combinations are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_160",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_phone",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "미성년자 전화번호 입력 차단",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "미성년자 전화번호는 입력할 수 없습니다.",
+   "message_en": "Minor phone numbers cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_KR_161",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_photo_ref",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "미성년자 사진 + 식별 요청 차단",
+   "patterns": [
+    "(?=.*사진)(?=.*누군지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 사진에서 식별 요청은 차단됩니다.",
+   "message_en": "Identifying minors from photos is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_162",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_school_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "미성년자 학교 + 학년 + 성씨 결합 차단",
+   "patterns": [
+    "(?=.*중학교)(?=.*김씨)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 학교+학년+성씨 결합은 차단됩니다.",
+   "message_en": "School+grade+surname for a minor is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_163",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_grades",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "미성년자 성적 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*수학)(?=.*학기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 성적과 실명 결합은 차단됩니다.",
+   "message_en": "Minor grades + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_164",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_health",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 920,
+   "description": "미성년자 건강 정보 + 실명 차단",
+   "patterns": [
+    "(?=.*천식)(?=.*치료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 건강 정보 + 실명은 차단됩니다.",
+   "message_en": "Minor health info + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_165",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_chat_logs",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "미성년자 채팅 로그 + 실명 차단",
+   "patterns": [
+    "(?=.*카톡)(?=.*분석해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 채팅 로그 + 실명 결합은 차단됩니다.",
+   "message_en": "Minor chat logs + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_166",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_location",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "미성년자 실시간 위치 요청 차단",
+   "patterns": [
+    "(?=.*실시간)(?=.*딸의)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 실시간 위치 추적은 차단됩니다.",
+   "message_en": "Minor real-time location tracking is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_167",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_biometric",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "미성년자 생체정보 업로드 차단",
+   "patterns": [
+    "(?=.*임베딩)(?=.*딸의)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 생체정보는 업로드할 수 없습니다.",
+   "message_en": "Minor biometric data cannot be uploaded."
+  },
+  {
+   "rule_id": "PRIV_KR_168",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_browsing",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 820,
+   "description": "미성년자 브라우징 기록 + 실명 차단",
+   "patterns": [
+    "(?=.*브라우저)(?=.*히스토리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 브라우징 기록 + 실명은 차단됩니다.",
+   "message_en": "Minor browsing + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_169",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_financial_info",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "미성년자 계좌·카드 + 실명 차단",
+   "patterns": [
+    "(?=.*XXXXXX)(?=.*통장번호)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 계좌·카드 + 실명은 차단됩니다.",
+   "message_en": "Minor account/card + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_170",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_voice_recording",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 820,
+   "description": "미성년자 음성 + 식별정보 결합 차단",
+   "patterns": [
+    "(?=.*음성)(?=.*녹음)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 음성 + 식별정보 결합은 차단됩니다.",
+   "message_en": "Minor voice + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_171",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_guardian_contact",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "미성년자 보호자 연락처 결합 차단",
+   "patterns": [
+    "(?=.*엄마)(?=.*딸과)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보호자 연락처 + 미성년자 결합은 차단됩니다.",
+   "message_en": "Guardian contact + minor identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_172",
+   "io_type": "input",
+   "category": "children",
+   "sub_category": "minor_consent_request",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 400,
+   "description": "미성년자 처리 시 보호자 동의 안내",
+   "patterns": [
+    "(?=.*초등학생)(?=.*학습할거)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 데이터 처리 시 보호자 동의 필요.",
+   "message_en": "Processing minor data requires guardian consent."
+  },
+  {
+   "rule_id": "PRIV_KR_173",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "raw_access_logs",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 820,
+   "description": "원시 접근 로그 업로드 차단",
+   "patterns": [
+    "(?=.*row)(?=.*액세스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "원시 접근 로그는 가명화 후 사용하세요.",
+   "message_en": "Anonymize raw access logs before upload."
+  },
+  {
+   "rule_id": "PRIV_KR_174",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "ipv4_combo",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 300,
+   "description": "IPv4 주소 입력 시 경고",
+   "patterns": [
+    "\\b(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "IP 주소는 가능하면 가명화 후 사용하세요.",
+   "message_en": "Consider anonymizing IP addresses."
+  },
+  {
+   "rule_id": "PRIV_KR_175",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "ipv6_combo",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 300,
+   "description": "IPv6 주소 입력 시 경고",
+   "patterns": [
+    "(?=.*IPv)(?=.*접속)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "IPv6 주소는 가명화 권고.",
+   "message_en": "IPv6 should be anonymized."
+  },
+  {
+   "rule_id": "PRIV_KR_176",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "user_agent_combo",
+   "severity": "low",
+   "action": "warn",
+   "priority": 150,
+   "description": "User-Agent + user_id 결합 경고",
+   "patterns": [
+    "(?=.*Mozilla)(?=.*user)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "UA + user_id 결합은 식별 위험이 있습니다.",
+   "message_en": "UA + user_id combos risk identification."
+  },
+  {
+   "rule_id": "PRIV_KR_177",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "device_fingerprint",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "디바이스 핑거프린트 + user_id 결합 마스킹",
+   "patterns": [
+    "(?=.*AbCd)(?=.*FPid)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "디바이스 핑거프린트 + user_id 결합은 마스킹됩니다.",
+   "message_en": "Device FP + user_id combos are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_178",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "mobile_advertising_id",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "모바일 광고 ID (IDFA/AAID) 마스킹",
+   "patterns": [
+    "(?=.*EEEEEEEEEEEE)(?=.*AAAAAAAA)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "광고 ID는 마스킹 처리됩니다.",
+   "message_en": "Mobile advertising IDs are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_179",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "server_logs_with_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "서버 로그 내 PII 자동 마스킹",
+   "patterns": [
+    "(?=.*trace)(?=.*email)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "서버 로그 내 PII는 마스킹됩니다.",
+   "message_en": "PII in server logs is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_180",
+   "io_type": "input",
+   "category": "scope",
+   "sub_category": "linkage_attack",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 880,
+   "description": "익명 데이터셋 연결 재식별 요청 거부",
+   "patterns": [
+    "(?=.*재식별해줘)(?=.*투표인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "익명 데이터셋 재식별 요청은 거부됩니다.",
+   "message_en": "Linkage attacks on anonymized data are refused."
+  },
+  {
+   "rule_id": "PRIV_KR_181",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cross_border_transfer",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 400,
+   "description": "국외 이전 설계 시 컴플라이언스 안내",
+   "patterns": [
+    "(?=.*데이터센터)(?=.*PII)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 국외이전 설계 시 적정성·SCC 등 확인 필요.",
+   "message_en": "Cross-border PII transfer designs must follow adequacy / SCC rules."
+  },
+  {
+   "rule_id": "PRIV_KR_182",
+   "io_type": "input",
+   "category": "scope",
+   "sub_category": "dataset_join_risk",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 400,
+   "description": "여러 데이터셋 JOIN으로 인한 재식별 위험 경고",
+   "patterns": [
+    "(?=.*JOIN)(?=.*익명화된)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "다중 JOIN 재식별 위험이 있습니다.",
+   "message_en": "Cross-dataset JOIN risks re-identification."
+  },
+  {
+   "rule_id": "PRIV_KR_183",
+   "io_type": "input",
+   "category": "scope",
+   "sub_category": "k_anonymity_violation",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 400,
+   "description": "k-익명성 위반 가능 쿼리 경고",
+   "patterns": [
+    "(?=.*코호트)(?=.*연봉)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "k-익명성 위반 위험이 있습니다.",
+   "message_en": "Query may violate k-anonymity."
+  },
+  {
+   "rule_id": "PRIV_KR_184",
+   "io_type": "input",
+   "category": "scope",
+   "sub_category": "metadata_only_pii",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 350,
+   "description": "메타데이터 단독으로도 PII 가능성 경고",
+   "patterns": [
+    "(?=.*EXIF)(?=.*시각)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "메타데이터 자체로 식별 가능성이 있습니다.",
+   "message_en": "Metadata alone may identify a person."
+  },
+  {
+   "rule_id": "PRIV_KR_185",
+   "io_type": "input",
+   "category": "scope",
+   "sub_category": "temporal_correlation",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 350,
+   "description": "시간 상관으로 인한 재식별 경고",
+   "patterns": [
+    "(?=.*시각)(?=.*익명)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "시간 상관 재식별 위험이 있습니다.",
+   "message_en": "Temporal correlation risks re-identification."
+  },
+  {
+   "rule_id": "PRIV_KR_186",
+   "io_type": "input",
+   "category": "scope",
+   "sub_category": "dp_budget_warning",
+   "severity": "low",
+   "action": "warn",
+   "priority": 200,
+   "description": "차등 프라이버시 예산 소진 경고",
+   "patterns": [
+    "(?=.*epsilon)(?=.*실행)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "차등 프라이버시 예산이 소진되었습니다.",
+   "message_en": "DP epsilon budget exhausted."
+  },
+  {
+   "rule_id": "PRIV_KR_187",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "nhs_uk",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "영국 NHS 번호 입력 차단",
+   "patterns": [
+    "\\b\\d{3}[- ]?\\d{3}[- ]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "영국 NHS 번호는 입력하지 마세요.",
+   "message_en": "Do not enter UK NHS numbers."
+  },
+  {
+   "rule_id": "PRIV_KR_188",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "sin_canada",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "캐나다 SIN 입력 차단",
+   "patterns": [
+    "\\b\\d{3}[- ]?\\d{3}[- ]?\\d{3}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "캐나다 SIN은 입력하지 마세요.",
+   "message_en": "Do not paste Canadian SINs."
+  },
+  {
+   "rule_id": "PRIV_KR_189",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "medicare_au",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "호주 Medicare 카드번호 입력 차단",
+   "patterns": [
+    "\\b\\d{4}[- ]?\\d{5}[- ]?\\d\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "호주 Medicare 번호는 입력할 수 없습니다.",
+   "message_en": "Do not paste Australian Medicare numbers."
+  },
+  {
+   "rule_id": "PRIV_KR_190",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "aadhaar_india",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "인도 Aadhaar 번호 입력 차단",
+   "patterns": [
+    "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "Aadhaar 번호는 입력할 수 없습니다.",
+   "message_en": "Do not paste Indian Aadhaar numbers."
+  },
+  {
+   "rule_id": "PRIV_KR_191",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "cpf_brazil",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "브라질 CPF 입력 차단",
+   "patterns": [
+    "\\b\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "브라질 CPF는 입력할 수 없습니다.",
+   "message_en": "Do not paste Brazilian CPF numbers."
+  },
+  {
+   "rule_id": "PRIV_KR_192",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "verification_link_token",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "이메일/SMS 검증 링크 토큰 차단",
+   "patterns": [
+    "\\bverify[?_/=][A-Za-z0-9]{20,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "검증 링크 토큰은 입력할 수 없습니다.",
+   "message_en": "Verification link tokens cannot be entered."
+  },
+  {
+   "rule_id": "PRIV_KR_193",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "recovery_email_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "복구 이메일 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*backup)(?=.*복구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "복구 이메일 + 실명 결합은 차단됩니다.",
+   "message_en": "Recovery email + real name combos are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_194",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "recovery_phone_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "복구 전화 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*복구)(?=.*전화)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "복구 전화번호 + 실명 결합은 차단됩니다.",
+   "message_en": "Recovery phone + real name combos are blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_195",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "worker_protected_class",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 870,
+   "description": "장애·보호 대상 + 실명 결합 입력 차단",
+   "patterns": [
+    "(?=.*보호대상)(?=.*청각)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보호 대상 신분과 실명 결합은 차단됩니다.",
+   "message_en": "Protected-class status + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_196",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "philosophical_donation",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 820,
+   "description": "철학적 신념 단체 후원 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*재단)(?=.*후원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "철학적 신념 단체 후원 + 실명 결합은 차단됩니다.",
+   "message_en": "Philosophical-org donation + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_197",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "political_protest_combo",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 830,
+   "description": "정치 집회·시위 참여 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*집회)(?=.*참석)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정치 집회 참여와 실명 결합은 차단됩니다.",
+   "message_en": "Protest attendance + identity is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_198",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "error_stack_with_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "예외 stack trace 내 PII 마스킹",
+   "patterns": [
+    "(?=.*ValueError)(?=.*cannot)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "예외 stack trace 내 PII는 마스킹됩니다.",
+   "message_en": "PII inside stack traces is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_199",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "kafka_topic_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "Kafka 토픽 페이로드 내 PII 마스킹",
+   "patterns": [
+    "(?=.*payload)(?=.*Kafka)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "Kafka 페이로드 내 PII는 마스킹됩니다.",
+   "message_en": "PII inside Kafka payloads is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_200",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "metrics_label_with_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 400,
+   "description": "메트릭 라벨 내 PII 마스킹",
+   "patterns": [
+    "(?=.*requests)(?=.*email)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "메트릭 라벨 내 PII는 마스킹됩니다.",
+   "message_en": "PII inside metric labels is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_201",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "trace_span_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 400,
+   "description": "OTel trace span 속성 PII 마스킹",
+   "patterns": [
+    "(?=.*attrs)(?=.*span)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "OTel span 속성 PII는 마스킹됩니다.",
+   "message_en": "OTel span attribute PII is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_202",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "rag_doc_with_pii",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 800,
+   "description": "RAG 인덱싱 대상 문서 내 PII 차단",
+   "patterns": [
+    "(?=.*인덱스)(?=.*PDF)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "RAG 인덱스 문서는 가명화 후 사용하세요.",
+   "message_en": "RAG documents must be pseudonymized before indexing."
+  },
+  {
+   "rule_id": "PRIV_KR_203",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "prompt_with_secret_paste",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 820,
+   "description": "프롬프트 내 시크릿 .env 붙여넣기 차단",
+   "patterns": [
+    "\\b(?:DB|AWS|API|GCP|GITHUB)_[A-Z_]+=\\S+\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": ".env 파일 붙여넣기는 차단됩니다.",
+   "message_en": ".env paste inside prompts is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_204",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "training_data_with_pii",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 830,
+   "description": "모델 학습 데이터 내 PII 차단",
+   "patterns": [
+    "(?=.*SSN)(?=.*csv)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "학습 데이터 PII는 가명화 후 사용하세요.",
+   "message_en": "Training data PII must be pseudonymized."
+  },
+  {
+   "rule_id": "PRIV_KR_205",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "vector_db_query_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "벡터 DB 쿼리에 포함된 PII 마스킹",
+   "patterns": [
+    "(?=.*SSN)(?=.*검색)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "벡터 DB 쿼리 내 PII는 마스킹됩니다.",
+   "message_en": "PII inside vector DB queries is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_206",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "national_id_kr",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 950,
+   "description": "응답 내 주민등록번호 마스킹",
+   "patterns": [
+    "\\b\\d{6}[- ]?\\d{7}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "주민등록번호는 마스킹 처리됩니다.",
+   "message_en": "Korean RRN is redacted in responses."
+  },
+  {
+   "rule_id": "PRIV_KR_207",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "ssn_us",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 950,
+   "description": "응답 내 SSN 마스킹",
+   "patterns": [
+    "\\b(?!000|666)[0-8]\\d{2}[- ]\\d{2}[- ]\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답에서 SSN은 마스킹됩니다.",
+   "message_en": "SSNs are redacted in responses."
+  },
+  {
+   "rule_id": "PRIV_KR_208",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "mynumber_jp",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 950,
+   "description": "응답 내 마이넘버 마스킹",
+   "patterns": [
+    "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "마이넘버는 마스킹됩니다.",
+   "message_en": "Japanese My Number is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_209",
+   "io_type": "output",
+   "category": "financial",
+   "sub_category": "card_number",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 900,
+   "description": "응답 내 카드번호 마스킹",
+   "patterns": [
+    "\\b(?:\\d[ -]*?){13,19}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답에서 카드번호는 마스킹됩니다.",
+   "message_en": "Card numbers are redacted in responses."
+  },
+  {
+   "rule_id": "PRIV_KR_210",
+   "io_type": "output",
+   "category": "financial",
+   "sub_category": "iban",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "응답 내 IBAN 마스킹",
+   "patterns": [
+    "\\b[A-Z]{2}\\d{2}[A-Z0-9]{11,30}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답에서 IBAN은 마스킹됩니다.",
+   "message_en": "IBANs are redacted in responses."
+  },
+  {
+   "rule_id": "PRIV_KR_211",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "phone_kr",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "응답 내 한국 휴대전화 마스킹",
+   "patterns": [
+    "\\b01[016789][- .]?\\d{3,4}[- .]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답 내 휴대전화는 마스킹됩니다.",
+   "message_en": "Korean mobile numbers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_212",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "phone_us",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "응답 내 미국 전화번호 마스킹",
+   "patterns": [
+    "\\b(?:\\+?1[- .]?)?\\(?\\d{3}\\)?[- .]?\\d{3}[- .]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답 내 미국 전화번호는 마스킹됩니다.",
+   "message_en": "US phone numbers are redacted in responses."
+  },
+  {
+   "rule_id": "PRIV_KR_213",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "email",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "응답 내 이메일 마스킹",
+   "patterns": [
+    "\\b[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답 내 이메일은 마스킹됩니다.",
+   "message_en": "Emails are redacted in responses."
+  },
+  {
+   "rule_id": "PRIV_KR_214",
+   "io_type": "output",
+   "category": "credentials",
+   "sub_category": "api_key",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "응답 내 API 키 마스킹",
+   "patterns": [
+    "\\b(?:sk|pk|api|key|token)[_-][A-Za-z0-9_-]{16,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답 내 API 키는 마스킹됩니다.",
+   "message_en": "API keys/secrets are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_215",
+   "io_type": "output",
+   "category": "credentials",
+   "sub_category": "password",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 940,
+   "description": "응답 내 비밀번호 노출 방지",
+   "patterns": [
+    "(?=.*ssw)(?=.*데모)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에 비밀번호 노출은 마스킹됩니다.",
+   "message_en": "Password disclosure in output is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_216",
+   "io_type": "output",
+   "category": "credentials",
+   "sub_category": "ssh_private_key",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "응답 내 SSH 개인키 노출 차단",
+   "patterns": [
+    "(?=.*PRIVATE)(?=.*OPENSSH)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "SSH 개인키 노출은 차단됩니다.",
+   "message_en": "SSH private key disclosure is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_217",
+   "io_type": "output",
+   "category": "health",
+   "sub_category": "medical_record_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "응답 내 환자 식별 정보 마스킹",
+   "patterns": [
+    "(?=.*메트포르민)(?=.*당뇨)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 환자 식별 정보는 마스킹됩니다.",
+   "message_en": "Identifiable patient info is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_218",
+   "io_type": "output",
+   "category": "health",
+   "sub_category": "mental_health_out",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 920,
+   "description": "응답 내 정신건강+실명 마스킹",
+   "patterns": [
+    "(?=.*약을)(?=.*복용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정신건강 정보와 실명은 마스킹됩니다.",
+   "message_en": "Mental health + identity is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_219",
+   "io_type": "output",
+   "category": "health",
+   "sub_category": "self_harm_out",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "응답 내 자살·자해 방법 차단",
+   "patterns": [
+    "(?=.*구체적)(?=.*자해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "안전을 위해 해당 정보는 제공하지 않습니다.",
+   "message_en": "We do not provide that information. Please seek support."
+  },
+  {
+   "rule_id": "PRIV_KR_220",
+   "io_type": "output",
+   "category": "health",
+   "sub_category": "genetic_out",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 950,
+   "description": "응답 내 유전자 정보 + 실명 마스킹",
+   "patterns": [
+    "(?=.*mutation)(?=.*positive)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 유전자 정보 + 실명은 마스킹됩니다.",
+   "message_en": "Genetic info + identity is redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_221",
+   "io_type": "output",
+   "category": "sensitive",
+   "sub_category": "sensitive_attr_out",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 880,
+   "description": "응답에 특정 개인 민감 속성 추론 차단",
+   "patterns": [
+    "(?=.*정치성향)(?=.*추정됩니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "특정 개인의 민감 속성은 추론·노출되지 않습니다.",
+   "message_en": "Cannot infer or disclose individual sensitive attributes."
+  },
+  {
+   "rule_id": "PRIV_KR_222",
+   "io_type": "output",
+   "category": "sensitive",
+   "sub_category": "political_donor_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "응답 내 정치 후원자 명단 노출 차단",
+   "patterns": [
+    "(?=.*후원자)(?=.*만원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정치 후원자 명단은 마스킹됩니다.",
+   "message_en": "Political donor lists are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_223",
+   "io_type": "output",
+   "category": "location",
+   "sub_category": "home_address_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "응답 내 집 주소를 시·구 단위로 일반화",
+   "patterns": [
+    "(?=.*강남구)(?=.*서울시)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "집 주소는 시·구 단위로 일반화됩니다.",
+   "message_en": "Home addresses are generalized to city/district."
+  },
+  {
+   "rule_id": "PRIV_KR_224",
+   "io_type": "output",
+   "category": "location",
+   "sub_category": "gps_coord_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "응답 내 정확 GPS 좌표 + 실명 차단",
+   "patterns": [
+    "(?=.*현재)(?=.*홍길동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정확 GPS 좌표 + 실명은 차단·일반화됩니다.",
+   "message_en": "Precise GPS + names are blocked / generalized."
+  },
+  {
+   "rule_id": "PRIV_KR_225",
+   "io_type": "output",
+   "category": "children",
+   "sub_category": "minor_out",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 970,
+   "description": "응답 내 미성년자 식별 정보 마스킹",
+   "patterns": [
+    "(?=.*학생)(?=.*출력)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 미성년자 식별 정보는 마스킹됩니다.",
+   "message_en": "Minor identifying info is redacted in output."
+  },
+  {
+   "rule_id": "PRIV_KR_226",
+   "io_type": "output",
+   "category": "biometrics",
+   "sub_category": "biometric_out",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 920,
+   "description": "응답 내 생체 데이터 노출 차단",
+   "patterns": [
+    "(?=.*임베딩)(?=.*벡터)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 생체 데이터는 차단됩니다.",
+   "message_en": "Biometric data disclosure is blocked."
+  },
+  {
+   "rule_id": "PRIV_KR_227",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "hallucinated_pii_warning",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 500,
+   "description": "응답 내 가공·추정 PII 경고 추가",
+   "patterns": [
+    "(?=.*SSN)(?=.*가능성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 PII는 예시 값이며 실제와 다를 수 있음을 안내합니다.",
+   "message_en": "PII-shaped values may be fabricated; disclaimer added."
+  },
+  {
+   "rule_id": "PRIV_KR_228",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "audit_log_out",
+   "severity": "high",
+   "action": "aggregate_only",
+   "priority": 800,
+   "description": "응답 내 감사 로그는 집계 형태만 노출",
+   "patterns": [
+    "(?=.*월에)(?=.*실패)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "감사 로그는 집계 형태로만 응답합니다.",
+   "message_en": "Audit logs in output are aggregate-only."
+  },
+  {
+   "rule_id": "PRIV_KR_229",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "fabricated_law_citation",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 400,
+   "description": "응답 내 법령 인용 시 정확성 안내",
+   "patterns": [
+    "(?=.*개정)(?=.*따르면)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "법령 정보는 공식 출처 확인이 필요합니다.",
+   "message_en": "Law citations should be verified with official sources."
+  },
+  {
+   "rule_id": "PRIV_KR_230",
+   "io_type": "output",
+   "category": "scope",
+   "sub_category": "export_synth_dataset",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 800,
+   "description": "응답으로 실명 포함 데이터셋 생성 차단",
+   "patterns": [
+    "(?=.*CSV)(?=.*명의)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "실명 포함 데이터셋 생성 요청은 거부·익명화됩니다.",
+   "message_en": "Real-PII dataset generation requests are refused."
+  },
+  {
+   "rule_id": "PRIV_KR_231",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "nhs_uk_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 870,
+   "description": "응답 내 NHS 번호 마스킹",
+   "patterns": [
+    "\\b\\d{3}[- ]?\\d{3}[- ]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답 내 NHS 번호는 마스킹됩니다.",
+   "message_en": "NHS numbers are redacted in responses."
+  },
+  {
+   "rule_id": "PRIV_KR_232",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "sin_canada_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 870,
+   "description": "응답 내 캐나다 SIN 마스킹",
+   "patterns": [
+    "\\b\\d{3}[- ]?\\d{3}[- ]?\\d{3}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답 내 SIN은 마스킹됩니다.",
+   "message_en": "Canadian SINs are redacted in responses."
+  },
+  {
+   "rule_id": "PRIV_KR_233",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "aadhaar_out",
+   "severity": "critical",
+   "action": "redact",
+   "priority": 920,
+   "description": "응답 내 Aadhaar 마스킹",
+   "patterns": [
+    "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답 내 Aadhaar는 마스킹됩니다.",
+   "message_en": "Aadhaar identifiers are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_234",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "cpf_brazil_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 870,
+   "description": "응답 내 CPF 마스킹",
+   "patterns": [
+    "\\b\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답 내 CPF는 마스킹됩니다.",
+   "message_en": "Brazilian CPFs are redacted."
+  },
+  {
+   "rule_id": "PRIV_KR_235",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "worker_protected_class_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "응답 내 보호 대상 신분 + 실명 마스킹",
+   "patterns": [
+    "(?=.*보호대상)(?=.*청각)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 보호 대상 + 실명은 마스킹됩니다.",
+   "message_en": "Protected-class + identity is redacted in output."
+  },
+  {
+   "rule_id": "PRIV_KR_236",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "political_protest_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "응답 내 집회 참여 + 실명 마스킹",
+   "patterns": [
+    "(?=.*집회)(?=.*참석)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 집회 참여 + 실명은 마스킹됩니다.",
+   "message_en": "Protest attendance + identity is redacted in output."
+  },
+  {
+   "rule_id": "PRIV_KR_237",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "verification_link_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "응답 내 검증 링크 토큰 마스킹",
+   "patterns": [
+    "\\bverify[?_/=][A-Za-z0-9]{20,}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "응답 내 검증 링크 토큰은 마스킹됩니다.",
+   "message_en": "Verification link tokens are redacted in output."
+  },
+  {
+   "rule_id": "PRIV_KR_238",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "rag_citation_with_pii_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 750,
+   "description": "RAG 인용문 내 PII 마스킹",
+   "patterns": [
+    "(?=.*인용)(?=.*원문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "RAG 인용 내 PII는 마스킹됩니다.",
+   "message_en": "PII inside RAG citations is redacted in output."
+  },
+  {
+   "rule_id": "PRIV_KR_239",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "vector_search_result_out",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "벡터 검색 결과 응답에서 PII 마스킹",
+   "patterns": [
+    "(?=.*SSN)(?=.*유사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "벡터 검색 결과 PII는 마스킹됩니다.",
+   "message_en": "PII inside vector-search results is redacted in output."
+  },
+  {
+   "rule_id": "PRIV_KR_240",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "k_anonymity_violation_out",
+   "severity": "medium",
+   "action": "aggregate_only",
+   "priority": 500,
+   "description": "응답 내 k-익명성 위반 가능 집계 결과 차단",
+   "patterns": [
+    "(?=.*강남구)(?=.*변호사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "k-익명성 위반 가능 결과는 집계로만 노출합니다.",
+   "message_en": "Results that may violate k-anonymity are aggregate-only."
+  },
+  {
+   "rule_id": "PRIV_KR_241",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "metadata_only_pii_out",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 400,
+   "description": "응답에 메타데이터 기반 식별 가능성 경고",
+   "patterns": [
+    "(?=.*EXIF)(?=.*시각)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "메타데이터 기반 식별 가능성을 안내합니다.",
+   "message_en": "Disclaimer added when metadata alone may identify."
+  },
+  {
+   "rule_id": "PRIV_KR_242",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "cross_border_transfer_out",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 400,
+   "description": "응답에 국외 이전 시 컴플라이언스 안내",
+   "patterns": [
+    "(?=.*데이터센터)(?=.*PII)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "국외 이전은 적정성/SCC 검토 필요 안내가 추가됩니다.",
+   "message_en": "Cross-border transfers must follow adequacy/SCC checks."
+  },
+  {
+   "rule_id": "PRIV_KR_243",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "synthetic_dataset_out",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 800,
+   "description": "응답으로 실명 dataset 생성 차단",
+   "patterns": [
+    "(?=.*dataset)(?=.*생성해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에는 실명 dataset이 생성되지 않습니다.",
+   "message_en": "Real-PII dataset generation is refused in output."
+  },
+  {
+   "rule_id": "PRIV_KR_244",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "audit_event_pii_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "응답 내 감사 이벤트 PII 마스킹",
+   "patterns": [
+    "(?=.*action)(?=.*delete)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "감사 이벤트 PII는 응답에서 마스킹됩니다.",
+   "message_en": "PII inside audit events is redacted in output."
+  },
+  {
+   "rule_id": "PRIV_KR_245",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "third_party_api_with_pii_out",
+   "severity": "high",
+   "action": "warn",
+   "priority": 500,
+   "description": "응답에서 제3자 API에 PII 전송 권유 시 경고",
+   "patterns": [
+    "(?=.*전송하세)(?=.*SSN)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 PII를 제3자 API에 전송하라고 권유 시 경고합니다.",
+   "message_en": "Warn when suggesting PII be sent to third-party APIs."
+  }
+ ]
+}

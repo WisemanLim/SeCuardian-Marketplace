@@ -61,6 +61,13 @@ async def lifespan(app: FastAPI):
     await addon_init(app)
     from app.agents import guardrails_gate
     guardrails_gate.install()  # F-GRD: orchestrator._exec_api_call 게이트 배선(§7.8.4)
+    # F-GRD §7.8.7: 컴파일된 도메인 규칙 → guardrails_domain_catalog 동기화(전 도메인 노출)
+    try:
+        from app.services.guardrails_rules import sync_catalog
+        await sync_catalog()
+    except Exception:  # noqa: BLE001 — 카탈로그 동기화 실패가 부팅을 막아선 안 됨
+        import logging
+        logging.getLogger("uvicorn.error").exception("[main] guardrails 카탈로그 동기화 실패")
     from app.services import mcp_proxy_server
     await mcp_proxy_server.init_from_db()  # tbl_mcp_configs 기준 MCP proxy 서버 복원
 

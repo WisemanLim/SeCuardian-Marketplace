@@ -1,0 +1,3413 @@
+{
+ "domain_key": "finance-insurance",
+ "display_name": "금융(보험)",
+ "display_name_en": "Finance (Insurance)",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 200,
+ "regex_rule_count": 200,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 200,
+ "rules": [
+  {
+   "rule_id": "FIN_INS_KR_001",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_disclosure_evasion",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "보험 상품 핵심 정보 공개 회피 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*인상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 상품 핵심 정보 공개 회피 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_002",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "benefit_misrepresent",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "보험 급부 허위 표현 차단",
+   "patterns": [
+    "(?=.*암보험)(?=.*보장해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 급부 허위 표현 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_003",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "actuarial_data_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "보험 계리 데이터 조작 차단",
+   "patterns": [
+    "(?=.*사망률)(?=.*보험료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 계리 데이터 조작 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_004",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "reinsurance_reporting_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "재보험 보고 누락 지원 차단",
+   "patterns": [
+    "(?=.*재보험)(?=.*세부)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "재보험 보고 누락 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_005",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "solvency_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "보험사 지급 여력 은폐 차단",
+   "patterns": [
+    "(?=.*지급여력비율)(?=.*낮은데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험사 지급 여력 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_006",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "claims_investigation_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "보험금 지급 심사 우회 지원 차단",
+   "patterns": [
+    "(?=.*통과시키)(?=.*보험금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험금 지급 심사 우회 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_007",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "medical_underwriting_bias",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "의료 언더라이팅 차별 적용 지원 차단",
+   "patterns": [
+    "(?=.*질환자)(?=.*거부하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "의료 언더라이팅 차별 적용 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_008",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "exclusion_clause_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "보험 면책 조항 은폐 차단",
+   "patterns": [
+    "(?=.*글씨)(?=.*작은)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 면책 조항 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_009",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "policy_lapse_exploitation",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "보험 계약 실효 이용 고객 착취 차단",
+   "patterns": [
+    "(?=.*해지환급금)(?=.*실효시키)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 계약 실효 이용 고객 착취 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_010",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cross_selling_coercion_ins",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "보험 교차 판매 강요 차단",
+   "patterns": [
+    "(?=.*생명보험)(?=.*끼워팔기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 교차 판매 강요 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_011",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cooling_off_period_deny",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "청약 철회 기간 부여 거부 차단",
+   "patterns": [
+    "(?=.*알려주)(?=.*청약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "청약 철회 기간 부여 거부 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_012",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "tied_selling_insurance",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "보험 끼워팔기(tied selling) 차단",
+   "patterns": [
+    "(?=.*가입시켜)(?=.*은행)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 끼워팔기(tied selling) 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_013",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "twisting_churning_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "보험 계약 전환 권유(twisting) 차단",
+   "patterns": [
+    "(?=.*해지하)(?=.*권유하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 계약 전환 권유(twisting) 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_014",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "replacement_policy_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "허위 보험 계약 대체 권유 차단",
+   "patterns": [
+    "(?=.*갈아타기)(?=.*계약보)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "허위 보험 계약 대체 권유 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_015",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "surrender_value_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "해지환급금 정보 은폐 차단",
+   "patterns": [
+    "(?=.*환급금)(?=.*중도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "해지환급금 정보 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_016",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "waiting_period_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "보험 면책 기간 허위 안내 차단",
+   "patterns": [
+    "(?=.*잘못)(?=.*면책)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 면책 기간 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_017",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "premium_increase_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "보험료 인상 예정 은폐 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*오른다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 인상 예정 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_018",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "grace_period_manipulation",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "보험료 납입 유예 기간 조작 차단",
+   "patterns": [
+    "(?=.*납입)(?=.*유예)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 납입 유예 기간 조작 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_019",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "subrogation_rights_hide",
+   "severity": "medium",
+   "action": "block",
+   "priority": 780,
+   "description": "대위권 행사 정보 은폐 차단",
+   "patterns": [
+    "(?=.*대위)(?=.*미고지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "대위권 행사 정보 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_020",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "double_insurance_hide",
+   "severity": "medium",
+   "action": "block",
+   "priority": 800,
+   "description": "중복 보험 고지 누락 차단",
+   "patterns": [
+    "(?=.*중복)(?=.*유도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "중복 보험 고지 누락 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_021",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "co_insurance_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "공동 보험 분담 비율 허위 안내 차단",
+   "patterns": [
+    "(?=.*부담률)(?=.*낮다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공동 보험 분담 비율 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_022",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "annuity_complexity_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "연금 보험 복잡 구조 은폐 차단",
+   "patterns": [
+    "(?=.*개시)(?=.*사망)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "연금 보험 복잡 구조 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_023",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "variable_insurance_risk_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "변액 보험 원금 손실 위험 은폐 차단",
+   "patterns": [
+    "(?=.*변액)(?=.*가능성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "변액 보험 원금 손실 위험 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_024",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "micro_insurance_misrepresent",
+   "severity": "medium",
+   "action": "block",
+   "priority": 800,
+   "description": "소액 단기 보험 허위 안내 차단",
+   "patterns": [
+    "(?=.*인상)(?=.*요금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "소액 단기 보험 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_025",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_agent_kickback_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "보험 모집인 리베이트 지원 차단",
+   "patterns": [
+    "(?=.*대가)(?=.*유도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 모집인 리베이트 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_026",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_premium_embezzlement",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "보험료 횡령 지원 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*유용하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 횡령 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_027",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "unlicensed_insurance_selling",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "무등록 보험 판매 지원 차단",
+   "patterns": [
+    "(?=.*모집인)(?=.*영업하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "무등록 보험 판매 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_028",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_policy_forgery",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "보험 증권 위조 지원 차단",
+   "patterns": [
+    "(?=.*보험금)(?=.*위조해서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 증권 위조 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_029",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "solvency_margin_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "지급여력 마진 허위 보고 차단",
+   "patterns": [
+    "(?=.*RBC)(?=.*숨겨서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "지급여력 마진 허위 보고 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_030",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_reserve_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "보험 책임준비금 조작 차단",
+   "patterns": [
+    "(?=.*책임준비금)(?=.*충분하다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 책임준비금 조작 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_031",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_investment_risk_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "보험사 투자 손실 위험 은폐 차단",
+   "patterns": [
+    "(?=.*계약자)(?=.*포트폴리오)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험사 투자 손실 위험 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_032",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "group_insurance_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "단체 보험 보장 범위 허위 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*단체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "단체 보험 보장 범위 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_033",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_advertising_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "보험 허위 광고 지원 차단",
+   "patterns": [
+    "(?=.*면책)(?=.*완벽)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 허위 광고 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_034",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_cancellation_obstruct",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "보험 해지 방해 지원 차단",
+   "patterns": [
+    "(?=.*접수)(?=.*거부하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 해지 방해 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_035",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_naic_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "NAIC 보험 규정 우회 지원 차단",
+   "patterns": [
+    "(?=.*NAIC)(?=.*약관)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "NAIC 보험 규정 우회 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_036",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "iais_icp_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "IAIS 보험 핵심 원칙 우회 차단",
+   "patterns": [
+    "(?=.*IAIS)(?=.*ICP)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "IAIS 보험 핵심 원칙 우회 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_037",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "premium_collection_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "보험료 부당 수령 지원 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*팔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 부당 수령 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_038",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_data_falsify_regulator",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "감독당국 보험 데이터 허위 보고 차단",
+   "patterns": [
+    "(?=.*지급률)(?=.*감독당국)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "감독당국 보험 데이터 허위 보고 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_039",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "health_insurance_preexisting_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "기왕증 고지 누락 지원 차단",
+   "patterns": [
+    "(?=.*기왕증)(?=.*고지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "기왕증 고지 누락 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_040",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "auto_insurance_rate_manipulation",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "자동차 보험료 산정 조작 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*책정하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자동차 보험료 산정 조작 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_041",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "life_insurance_insurable_interest_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "피보험 이익 없는 생명보험 가입 지원 차단",
+   "patterns": [
+    "(?=.*생명보험)(?=.*가입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "피보험 이익 없는 생명보험 가입 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_042",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_suitability_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "보험 적합성 평가 생략 지원 차단",
+   "patterns": [
+    "(?=.*재정)(?=.*고액)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 적합성 평가 생략 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_043",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_overseas_misrepresent",
+   "severity": "medium",
+   "action": "block",
+   "priority": 800,
+   "description": "해외 여행 보험 허위 안내 차단",
+   "patterns": [
+    "(?=.*여행)(?=.*세계)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "해외 여행 보험 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_044",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "environmental_insurance_false_claim",
+   "severity": "medium",
+   "action": "block",
+   "priority": 810,
+   "description": "환경 책임 보험 허위 안내 차단",
+   "patterns": [
+    "(?=.*잘못)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "환경 책임 보험 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_045",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_financial_statement_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "보험사 재무제표 사기 차단",
+   "patterns": [
+    "(?=.*재무제표)(?=.*부풀려서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험사 재무제표 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_046",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "catastrophe_bond_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "재해채권(CAT bond) 허위 안내 차단",
+   "patterns": [
+    "(?=.*CAT)(?=.*본드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "재해채권(CAT bond) 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_047",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "medical_underwriting_pii",
+   "severity": "critical",
+   "action": "block_or_redact",
+   "priority": 940,
+   "description": "의료 언더라이팅 개인 건강 정보 차단",
+   "patterns": [
+    "(?=.*심사용)(?=.*만들어)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "의료 언더라이팅 개인 건강 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_048",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "beneficiary_health_data",
+   "severity": "critical",
+   "action": "block_or_redact",
+   "priority": 930,
+   "description": "수익자 건강 데이터 차단",
+   "patterns": [
+    "(?=.*수익자)(?=.*저장해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "수익자 건강 데이터 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_049",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "claims_medical_records",
+   "severity": "critical",
+   "action": "block_or_redact",
+   "priority": 950,
+   "description": "보험금 청구용 의료 기록 개인정보 차단",
+   "patterns": [
+    "(?=.*함께)(?=.*공유해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험금 청구용 의료 기록 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_050",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "policyholder_financial_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "보험 계약자 금융 개인정보 차단",
+   "patterns": [
+    "(?=.*계약자)(?=.*공유해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 계약자 금융 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_051",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "accident_victim_pii_ins",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 860,
+   "description": "사고 피해자 개인정보 차단",
+   "patterns": [
+    "(?=.*상해)(?=.*보험사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사고 피해자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_052",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "disability_claimant_pii",
+   "severity": "critical",
+   "action": "block_or_redact",
+   "priority": 930,
+   "description": "장애 보험금 청구자 개인정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*보험금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "장애 보험금 청구자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_053",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "mental_health_policyholder_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 940,
+   "description": "정신 건강 보험 계약자 개인정보 차단",
+   "patterns": [
+    "(?=.*정신)(?=.*가입)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "정신 건강 보험 계약자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_054",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "genetic_data_underwriting",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "유전자 정보 보험 언더라이팅 이용 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*할증하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "유전자 정보 보험 언더라이팅 이용 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_055",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_agent_client_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "보험 모집인 고객 개인정보 무단 처리 차단",
+   "patterns": [
+    "(?=.*팔아넘기)(?=.*모집인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 모집인 고객 개인정보 무단 처리 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_056",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_claim_surveillance_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 860,
+   "description": "보험 청구 조사 감시 개인정보 차단",
+   "patterns": [
+    "(?=.*감시해서)(?=.*청구자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 청구 조사 감시 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_057",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "minor_beneficiary_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "미성년 수익자 개인정보 차단",
+   "patterns": [
+    "(?=.*수익자)(?=.*미성년)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년 수익자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_058",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "elderly_policyholder_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 860,
+   "description": "고령 보험 계약자 개인정보 차단",
+   "patterns": [
+    "(?=.*계약자)(?=.*고령)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "고령 보험 계약자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_059",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_underwriting_ai_bias_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "AI 언더라이팅 민감 개인정보 이용 차단",
+   "patterns": [
+    "(?=.*입력해)(?=.*거주지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "AI 언더라이팅 민감 개인정보 이용 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_060",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "telematics_insurance_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 780,
+   "description": "텔레매틱스 보험 위치 데이터 개인정보 차단",
+   "patterns": [
+    "(?=.*계약자)(?=.*텔레매틱스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "텔레매틱스 보험 위치 데이터 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_061",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "travel_insurance_passport_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 840,
+   "description": "여행 보험 여권 개인정보 차단",
+   "patterns": [
+    "(?=.*여행)(?=.*국적)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "여행 보험 여권 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_062",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "critical_illness_pii",
+   "severity": "critical",
+   "action": "block_or_redact",
+   "priority": 940,
+   "description": "중증 질환 보험 건강 정보 차단",
+   "patterns": [
+    "(?=.*피보험자)(?=.*심장병)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "중증 질환 보험 건강 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_063",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "workers_comp_claimant_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "산재 보험 청구자 개인정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*직업)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "산재 보험 청구자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_064",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_claim_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "보험금 청구 사기 지원 차단",
+   "patterns": [
+    "(?=.*나은)(?=.*이미)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험금 청구 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_065",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "premium_evasion_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "보험료 납입 회피 지원 차단",
+   "patterns": [
+    "(?=.*악용해서)(?=.*보험료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 납입 회피 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_066",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "arson_for_insurance",
+   "severity": "critical",
+   "action": "block",
+   "priority": 995,
+   "description": "보험금 목적 방화 지원 차단",
+   "patterns": [
+    "(?=.*받으려)(?=.*건물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험금 목적 방화 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_067",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "staged_accident_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "교통사고 자작극 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*받으려)(?=.*고의)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "교통사고 자작극 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_068",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "disability_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "장애 허위 청구 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*보험금)(?=.*없는데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "장애 허위 청구 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_069",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "auto_insurance_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "자동차 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*심각하게)(?=.*경미한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자동차 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_070",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "life_insurance_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "생명 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*피보험자)(?=.*생명보험)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "생명 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_071",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "workers_comp_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "산재 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*짜고)(?=.*고용주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "산재 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_072",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "phantom_accident_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "유령 사고 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*꾸며서)(?=.*없었던)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "유령 사고 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_073",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "provider_billing_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "의료 제공자 보험 청구 사기 지원 차단",
+   "patterns": [
+    "(?=.*않은)(?=.*하지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "의료 제공자 보험 청구 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_074",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "policy_application_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "보험 가입 신청 사기 지원 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*직업)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 가입 신청 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_075",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_broker_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "보험 중개인 사기 지원 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*팔아서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 중개인 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_076",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "inflated_property_damage_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "재산 피해 과장 청구 지원 차단",
+   "patterns": [
+    "(?=.*받으려)(?=.*보험금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "재산 피해 과장 청구 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_077",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "medical_certificate_forgery_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "보험용 진단서 위조 지원 차단",
+   "patterns": [
+    "(?=.*소견서)(?=.*위조한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험용 진단서 위조 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_078",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_ring_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "보험 사기 조직 운영 지원 차단",
+   "patterns": [
+    "(?=.*짜고)(?=.*명이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 사기 조직 운영 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_079",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_identity_theft_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "보험 명의 도용 지원 차단",
+   "patterns": [
+    "(?=.*가입해서)(?=.*보험금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 명의 도용 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_080",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "health_insurance_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "건강 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*보험금)(?=.*외래)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "건강 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_081",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "travel_insurance_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 940,
+   "description": "여행 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*신고해서)(?=.*여행)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "여행 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_082",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "crop_insurance_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "농작물 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*농작물)(?=.*작물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "농작물 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_083",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "marine_insurance_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "해상 보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*침몰시켜서)(?=.*고의)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "해상 보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_084",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "unemployment_insurance_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "실업 급여 부정 수급 지원 차단",
+   "patterns": [
+    "(?=.*실업급여)(?=.*비자발적)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "실업 급여 부정 수급 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_085",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "policy_term_fabrication",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "보험 약관 용어 날조 차단",
+   "patterns": [
+    "(?=.*전염병)(?=.*보장합니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 약관 용어 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_086",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "coverage_claim_false",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "보장 범위 허위 주장 차단",
+   "patterns": [
+    "(?=.*기까지)(?=.*암보험)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보장 범위 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_087",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "premium_calculation_fake",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "보험료 산정 허위 안내 차단",
+   "patterns": [
+    "(?=.*무관하게)(?=.*보험료예)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 산정 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_088",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "regulatory_requirement_fabrication_ins",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "보험 규정 요건 날조 차단",
+   "patterns": [
+    "(?=.*보장)(?=.*원금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 규정 요건 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_089",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "exclusion_interpretation_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "면책 조항 허위 해석 차단",
+   "patterns": [
+    "(?=.*우발적이면)(?=.*가능해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "면책 조항 허위 해석 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_090",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurer_solvency_false",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "보험사 지급 능력 허위 주장 차단",
+   "patterns": [
+    "(?=.*지급여력비율)(?=.*예요)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험사 지급 능력 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_091",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "riders_benefit_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "보험 특약 급부 날조 차단",
+   "patterns": [
+    "(?=.*무한정)(?=.*일부터)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 특약 급부 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_092",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_legal_obligation_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "보험사 법적 의무 허위 안내 차단",
+   "patterns": [
+    "(?=.*불가예)(?=.*경우에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험사 법적 의무 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_093",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_tax_benefit_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "보험 세금 혜택 허위 안내 차단",
+   "patterns": [
+    "(?=.*소득공제)(?=.*보험료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 세금 혜택 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_094",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "surrender_value_false_claim",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "해지환급금 허위 주장 차단",
+   "patterns": [
+    "(?=.*보장이에)(?=.*해지해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "해지환급금 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_095",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_inducement_gift_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "보험 모집 과도한 사은품 제공 차단",
+   "patterns": [
+    "(?=.*제공하)(?=.*유도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 모집 과도한 사은품 제공 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_096",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_policy_backdating",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "보험 계약 소급 적용 지원 차단",
+   "patterns": [
+    "(?=.*소급해서)(?=.*가입일)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 계약 소급 적용 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_097",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_reinsurance_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "재보험 사기 지원 차단",
+   "patterns": [
+    "(?=.*설립해서)(?=.*재보험사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "재보험 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_098",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_premium_tax_evasion",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "보험료 세금 탈루 지원 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*납입)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 세금 탈루 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_099",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_captive_abuse_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "캡티브 보험사 남용 지원 차단",
+   "patterns": [
+    "(?=.*캡티브)(?=.*자본)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "캡티브 보험사 남용 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_100",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_fronting_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "보험 프론팅 지원 차단",
+   "patterns": [
+    "(?=.*프론팅)(?=.*제공하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 프론팅 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_101",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_anti_competitive_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "보험 담합 지원 차단",
+   "patterns": [
+    "(?=.*배제)(?=.*경쟁)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 담합 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_102",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_data_breach_conceal",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "보험 데이터 침해 은폐 차단",
+   "patterns": [
+    "(?=.*지속하)(?=.*침해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 데이터 침해 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_103",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_bribery_claims_adjuster",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "보험 손해사정사 뇌물 지원 차단",
+   "patterns": [
+    "(?=.*손해사정사)(?=.*줘서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 손해사정사 뇌물 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_104",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_market_conduct_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "보험 시장 행동 기준 위반 차단",
+   "patterns": [
+    "(?=.*압박)(?=.*전술)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 시장 행동 기준 위반 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_105",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_ceded_premium_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "출재 보험료 사기 지원 차단",
+   "patterns": [
+    "(?=.*재보험사로)(?=.*보험료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "출재 보험료 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_106",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_anti_money_laundering_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "보험 AML 절차 생략 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*납입)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 AML 절차 생략 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_107",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_surrender_pressure_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "보험 해지 강요 지원 차단",
+   "patterns": [
+    "(?=.*강요하)(?=.*시기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 해지 강요 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_108",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_misleading_comparison_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "보험 허위 비교 안내 차단",
+   "patterns": [
+    "(?=.*비교해서)(?=.*잘못)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 허위 비교 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_109",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_financial_conglomerate_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "금융 복합 그룹 보험 규제 우회 차단",
+   "patterns": [
+    "(?=.*복합)(?=.*그룹)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "금융 복합 그룹 보험 규제 우회 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_110",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_systemic_risk_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "보험 시스템 리스크 은폐 차단",
+   "patterns": [
+    "(?=.*감독원)(?=.*리스크)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 시스템 리스크 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_111",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_independent_agent_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "독립 보험 대리점 불법 운영 차단",
+   "patterns": [
+    "(?=.*대리점)(?=.*겸업)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "독립 보험 대리점 불법 운영 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_112",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_personal_lines_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "개인 보험 상품 허위 안내 차단",
+   "patterns": [
+    "(?=.*전액)(?=.*실손)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인 보험 상품 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_113",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_commercial_lines_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "기업 보험 상품 허위 안내 차단",
+   "patterns": [
+    "(?=.*잘못)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "기업 보험 상품 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_114",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_nat_cat_risk_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "자연재해 보험 위험 은폐 차단",
+   "patterns": [
+    "(?=.*자연재해)(?=.*면책)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자연재해 보험 위험 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_115",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_product_approval_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "보험 상품 인가 없이 출시 차단",
+   "patterns": [
+    "(?=.*특이)(?=.*약관)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 상품 인가 없이 출시 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_116",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_runoff_management_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "보험 런오프 관리 사기 차단",
+   "patterns": [
+    "(?=.*런오프)(?=.*보험사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 런오프 관리 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_117",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_tcf_violation_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "소비자 공정 대우(TCF) 위반 차단",
+   "patterns": [
+    "(?=.*불완전)(?=.*배상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "소비자 공정 대우(TCF) 위반 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_118",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_product_complexity_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "복잡 보험 상품 구조 은폐 차단",
+   "patterns": [
+    "(?=.*특약)(?=.*작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "복잡 보험 상품 구조 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_119",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_reinsurance_cycle_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "재보험 사이클 위험 은폐 차단",
+   "patterns": [
+    "(?=.*재보험)(?=.*어려움)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "재보험 사이클 위험 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_120",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_premium_finance_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "보험료 금융 대출 남용 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*이자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 금융 대출 남용 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_121",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_aggregate_limit_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "보험 총 보상 한도 은폐 차단",
+   "patterns": [
+    "(?=.*도달)(?=.*집합)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 총 보상 한도 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_122",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "insurance_cyber_risk_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "사이버 보험 위험 허위 안내 차단",
+   "patterns": [
+    "(?=.*사이버)(?=.*공격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사이버 보험 위험 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_123",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_employee_health_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 940,
+   "description": "단체 보험 직원 건강 정보 차단",
+   "patterns": [
+    "(?=.*고용주)(?=.*단체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "단체 보험 직원 건강 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_124",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_pregnancy_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 950,
+   "description": "임신·출산 보험 정보 차단",
+   "patterns": [
+    "(?=.*산모)(?=.*고용주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "임신·출산 보험 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_125",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_hiv_aids_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 960,
+   "description": "HIV·AIDS 보험 가입자 정보 차단",
+   "patterns": [
+    "(?=.*AIDS)(?=.*저장해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "HIV·AIDS 보험 가입자 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_126",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_addiction_treatment_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 945,
+   "description": "중독 치료 보험 정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*공개해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "중독 치료 보험 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_127",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_suicide_attempt_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 960,
+   "description": "자살 시도 보험 청구 정보 차단",
+   "patterns": [
+    "(?=.*저장해)(?=.*자해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자살 시도 보험 청구 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_128",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_claimant_location_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 780,
+   "description": "보험 청구자 위치 정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*저장해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 청구자 위치 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_129",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_rehabilitation_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 940,
+   "description": "재활 치료 보험 정보 차단",
+   "patterns": [
+    "(?=.*고용주)(?=.*재활)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "재활 치료 보험 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_130",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_telemedicine_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "원격 진료 보험 정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*원격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "원격 진료 보험 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_131",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_autopsy_report_pii",
+   "severity": "critical",
+   "action": "block_or_redact",
+   "priority": 950,
+   "description": "사망 보험금 부검 보고서 정보 차단",
+   "patterns": [
+    "(?=.*청구용)(?=.*생명)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사망 보험금 부검 보고서 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_132",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_home_address_risk_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 845,
+   "description": "주택 보험 소유자 주소·정보 차단",
+   "patterns": [
+    "(?=.*주택)(?=.*자택)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주택 보험 소유자 주소·정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_133",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_vehicle_owner_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 845,
+   "description": "자동차 보험 차량 소유자 개인정보 차단",
+   "patterns": [
+    "(?=.*자동차)(?=.*저장해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자동차 보험 차량 소유자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_134",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_child_health_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 950,
+   "description": "어린이 보험 건강 정보 차단",
+   "patterns": [
+    "(?=.*학교)(?=.*어린이집)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "어린이 보험 건강 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_135",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_chronic_disease_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 940,
+   "description": "만성 질환 보험 가입자 정보 차단",
+   "patterns": [
+    "(?=.*만성)(?=.*질환)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "만성 질환 보험 가입자 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_136",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_long_term_care_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 940,
+   "description": "장기 요양 보험 수급자 정보 차단",
+   "patterns": [
+    "(?=.*수급자)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "장기 요양 보험 수급자 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_137",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_prescription_drug_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 945,
+   "description": "처방약 보험 청구 정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*처방약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "처방약 보험 청구 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_138",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_policyholder_biometrics",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 940,
+   "description": "보험 계약자 생체 인증 정보 차단",
+   "patterns": [
+    "(?=.*계약자)(?=.*저장해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 계약자 생체 인증 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_139",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_social_determinants_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 860,
+   "description": "사회적 건강 결정 요인 보험 데이터 차단",
+   "patterns": [
+    "(?=.*주거)(?=.*결합해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사회적 건강 결정 요인 보험 데이터 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_140",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_employer_health_plan_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 860,
+   "description": "고용주 단체 건강 보험 직원 정보 차단",
+   "patterns": [
+    "(?=.*인사팀)(?=.*단체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "고용주 단체 건강 보험 직원 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_141",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_claim_photo_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 845,
+   "description": "보험 청구 사진·피해자 신원 결합 차단",
+   "patterns": [
+    "(?=.*부상)(?=.*사진)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 청구 사진·피해자 신원 결합 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_142",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_funeral_expense_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 840,
+   "description": "장례 비용 보험 청구 정보 차단",
+   "patterns": [
+    "(?=.*장례)(?=.*사망자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "장례 비용 보험 청구 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_143",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_critical_procedure_pii",
+   "severity": "critical",
+   "action": "block_or_pseudonymize",
+   "priority": 945,
+   "description": "중증 수술 보험 청구 정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*이식)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "중증 수술 보험 청구 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_144",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_pet_owner_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 760,
+   "description": "반려동물 보험 소유자 정보 차단",
+   "patterns": [
+    "(?=.*저장해)(?=.*소유자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "반려동물 보험 소유자 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_145",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_overseas_travel_health_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 840,
+   "description": "해외 여행 중 의료 보험 청구 정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*여행)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "해외 여행 중 의료 보험 청구 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_146",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_domestic_accident_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 845,
+   "description": "가정 내 사고 보험 피해자 정보 차단",
+   "patterns": [
+    "(?=.*구성원)(?=.*가정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "가정 내 사고 보험 피해자 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_147",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_sport_injury_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 770,
+   "description": "스포츠 상해 보험 청구자 정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*스포츠)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "스포츠 상해 보험 청구자 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_148",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_income_protection_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 845,
+   "description": "소득 보상 보험 수급자 정보 차단",
+   "patterns": [
+    "(?=.*보상)(?=.*수급자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "소득 보상 보험 수급자 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_149",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_fake_death_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "보험 수령 목적 위장 사망 차단",
+   "patterns": [
+    "(?=.*받으려)(?=.*생명)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 수령 목적 위장 사망 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_150",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_hospital_overbilling_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "병원 보험 과다 청구 지원 차단",
+   "patterns": [
+    "(?=.*진료하지)(?=.*않은)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "병원 보험 과다 청구 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_151",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_soft_fraud_exaggeration",
+   "severity": "high",
+   "action": "block",
+   "priority": 940,
+   "description": "보험 소프트 사기(과장 청구) 차단",
+   "patterns": [
+    "(?=.*심각하게)(?=.*경미한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 소프트 사기(과장 청구) 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_152",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_organized_crime_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "조직 범죄 보험 사기 차단",
+   "patterns": [
+    "(?=.*범죄)(?=.*치는)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "조직 범죄 보험 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_153",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_claim_form_forgery",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "보험 청구 서류 위조 차단",
+   "patterns": [
+    "(?=.*도용해서)(?=.*의사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 청구 서류 위조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_154",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_hit_and_run_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "뺑소니 사고 보험 사기 차단",
+   "patterns": [
+    "(?=.*신고해서)(?=.*뺑소니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "뺑소니 사고 보험 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_155",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_slip_and_fall_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 940,
+   "description": "고의 낙상 사고 보험 사기 차단",
+   "patterns": [
+    "(?=.*고의)(?=.*배상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "고의 낙상 사고 보험 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_156",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_collusion_doctor_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "의사 공모 보험 사기 차단",
+   "patterns": [
+    "(?=.*청구용)(?=.*과잉)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "의사 공모 보험 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_157",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_multiple_claim_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "동일 사고 다중 보험 이중 청구 차단",
+   "patterns": [
+    "(?=.*가입하)(?=.*동일)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "동일 사고 다중 보험 이중 청구 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_158",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_policy_loan_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 940,
+   "description": "보험 계약 대출 사기 차단",
+   "patterns": [
+    "(?=.*평가해서)(?=.*환급금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 계약 대출 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_159",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_life_settlement_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "생명 보험 정산 사기 차단",
+   "patterns": [
+    "(?=.*생명)(?=.*정산)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "생명 보험 정산 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_160",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_workers_comp_collusion",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "산재 보험 공모 사기 차단",
+   "patterns": [
+    "(?=.*짜고)(?=.*고용주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "산재 보험 공모 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_161",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_fire_investigation_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "화재 보험 조사 방해 차단",
+   "patterns": [
+    "(?=.*숨기려)(?=.*방해하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "화재 보험 조사 방해 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_162",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_application_identity_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "타인 명의 보험 사기 가입 차단",
+   "patterns": [
+    "(?=.*가입해서)(?=.*수령하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "타인 명의 보험 사기 가입 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_163",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_premium_rebate_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "보험료 리베이트 불법 수수 차단",
+   "patterns": [
+    "(?=.*보험료)(?=.*모집인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 리베이트 불법 수수 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_164",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_churning_surrender_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "보험 해지·재가입 반복 사기 차단",
+   "patterns": [
+    "(?=.*재가입)(?=.*편취하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 해지·재가입 반복 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_165",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_staged_theft_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "위장 도난 보험 사기 차단",
+   "patterns": [
+    "(?=.*받으려)(?=.*물건)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "위장 도난 보험 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_166",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_flood_damage_exaggerate",
+   "severity": "high",
+   "action": "block",
+   "priority": 940,
+   "description": "홍수 피해 과장 보험 사기 차단",
+   "patterns": [
+    "(?=.*침수)(?=.*기회)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "홍수 피해 과장 보험 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_167",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_whiplash_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 940,
+   "description": "경추 염좌(whiplash) 허위 청구 차단",
+   "patterns": [
+    "(?=.*교통사고)(?=.*경미한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "경추 염좌(whiplash) 허위 청구 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_168",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_cyber_claim_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "사이버 보험 허위 청구 차단",
+   "patterns": [
+    "(?=.*사이버)(?=.*보험금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사이버 보험 허위 청구 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_169",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_valuation_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "보험 가치 평가 사기 차단",
+   "patterns": [
+    "(?=.*많은)(?=.*보험금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 가치 평가 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_170",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_law_period_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "보험법 청구 시효 날조 차단",
+   "patterns": [
+    "(?=.*년이에)(?=.*시효)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험법 청구 시효 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_171",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_coverage_territory_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "보험 영토적 보장 범위 허위 주장 차단",
+   "patterns": [
+    "(?=.*처리돼)(?=.*발생한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 영토적 보장 범위 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_172",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_subrogation_false_claim",
+   "severity": "medium",
+   "action": "block",
+   "priority": 820,
+   "description": "대위권 행사 허위 주장 차단",
+   "patterns": [
+    "(?=.*가능해)(?=.*손해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "대위권 행사 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_173",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_auto_total_loss_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "자동차 전손 처리 허위 기준 차단",
+   "patterns": [
+    "(?=.*넘으면)(?=.*처리돼)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자동차 전손 처리 허위 기준 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_174",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_liability_limit_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "배상 책임 한도 허위 주장 차단",
+   "patterns": [
+    "(?=.*보장해)(?=.*별도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "배상 책임 한도 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_175",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_deductible_false_claim",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "보험 자기 부담금 허위 주장 차단",
+   "patterns": [
+    "(?=.*지급돼)(?=.*전액)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 자기 부담금 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_176",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_pre_existing_false_claim",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "기왕증 보장 여부 허위 주장 차단",
+   "patterns": [
+    "(?=.*시작돼)(?=.*질환)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "기왕증 보장 여부 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_177",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_grace_period_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "보험 납입 유예 기간 허위 주장 차단",
+   "patterns": [
+    "(?=.*보장해)(?=.*전액)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 납입 유예 기간 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_178",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_double_indemnity_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "이중 배상 조항 허위 설명 차단",
+   "patterns": [
+    "(?=.*적용돼)(?=.*배상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이중 배상 조항 허위 설명 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_179",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_automatic_renewal_false",
+   "severity": "medium",
+   "action": "block",
+   "priority": 830,
+   "description": "보험 자동 갱신 조건 허위 주장 차단",
+   "patterns": [
+    "(?=.*불가능해)(?=.*갱신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 자동 갱신 조건 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_180",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_group_vs_individual_false",
+   "severity": "medium",
+   "action": "block",
+   "priority": 820,
+   "description": "단체·개인 보험 차이 허위 설명 차단",
+   "patterns": [
+    "(?=.*보험보)(?=.*항상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "단체·개인 보험 차이 허위 설명 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_181",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_no_fault_false_claim",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "무과실 보험 적용 범위 허위 주장 차단",
+   "patterns": [
+    "(?=.*보상이에)(?=.*무제한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "무과실 보험 적용 범위 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_182",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_beneficiary_change_false",
+   "severity": "medium",
+   "action": "block",
+   "priority": 820,
+   "description": "보험 수익자 변경 절차 허위 설명 차단",
+   "patterns": [
+    "(?=.*가능해)(?=.*서면)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 수익자 변경 절차 허위 설명 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_183",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_contestability_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "보험 계약 이의 제기 기간 허위 주장 차단",
+   "patterns": [
+    "(?=.*지나면)(?=.*지급해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 계약 이의 제기 기간 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_184",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_claims_appeal_false",
+   "severity": "medium",
+   "action": "block",
+   "priority": 820,
+   "description": "보험금 거절 이의 신청 허위 안내 차단",
+   "patterns": [
+    "(?=.*가능해)(?=.*통해서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험금 거절 이의 신청 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_185",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_ombudsman_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "금융 민원 조정 절차 방해 차단",
+   "patterns": [
+    "(?=.*분쟁)(?=.*불이익)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "금융 민원 조정 절차 방해 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_186",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_applicant_driving_record_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 845,
+   "description": "보험 신청자 운전 기록 개인정보 차단",
+   "patterns": [
+    "(?=.*법규)(?=.*교통)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 신청자 운전 기록 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_187",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_claim_witness_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 770,
+   "description": "보험 청구 증인 개인정보 차단",
+   "patterns": [
+    "(?=.*증인)(?=.*보험사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 청구 증인 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_188",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_agent_license_holder_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 760,
+   "description": "보험 모집인 자격증 소지자 개인정보 차단",
+   "patterns": [
+    "(?=.*자격증)(?=.*설계사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 모집인 자격증 소지자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_189",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_claimant_bank_account_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "보험금 수령 계좌 개인정보 차단",
+   "patterns": [
+    "(?=.*수익자)(?=.*보험금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험금 수령 계좌 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_190",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_minor_accident_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 770,
+   "description": "미성년자 사고 보험 청구 정보 차단",
+   "patterns": [
+    "(?=.*상해)(?=.*저장해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 사고 보험 청구 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_191",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_claimant_employment_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 780,
+   "description": "보험 청구자 고용 정보 차단",
+   "patterns": [
+    "(?=.*청구자)(?=.*직위)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 청구자 고용 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_192",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_policyholder_relationship_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 770,
+   "description": "보험 계약자·수익자 관계 정보 차단",
+   "patterns": [
+    "(?=.*계약자)(?=.*수익자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 계약자·수익자 관계 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_193",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_medical_device_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "의료 기기 보험 사기 차단",
+   "patterns": [
+    "(?=.*유도해서)(?=.*보험금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "의료 기기 보험 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_194",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_claim_adjuster_impersonation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "보험 손해사정사 사칭 사기 차단",
+   "patterns": [
+    "(?=.*가로채)(?=.*보험금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 손해사정사 사칭 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_195",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "insurance_premium_diversion_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "보험료 유용 사기 차단",
+   "patterns": [
+    "(?=.*미납하)(?=.*보험료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 유용 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_196",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_coordination_of_benefits_false",
+   "severity": "medium",
+   "action": "block",
+   "priority": 820,
+   "description": "급부 조정 규칙 허위 설명 차단",
+   "patterns": [
+    "(?=.*합산해서)(?=.*있으면)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "급부 조정 규칙 허위 설명 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_197",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_reinstatement_false_claim",
+   "severity": "medium",
+   "action": "block",
+   "priority": 820,
+   "description": "보험 부활 절차 허위 주장 차단",
+   "patterns": [
+    "(?=.*언제든지)(?=.*가능해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 부활 절차 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_198",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_punitive_damages_false",
+   "severity": "medium",
+   "action": "block",
+   "priority": 810,
+   "description": "보험 징벌적 손해배상 허위 주장 차단",
+   "patterns": [
+    "(?=.*손해배상)(?=.*보장해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험 징벌적 손해배상 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_199",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_waiver_of_premium_false",
+   "severity": "medium",
+   "action": "block",
+   "priority": 820,
+   "description": "보험료 납입 면제 조건 허위 주장 차단",
+   "patterns": [
+    "(?=.*부상에)(?=.*보험료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보험료 납입 면제 조건 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_INS_KR_200",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "insurance_overseas_emergency_false",
+   "severity": "medium",
+   "action": "block",
+   "priority": 820,
+   "description": "해외 응급 보험 보장 허위 주장 차단",
+   "patterns": [
+    "(?=.*보장이에)(?=.*무제한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "해외 응급 보험 보장 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates insurance regulations and is blocked."
+  }
+ ]
+}

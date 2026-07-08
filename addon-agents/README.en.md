@@ -81,6 +81,14 @@ addon-agents/
   the dynamic loader (`spec_from_file_location`) does not register the module in `sys.modules`,
   so pydantic cannot resolve postponed annotations on request-body models (500 error).
 
+### Screen alignment standard (`-front.tsx`, PRD §7.11 impl/24)
+
+- Apply the **`.page` class to the top-level container** of an agent screen (`-front.tsx`)
+  (defined in `front/src/index.css` = `w-full max-w-6xl p-4 sm:p-6`): **left-aligned, responsive, width-capped**, unified across all screens.
+- No `mx-auto` (centering), no per-page `max-w-4xl/5xl` — standardize via `.page`.
+- e.g. `<div className="page space-y-4"> … </div>` (grids: `page grid grid-cols-3 gap-4`).
+- **Exception**: full-height interactive layouts (`flex flex-col h-full`, e.g. chat/terminal — AI Assistant, ShellAgent, emb_server-shell) do NOT use `.page`. All other content/form screens follow `.page`.
+
 ---
 
 ## Development Workflow (Makefile)

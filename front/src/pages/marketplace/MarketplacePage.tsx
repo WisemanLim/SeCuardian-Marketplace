@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  MarketplaceAsset, ASSET_KINDS, listCatalog, registerAsset, installAsset, uninstallAsset,
+  MarketplaceAsset, listCatalog, installAsset, uninstallAsset,
 } from "../../api/marketplace";
 import { RemoteAsset, remoteCatalog, remoteInstall } from "../../api/marketplaceRemote";
 import { useLocale } from "../../hooks/useLocale";
@@ -8,8 +8,6 @@ import { useLocale } from "../../hooks/useLocale";
 export default function MarketplacePage() {
   const { t } = useLocale();
   const [assets, setAssets] = useState<MarketplaceAsset[]>([]);
-  const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({ asset_key: "", name: "", kind: "agent", description: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   // 원격 레지스트리(E1.5) — MARKETPLACE_REMOTE_ENABLED=false 면 409 → 섹션 숨김
@@ -38,20 +36,6 @@ export default function MarketplacePage() {
     }
   }
 
-  async function handleRegister() {
-    setError("");
-    if (!form.asset_key.trim() || !form.name.trim()) { setError("asset_key/name 필수"); return; }
-    try {
-      await registerAsset(form);
-      setShowCreate(false);
-      setForm({ asset_key: "", name: "", kind: "agent", description: "" });
-      load();
-    } catch (e) {
-      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg || "등록 실패");
-    }
-  }
-
   async function handleInstall(a: MarketplaceAsset) {
     setBusy(a.asset_key);
     try {
@@ -73,47 +57,13 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("nav.marketplace") ?? "마켓플레이스"}</h1>
-          <p className="text-xs text-gray-500 mt-0.5">에이전트·워크플로우·RAG 파이프라인을 탐색·설치·버전관리합니다.</p>
-        </div>
-        <button onClick={() => setShowCreate((v) => !v)}
-          className="text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">
-          {showCreate ? "닫기" : "+ 자산 등록"}
-        </button>
+    <div>
+      <div className="mb-3">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("agent.assetCatalog")}</h2>
+        <p className="text-xs text-gray-500 mt-0.5">에이전트·워크플로우·RAG 파이프라인을 탐색·설치·버전관리합니다. (등록은 상단 ‘{t("agent.registerAsset")}’)</p>
       </div>
 
-      {showCreate && (
-        <div className="mb-6 p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 grid grid-cols-2 gap-3">
-          <label className="text-xs text-gray-500">
-            asset_key
-            <input value={form.asset_key} onChange={(e) => setForm((f) => ({ ...f, asset_key: e.target.value }))}
-              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
-          </label>
-          <label className="text-xs text-gray-500">
-            name
-            <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
-          </label>
-          <label className="text-xs text-gray-500">
-            kind
-            <select value={form.kind} onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value }))}
-              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
-              {ASSET_KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
-            </select>
-          </label>
-          <label className="text-xs text-gray-500 col-span-2">
-            description
-            <input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
-          </label>
-          {error && <p role="alert" className="text-xs text-red-500 col-span-2">{error}</p>}
-          <button onClick={handleRegister}
-            className="col-span-2 text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">등록</button>
-        </div>
-      )}
+      {error && <p role="alert" className="mb-3 text-xs text-red-500">{error}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {assets.map((a) => (
@@ -145,7 +95,7 @@ export default function MarketplacePage() {
             </div>
           </div>
         ))}
-        {assets.length === 0 && !showCreate && (
+        {assets.length === 0 && (
           <p className="text-sm text-gray-400 col-span-2">등록된 자산이 없습니다.</p>
         )}
       </div>

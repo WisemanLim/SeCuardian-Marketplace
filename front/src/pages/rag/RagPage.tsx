@@ -68,7 +68,7 @@ export default function RagPage() {
   }
 
   return (
-    <div className="p-4 max-w-5xl mx-auto grid grid-cols-3 gap-4">
+    <div className="page grid grid-cols-3 gap-4">
       <div className="col-span-1">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("nav.rag") ?? "RAG"}</h1>

@@ -326,11 +326,16 @@ CREATE INDEX IF NOT EXISTS idx_pg_runs_tenant ON playground_runs(tenant_id, crea
 
 -- ── Guardrails (F-GRD) — 도메인 스코프는 SeCMP 소유(§7.8.3, 업스트림 미강제) ──
 CREATE TABLE IF NOT EXISTS guardrails_domain_catalog (
-    domain_key      VARCHAR(64) PRIMARY KEY,
-    display_name    VARCHAR(128) NOT NULL,
-    status          VARCHAR(16)  NOT NULL DEFAULT 'catalog_only',  -- functional | catalog_only
-    rule_count      INTEGER      NOT NULL DEFAULT 0,
-    last_synced_at  TIMESTAMP
+    domain_key       VARCHAR(64) PRIMARY KEY,
+    display_name     VARCHAR(128) NOT NULL,
+    status           VARCHAR(16)  NOT NULL DEFAULT 'catalog_only',  -- functional | heuristic | catalog_only
+    rule_count       INTEGER      NOT NULL DEFAULT 0,
+    regex_rule_count INTEGER      NOT NULL DEFAULT 0,   -- 판정 가능 규칙 수(실판정+휴리스틱)
+    real_rule_count  INTEGER      NOT NULL DEFAULT 0,   -- 실판정(원본 regex) 규칙 수
+    heuristic_rule_count INTEGER  NOT NULL DEFAULT 0,   -- 휴리스틱(생성 regex) 규칙 수
+    is_required      INTEGER      NOT NULL DEFAULT 0,   -- global=1: 필수(필터적용 토글 잠금)
+    filter_enabled   INTEGER      NOT NULL DEFAULT 0,   -- 테스트 시 이 도메인 필터 적용 여부(§7.8.7)
+    last_synced_at   TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS agent_guardrail_config (

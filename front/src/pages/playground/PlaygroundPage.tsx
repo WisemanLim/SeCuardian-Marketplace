@@ -89,7 +89,7 @@ export default function PlaygroundPage() {
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="page">
       <div className="flex items-center justify-between mb-2">
         <div>
           <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("nav.playground") ?? "플레이그라운드"}</h1>

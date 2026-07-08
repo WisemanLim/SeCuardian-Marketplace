@@ -7,9 +7,11 @@ import {
   getMcpConfig, upsertMcpConfig, getMcpStatus, deleteMcpConfig, McpConfig, McpStatusColor,
 } from "../../api/mcpConfig";
 import { getUiConfig } from "../../api/settings";
+import { registerAsset, ASSET_KINDS } from "../../api/marketplace";
 import { getAuth } from "../../store/auth";
 import { useLocale } from "../../hooks/useLocale";
 import ConfirmDialog from "../../components/ConfirmDialog";
+import MarketplacePage from "../marketplace/MarketplacePage";
 import AgentBuilderModal from "./AgentBuilderModal";
 import McpGuideModal from "./McpGuideModal";
 import McpEditModal from "./McpEditModal";
@@ -115,10 +117,80 @@ function AgentAvatar({ agentKey, name }: { agentKey: string; name: string }) {
   );
 }
 
-// Orchestrator(general) / AI 어시스턴트(chat) — is_required 이지만 MCP·A2A 로 개방 (#2)
-const ORCHESTRATOR_KEYS = new Set(["general", "chat"]);
+// 내장 에이전트 한정 7종 — Orchestrator·AI 어시스턴트·마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일.
+// 그 외 tbl_agent_config 행(보안 도메인 등)은 '시스템 에이전트'로 분류.
+const BUILTIN_KEYS = new Set([
+  "general", "chat", "marketplace", "workflow", "rag", "playground", "guardrails",
+]);
 
-type Tab = "builtin" | "addon";
+type Tab = "builtin" | "system" | "addon";
+
+// 마켓플레이스 자산 등록 모달 — '시스템 에이전트' 탭 상단 '자산 등록' 버튼에서 호출.
+// 기존 마켓플레이스 화면의 등록 폼을 에이전트 관리로 통합(요구 R+, registerAsset 재사용).
+function AssetRegisterModal({ onClose }: Readonly<{ onClose: () => void }>) {
+  const { t } = useLocale();
+  const [form, setForm] = useState({ asset_key: "", name: "", kind: "agent", description: "" });
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit() {
+    setError("");
+    if (!form.asset_key.trim() || !form.name.trim()) { setError(t("agent.assetKeyNameRequired")); return; }
+    setBusy(true);
+    try {
+      await registerAsset(form);
+      onClose();
+    } catch (e) {
+      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(msg || t("agent.assetRegisterFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div
+        className="w-full max-w-lg rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100">{t("agent.registerAsset")}</h2>
+          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-sm">✕</button>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="text-xs text-gray-500">
+            asset_key
+            <input value={form.asset_key} onChange={(e) => setForm((f) => ({ ...f, asset_key: e.target.value }))}
+              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
+          </label>
+          <label className="text-xs text-gray-500">
+            name
+            <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
+          </label>
+          <label className="text-xs text-gray-500">
+            {t("agent.assetKind")}
+            <select value={form.kind} onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value }))}
+              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
+              {ASSET_KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
+            </select>
+          </label>
+          <label className="text-xs text-gray-500 col-span-2">
+            {t("agent.assetDesc")}
+            <input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
+          </label>
+          {error && <p role="alert" className="text-xs text-red-500 col-span-2">{error}</p>}
+          <button onClick={submit} disabled={busy}
+            className="col-span-2 text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
+            {t("agent.assetRegisterSubmit")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 type ConfirmTarget =
   | { type: "agent"; key: string; name: string }
   | { type: "mcp"; key: string; name: string };
@@ -137,6 +209,7 @@ export default function AgentsPage() {
   const [addons, setAddons]   = useState<AddonAgent[]>([]);
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [showBuilder, setShowBuilder]       = useState(false);
+  const [showAssetRegister, setShowAssetRegister] = useState(false);
   const [agentCreateMode, setAgentCreateMode] = useState<string>("both");
   const [confirmTarget, setConfirmTarget] = useState<ConfirmTarget | null>(null);
 
@@ -153,7 +226,7 @@ export default function AgentsPage() {
   async function loadMcpStatuses(cfgs: AgentConfig[], ads: AddonAgent[]) {
     const keys = [
       ...cfgs
-        .filter((c) => (!c.is_required || ORCHESTRATOR_KEYS.has(c.agent_key)) && c.is_enabled)
+        .filter((c) => (!c.is_required || BUILTIN_KEYS.has(c.agent_key)) && c.is_enabled)
         .map((c) => c.agent_key),
       ...ads.filter((a) => a.is_active).map((a) => a.agent_key),
     ];
@@ -285,7 +358,9 @@ export default function AgentsPage() {
   }
 
   const userAddonKeys = new Set(addons.filter((a) => !a.is_builtin).map((a) => a.agent_key));
-  const builtinConfigs = configs.filter((c) => !userAddonKeys.has(c.agent_key));
+  // 내장(한정 7종) / 시스템(그 외) 분리 — 둘 다 tbl_agent_config 소스, 사용자 Addon 은 제외
+  const builtinConfigs = configs.filter((c) => !userAddonKeys.has(c.agent_key) && BUILTIN_KEYS.has(c.agent_key));
+  const systemConfigs = configs.filter((c) => !userAddonKeys.has(c.agent_key) && !BUILTIN_KEYS.has(c.agent_key));
   const userAddons = addons.filter((a) => !a.is_builtin);
   // export 가능 대상 = tbl_addon_agents 에 소스가 등록된 에이전트 (내장 포함) — F26/F27
   const exportableKeys = new Set(addons.map((a) => a.agent_key));
@@ -439,7 +514,8 @@ export default function AgentsPage() {
   }
 
   function BuiltinCard({ c }: { c: AgentConfig }) {
-    const mcpEligible = (!c.is_required || ORCHESTRATOR_KEYS.has(c.agent_key)) && !!c.is_enabled;
+    // 내장(REQUIRED 포함 7종)·시스템 에이전트 모두 MCP 개방 — REQUIRED 라도 잠그지 않음 (#C)
+    const mcpEligible = (!c.is_required || BUILTIN_KEYS.has(c.agent_key)) && !!c.is_enabled;
     const canExport = isAdmin && exportableKeys.has(c.agent_key);
     // REQUIRED(필수) 에이전트는 카드덱 색상을 rose 계열로 구분 — REQUIRED 배지와 톤 일치
     const cardTone = c.is_required
@@ -546,14 +622,14 @@ export default function AgentsPage() {
   }
 
   return (
-    <div className="p-6 space-y-5 max-w-6xl">
+    <div className="page space-y-5">
       {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 */}
       <p className="text-sm text-gray-500 dark:text-gray-400">{t("agent.pageDesc")}</p>
 
-      {/* Tabs: 내장 / ADDON */}
+      {/* Tabs: 내장 / 시스템 / ADDON */}
       <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
         <div className="flex gap-1">
-          {(["builtin", "addon"] as Tab[]).map((tb) => (
+          {(["builtin", "system", "addon"] as Tab[]).map((tb) => (
             <button
               key={tb}
               type="button"
@@ -564,13 +640,24 @@ export default function AgentsPage() {
                   : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               }`}
             >
-              {tb === "builtin" ? t("agent.builtin") : t("agent.addon")}
+              {t(`agent.${tb}`)}
               <span className="ml-1.5 text-[11px] font-normal text-gray-400 dark:text-gray-500">
-                {tb === "builtin" ? builtinConfigs.length : userAddons.length}
+                {tb === "builtin" ? builtinConfigs.length : tb === "system" ? systemConfigs.length : userAddons.length}
               </span>
             </button>
           ))}
         </div>
+        {/* 시스템 에이전트 → '자산 등록'(마켓플레이스), Addon → '새 Agent 만들기' — 동일 위치 (R+) */}
+        {tab === "system" && isAdmin && (
+          <button
+            type="button"
+            onClick={() => setShowAssetRegister(true)}
+            className="mb-1.5 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold transition-all"
+          >
+            <span>+</span>
+            {t("agent.registerAsset")}
+          </button>
+        )}
         {tab === "addon" && isAdmin && (
           <button
             type="button"
@@ -584,7 +671,7 @@ export default function AgentsPage() {
       </div>
 
       {/* Card deck */}
-      {tab === "builtin" ? (
+      {tab === "builtin" && (
         builtinConfigs.length === 0 ? (
           <p className="text-sm text-gray-400 dark:text-gray-500">{t("agent.noAgents")}</p>
         ) : (
@@ -592,12 +679,30 @@ export default function AgentsPage() {
             {builtinConfigs.map((c) => <BuiltinCard key={c.agent_key} c={c} />)}
           </div>
         )
-      ) : userAddons.length === 0 ? (
-        <p className="text-sm text-gray-400 dark:text-gray-500">{t("agent.noAddon")}</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {userAddons.map((a) => <AddonCard key={a.agent_key} a={a} />)}
+      )}
+      {tab === "system" && (
+        <div className="space-y-6">
+          {systemConfigs.length === 0 ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500">{t("agent.noSystem")}</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {systemConfigs.map((c) => <BuiltinCard key={c.agent_key} c={c} />)}
+            </div>
+          )}
+          {/* 마켓플레이스 자산 카탈로그(로컬+원격) 통합 — 설치 시 시스템/Addon 에이전트로 편입 */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
+            <MarketplacePage />
+          </div>
         </div>
+      )}
+      {tab === "addon" && (
+        userAddons.length === 0 ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500">{t("agent.noAddon")}</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {userAddons.map((a) => <AddonCard key={a.agent_key} a={a} />)}
+          </div>
+        )
       )}
 
       {showBuilder && (
@@ -607,6 +712,11 @@ export default function AgentsPage() {
           onDeployed={() => { setShowBuilder(false); handleModalChanged(); }}
           onChanged={handleModalChanged}
         />
+      )}
+
+      {/* 자산 등록 — 마켓플레이스 자산 등록(시스템 에이전트 탭) */}
+      {showAssetRegister && (
+        <AssetRegisterModal onClose={() => setShowAssetRegister(false)} />
       )}
 
       {mcpGuideKey && (

@@ -25,11 +25,6 @@ const IcAI = () => (
     <path d="M10 2a1 1 0 01.894.553l2.382 4.764 5.26.764a1 1 0 01.555 1.705l-3.806 3.71.898 5.238a1 1 0 01-1.451 1.054L10 17.347l-4.732 2.441a1 1 0 01-1.451-1.054l.898-5.238L.91 9.786a1 1 0 01.555-1.705l5.26-.764L9.106 2.553A1 1 0 0110 2z" />
   </svg>
 );
-const IcAgents = () => (
-  <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-    <path fillRule="evenodd" d="M10 2a4 4 0 100 8 4 4 0 000-8zM5.004 11.503A7 7 0 003 17.5c0 .276.224.5.5.5h13a.5.5 0 00.5-.5 7 7 0 00-2.004-5.997A5.99 5.99 0 0110 13a5.99 5.99 0 01-4.996-1.497z" clipRule="evenodd" />
-  </svg>
-);
 const IcUsers = () => (
   <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
     <path d="M7 8a3 3 0 100-6 3 3 0 000 6zm7.5 1a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM1.615 16.428a1.224 1.224 0 01-.569-1.175 6.002 6.002 0 0111.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 017 17a9.953 9.953 0 01-5.385-1.572zm13.66 2.234a.75.75 0 00.039-1.497A5.022 5.022 0 0013 15c-.836 0-1.622.199-2.313.554a7.493 7.493 0 013.629 3.108z" />
@@ -289,19 +284,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {!collapsed && <span>{t("nav.aiAssistant")}</span>}
           </NavLink>
 
-          {/* 에이전트 관리 (supervisor/admin) */}
-          {isAdmin && (
-            <NavLink
-              to="/agents"
-              title={collapsed ? t("nav.agents") : undefined}
-              className={({ isActive }) => navCls(isActive, false, collapsed)}
-            >
-              <span className="shrink-0"><IcAgents /></span>
-              {!collapsed && <span>{t("nav.agents")}</span>}
-            </NavLink>
-          )}
+          {/* 에이전트 관리는 마켓플레이스로 통합됨 — 별도 '에이전트' 메뉴 제거 (내장/시스템/Addon 탭은 마켓플레이스 화면 상단탭) */}
 
-          {/* 내장 에이전트: 마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일 (F-MP/F-WF/F-RAG/F-PG/F-GRD) */}
+          {/* 내장 에이전트: 마켓플레이스(통합 허브)·워크플로우·RAG·플레이그라운드·가드레일 (F-MP/F-WF/F-RAG/F-PG/F-GRD) */}
           <div className={`my-1.5 mx-1 border-t ${sidebar.border}`} />
           <NavLink to="/marketplace" title={collapsed ? t("nav.marketplace") : undefined}
             className={({ isActive }) => navCls(isActive, false, collapsed)}>

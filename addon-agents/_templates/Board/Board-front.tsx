@@ -318,7 +318,7 @@ export default function BoardPage() {
 
   // ── Create ──
   if (view === "create") return (
-    <div className="p-6 space-y-4">
+    <div className="page space-y-4">
       <button onClick={() => { setError(""); setView("list"); }} className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{t("back")}</button>
       <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t("newPost")}</h1>
       {ErrorBanner}
@@ -328,7 +328,7 @@ export default function BoardPage() {
 
   // ── Edit ──
   if (view === "edit" && post) return (
-    <div className="p-6 space-y-4">
+    <div className="page space-y-4">
       <button onClick={() => { setError(""); setView("detail"); }} className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{t("back")}</button>
       <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t("editPost")}</h1>
       {ErrorBanner}
@@ -338,7 +338,7 @@ export default function BoardPage() {
 
   // ── Detail ──
   if (view === "detail" && post) return (
-    <div className="p-6 space-y-5">
+    <div className="page space-y-5">
       <button onClick={() => { setError(""); setView("list"); setPost(null); }} className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{t("back")}</button>
       {ErrorBanner}
 
@@ -397,7 +397,7 @@ export default function BoardPage() {
 
   // ── List ──
   return (
-    <div className="p-6 space-y-4">
+    <div className="page space-y-4">
       <div className="flex items-center justify-between">
         {/* 타이틀은 상단 헤더(AppLayout)가 에이전트명으로 표시 — 본문에는 설명만 (가이드 규칙) */}
         <p className="text-sm text-gray-500 dark:text-gray-400">{t("desc")}</p>

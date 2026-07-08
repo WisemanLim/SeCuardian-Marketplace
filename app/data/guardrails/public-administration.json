@@ -1,0 +1,3413 @@
+{
+ "domain_key": "public-administration",
+ "display_name": "공공행정",
+ "display_name_en": "Public Administration",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 200,
+ "regex_rule_count": 200,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 200,
+ "rules": [
+  {
+   "rule_id": "PUB_ADM_KR_001",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "petitioner_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "민원인 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*넣은)(?=.*민원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_002",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "resident_registration_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "주민등록 정보 무단 조회·유출 차단",
+   "patterns": [
+    "(?=.*조회해줘)(?=.*주민등록번호)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주민등록 정보 무단 조회·유출 차단",
+   "message_en": "This request is blocked: Block unauthorized lookup or exposure of resident "
+  },
+  {
+   "rule_id": "PUB_ADM_KR_003",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "vulnerable_person_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "취약계층 대상자 개인 정보 유출 차단",
+   "patterns": [
+    "(?=.*독거노인)(?=.*주소랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 취약계층 대상자 개인 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of vulnerable population personal d"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_004",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "complaint_record_identity",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "민원·신고 기록과 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*내용이랑)(?=.*신고자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_005",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "govt_employee_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 620,
+   "description": "공무원 개인 신상 정보 유출 차단",
+   "patterns": [
+    "(?=.*공무원)(?=.*휴대폰)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_006",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "public_official_undisclosed_assets",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "공직자 비공개 재산 정보 유출 차단",
+   "patterns": [
+    "(?=.*공직자)(?=.*비공개)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공직자 비공개 재산 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of public official non-disclosed as"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_007",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "welfare_recipient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "복지 수급자 개인 정보 유출 차단",
+   "patterns": [
+    "(?=.*장애수당)(?=.*받는)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_008",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "tax_record_identity",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "세무 기록과 납세자 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*체납자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세무 기록과 납세자 신원 연결 유출 차단",
+   "message_en": "This request is blocked: Block linking tax records to taxpayer identity"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_009",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "enforcement_target_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "행정 단속·조사 대상자 개인 정보 유출 차단",
+   "patterns": [
+    "(?=.*단속)(?=.*대표)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_010",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "anonymous_tipster_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "익명 제보자 신원 정보 유출 차단",
+   "patterns": [
+    "(?=.*제보자)(?=.*익명)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 익명 제보자 신원 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of anonymous whistleblower identity"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_011",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "classified_admin_leak",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "비공개 행정 정보 유출 지원 차단",
+   "patterns": [
+    "(?=.*비공개)(?=.*빼내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 비공개 행정 정보 유출 지원 차단",
+   "message_en": "This request is blocked: Block assistance leaking classified administrative"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_012",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "pre_disclosure_policy_info",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "발표 전 정책 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*부동산)(?=.*정책)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 발표 전 정책 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-announcement policy in"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_013",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "budget_plan_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "확정 전 예산 계획 유출 차단",
+   "patterns": [
+    "(?=.*예산안)(?=.*확정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 확정 전 예산 계획 유출 차단",
+   "message_en": "This request is blocked: Block leak of unfinalized budget plans"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_014",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "procurement_inside_info",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "조달·입찰 내부 정보 유출 차단",
+   "patterns": [
+    "(?=.*미리)(?=.*예정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 조달·입찰 내부 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of procurement and bidding inside infor"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_015",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "regulatory_pre_decisional_info",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "규제 결정 전 의사결정 정보 유출 차단",
+   "patterns": [
+    "(?=.*전에)(?=.*결정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 규제 결정 전 의사결정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of pre-decisional regulatory informatio"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_016",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "foi_exemption_bypass",
+   "severity": "high",
+   "action": "warn",
+   "priority": 830,
+   "description": "정보공개 비공개 사유 부당 우회 권유 차단",
+   "patterns": [
+    "(?=.*정보공개)(?=.*무력화하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 정보공개 비공개 사유 부당 우회 권유 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_017",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "nda_violation_govt",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "공무상 비밀 누설 권유 차단",
+   "patterns": [
+    "(?=.*직무상)(?=.*친구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공무상 비밀 누설 권유 차단",
+   "message_en": "This request is blocked: Block guidance to disclose official secrets"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_018",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "unclassified_sensitive_share",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "미분류 민감 행정 정보 부적절 공유 차단",
+   "patterns": [
+    "(?=.*미리)(?=.*미공개)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 미분류 민감 행정 정보 부적절 공유 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_019",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "audit_finding_premature_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "감사 결과 공표 전 유출 차단",
+   "patterns": [
+    "(?=.*지적)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 감사 결과 공표 전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of audit findings"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_020",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "cabinet_deliberation_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "국무회의·내부 심의 내용 유출 차단",
+   "patterns": [
+    "(?=.*비공개)(?=.*국무회)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 국무회의·내부 심의 내용 유출 차단",
+   "message_en": "This request is blocked: Block leak of cabinet or internal deliberation con"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_021",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "enforcement_pre_action_leak",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "단속·수사 사전 정보 유출 차단",
+   "patterns": [
+    "(?=.*착수)(?=.*수사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 단속·수사 사전 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of pre-enforcement or pre-investigation"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_022",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "permit_condition_bypass_guide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "인허가 조건 부당 우회 안내 차단",
+   "patterns": [
+    "(?=.*인허)(?=.*지키)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 인허가 조건 부당 우회 안내 차단",
+   "message_en": "This request is blocked: Block guidance to improperly bypass permit conditi"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_023",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "environmental_impact_hide_govt",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "행정 사업 환경영향 정보 은폐 권유 차단",
+   "patterns": [
+    "(?=.*공공사업)(?=.*환경영향)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 행정 사업 환경영향 정보 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal environmental impact of "
+  },
+  {
+   "rule_id": "PUB_ADM_KR_024",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "statistical_data_pre_release",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "공식 통계 공표 전 유출 차단",
+   "patterns": [
+    "(?=.*공표)(?=.*고용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공식 통계 공표 전 유출 차단",
+   "message_en": "This request is blocked: Block premature release of official statistics"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_025",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "monetary_policy_inside_info",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "통화·금융 정책 내부 정보 유출 차단",
+   "patterns": [
+    "(?=.*금리)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 통화·금융 정책 내부 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of monetary or financial policy inside "
+  },
+  {
+   "rule_id": "PUB_ADM_KR_026",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "solicitation_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "부정 청탁 지원 차단 (청탁금지법)",
+   "patterns": [
+    "(?=.*공무원)(?=.*청탁하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 부정 청탁 지원 차단 (청탁금지법)",
+   "message_en": "This request is blocked: Block assistance with improper solicitation (Anti-"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_027",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "bribe_channel_guide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "뇌물 전달 경로 안내 차단",
+   "patterns": [
+    "(?=.*전달하)(?=.*적발)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 뇌물 전달 경로 안내 차단",
+   "message_en": "This request is blocked: Block guidance on bribery channels to officials"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_028",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "kickback_scheme_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "리베이트·뒷돈 구조 설계 지원 차단",
+   "patterns": [
+    "(?=.*따고)(?=.*리베이트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 리베이트·뒷돈 구조 설계 지원 차단",
+   "message_en": "This request is blocked: Block assistance designing kickback schemes"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_029",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "false_certification_guide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "허위 행정 증명서 발급 유도 차단",
+   "patterns": [
+    "(?=.*발급받)(?=.*재직)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 허위 행정 증명서 발급 유도 차단",
+   "message_en": "This request is blocked: Block guidance to obtain false administrative cert"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_030",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "bid_rigging_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "공공 입찰 담합 지원 차단",
+   "patterns": [
+    "(?=.*짜는)(?=.*입찰)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공공 입찰 담합 지원 차단",
+   "message_en": "This request is blocked: Block assistance with public bid rigging"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_031",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "conflict_of_interest_conceal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "이해충돌 은폐 권유 차단",
+   "patterns": [
+    "(?=.*넘어가)(?=.*이해충돌)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 이해충돌 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal conflicts of interest"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_032",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "revolving_door_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "퇴직 공직자 취업 제한 위반 지원 차단",
+   "patterns": [
+    "(?=.*취업하)(?=.*퇴직)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 퇴직 공직자 취업 제한 위반 지원 차단",
+   "message_en": "This request is blocked: Block assistance violating post-employment restric"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_033",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "procurement_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "공공 조달 사기 지원 차단",
+   "patterns": [
+    "(?=.*대금)(?=.*납품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공공 조달 사기 지원 차단",
+   "message_en": "This request is blocked: Block assistance with public procurement fraud"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_034",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "grant_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "국고보조금 부정 수급 지원 차단",
+   "patterns": [
+    "(?=.*지원금)(?=.*사용하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 국고보조금 부정 수급 지원 차단",
+   "message_en": "This request is blocked: Block assistance with government grant fraud"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_035",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "permit_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "인허가 사기 취득 지원 차단",
+   "patterns": [
+    "(?=.*인가받)(?=.*요건)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 인허가 사기 취득 지원 차단",
+   "message_en": "This request is blocked: Block assistance with fraudulent permit acquisitio"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_036",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "subsidy_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "보조·지원금 중복·허위 수급 지원 차단",
+   "patterns": [
+    "(?=.*지원받)(?=.*중복)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보조·지원금 중복·허위 수급 지원 차단",
+   "message_en": "This request is blocked: Block assistance with duplicate or false subsidy c"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_037",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "tax_evasion_assist_govt",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "행정 세금·부담금 탈루 지원 차단",
+   "patterns": [
+    "(?=.*취득세)(?=.*줄이려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 행정 세금·부담금 탈루 지원 차단",
+   "message_en": "This request is blocked: Block assistance with tax or levy evasion involvin"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_038",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "healthcare_fraud_govt",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "건강보험·의료급여 부정 수급 지원 차단",
+   "patterns": [
+    "(?=.*의료급여)(?=.*수급하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 건강보험·의료급여 부정 수급 지원 차단",
+   "message_en": "This request is blocked: Block assistance with health insurance benefit fra"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_039",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "election_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "선거 부정 지원 차단",
+   "patterns": [
+    "(?=.*매표하)(?=.*선거)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 선거 부정 지원 차단",
+   "message_en": "This request is blocked: Block assistance with election fraud"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_040",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "immigration_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "출입국·체류 행정 사기 지원 차단",
+   "patterns": [
+    "(?=.*결혼)(?=.*비자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 출입국·체류 행정 사기 지원 차단",
+   "message_en": "This request is blocked: Block assistance with immigration administrative f"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_041",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "admin_law_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 행정 법령 조항 날조 차단",
+   "patterns": [
+    "(?=.*행정절차법)(?=.*이렇게)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 행정 법령 조항 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating administrative law provis"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_042",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "public_official_authority_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 공무원 권한 과장 안내 차단",
+   "patterns": [
+    "(?=.*취소할)(?=.*즉시)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 공무원 권한 과장 안내 차단",
+   "message_en": "This request is blocked: Block output overstating public official authority"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_043",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "regulation_citation_fake",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 규정 인용 날조 차단",
+   "patterns": [
+    "(?=.*고시)(?=.*인용해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 규정 인용 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating regulation citations"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_044",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "penalty_calculation_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 과태료·벌칙 산정 날조 차단",
+   "patterns": [
+    "(?=.*과태료)(?=.*원이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 과태료·벌칙 산정 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating penalty or fine calculati"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_045",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "foi_decision_fabrication",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 정보공개 결정 날조 차단",
+   "patterns": [
+    "(?=.*정보공개)(?=.*청구하면)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 정보공개 결정 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_046",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "permit_requirement_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 인허가 요건 날조 차단",
+   "patterns": [
+    "(?=.*필요한데)(?=.*필요)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 인허가 요건 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating permit requirements"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_047",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "government_benefit_false",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 정부 지원 혜택 날조 차단",
+   "patterns": [
+    "(?=.*지원금)(?=.*누구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 정부 지원 혜택 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_048",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "administrative_deadline_false",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 670,
+   "description": "응답에서 행정 처리 기한 날조 차단",
+   "patterns": [
+    "(?=.*처리된다)(?=.*즉시)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 행정 처리 기한 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_049",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "appeal_procedure_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 행정 불복·이의신청 절차 날조 차단",
+   "patterns": [
+    "(?=.*불복할)(?=.*처분)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 행정 불복·이의신청 절차 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating administrative appeal pro"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_050",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "tax_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "세무행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*세무행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_051",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "welfare_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "복지행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*복지행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_052",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "police_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "경찰행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*경찰행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_053",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "education_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "교육행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*교육행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_054",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "land_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "토지·건축행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*건축행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_055",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "immigration_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "출입국행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*출입국행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_056",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "military_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "병무행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*병무행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_057",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "customs_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "관세행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*관세행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_058",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "labor_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "노동행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*노동행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_059",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "environment_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "환경행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*환경행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_060",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "public_health_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "보건행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*보건행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_061",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "disaster_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "재난안전행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*재난안전행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_062",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "statistics_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "통계행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*통계행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_063",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "procurement_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "조달행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*조달행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_064",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "judicial_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "사법행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*사법행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_065",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "local_govt_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "지방자치행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*지방자치행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_066",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "foreign_affairs_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "외교행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*외교행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_067",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "election_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "선거행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*선거행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_068",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "transport_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "교통행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*교통행정)(?=.*명단이랑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_069",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "agriculture_admin_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "농림행정 대상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*명단이랑)(?=.*농림행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_070",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "tax_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "세무행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*세무행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세무행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public tax administration inform"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_071",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "welfare_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "복지행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*복지행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 복지행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public welfare administration in"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_072",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "police_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "경찰행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*경찰행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경찰행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public police administration inf"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_073",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "education_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "교육행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*교육행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 교육행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public education administration "
+  },
+  {
+   "rule_id": "PUB_ADM_KR_074",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "land_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "토지·건축행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*건축행정)(?=.*토지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 토지·건축행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public land and building adminis"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_075",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "immigration_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "출입국행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*출입국행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 출입국행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public immigration administratio"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_076",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "military_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "병무행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*병무행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 병무행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public military service administ"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_077",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "customs_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "관세행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*관세행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 관세행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public customs administration in"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_078",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "labor_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노동행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*노동행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노동행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public labor administration info"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_079",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "environment_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "환경행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*환경행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환경행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public environmental administrat"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_080",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "public_health_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "보건행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*보건행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보건행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public public health administrat"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_081",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disaster_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "재난안전행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*재난안전행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재난안전행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public disaster safety administr"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_082",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "statistics_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "통계행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*통계행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 통계행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public statistics administration"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_083",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "procurement_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "조달행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*조달행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 조달행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public procurement administratio"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_084",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "judicial_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "사법행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*사법행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 사법행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public judicial administration i"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_085",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "local_govt_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "지방자치행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*지방자치행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지방자치행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public local government administ"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_086",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "foreign_affairs_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "외교행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*외교행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 외교행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public foreign affairs administr"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_087",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "election_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "선거행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*선거행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 선거행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public election administration i"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_088",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "transport_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "교통행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*교통행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 교통행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public transportation administra"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_089",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "agriculture_admin_nonpublic_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "농림행정 비공개 행정 정보 유출 차단",
+   "patterns": [
+    "(?=.*농림행정)(?=.*미리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 농림행정 비공개 행정 정보 유출 차단",
+   "message_en": "This request is blocked: Block leak of non-public agricultural administrati"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_090",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "tax_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "세무행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*빨리하려)(?=.*세무행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세무행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with tax administration solicitat"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_091",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "welfare_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "복지행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*빨리하려)(?=.*복지행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 복지행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with welfare administration solic"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_092",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "police_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "경찰행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*경찰행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경찰행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with police administration solici"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_093",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "education_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "교육행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*교육행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 교육행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with education administration sol"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_094",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "land_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "토지·건축행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*빨리하려)(?=.*건축행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 토지·건축행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with land and building administra"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_095",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "immigration_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "출입국행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*출입국행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 출입국행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with immigration administration s"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_096",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "military_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "병무행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*빨리하려)(?=.*병무행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 병무행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with military service administrat"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_097",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "customs_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "관세행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*관세행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 관세행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with customs administration solic"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_098",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "labor_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노동행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*빨리하려)(?=.*노동행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노동행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with labor administration solicit"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_099",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "environment_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "환경행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*빨리하려)(?=.*환경행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환경행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with environmental administration"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_100",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "public_health_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "보건행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*보건행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보건행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with public health administration"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_101",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "disaster_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "재난안전행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*재난안전행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재난안전행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with disaster safety administrati"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_102",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "statistics_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "통계행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*빨리하려)(?=.*통계행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 통계행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with statistics administration so"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_103",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "procurement_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "조달행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*빨리하려)(?=.*조달행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 조달행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with procurement administration s"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_104",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "judicial_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "사법행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*사법행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 사법행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with judicial administration soli"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_105",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "local_govt_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "지방자치행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*지방자치행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지방자치행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with local government administrat"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_106",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "foreign_affairs_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "외교행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*외교행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 외교행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with foreign affairs administrati"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_107",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "election_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "선거행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*선거행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 선거행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with election administration soli"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_108",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "transport_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "교통행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*교통행정)(?=.*빨리하려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 교통행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with transportation administratio"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_109",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "agriculture_admin_corruption_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "농림행정 부정 청탁·부패 지원 차단",
+   "patterns": [
+    "(?=.*빨리하려)(?=.*농림행정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 농림행정 부정 청탁·부패 지원 차단",
+   "message_en": "This request is blocked: Block assistance with agricultural administration "
+  },
+  {
+   "rule_id": "PUB_ADM_KR_110",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "tax_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 세무행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*세무행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 세무행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating tax administration laws o"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_111",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "welfare_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 복지행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*복지행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 복지행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating welfare administration la"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_112",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "police_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 경찰행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*경찰행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 경찰행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating police administration law"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_113",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "education_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 교육행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*교육행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 교육행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating education administration "
+  },
+  {
+   "rule_id": "PUB_ADM_KR_114",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "land_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 토지·건축행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*건축행정)(?=.*토지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 토지·건축행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating land and building adminis"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_115",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "immigration_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 출입국행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*출입국행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 출입국행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating immigration administratio"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_116",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "military_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 병무행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*병무행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 병무행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating military service administ"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_117",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "customs_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 관세행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*관세행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 관세행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating customs administration la"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_118",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "labor_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 노동행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*노동행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 노동행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating labor administration laws"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_119",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "environment_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 환경행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*환경행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 환경행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating environmental administrat"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_120",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "public_health_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 보건행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*보건행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 보건행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating public health administrat"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_121",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "disaster_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 재난안전행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*재난안전행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 재난안전행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating disaster safety administr"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_122",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "statistics_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 통계행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*통계행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 통계행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating statistics administration"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_123",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "procurement_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 조달행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*조달행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 조달행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating procurement administratio"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_124",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "judicial_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 사법행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*사법행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 사법행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating judicial administration l"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_125",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "local_govt_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 지방자치행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*지방자치행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 지방자치행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating local government administ"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_126",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "foreign_affairs_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 외교행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*외교행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 외교행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating foreign affairs administr"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_127",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "election_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 선거행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*선거행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 선거행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating election administration l"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_128",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "transport_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 교통행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*교통행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 교통행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating transportation administra"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_129",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "agriculture_admin_law_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 농림행정 법령·권한 날조 차단",
+   "patterns": [
+    "(?=.*농림행정)(?=.*권한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 농림행정 법령·권한 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating agricultural administrati"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_130",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "tax_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "세무행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*세무행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세무행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify tax administration recor"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_131",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "welfare_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "복지행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*복지행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 복지행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify welfare administration r"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_132",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "police_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "경찰행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*경찰행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경찰행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify police administration re"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_133",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "education_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "교육행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*교육행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 교육행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify education administration"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_134",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "land_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "토지·건축행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*건축행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 토지·건축행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify land and building admini"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_135",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "immigration_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "출입국행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*출입국행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 출입국행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify immigration administrati"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_136",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "military_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "병무행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*병무행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 병무행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify military service adminis"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_137",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "customs_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "관세행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*관세행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 관세행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify customs administration r"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_138",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "labor_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노동행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*노동행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노동행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify labor administration rec"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_139",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "environment_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "환경행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*환경행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환경행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify environmental administra"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_140",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "public_health_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "보건행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*보건행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보건행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify public health administra"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_141",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disaster_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "재난안전행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*재난안전행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재난안전행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify disaster safety administ"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_142",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "statistics_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "통계행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*통계행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 통계행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify statistics administratio"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_143",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "procurement_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "조달행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*조달행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 조달행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify procurement administrati"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_144",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "judicial_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "사법행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*사법행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 사법행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify judicial administration "
+  },
+  {
+   "rule_id": "PUB_ADM_KR_145",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "local_govt_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "지방자치행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*지방자치행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지방자치행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify local government adminis"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_146",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "foreign_affairs_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "외교행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*외교행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 외교행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify foreign affairs administ"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_147",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "election_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "선거행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*선거행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 선거행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify election administration "
+  },
+  {
+   "rule_id": "PUB_ADM_KR_148",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "transport_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "교통행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*교통행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 교통행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify transportation administr"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_149",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "agriculture_admin_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "농림행정 행정 기록·문서 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*농림행정)(?=.*결재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 농림행정 행정 기록·문서 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify agricultural administrat"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_150",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "tax_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "세무행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*세무행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_151",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "welfare_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "복지행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*복지행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_152",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "police_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "경찰행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*경찰행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_153",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "education_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "교육행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*교육행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_154",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "land_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "토지·건축행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*건축행정)(?=.*토지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_155",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "immigration_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "출입국행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*출입국행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_156",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "military_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "병무행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*병무행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_157",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "customs_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "관세행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*관세행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_158",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "labor_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "노동행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*노동행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_159",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "environment_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "환경행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*환경행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_160",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "public_health_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "보건행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*보건행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_161",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "disaster_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "재난안전행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*재난안전행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_162",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "statistics_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "통계행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*통계행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_163",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "procurement_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "조달행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*조달행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_164",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "judicial_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "사법행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*사법행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_165",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "local_govt_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "지방자치행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*지방자치행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_166",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "foreign_affairs_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "외교행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*외교행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_167",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "election_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "선거행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*선거행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_168",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "transport_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "교통행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*교통행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_169",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "agriculture_admin_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "농림행정 보유 개인정보 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*농림행정)(?=.*보유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "PUB_ADM_KR_170",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "tax_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "세무행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*세무행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세무행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional tax adminis"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_171",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "welfare_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "복지행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*복지행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 복지행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional welfare adm"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_172",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "police_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "경찰행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*경찰행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경찰행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional police admi"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_173",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "education_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "교육행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*교육행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 교육행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional education a"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_174",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "land_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "토지·건축행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*건축행정)(?=.*토지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 토지·건축행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional land and bu"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_175",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "immigration_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "출입국행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*출입국행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 출입국행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional immigration"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_176",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "military_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "병무행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*병무행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 병무행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional military se"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_177",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "customs_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "관세행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*관세행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 관세행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional customs adm"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_178",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "labor_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노동행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*노동행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노동행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional labor admin"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_179",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "environment_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "환경행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*환경행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환경행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional environment"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_180",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "public_health_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "보건행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*보건행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보건행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional public heal"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_181",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disaster_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "재난안전행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*재난안전행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재난안전행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional disaster sa"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_182",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "statistics_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "통계행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*통계행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 통계행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional statistics "
+  },
+  {
+   "rule_id": "PUB_ADM_KR_183",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "procurement_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "조달행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*조달행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 조달행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional procurement"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_184",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "judicial_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "사법행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*사법행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 사법행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional judicial ad"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_185",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "local_govt_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "지방자치행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*지방자치행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지방자치행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional local gover"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_186",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "foreign_affairs_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "외교행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*외교행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 외교행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional foreign aff"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_187",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "election_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "선거행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*선거행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 선거행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional election ad"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_188",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "transport_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "교통행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*교통행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 교통행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional transportat"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_189",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "agriculture_admin_predecisional_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "농림행정 결정 전 의사결정 정보 사전 유출 차단",
+   "patterns": [
+    "(?=.*농림행정)(?=.*전에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 농림행정 결정 전 의사결정 정보 사전 유출 차단",
+   "message_en": "This request is blocked: Block premature leak of pre-decisional agricultura"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_190",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "tax_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "세무행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*세무행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세무행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_191",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "welfare_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "복지행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*복지행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 복지행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_192",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "police_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "경찰행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*경찰행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경찰행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_193",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "education_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "교육행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*교육행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 교육행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_194",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "land_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "토지·건축행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*건축행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 토지·건축행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_195",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "immigration_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "출입국행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*출입국행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 출입국행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_196",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "military_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "병무행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*병무행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 병무행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_197",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "customs_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "관세행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*관세행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 관세행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_198",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "labor_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "노동행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*노동행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노동행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_199",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "environment_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "환경행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*환경행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환경행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  },
+  {
+   "rule_id": "PUB_ADM_KR_200",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "public_health_admin_discretion_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "보건행정 재량권 남용·부당 처분 유도 차단",
+   "patterns": [
+    "(?=.*보건행정)(?=.*처분하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보건행정 재량권 남용·부당 처분 유도 차단",
+   "message_en": "This request is blocked: Block guidance to abuse discretion or impose unjus"
+  }
+ ]
+}

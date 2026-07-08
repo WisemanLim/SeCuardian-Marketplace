@@ -21,14 +21,26 @@ bases (RAG).
 | Orchestrator + AI Assistant (F-AI), Setup Wizard (F-SETUP) | ✅ Done |
 | Addon hot-deploy (ZIP upload · live mount) | ✅ Restored |
 | Dashboard (`/dashboard` — server status + agent summary + quick links) | ✅ Done |
-| Marketplace (F-MP: catalog · install · single active version) — backend+frontend | 🟡 |
+| Marketplace (F-MP: catalog · install · single active version, **unified agent-management hub**) — backend+frontend | 🟡 |
 | Workflow (F-WF: DAG engine · 7 nodes · retry · HITL · SSE) — backend+a11y form frontend | 🟡 |
 | RAG (F-RAG: chunking · BM25+dense · RRF hybrid search) — backend+frontend | 🟡 |
 | Playground (F-PG: prompt/model/RAG experimentation · A/B) — backend+frontend | 🟡 |
-| Guardrails (F-GRD: PII/financial 13-type real detection · agent toggle · **Orchestrator live gate**) — backend+frontend | 🟡 |
+| Guardrails (F-GRD: real+heuristic coexist · **24 domain rulesets vendored · filter toggle · multi-domain · LLM classifier (optional) full judgment** · Orchestrator gate) — backend+frontend | 🟡 |
 | Env separation/keys (F-ENV), Web portal (F-WEB), Governance (F-GOV) | 🟡 Partial |
 
 > All 5 built-in agents have working backend+frontend (tests PASS). 🟡 = extension items remain (remote registry, React Flow canvas, pgvector, MCP proxy, etc). Details: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
+>
+> **UI layout (impl/20)**: there is no separate `Agent Management` menu — the **Marketplace menu is the unified agent hub**. Three top tabs: **Built-in Agents** (limited to Orchestrator, AI Assistant, Marketplace, Workflow, RAG, Playground, Guardrails), **System Agents** (security domains, etc.), **Addon Agents** (user-uploaded). The 5 built-ins (Marketplace/Workflow/RAG/Playground/Guardrails) are **REQUIRED (cannot be disabled)**. `Register Asset` sits on the System Agents tab (same position as `New Agent` on the Addon tab); the asset catalog (local + remote) is embedded below it.
+>
+> **Guardrails domain filters (impl/20 §7.8.7)**: all **24 wise-Guardrails domain rulesets are vendored as agent-internal data (`app/data/guardrails/`)**. `global` (PII/financial) is always required; industry domains (finance/healthcare/manufacturing/public-admin, …) get **generated regex** for their classifier rules, and each non-required domain has a **`Filter` toggle** in the catalog to include/exclude it at test time (multi-domain evaluation). Rebuild data: `make guardrails-data` (`scripts/build_guardrails_data.py`).
+>
+> **Two-tier full judgment (impl/23 §7.8.7)**: (1) **regex** (deterministic) — each rule tagged with a `mode`, so **real (original regex) + heuristic (generated regex) coexist** (catalog shows `real N · heuristic M`). (2) **LLM classifier** (optional `GUARDRAILS_CLASSIFIER_ENABLED=true`, default off / non-deterministic) — after regex, presents the rule menu to the LLM to judge paraphrase/contextual violations; degrades to regex when unconfigured/unavailable. Generated-regex over-matching is mitigated by **2-keyword co-occurrence (AND) + cross-domain DF filter** (removes single common-keyword false positives). The catalog has a **select-all / deselect-all toggle** (right of `Filter N/M domains`). The emb_guardrails ADDON bundles the ruleset data.
+>
+> **Screen alignment standard (impl/24)**: every agent screen root uses the **`.page` class** (`front/src/index.css` = `w-full max-w-6xl p-4 sm:p-6`) for **left-aligned, responsive, width-capped** layout (no `mx-auto`). Baseline for all new agents (built-in & addon). **Exception**: full-height interactive layouts (chat/terminal, e.g. AI Assistant).
+>
+> **Built-in MCP unlock (impl/20)**: the MCP lock on the REQUIRED built-in 5 is removed — all 7 built-in agents can be exposed as MCP servers.
+>
+> **emb_ built-in packages (impl/20 §7.8.8)**: ADDON packages `addon-agents/zip/emb_{marketplace,workflow,rag,playground,guardrails}` are created (same convention as the 13 security agents).
 
 ---
 
@@ -43,15 +55,18 @@ app/
                          setup·agent_config·agent_registry·a2a·mcp·mcp_config·
                          marketplace(F-MP)·workflow(F-WF)·rag(F-RAG)·playground(F-PG)·guardrails(F-GRD)
   services/              llm_fallback·ollama_warmup·mcp_proxy_server·openapi_to_mcp·
-                         workflow_engine(F-WF DAG)·embeddings+rag_pipeline(F-RAG)·guardrails_detector(F-GRD)
+                         workflow_engine(F-WF DAG)·embeddings+rag_pipeline(F-RAG)·
+                         guardrails_detector+guardrails_rules(F-GRD multi-domain rule store)
+  data/guardrails/       compiled domain rulesets (incl. generated regex) 24 (scripts/build_guardrails_data.py)
   core/                  config(settings)·deps(JWT/RBAC)·security
   rules/                 keyword_matcher (Orchestrator rules)
   db.py                  raw-SQL helpers (fetch_one/all·execute_write/insert·_PH·migrations)
 sql/{sqlite,pg}/         01_init.sql (idempotent DDL: core + marketplace/workflow/rag/playground/guardrails)
                          02_seed.sql (agent/settings/domain-catalog seed)
 front/src/
-  pages/                 chat·agents·users·settings·profile·addon·setup +
-                         marketplace·workflow·rag·playground·guardrails (5 built-in agents)
+  pages/                 chat·users·settings·profile·addon·setup +
+                         marketplace(=unified agent hub: Built-in/System/Addon 3 tabs + asset catalog)·
+                         workflow·rag·playground·guardrails (5 built-in agents)
   api/                   axios client per backend contract (1:1)
 addon-agents/            Addon ZIP assets (deployed/ is runtime bind-mount)
 test/impl/<Nth>/         per-iteration test scenario·result
@@ -212,9 +227,19 @@ curl -X POST http://localhost:8100/api/playground/run -H "Authorization: Bearer 
   -H 'Content-Type: application/json' -d '{"prompt":"hello world","rag_collection_id":1}'
 # → {"id":1,"response_text":"...","provider":"ollama|degraded","latency_ms":42,"citations_json":"[...]"}
 
-# ── Guardrails (F-GRD) — global PII 13-type detection (Playground integration) ──
+# ── Guardrails (F-GRD) — domain catalog + multi-domain evaluation (§7.8.7) ──
+curl http://localhost:8100/api/guardrails/domains -H "Authorization: Bearer $TOKEN"
+# → {"domains":[{"domain_key":"global","status":"functional","is_required":1,"filter_enabled":1,...},
+#               {"domain_key":"finance-banking","status":"functional","filter_enabled":0,...}, ...]}
+# domain 'filter' toggle (admin) — required (global) cannot be disabled (409)
+curl -X PUT http://localhost:8100/api/guardrails/domains/finance-banking/filter -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"enabled":true}'
+# test — without domains: evaluates global (required) + filter-enabled domains; or pass domains explicitly
 curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' -d '{"text":"email me at secret@corp.com","domain":"global"}'
+  -H 'Content-Type: application/json' -d '{"text":"open an account without KYC","domains":["global","finance-banking"]}'
+# → {"decision":"block","evaluatedDomains":["global","finance-banking"],"perDomain":[...], ...}
+curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"text":"email me at secret@corp.com"}'
 # → {"decision":"redact",...}  low-risk PII (email/phone/IP) = masked
 # promotion (impl/11): 1 high-risk category (secret/financial/national-id) → block, 2+ → escalate
 curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \

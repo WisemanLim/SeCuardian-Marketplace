@@ -112,6 +112,9 @@ class Settings(BaseSettings):
     guardrails_mcp_url: str = "http://localhost:8080"
     guardrails_api_key: str = ""               # MCP_HTTP_AUTH=required 인 경우만 필요
     guardrails_default_domain: str = "global"  # 1차 실판정 도메인(§7.8.0), 나머지는 카탈로그 전용
+    # 완전판정(LLM classifier, §7.8.7) — 기본 off·비결정적. on 시 /test 가 regex 후 LLM 으로 패러프레이즈 판정
+    guardrails_classifier_enabled: bool = False
+    guardrails_classifier_max_rules: int = 40   # 도메인당 LLM 메뉴 제시 규칙 수(비용/지연 제어)
 
 
 settings = Settings()

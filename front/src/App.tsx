@@ -9,7 +9,6 @@ import SettingsPage from "./pages/settings/SettingsPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import AddonAgentPage from "./pages/addon/AddonAgentPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
-import MarketplacePage from "./pages/marketplace/MarketplacePage";
 import WorkflowPage from "./pages/workflow/WorkflowPage";
 import RagPage from "./pages/rag/RagPage";
 import PlaygroundPage from "./pages/playground/PlaygroundPage";
@@ -46,13 +45,15 @@ export default function App() {
       <Route element={<SetupGuardOutlet />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/chat" element={<LayoutRoute><ChatPage /></LayoutRoute>} />
-        <Route path="/agents" element={<LayoutRoute><AgentsPage /></LayoutRoute>} />
+        {/* 에이전트 관리는 마켓플레이스로 통합됨 — /agents 는 하위호환 리다이렉트 */}
+        <Route path="/agents" element={<Navigate to="/marketplace" replace />} />
         <Route path="/users" element={<LayoutRoute><UsersPage /></LayoutRoute>} />
         <Route path="/settings" element={<LayoutRoute><SettingsPage /></LayoutRoute>} />
         <Route path="/profile" element={<LayoutRoute><ProfilePage /></LayoutRoute>} />
         <Route path="/addon/:agentKey" element={<LayoutRoute><AddonAgentPage /></LayoutRoute>} />
         <Route path="/dashboard" element={<LayoutRoute><DashboardPage /></LayoutRoute>} />
-        <Route path="/marketplace" element={<LayoutRoute><MarketplacePage /></LayoutRoute>} />
+        {/* 마켓플레이스 = 통합 에이전트 허브(내장/시스템/Addon 탭 + 자산 카탈로그) */}
+        <Route path="/marketplace" element={<LayoutRoute><AgentsPage /></LayoutRoute>} />
         <Route path="/workflow" element={<LayoutRoute><WorkflowPage /></LayoutRoute>} />
         <Route path="/rag" element={<LayoutRoute><RagPage /></LayoutRoute>} />
         <Route path="/playground" element={<LayoutRoute><PlaygroundPage /></LayoutRoute>} />

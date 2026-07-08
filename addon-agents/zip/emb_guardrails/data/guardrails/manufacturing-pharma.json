@@ -1,0 +1,3581 @@
+{
+ "domain_key": "manufacturing-pharma",
+ "display_name": "제조업(제약)",
+ "display_name_en": "Manufacturing (Pharma)",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 210,
+ "regex_rule_count": 209,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 209,
+ "rules": [
+  {
+   "rule_id": "MF_PHARMA_KR_001",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "gmp_batch_record_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "GMP 배치 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*조작해줘)(?=.*통과)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: GMP 배치 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block GMP batch record falsification"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_002",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "off_label_promotion",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "허가 외 적응증(off-label) 판촉 권유 차단",
+   "patterns": [
+    "(?=.*label)(?=.*off)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 허가 외 적응증(off-label) 판촉 권유 차단",
+   "message_en": "This request is blocked: Block off-label indication promotion"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_003",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "sae_underreport",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "중대 이상반응(SAE) 누락 보고 권유 차단",
+   "patterns": [
+    "(?=.*부작용)(?=.*사례)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중대 이상반응(SAE) 누락 보고 권유 차단",
+   "message_en": "This request is blocked: Block underreporting of serious adverse events"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_004",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "efficacy_exaggeration_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 의약품 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*완치된다)(?=.*광고해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 의약품 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating drug efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_005",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "21cfr11_audit_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "전자기록(21 CFR Part 11) 감사추적 우회 권유 차단",
+   "patterns": [
+    "(?=.*감사추적)(?=.*끄는)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자기록(21 CFR Part 11) 감사추적 우회 권유 차단",
+   "message_en": "This request is blocked: Block 21 CFR Part 11 audit trail bypass"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_006",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "clinical_protocol_deviation_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "임상시험 프로토콜 위반 은폐 권유 차단",
+   "patterns": [
+    "(?=.*일탈)(?=.*임상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 임상시험 프로토콜 위반 은폐 권유 차단",
+   "message_en": "This request is blocked: Block concealment of clinical protocol deviations"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_007",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "expiry_relabel_pharma",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "유효기간 경과 의약품 재표시 권유 차단",
+   "patterns": [
+    "(?=.*유효기간)(?=.*지난)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유효기간 경과 의약품 재표시 권유 차단",
+   "message_en": "This request is blocked: Block relabeling of expired drugs"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_008",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "import_counterfeit_drug",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "위조·불법 의약품 수입 권유 차단",
+   "patterns": [
+    "(?=.*유통하)(?=.*의약품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위조·불법 의약품 수입 권유 차단",
+   "message_en": "This request is blocked: Block import of counterfeit/illegal drugs"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_009",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "manufacturing_deviation_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "제조 공정 일탈 은폐 권유 차단",
+   "patterns": [
+    "(?=.*일탈)(?=.*남기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제조 공정 일탈 은폐 권유 차단",
+   "message_en": "This request is blocked: Block concealment of manufacturing deviations"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_010",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "regulatory_submission_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "인허가 제출 자료 위조 권유 차단",
+   "patterns": [
+    "(?=.*제출하)(?=.*임상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 인허가 제출 자료 위조 권유 차단",
+   "message_en": "This request is blocked: Block falsification of regulatory submission data"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_011",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "accelerated_stability_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "안정성 시험 생략·조작 권유 차단",
+   "patterns": [
+    "(?=.*정하)(?=.*유효기간)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안정성 시험 생략·조작 권유 차단",
+   "message_en": "This request is blocked: Block skipping or falsifying stability testing"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_012",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pharmacovigilance_signal_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "약물감시 안전성 신호 은폐 권유 차단",
+   "patterns": [
+    "(?=.*시판)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 약물감시 안전성 신호 은폐 권유 차단",
+   "message_en": "This request is blocked: Block concealment of pharmacovigilance safety sign"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_013",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "process_validation_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "공정 밸리데이션 생략 권유 차단",
+   "patterns": [
+    "(?=.*밸리데이션)(?=.*생산하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공정 밸리데이션 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping of process validation"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_014",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "oos_batch_release",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "기준 미달(OOS) 배치 출하 권유 차단",
+   "patterns": [
+    "(?=.*재시험)(?=.*통과시키)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 기준 미달(OOS) 배치 출하 권유 차단",
+   "message_en": "This request is blocked: Block release of out-of-specification batches"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_015",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "gmp_line_clearance_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "GMP 라인 클리어런스 생략 권유 차단",
+   "patterns": [
+    "(?=.*청소)(?=.*교체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: GMP 라인 클리어런스 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping of GMP line clearance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_016",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "clinical_subject_id_link",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "임상시험 피험자 식별 정보 연결 유출 차단",
+   "patterns": [
+    "(?=.*코드랑)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 임상시험 피험자 식별 정보 연결 유출 차단",
+   "message_en": "This request is blocked: Block linking clinical trial subject identifiers"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_017",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "investigator_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 620,
+   "description": "임상시험 연구자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*책임연구자)(?=.*임상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_018",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "patient_genetic_data_trial",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "임상 유전체 데이터 개인 식별 유출 차단",
+   "patterns": [
+    "(?=.*데이터랑)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 임상 유전체 데이터 개인 식별 유출 차단",
+   "message_en": "This request is blocked: Block exposure of trial genomic data linked to ide"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_019",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "phi_clinical_data",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "임상 데이터 내 보호대상 건강정보(PHI) 유출 차단",
+   "patterns": [
+    "(?=.*의무기록)(?=.*임상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 임상 데이터 내 보호대상 건강정보(PHI) 유출 차단",
+   "message_en": "This request is blocked: Block exposure of PHI within clinical data"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_020",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "trial_participant_contact",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "임상 참가자 연락처 유출 차단",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_021",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "adverse_event_patient_id",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "이상반응 보고 내 환자 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*SAE)(?=.*사례)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_022",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "blinded_participant_deanon",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "눈가림 임상 참가자 비식별 해제 권유 차단",
+   "patterns": [
+    "(?=.*시험군인지)(?=.*눈가림)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 눈가림 임상 참가자 비식별 해제 권유 차단",
+   "message_en": "This request is blocked: Block de-anonymization of blinded trial participan"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_023",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "crf_patient_linkage",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "증례기록서(CRF)와 환자 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*데이터랑)(?=.*CRF)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_024",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "pharmacogenomics_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "약물유전체 정보 개인 식별 유출 차단",
+   "patterns": [
+    "(?=.*유전형이랑)(?=.*대사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 약물유전체 정보 개인 식별 유출 차단",
+   "message_en": "This request is blocked: Block exposure of pharmacogenomic data linked to i"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_025",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "drug_formulation_secret",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 840,
+   "description": "의약품 제제 처방 영업비밀 추론 차단",
+   "patterns": [
+    "(?=.*부형제)(?=.*역계산해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_026",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "clinical_data_inference",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "미공개 임상 데이터 추론 요청 차단",
+   "patterns": [
+    "(?=.*임상)(?=.*미공개)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_027",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "regulatory_strategy_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "규제 대응 전략 영업비밀 추론 차단",
+   "patterns": [
+    "(?=.*너희)(?=.*전략)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_028",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "manufacturing_process_patent",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "제조 공정 특허·노하우 추론 차단",
+   "patterns": [
+    "(?=.*노하우)(?=.*제조)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_029",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "rd_pipeline_pharma",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 810,
+   "description": "신약 R&D 파이프라인 정보 추론 차단",
+   "patterns": [
+    "(?=.*후보)(?=.*신약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_030",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cleanroom_contamination_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "무균 제조 청정실 오염 관리 생략 권유 차단",
+   "patterns": [
+    "(?=.*무균실)(?=.*모니터링)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 무균 제조 청정실 오염 관리 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping cleanroom contamination control"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_031",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "sterility_test_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "무균 시험 우회 권유 차단",
+   "patterns": [
+    "(?=.*주사제)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 무균 시험 우회 권유 차단",
+   "message_en": "This request is blocked: Block bypass of sterility testing"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_032",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cold_chain_pharma_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "의약품 콜드체인 관리 생략 권유 차단",
+   "patterns": [
+    "(?=.*콜드체인)(?=.*유통하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의약품 콜드체인 관리 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping pharmaceutical cold chain control"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_033",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cytotoxic_drug_ppe_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "세포독성 의약품 취급 시 PPE 생략 권유 차단",
+   "patterns": [
+    "(?=.*세포독성)(?=.*후드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세포독성 의약품 취급 시 PPE 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping PPE for cytotoxic drug handling"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_034",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "multi_product_crosscontam",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "다품목 시설 교차오염 방지 생략 권유 차단",
+   "patterns": [
+    "(?=.*페니실린이랑)(?=.*라인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 다품목 시설 교차오염 방지 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping cross-contamination control in mult"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_035",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "counterfeit_drug_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "위조 의약품 제조·유통 지원 차단",
+   "patterns": [
+    "(?=.*정품처럼)(?=.*포장하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위조 의약품 제조·유통 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit drug manufacturing/distribution "
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_036",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "regulatory_submission_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "허가 신청 사기 지원 차단",
+   "patterns": [
+    "(?=.*제출하)(?=.*임상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 허가 신청 사기 지원 차단",
+   "message_en": "This request is blocked: Block regulatory submission fraud assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_037",
+   "io_type": "output",
+   "category": "fraud",
+   "sub_category": "efficacy_false_claim_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 의약품 허위 효능 주장 차단",
+   "patterns": [
+    "(?=.*낫게)(?=.*약이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 의약품 허위 효능 주장 차단",
+   "message_en": "This request is blocked: Block output making false drug efficacy claims"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_038",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "smallmol_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 합성의약품 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*합성의약품)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 합성의약품 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising small molecule drugs GMP dev"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_039",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "biologic_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 바이오의약품 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*바이오의약품)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 바이오의약품 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising biologics GMP deviation conc"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_040",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "vaccine_ph_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 백신 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*일탈)(?=.*백신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 백신 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising vaccines GMP deviation conce"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_041",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "biosimilar_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 바이오시밀러 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*바이오시밀러)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 바이오시밀러 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising biosimilars GMP deviation co"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_042",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "cell_therapy_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 세포치료제 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*세포치료제)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 세포치료제 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising cell therapy GMP deviation c"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_043",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "gene_therapy_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 유전자치료제 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*유전자치료제)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 유전자치료제 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising gene therapy GMP deviation c"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_044",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "injectable_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 주사제 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*주사제)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 주사제 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising injectables GMP deviation co"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_045",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "oral_solid_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 경구고형제 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*경구고형제)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 경구고형제 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising oral solid dosage GMP deviat"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_046",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "controlled_drug_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 마약·향정신성 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*향정신성)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 마약·향정신성 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising controlled substances GMP de"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_047",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "otc_drug_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 일반의약품 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*일반의약품)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 일반의약품 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising OTC drugs GMP deviation conc"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_048",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "generic_drug_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 제네릭 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*제네릭)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 제네릭 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising generic drugs GMP deviation "
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_049",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "orphan_drug_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 희귀의약품 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*희귀의약품)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 희귀의약품 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising orphan drugs GMP deviation c"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_050",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "api_raw_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 원료의약품 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*원료의약품)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 원료의약품 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising APIs GMP deviation concealme"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_051",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "herbal_med_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 생약·한약제제 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*한약제제)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 생약·한약제제 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising herbal medicines GMP deviati"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_052",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "radiopharm_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 방사성의약품 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*방사성의약품)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 방사성의약품 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising radiopharmaceuticals GMP dev"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_053",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "ophthalmic_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 점안제 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*점안제)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 점안제 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising ophthalmic drugs GMP deviati"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_054",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "inhalation_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 흡입제 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*흡입제)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 흡입제 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising inhalation drugs GMP deviati"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_055",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "transdermal_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 경피흡수제 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*경피흡수제)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 경피흡수제 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising transdermal drugs GMP deviat"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_056",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "diagnostic_agent_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 진단용의약품 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*진단용의약품)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 진단용의약품 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising diagnostic agents GMP deviat"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_057",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "blood_product_gmp_deviation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 혈액제제 GMP 제조 일탈 은폐 안내 차단",
+   "patterns": [
+    "(?=.*혈액제제)(?=.*일탈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 혈액제제 GMP 제조 일탈 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising blood products GMP deviation"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_058",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "smallmol_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 합성의약품 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*합성의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 합성의약품 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating small molecule drugs eff"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_059",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "biologic_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 바이오의약품 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*바이오의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 바이오의약품 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating biologics efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_060",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "vaccine_ph_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 백신 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*부작용)(?=.*백신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 백신 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating vaccines efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_061",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "biosimilar_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 바이오시밀러 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*바이오시밀러)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 바이오시밀러 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating biosimilars efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_062",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "cell_therapy_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 세포치료제 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*세포치료제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 세포치료제 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating cell therapy efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_063",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "gene_therapy_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 유전자치료제 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*유전자치료제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 유전자치료제 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating gene therapy efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_064",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "injectable_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 주사제 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*주사제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 주사제 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating injectables efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_065",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "oral_solid_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 경구고형제 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*경구고형제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 경구고형제 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating oral solid dosage effica"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_066",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "controlled_drug_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 마약·향정신성 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*향정신성)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 마약·향정신성 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating controlled substances ef"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_067",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "otc_drug_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 일반의약품 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*일반의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 일반의약품 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating OTC drugs efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_068",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "generic_drug_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 제네릭 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*제네릭)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 제네릭 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating generic drugs efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_069",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "orphan_drug_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 희귀의약품 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*희귀의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 희귀의약품 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating orphan drugs efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_070",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "api_raw_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 원료의약품 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*원료의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 원료의약품 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating APIs efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_071",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "herbal_med_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 생약·한약제제 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*한약제제)(?=.*생약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 생약·한약제제 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating herbal medicines efficac"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_072",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "radiopharm_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 방사성의약품 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*방사성의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 방사성의약품 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating radiopharmaceuticals eff"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_073",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "ophthalmic_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 점안제 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*점안제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 점안제 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating ophthalmic drugs efficac"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_074",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "inhalation_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 흡입제 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*흡입제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 흡입제 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating inhalation drugs efficac"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_075",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "transdermal_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 경피흡수제 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*경피흡수제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 경피흡수제 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating transdermal drugs effica"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_076",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "diagnostic_agent_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 진단용의약품 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*진단용의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 진단용의약품 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating diagnostic agents effica"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_077",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "blood_product_efficacy_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 혈액제제 효능 과장 안내 차단",
+   "patterns": [
+    "(?=.*혈액제제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 혈액제제 효능 과장 안내 차단",
+   "message_en": "This request is blocked: Block output exaggerating blood products efficacy"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_078",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "smallmol_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "합성의약품 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*합성의약품)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_079",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "biologic_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "바이오의약품 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*바이오의약품)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_080",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "vaccine_ph_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "백신 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*피험자)(?=.*백신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_081",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "biosimilar_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "바이오시밀러 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*바이오시밀러)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_082",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "cell_therapy_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "세포치료제 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*세포치료제)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_083",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "gene_therapy_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "유전자치료제 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*유전자치료제)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_084",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "injectable_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "주사제 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*주사제)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_085",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "oral_solid_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "경구고형제 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*경구고형제)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_086",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "controlled_drug_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "마약·향정신성 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*향정신성)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_087",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "otc_drug_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "일반의약품 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*일반의약품)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_088",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "generic_drug_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "제네릭 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*제네릭)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_089",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "orphan_drug_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "희귀의약품 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*희귀의약품)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_090",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "api_raw_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "원료의약품 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*원료의약품)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_091",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "herbal_med_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "생약·한약제제 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*한약제제)(?=.*생약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_092",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "radiopharm_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "방사성의약품 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*방사성의약품)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_093",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "ophthalmic_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "점안제 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*점안제)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_094",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "inhalation_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "흡입제 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*흡입제)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_095",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "transdermal_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "경피흡수제 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*경피흡수제)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_096",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "diagnostic_agent_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "진단용의약품 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*진단용의약품)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_097",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "blood_product_trial_subject_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "혈액제제 임상 피험자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*혈액제제)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_098",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "smallmol_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "합성의약품 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*합성의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 합성의약품 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for small molec"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_099",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "biologic_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "바이오의약품 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*바이오의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 바이오의약품 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for biologics"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_100",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vaccine_ph_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "백신 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*부작용)(?=.*백신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 백신 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for vaccines"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_101",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "biosimilar_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "바이오시밀러 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*바이오시밀러)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 바이오시밀러 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for biosimilars"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_102",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cell_therapy_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "세포치료제 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*세포치료제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세포치료제 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for cell therap"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_103",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "gene_therapy_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "유전자치료제 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*유전자치료제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유전자치료제 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for gene therap"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_104",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "injectable_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "주사제 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*주사제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주사제 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for injectables"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_105",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "oral_solid_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "경구고형제 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*경구고형제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경구고형제 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for oral solid "
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_106",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "controlled_drug_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "마약·향정신성 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*향정신성)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 마약·향정신성 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for controlled "
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_107",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "otc_drug_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "일반의약품 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*일반의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 일반의약품 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for OTC drugs"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_108",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "generic_drug_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "제네릭 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*제네릭)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제네릭 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for generic dru"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_109",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "orphan_drug_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "희귀의약품 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*희귀의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 희귀의약품 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for orphan drug"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_110",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "api_raw_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "원료의약품 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*원료의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 원료의약품 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for APIs"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_111",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "herbal_med_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "생약·한약제제 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*한약제제)(?=.*생약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 생약·한약제제 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for herbal medi"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_112",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "radiopharm_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방사성의약품 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*방사성의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방사성의약품 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for radiopharma"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_113",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ophthalmic_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "점안제 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*점안제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 점안제 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for ophthalmic "
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_114",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "inhalation_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "흡입제 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*흡입제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 흡입제 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for inhalation "
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_115",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "transdermal_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "경피흡수제 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*경피흡수제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경피흡수제 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for transdermal"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_116",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "diagnostic_agent_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "진단용의약품 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*진단용의약품)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 진단용의약품 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for diagnostic "
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_117",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "blood_product_adverse_event_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "혈액제제 이상반응·부작용 보고 누락 차단",
+   "patterns": [
+    "(?=.*혈액제제)(?=.*부작용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 혈액제제 이상반응·부작용 보고 누락 차단",
+   "message_en": "This request is blocked: Block adverse event underreporting for blood produ"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_118",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "smallmol_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 합성의약품 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*합성의약품)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_119",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "biologic_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 바이오의약품 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*바이오의약품)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_120",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "vaccine_ph_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 백신 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*백신)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_121",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "biosimilar_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 바이오시밀러 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*바이오시밀러)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_122",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "cell_therapy_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 세포치료제 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*세포치료제)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_123",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "gene_therapy_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 유전자치료제 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*유전자치료제)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_124",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "injectable_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 주사제 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*주사제)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_125",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "oral_solid_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 경구고형제 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*경구고형제)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_126",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "controlled_drug_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 마약·향정신성 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*향정신성)(?=.*마약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_127",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "otc_drug_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 일반의약품 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*일반의약품)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_128",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "generic_drug_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 제네릭 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*제네릭)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_129",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "orphan_drug_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 희귀의약품 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*희귀의약품)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_130",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "api_raw_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 원료의약품 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*원료의약품)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_131",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "herbal_med_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 생약·한약제제 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*한약제제)(?=.*생약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_132",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "radiopharm_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 방사성의약품 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*방사성의약품)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_133",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "ophthalmic_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 점안제 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*점안제)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_134",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "inhalation_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 흡입제 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*흡입제)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_135",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "transdermal_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 경피흡수제 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*경피흡수제)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_136",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "diagnostic_agent_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 진단용의약품 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*진단용의약품)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_137",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "blood_product_formulation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 혈액제제 제제·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*혈액제제)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_138",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "smallmol_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "합성의약품 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*합성의약품)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 합성의약품 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_139",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "biologic_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "바이오의약품 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*바이오의약품)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 바이오의약품 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_140",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "vaccine_ph_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "백신 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*위조품)(?=.*백신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 백신 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_141",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "biosimilar_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "바이오시밀러 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*바이오시밀러)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 바이오시밀러 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_142",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "cell_therapy_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "세포치료제 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*세포치료제)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세포치료제 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_143",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "gene_therapy_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "유전자치료제 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*유전자치료제)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유전자치료제 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_144",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "injectable_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "주사제 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*위조품)(?=.*주사제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주사제 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_145",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "oral_solid_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "경구고형제 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*경구고형제)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경구고형제 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_146",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "controlled_drug_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "마약·향정신성 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*향정신성)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 마약·향정신성 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_147",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "otc_drug_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "일반의약품 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*일반의약품)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 일반의약품 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_148",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "generic_drug_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "제네릭 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*위조품)(?=.*제네릭)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제네릭 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_149",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "orphan_drug_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "희귀의약품 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*희귀의약품)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 희귀의약품 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_150",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "api_raw_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "원료의약품 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*원료의약품)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 원료의약품 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_151",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "herbal_med_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "생약·한약제제 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*한약제제)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 생약·한약제제 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_152",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "radiopharm_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "방사성의약품 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*방사성의약품)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방사성의약품 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_153",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "ophthalmic_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "점안제 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*위조품)(?=.*점안제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 점안제 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_154",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "inhalation_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "흡입제 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*위조품)(?=.*흡입제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 흡입제 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_155",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "transdermal_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "경피흡수제 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*경피흡수제)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경피흡수제 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_156",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "diagnostic_agent_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "진단용의약품 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*진단용의약품)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 진단용의약품 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_157",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "blood_product_counterfeit_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "혈액제제 위조·불법 제조 지원 차단",
+   "patterns": [
+    "(?=.*혈액제제)(?=.*위조품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 혈액제제 위조·불법 제조 지원 차단",
+   "message_en": "This request is blocked: Block counterfeit/illegal manufacturing assistance"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_158",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "smallmol_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "합성의약품 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*합성의약품)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 합성의약품 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for s"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_159",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "biologic_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "바이오의약품 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*바이오의약품)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 바이오의약품 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for b"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_160",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "vaccine_ph_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "백신 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*무균)(?=.*백신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 백신 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for v"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_161",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "biosimilar_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "바이오시밀러 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*바이오시밀러)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 바이오시밀러 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for b"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_162",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cell_therapy_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "세포치료제 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*세포치료제)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세포치료제 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for c"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_163",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "gene_therapy_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "유전자치료제 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*유전자치료제)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유전자치료제 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for g"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_164",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "injectable_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주사제 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*주사제)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주사제 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for i"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_165",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "oral_solid_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "경구고형제 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*경구고형제)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경구고형제 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for o"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_166",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "controlled_drug_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "마약·향정신성 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*향정신성)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 마약·향정신성 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for c"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_167",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "otc_drug_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "일반의약품 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*일반의약품)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 일반의약품 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for O"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_168",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "generic_drug_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "제네릭 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*제네릭)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제네릭 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for g"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_169",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "orphan_drug_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "희귀의약품 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*희귀의약품)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 희귀의약품 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for o"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_170",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "api_raw_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "원료의약품 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*원료의약품)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 원료의약품 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for A"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_171",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "herbal_med_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "생약·한약제제 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*한약제제)(?=.*생약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 생약·한약제제 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for h"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_172",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "radiopharm_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방사성의약품 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*방사성의약품)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방사성의약품 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for r"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_173",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ophthalmic_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "점안제 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*점안제)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 점안제 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for o"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_174",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "inhalation_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "흡입제 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*흡입제)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 흡입제 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for i"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_175",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "transdermal_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "경피흡수제 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*경피흡수제)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경피흡수제 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for t"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_176",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "diagnostic_agent_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "진단용의약품 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*진단용의약품)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 진단용의약품 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for d"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_177",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "blood_product_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "혈액제제 취급·제조 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*혈액제제)(?=.*무균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 혈액제제 취급·제조 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling/manufacturing safety for b"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_178",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "smallmol_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "합성의약품 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*합성의약품)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 합성의약품 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of small mo"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_179",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "biologic_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "바이오의약품 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*바이오의약품)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 바이오의약품 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of biologic"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_180",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vaccine_ph_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "백신 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*수입하)(?=.*백신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 백신 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of vaccines"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_181",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "biosimilar_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "바이오시밀러 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*바이오시밀러)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 바이오시밀러 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of biosimil"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_182",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cell_therapy_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "세포치료제 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*세포치료제)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세포치료제 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of cell the"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_183",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "gene_therapy_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "유전자치료제 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*유전자치료제)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유전자치료제 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of gene the"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_184",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "injectable_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "주사제 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*주사제)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주사제 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of injectab"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_185",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "oral_solid_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "경구고형제 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*경구고형제)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경구고형제 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of oral sol"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_186",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "controlled_drug_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "마약·향정신성 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*향정신성)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 마약·향정신성 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of controll"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_187",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "otc_drug_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "일반의약품 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*일반의약품)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 일반의약품 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of OTC drug"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_188",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "generic_drug_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "제네릭 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*제네릭)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제네릭 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of generic "
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_189",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "orphan_drug_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "희귀의약품 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*희귀의약품)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 희귀의약품 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of orphan d"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_190",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "api_raw_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "원료의약품 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*원료의약품)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 원료의약품 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of APIs"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_191",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "herbal_med_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "생약·한약제제 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*한약제제)(?=.*생약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 생약·한약제제 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of herbal m"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_192",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "radiopharm_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방사성의약품 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*방사성의약품)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방사성의약품 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of radiopha"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_193",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ophthalmic_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "점안제 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*점안제)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 점안제 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of ophthalm"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_194",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "inhalation_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "흡입제 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*흡입제)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 흡입제 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of inhalati"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_195",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "transdermal_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "경피흡수제 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*경피흡수제)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경피흡수제 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of transder"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_196",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "diagnostic_agent_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "진단용의약품 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*진단용의약품)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 진단용의약품 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of diagnost"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_197",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "blood_product_import_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "혈액제제 미허가 수입·유통 차단",
+   "patterns": [
+    "(?=.*혈액제제)(?=.*수입하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 혈액제제 미허가 수입·유통 차단",
+   "message_en": "This request is blocked: Block unauthorized import/distribution of blood pr"
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_198",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "smallmol_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 합성의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*합성의약품)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 합성의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_199",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "biologic_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 바이오의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*바이오의약품)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 바이오의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_200",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "vaccine_ph_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 백신 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*안정성)(?=.*백신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 백신 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_201",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "biosimilar_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 바이오시밀러 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*바이오시밀러)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 바이오시밀러 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_202",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "cell_therapy_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 세포치료제 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*세포치료제)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 세포치료제 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_203",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "gene_therapy_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 유전자치료제 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*유전자치료제)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 유전자치료제 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_204",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "injectable_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 주사제 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*주사제)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 주사제 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_205",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "oral_solid_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 경구고형제 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*경구고형제)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 경구고형제 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_206",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "controlled_drug_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 마약·향정신성 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*향정신성)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 마약·향정신성 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_207",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "otc_drug_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 일반의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*일반의약품)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 일반의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_208",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "generic_drug_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 제네릭 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*제네릭)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 제네릭 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_209",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "orphan_drug_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 희귀의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*희귀의약품)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 희귀의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_PHARMA_KR_210",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "api_raw_stability_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 원료의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "patterns": [
+    "(?=.*원료의약품)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 원료의약품 안정성·유효기간 데이터 조작 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  }
+ ]
+}

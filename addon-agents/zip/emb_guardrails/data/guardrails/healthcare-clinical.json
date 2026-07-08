@@ -1,0 +1,3753 @@
+{
+ "domain_key": "healthcare-clinical",
+ "display_name": "의료(임상)",
+ "display_name_en": "Healthcare (Clinical)",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 220,
+ "regex_rule_count": 220,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 220,
+ "rules": [
+  {
+   "rule_id": "HC_CLIN_KR_001",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "phi_emr_protect",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "환자 의무기록(EMR) 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*EMR)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환자 의무기록(EMR) 개인 식별 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of patient medical records (PHI/EMR"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_002",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "patient_id_combo",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "환자 식별 조합(이름+생년월일+진단) 유출 차단",
+   "patterns": [
+    "(?=.*생년월일이랑)(?=.*진단명)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환자 식별 조합(이름+생년월일+진단) 유출 차단",
+   "message_en": "This request is blocked: Block patient identity combination (name+DOB+diagn"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_003",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "genetic_data_pii_clinical",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "임상 유전자 검사 결과 개인 식별 유출 차단",
+   "patterns": [
+    "(?=.*유전자)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 임상 유전자 검사 결과 개인 식별 유출 차단",
+   "message_en": "This request is blocked: Block exposure of clinical genetic test results li"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_004",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "mental_health_record_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "정신건강 진료 기록 개인 식별 유출 차단",
+   "patterns": [
+    "(?=.*정신)(?=.*진료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신건강 진료 기록 개인 식별 유출 차단",
+   "message_en": "This request is blocked: Block exposure of mental health records linked to "
+  },
+  {
+   "rule_id": "HC_CLIN_KR_005",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "minor_patient_pii_clinical",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "미성년 환자 개인 의료 정보 유출 차단",
+   "patterns": [
+    "(?=.*소아)(?=.*진단명)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 미성년 환자 개인 의료 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of minor patient personal medical i"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_006",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "diagnosis_name_combo",
+   "severity": "high",
+   "action": "redact",
+   "priority": 840,
+   "description": "진단명과 환자 이름 조합 유출 차단",
+   "patterns": [
+    "(?=.*당뇨)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_007",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "lab_result_identity",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "검사 결과와 환자 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*나온)(?=.*양성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_008",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "prescription_name_combo",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "처방 내역과 환자 이름 연결 유출 차단",
+   "patterns": [
+    "(?=.*마약류)(?=.*처방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_009",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "nursing_care_record_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 810,
+   "description": "간호 기록 내 환자 개인 정보 유출 차단",
+   "patterns": [
+    "(?=.*추출해줘)(?=.*간호사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_010",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "icu_patient_identity",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "중환자실 환자 신원 정보 유출 차단",
+   "patterns": [
+    "(?=.*중환자실)(?=.*입원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중환자실 환자 신원 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of ICU patient identity information"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_011",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "hiv_status_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "HIV 감염 여부 개인 식별 연결 유출 차단",
+   "patterns": [
+    "(?=.*에이즈)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: HIV 감염 여부 개인 식별 연결 유출 차단",
+   "message_en": "This request is blocked: Block exposure of HIV status linked to patient ide"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_012",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "substance_abuse_record_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "약물 남용 치료 기록 개인 식별 유출 차단",
+   "patterns": [
+    "(?=.*중독)(?=.*치료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 약물 남용 치료 기록 개인 식별 유출 차단",
+   "message_en": "This request is blocked: Block exposure of substance abuse treatment record"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_013",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "reproductive_health_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "생식 건강 기록 개인 식별 유출 차단",
+   "patterns": [
+    "(?=.*경험)(?=.*유산)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 생식 건강 기록 개인 식별 유출 차단",
+   "message_en": "This request is blocked: Block exposure of reproductive health records link"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_014",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_claim_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "보험 청구 내 환자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*환자)(?=.*청구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_015",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "research_participant_identity",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "임상연구 참가자 신원 정보 유출 차단",
+   "patterns": [
+    "(?=.*연구)(?=.*참가자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 임상연구 참가자 신원 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of clinical research participant id"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_016",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "disability_record_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "장애 판정 기록 개인 식별 유출 차단",
+   "patterns": [
+    "(?=.*판정)(?=.*장애)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_017",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "chronic_disease_name_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 810,
+   "description": "만성질환 진단명과 환자 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*고혈압)(?=.*당뇨)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_018",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "surgical_record_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "수술 기록 환자 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*수술)(?=.*심장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_019",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "immigration_status_health_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "이민·체류 상태와 의료 기록 연결 유출 차단",
+   "patterns": [
+    "(?=.*상태랑)(?=.*체류)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 이민·체류 상태와 의료 기록 연결 유출 차단",
+   "message_en": "This request is blocked: Block linking immigration/residency status with he"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_020",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "donor_recipient_identity",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "장기기증자·수혜자 신원 정보 유출 차단",
+   "patterns": [
+    "(?=.*기증자)(?=.*장기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장기기증자·수혜자 신원 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of organ donor and recipient identi"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_021",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "hmo_coverage_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 810,
+   "description": "응답에서 건강보험 수혜자 개인 정보 유출 차단",
+   "patterns": [
+    "(?=.*혜택)(?=.*건강보험)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_022",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "addiction_treatment_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "알코올·약물 중독 치료 참여자 신원 유출 차단",
+   "patterns": [
+    "(?=.*중독)(?=.*알코올)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 알코올·약물 중독 치료 참여자 신원 유출 차단",
+   "message_en": "This request is blocked: Block exposure of alcohol/drug addiction treatment"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_023",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "oncology_patient_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "암 환자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*항암)(?=.*치료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 암 환자 개인 식별 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of cancer patient personal identifi"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_024",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "terminal_patient_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "말기 환자 개인 정보 유출 차단",
+   "patterns": [
+    "(?=.*말기)(?=.*상태)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 말기 환자 개인 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of terminal patient personal inform"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_025",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "pediatric_diagnosis_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "소아 진단명과 아동 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*진단명이랑)(?=.*소아)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소아 진단명과 아동 신원 연결 유출 차단",
+   "message_en": "This request is blocked: Block exposure combining pediatric diagnosis with "
+  },
+  {
+   "rule_id": "HC_CLIN_KR_026",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "emergency_patient_identity",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "응급 환자 신원 정보 유출 차단",
+   "patterns": [
+    "(?=.*응급실)(?=.*내원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응급 환자 신원 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of emergency patient identity infor"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_027",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "psychiatric_commitment_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "강제 입원 환자 개인 정보 유출 차단",
+   "patterns": [
+    "(?=.*입원된)(?=.*강제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 강제 입원 환자 개인 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of involuntary psychiatric commitme"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_028",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "clinical_trial_outcome_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "응답에서 임상시험 결과와 피험자 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*임상시험)(?=.*피험자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_029",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "radiology_report_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "영상 판독 결과와 환자 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*MRI)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_030",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "pathology_report_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "조직 검사 결과와 환자 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*종양)(?=.*악성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 조직 검사 결과와 환자 신원 연결 유출 차단",
+   "message_en": "This request is blocked: Block exposure of pathology report linked to patie"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_031",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "allergy_record_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "알레르기 기록과 환자 신원 연결 유출 차단",
+   "patterns": [
+    "(?=.*페니실린)(?=.*알레르기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_032",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "diagnosis_direct_guidance",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "AI가 직접 진단 내리는 안내 차단",
+   "patterns": [
+    "(?=.*증상이면)(?=.*병이에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: AI가 직접 진단 내리는 안내 차단",
+   "message_en": "This request is blocked: Block AI providing direct diagnosis to users"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_033",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "off_label_rx_advice",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "허가 외 사용 처방 직접 안내 차단",
+   "patterns": [
+    "(?=.*용도)(?=.*써도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 허가 외 사용 처방 직접 안내 차단",
+   "message_en": "This request is blocked: Block direct off-label prescription guidance"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_034",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "mandatory_reporting_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "감염병 의무 신고 우회 권유 차단",
+   "patterns": [
+    "(?=.*진료해)(?=.*격리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 감염병 의무 신고 우회 권유 차단",
+   "message_en": "This request is blocked: Block guidance to bypass mandatory infectious dise"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_035",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "telemedicine_scope_breach",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "원격의료 허용 범위 초과 안내 차단",
+   "patterns": [
+    "(?=.*원격진료)(?=.*받아)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 원격의료 허용 범위 초과 안내 차단",
+   "message_en": "This request is blocked: Block guidance exceeding permitted telemedicine sc"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_036",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "samd_unvalidated_claim",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "미검증 AI 의료기기 효능 표방 안내 차단",
+   "patterns": [
+    "(?=.*의료기기)(?=.*FDA)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 미검증 AI 의료기기 효능 표방 안내 차단",
+   "message_en": "This request is blocked: Block output claiming unvalidated SaMD efficacy"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_037",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "clinical_guideline_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "임상 가이드라인 오인 표현 안내 차단",
+   "patterns": [
+    "(?=.*지어줘)(?=.*치료제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 임상 가이드라인 오인 표현 안내 차단",
+   "message_en": "This request is blocked: Block output misrepresenting clinical guidelines"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_038",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "unnecessary_procedure_promote",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "불필요한 의료 처치 유도 안내 차단",
+   "patterns": [
+    "(?=.*비보험)(?=.*받아)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 불필요한 의료 처치 유도 안내 차단",
+   "message_en": "This request is blocked: Block output promoting unnecessary medical procedu"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_039",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pharmacy_dispensing_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "처방전 없이 전문의약품 구입 안내 차단",
+   "patterns": [
+    "(?=.*사는)(?=.*항생제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 처방전 없이 전문의약품 구입 안내 차단",
+   "message_en": "This request is blocked: Block guidance to obtain prescription drugs withou"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_040",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "patient_consent_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "환자 동의 없는 의료 행위 권유 차단",
+   "patterns": [
+    "(?=.*의식)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환자 동의 없는 의료 행위 권유 차단",
+   "message_en": "This request is blocked: Block guidance to perform medical procedures witho"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_041",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "medical_record_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "의료 기록 위조 권유 차단",
+   "patterns": [
+    "(?=.*바꿔줘)(?=.*진단서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료 기록 위조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify medical records"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_042",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hospital_infection_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "병원 감염 발생 은폐 권유 차단",
+   "patterns": [
+    "(?=.*감염)(?=.*병원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 병원 감염 발생 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal hospital-acquired infect"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_043",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "medical_device_malfunction_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "의료 기기 오작동 은폐 권유 차단",
+   "patterns": [
+    "(?=.*의료기기)(?=.*고장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료 기기 오작동 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal medical device malfuncti"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_044",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "clinical_trial_result_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "임상시험 부정적 결과 은폐 권유 차단",
+   "patterns": [
+    "(?=.*좋으면)(?=.*임상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 임상시험 부정적 결과 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal negative clinical trial "
+  },
+  {
+   "rule_id": "HC_CLIN_KR_045",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "drug_shortage_exploit",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "의약품 부족 상황 이용 사기 권유 차단",
+   "patterns": [
+    "(?=.*바가지)(?=.*씌워)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의약품 부족 상황 이용 사기 권유 차단",
+   "message_en": "This request is blocked: Block guidance exploiting drug shortage for fraud"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_046",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emergency_triage_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "응급 환자 중증도 분류 무시 권유 차단",
+   "patterns": [
+    "(?=.*응급실)(?=.*치료해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응급 환자 중증도 분류 무시 권유 차단",
+   "message_en": "This request is blocked: Block guidance to bypass emergency triage procedur"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_047",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "do_not_resuscitate_override",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "DNR 의사 결정 무단 변경 권유 차단",
+   "patterns": [
+    "(?=.*치료해)(?=.*연명)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: DNR 의사 결정 무단 변경 권유 차단",
+   "message_en": "This request is blocked: Block guidance to override do-not-resuscitate deci"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_048",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "end_of_life_care_misguide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 임종 의료 결정 오인 안내 차단",
+   "patterns": [
+    "(?=.*선택하면)(?=.*호스피스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 임종 의료 결정 오인 안내 차단",
+   "message_en": "This request is blocked: Block output misguiding end-of-life care decisions"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_049",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insurance_auth_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "건강보험 사전 승인 우회 권유 차단",
+   "patterns": [
+    "(?=.*받아)(?=.*고가)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 건강보험 사전 승인 우회 권유 차단",
+   "message_en": "This request is blocked: Block guidance to bypass health insurance pre-auth"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_050",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "medical_billing_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "의료비 허위 청구 지원 차단",
+   "patterns": [
+    "(?=.*업코딩해서)(?=.*수가)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료비 허위 청구 지원 차단",
+   "message_en": "This request is blocked: Block assistance with medical billing fraud"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_051",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cross_contamination_clinical_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "임상 환경 교차 감염 은폐 권유 차단",
+   "patterns": [
+    "(?=.*교차)(?=.*감염)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 임상 환경 교차 감염 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal cross-contamination in c"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_052",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "experimental_therapy_unauthorized",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "미승인 실험적 치료 시술 권유 차단",
+   "patterns": [
+    "(?=.*IRB)(?=.*치료해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 미승인 실험적 치료 시술 권유 차단",
+   "message_en": "This request is blocked: Block guidance to administer unauthorized experime"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_053",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "health_fraud_promotion",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 검증되지 않은 건강 요법 홍보 차단",
+   "patterns": [
+    "(?=.*민간요법)(?=.*암에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 검증되지 않은 건강 요법 홍보 차단",
+   "message_en": "This request is blocked: Block output promoting unverified health remedies"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_054",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "medication_error_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "투약 오류 은폐 권유 차단",
+   "patterns": [
+    "(?=.*실수)(?=.*투약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 투약 오류 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal medication errors"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_055",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "unnecessary_lab_test_promote",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 650,
+   "description": "응답에서 불필요한 검사 과잉 권유 차단",
+   "patterns": [
+    "(?=.*받을수록)(?=.*좋다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 불필요한 검사 과잉 권유 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_056",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "patient_abandonment_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "응급 환자 방치 지원 차단",
+   "patterns": [
+    "(?=.*싫으면)(?=.*거부해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응급 환자 방치 지원 차단",
+   "message_en": "This request is blocked: Block guidance supporting abandonment of emergency"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_057",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "false_death_certificate",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "허위 사망 진단서 작성 권유 차단",
+   "patterns": [
+    "(?=.*다르게)(?=.*진단서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 허위 사망 진단서 작성 권유 차단",
+   "message_en": "This request is blocked: Block guidance to issue false death certificates"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_058",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "informed_consent_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "동의서 위조 권유 차단",
+   "patterns": [
+    "(?=.*동의서)(?=.*위조해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 동의서 위조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify informed consent documen"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_059",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "genetic_testing_without_consent",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "유전자 검사 동의 없이 진행 권유 차단",
+   "patterns": [
+    "(?=.*검사해)(?=.*유전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유전자 검사 동의 없이 진행 권유 차단",
+   "message_en": "This request is blocked: Block guidance to perform genetic testing without "
+  },
+  {
+   "rule_id": "HC_CLIN_KR_060",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "autopsy_report_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "부검 결과 위조 권유 차단",
+   "patterns": [
+    "(?=.*바꿔서)(?=.*부검)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 부검 결과 위조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify autopsy reports"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_061",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "telehealth_record_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "원격 의료 기록 보관 의무 우회 권유 차단",
+   "patterns": [
+    "(?=.*남겨)(?=.*원격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 원격 의료 기록 보관 의무 우회 권유 차단",
+   "message_en": "This request is blocked: Block guidance to bypass telehealth record keeping"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_062",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "health_data_secondary_use",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "환자 건강 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*연구)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환자 건강 데이터 동의 없는 2차 활용 권유 차단",
+   "message_en": "This request is blocked: Block guidance to use patient health data for seco"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_063",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "self_harm_with_support_channel",
+   "severity": "critical",
+   "action": "refuse",
+   "priority": 990,
+   "description": "자해 방법 안내 차단 + 지원 채널 안내 추가",
+   "patterns": [
+    "(?=.*상처)(?=.*몸에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자해 방법 안내 차단 + 지원 채널 안내 추가",
+   "message_en": "This request is blocked: Block self-harm method guidance and provide suppor"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_064",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "suicide_method_guide",
+   "severity": "critical",
+   "action": "refuse",
+   "priority": 990,
+   "description": "자살 방법 구체적 안내 차단",
+   "patterns": [
+    "(?=.*가장)(?=.*죽는)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자살 방법 구체적 안내 차단",
+   "message_en": "This request is blocked: Block specific suicide method guidance"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_065",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "experimental_treatment_promote",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "미검증 실험적 치료 권유 차단",
+   "patterns": [
+    "(?=.*권유해줘)(?=.*치료제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 미검증 실험적 치료 권유 차단",
+   "message_en": "This request is blocked: Block promotion of unverified experimental treatme"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_066",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "dangerous_medication_advice",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "위험한 의약품 복용 방법 직접 안내 차단",
+   "patterns": [
+    "(?=.*치사량)(?=.*먹는)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위험한 의약품 복용 방법 직접 안내 차단",
+   "message_en": "This request is blocked: Block direct guidance on dangerous medication use"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_067",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "contraindication_ignore",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "응답에서 금기 약물 조합 무시 안내 차단",
+   "patterns": [
+    "(?=.*조합이어)(?=.*문제없다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 금기 약물 조합 무시 안내 차단",
+   "message_en": "This request is blocked: Block output ignoring drug contraindications"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_068",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "overdose_guidance",
+   "severity": "critical",
+   "action": "refuse",
+   "priority": 980,
+   "description": "과다 복용 방법 안내 차단",
+   "patterns": [
+    "(?=.*먹으려면)(?=.*의식)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 과다 복용 방법 안내 차단",
+   "message_en": "This request is blocked: Block guidance on medication overdose methods"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_069",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "drug_interaction_risk_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "응답에서 심각한 약물 상호작용 위험 은폐 차단",
+   "patterns": [
+    "(?=.*위험하지)(?=.*않다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 심각한 약물 상호작용 위험 은폐 차단",
+   "message_en": "This request is blocked: Block output concealing serious drug interaction r"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_070",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "restraint_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "환자 억제대 사용 절차 무시 권유 차단",
+   "patterns": [
+    "(?=.*억제대)(?=.*써도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환자 억제대 사용 절차 무시 권유 차단",
+   "message_en": "This request is blocked: Block guidance to use patient restraints without p"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_071",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "resuscitation_decision",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "심폐소생술 여부 비전문가 결정 안내 차단",
+   "patterns": [
+    "(?=.*CPR)(?=.*해야)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 심폐소생술 여부 비전문가 결정 안내 차단",
+   "message_en": "This request is blocked: Block non-medical professional deciding on resusci"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_072",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "pediatric_dosing_error",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "응답에서 소아 투약 오류 유발 안내 차단",
+   "patterns": [
+    "(?=.*성인)(?=.*줘도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 소아 투약 오류 유발 안내 차단",
+   "message_en": "This request is blocked: Block output that may cause pediatric dosing error"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_073",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "pregnancy_medication_risk_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "응답에서 임산부 위험 약물 안전 허위 안내 차단",
+   "patterns": [
+    "(?=.*먹어)(?=.*임신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 임산부 위험 약물 안전 허위 안내 차단",
+   "message_en": "This request is blocked: Block output falsely claiming dangerous medication"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_074",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "elderly_polypharmacy_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 노인 다약제 복용 위험 은폐 차단",
+   "patterns": [
+    "(?=.*많아)(?=.*먹어)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 노인 다약제 복용 위험 은폐 차단",
+   "message_en": "This request is blocked: Block output concealing polypharmacy risks in elde"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_075",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "allergy_reaction_ignore",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "응답에서 알레르기 반응 무시 안내 차단",
+   "patterns": [
+    "(?=.*나도)(?=.*먹어)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 알레르기 반응 무시 안내 차단",
+   "message_en": "This request is blocked: Block output advising users to ignore allergic rea"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_076",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "blood_transfusion_mismatch_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "혈액형 불일치 수혈 은폐 권유 차단",
+   "patterns": [
+    "(?=.*혈액형)(?=.*실수)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 혈액형 불일치 수혈 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal blood type mismatch tran"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_077",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "surgical_site_infection_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "수술 부위 감염 은폐 권유 차단",
+   "patterns": [
+    "(?=.*부위)(?=.*감염)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 수술 부위 감염 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal surgical site infections"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_078",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "high_risk_procedure_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "고위험 의료 처치 안전 절차 무시 권유 차단",
+   "patterns": [
+    "(?=.*처치)(?=.*검토)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고위험 의료 처치 안전 절차 무시 권유 차단",
+   "message_en": "This request is blocked: Block guidance to bypass safety procedures for hig"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_079",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "latex_allergy_ignore",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "라텍스 알레르기 환자 처치 시 무시 권유 차단",
+   "patterns": [
+    "(?=.*알레르기)(?=.*라텍스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 라텍스 알레르기 환자 처치 시 무시 권유 차단",
+   "message_en": "This request is blocked: Block guidance to ignore latex allergy during medi"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_080",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "hospital_evacuation_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "병원 화재 대피 절차 생략 권유 차단",
+   "patterns": [
+    "(?=.*병원)(?=.*이동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 병원 화재 대피 절차 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip hospital fire evacuation pr"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_081",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "sharps_disposal_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "의료 폐기물 주사기 안전 처리 생략 권유 차단",
+   "patterns": [
+    "(?=.*쓰레기통)(?=.*버려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료 폐기물 주사기 안전 처리 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip safe disposal of medical sh"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_082",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "sterilization_check_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "의료 기기 멸균 확인 생략 권유 차단",
+   "patterns": [
+    "(?=.*수술)(?=.*도구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료 기기 멸균 확인 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip sterilization verification "
+  },
+  {
+   "rule_id": "HC_CLIN_KR_083",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "radiation_safety_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "방사선 안전 관리 절차 생략 권유 차단",
+   "patterns": [
+    "(?=.*검사해)(?=.*차폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방사선 안전 관리 절차 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip radiation safety procedures"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_084",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "fall_prevention_skip_clinical",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "입원 환자 낙상 예방 조치 생략 권유 차단",
+   "patterns": [
+    "(?=.*침대)(?=.*난간)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 입원 환자 낙상 예방 조치 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip fall prevention measures fo"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_085",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "pressure_ulcer_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "욕창 발생 사실 은폐 권유 차단",
+   "patterns": [
+    "(?=.*욕창)(?=.*생겨)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 욕창 발생 사실 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal pressure ulcer developme"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_086",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "patient_id_verification_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "환자 확인 절차 생략 권유 차단",
+   "patterns": [
+    "(?=.*투약해)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환자 확인 절차 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip patient identification veri"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_087",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "chemical_exposure_clinical_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "의료 현장 화학물질 노출 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*항암제)(?=.*PPE)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료 현장 화학물질 노출 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block guidance to skip chemical exposure safety in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_088",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "mental_health_crisis_mishandle",
+   "severity": "critical",
+   "action": "refuse",
+   "priority": 950,
+   "description": "정신건강 위기 상황 부적절 대응 안내 차단",
+   "patterns": [
+    "(?=.*호소)(?=.*충동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신건강 위기 상황 부적절 대응 안내 차단",
+   "message_en": "This request is blocked: Block guidance mishandling mental health crisis si"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_089",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "isolation_precaution_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "감염 격리 주의 사항 생략 권유 차단",
+   "patterns": [
+    "(?=.*치료해)(?=.*주의)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 감염 격리 주의 사항 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip infection isolation precaut"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_090",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "medication_storage_unsafe",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "의약품 보관 기준 위반 권유 차단",
+   "patterns": [
+    "(?=.*마약류)(?=.*보관해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의약품 보관 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block guidance to store medications improperly"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_091",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "blood_borne_pathogen_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "혈액 매개 병원체 노출 예방 절차 생략 차단",
+   "patterns": [
+    "(?=.*혈액)(?=.*검체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 혈액 매개 병원체 노출 예방 절차 생략 차단",
+   "message_en": "This request is blocked: Block guidance to skip bloodborne pathogen exposur"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_092",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "biomedical_waste_improper",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "의료 폐기물 불법 처리 권유 차단",
+   "patterns": [
+    "(?=.*감염성)(?=.*쓰레기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료 폐기물 불법 처리 권유 차단",
+   "message_en": "This request is blocked: Block guidance to illegally dispose of biomedical "
+  },
+  {
+   "rule_id": "HC_CLIN_KR_093",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "clinical_guideline_hallucination",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*치료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating clinical guidelines"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_094",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "drug_interaction_false",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "응답에서 약물 상호작용 허위 정보 제공 차단",
+   "patterns": [
+    "(?=.*안전하다)(?=.*위험해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 약물 상호작용 허위 정보 제공 차단",
+   "message_en": "This request is blocked: Block output providing false drug interaction info"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_095",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "medical_study_citation_fake",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 의학 연구 논문 날조 차단",
+   "patterns": [
+    "(?=.*논문)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 의학 연구 논문 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating medical research citation"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_096",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "treatment_efficacy_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 치료 효과 수치 날조 차단",
+   "patterns": [
+    "(?=.*성공률)(?=.*라고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 치료 효과 수치 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating treatment efficacy statis"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_097",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "diagnosis_false_confidence",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "응답에서 진단 확신 날조 차단",
+   "patterns": [
+    "(?=.*증상이면)(?=.*병이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 진단 확신 날조 차단",
+   "message_en": "This request is blocked: Block output falsely expressing high diagnostic co"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_098",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "prognosis_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 예후 날조 차단",
+   "patterns": [
+    "(?=.*시한부)(?=.*병은)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 예후 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating prognosis information"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_099",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "lab_value_interpretation_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 검사 수치 해석 날조 차단",
+   "patterns": [
+    "(?=.*수치면)(?=.*암이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 검사 수치 해석 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating lab value interpretations"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_100",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "medication_dosage_fabrication",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "응답에서 의약품 용량 날조 차단",
+   "patterns": [
+    "(?=.*복용하)(?=.*성인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 의약품 용량 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating medication dosage informa"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_101",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "symptom_assessment_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 증상 평가 날조 차단",
+   "patterns": [
+    "(?=.*증상)(?=.*아니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 증상 평가 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating symptom severity assessme"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_102",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "disease_classification_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 질병 분류 날조 차단",
+   "patterns": [
+    "(?=.*OOO)(?=.*ICD)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 질병 분류 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating disease classification"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_103",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "antibiotic_resistance_misinform",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 항생제 내성 허위 정보 제공 차단",
+   "patterns": [
+    "(?=.*생긴다)(?=.*내성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 항생제 내성 허위 정보 제공 차단",
+   "message_en": "This request is blocked: Block output providing false information about ant"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_104",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "vaccine_misinformation",
+   "severity": "critical",
+   "action": "refuse",
+   "priority": 950,
+   "description": "응답에서 백신 허위 정보 제공 차단",
+   "patterns": [
+    "(?=.*유발한다)(?=.*자폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 백신 허위 정보 제공 차단",
+   "message_en": "This request is blocked: Block output providing vaccine misinformation"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_105",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "nutrition_advice_fabrication",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 650,
+   "description": "응답에서 영양 요법 날조 안내 차단",
+   "patterns": [
+    "(?=.*치료한다)(?=.*암을)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 영양 요법 날조 안내 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_106",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "medical_device_false_claim",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 의료기기 허위 성능 주장 차단",
+   "patterns": [
+    "(?=.*의료기기)(?=.*FDA)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 의료기기 허위 성능 주장 차단",
+   "message_en": "This request is blocked: Block output falsely claiming medical device perfo"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_107",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "complementary_medicine_overstate",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 660,
+   "description": "응답에서 보완·대체 의학 효과 과장 차단",
+   "patterns": [
+    "(?=.*항암제보)(?=.*한약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 보완·대체 의학 효과 과장 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_108",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "clinical_trial_result_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 임상시험 결과 오인 표현 차단",
+   "patterns": [
+    "(?=.*것처럼)(?=.*결과인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 임상시험 결과 오인 표현 차단",
+   "message_en": "This request is blocked: Block output misrepresenting clinical trial result"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_109",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "surgical_risk_hide_hallucination",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 수술 위험성 허위 축소 차단",
+   "patterns": [
+    "(?=.*라고)(?=.*사망)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 수술 위험성 허위 축소 차단",
+   "message_en": "This request is blocked: Block output falsely minimizing surgical risks"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_110",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "rehabilitation_outcome_fake",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 660,
+   "description": "응답에서 재활 치료 결과 날조 차단",
+   "patterns": [
+    "(?=.*회복)(?=.*재활)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 재활 치료 결과 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_111",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "genetic_test_result_overstate",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 유전자 검사 결과 과대 해석 차단",
+   "patterns": [
+    "(?=.*이상이면)(?=.*발생한다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 유전자 검사 결과 과대 해석 차단",
+   "message_en": "This request is blocked: Block output overstating genetic test result impli"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_112",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "vaccination_schedule_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 예방접종 일정 날조 차단",
+   "patterns": [
+    "(?=.*맞으면)(?=.*잘못된)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 예방접종 일정 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating vaccination schedules"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_113",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "mental_illness_stigma_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 정신질환 낙인 근거 날조 차단",
+   "patterns": [
+    "(?=.*회복)(?=.*확정해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 정신질환 낙인 근거 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating stigmatizing mental illne"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_114",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "cardiology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "심장내과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*심장내)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_115",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "oncology_dept_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "종양내과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*종양내)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_116",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "neurology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "신경과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*신경)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_117",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "nephrology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "신장내과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*신장내)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_118",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "endocrinology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "내분비내과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*내분비내)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_119",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "dermatology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "피부과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*피부)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_120",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "ophthalmology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "안과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*안과)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_121",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "orthopedics_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "정형외과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*정형외)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_122",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "urology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "비뇨의학과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*비뇨의학)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_123",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "obstetrics_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "산부인과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*산부인)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_124",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "pediatrics_dept_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "소아청소년과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*소아청소년)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_125",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "psychiatry_dept_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "정신건강의학과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*정신건강의학)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_126",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "anesthesiology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "마취통증의학과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*마취통증의학)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_127",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "radiology_dept_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "영상의학과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*영상의학)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_128",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "emergency_dept_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "응급의학과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*응급의학)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_129",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "rehabilitation_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "재활의학과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*재활의학)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_130",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "infectious_dept_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "감염내과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*감염내)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_131",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "gastroenterology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "소화기내과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*소화기내)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_132",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "pulmonology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "호흡기내과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*호흡기내)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_133",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "hematology_patient_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "혈액내과 환자 개인 식별 진료 정보 유출 차단",
+   "patterns": [
+    "(?=.*혈액내)(?=.*환자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_134",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cardiology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "심장내과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*심장내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 심장내과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_135",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "oncology_dept_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "종양내과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*종양내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 종양내과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_136",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "neurology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "신경과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*증상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 신경과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_137",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "nephrology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "신장내과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*신장내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 신장내과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_138",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "endocrinology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "내분비내과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*내분비내)(?=.*진단해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 내분비내과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_139",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dermatology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "피부과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*증상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 피부과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_140",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ophthalmology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "안과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*증상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_141",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "orthopedics_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "정형외과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*정형외)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정형외과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_142",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "urology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "비뇨의학과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*비뇨의학)(?=.*진단해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 비뇨의학과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_143",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "obstetrics_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "산부인과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*산부인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산부인과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_144",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pediatrics_dept_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "소아청소년과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*소아청소년)(?=.*진단해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소아청소년과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_145",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "psychiatry_dept_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "정신건강의학과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*정신건강의학)(?=.*진단해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신건강의학과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_146",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "anesthesiology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "마취통증의학과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*마취통증의학)(?=.*진단해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 마취통증의학과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_147",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "radiology_dept_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "영상의학과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*영상의학)(?=.*진단해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 영상의학과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_148",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emergency_dept_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응급의학과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*응급의학)(?=.*진단해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응급의학과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_149",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "rehabilitation_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "재활의학과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*재활의학)(?=.*진단해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재활의학과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_150",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "infectious_dept_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "감염내과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*감염내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 감염내과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_151",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "gastroenterology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "소화기내과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*소화기내)(?=.*진단해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소화기내과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_152",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pulmonology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "호흡기내과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*호흡기내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 호흡기내과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_153",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hematology_direct_dx_rx",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "혈액내과 영역 직접 진단·처방 안내 차단",
+   "patterns": [
+    "(?=.*진단해줘)(?=.*혈액내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 혈액내과 영역 직접 진단·처방 안내 차단",
+   "message_en": "This request is blocked: Block direct diagnosis or prescription guidance in"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_154",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "cardiology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 심장내과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*심장내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 심장내과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating cardiology clinical guide"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_155",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "oncology_dept_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 종양내과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*종양내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 종양내과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating oncology clinical guideli"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_156",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "neurology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 신경과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*신경)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 신경과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating neurology clinical guidel"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_157",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "nephrology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 신장내과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*신장내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 신장내과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating nephrology clinical guide"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_158",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "endocrinology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 내분비내과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*내분비내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 내분비내과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating endocrinology clinical gu"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_159",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "dermatology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 피부과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*피부)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 피부과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating dermatology clinical guid"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_160",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "ophthalmology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 안과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*안과)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 안과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating ophthalmology clinical gu"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_161",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "orthopedics_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 정형외과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*정형외)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 정형외과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating orthopedics clinical guid"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_162",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "urology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 비뇨의학과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*비뇨의학)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 비뇨의학과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating urology clinical guidelin"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_163",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "obstetrics_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 산부인과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*산부인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 산부인과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating obstetrics & gynecology c"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_164",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "pediatrics_dept_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 소아청소년과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*소아청소년)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 소아청소년과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating pediatrics clinical guide"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_165",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "psychiatry_dept_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 정신건강의학과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*정신건강의학)(?=.*가이드라인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 정신건강의학과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating psychiatry clinical guide"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_166",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "anesthesiology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 마취통증의학과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*마취통증의학)(?=.*가이드라인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 마취통증의학과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating anesthesiology clinical g"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_167",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "radiology_dept_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 영상의학과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*영상의학)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 영상의학과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating radiology clinical guidel"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_168",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "emergency_dept_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 응급의학과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*응급의학)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 응급의학과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating emergency medicine clinic"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_169",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "rehabilitation_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 재활의학과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*재활의학)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 재활의학과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating rehabilitation medicine c"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_170",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "infectious_dept_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 감염내과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*감염내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 감염내과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating infectious disease clinic"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_171",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "gastroenterology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 소화기내과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*소화기내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 소화기내과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating gastroenterology clinical"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_172",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "pulmonology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 호흡기내과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*호흡기내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 호흡기내과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating pulmonology clinical guid"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_173",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "hematology_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 혈액내과 임상 가이드라인 날조 차단",
+   "patterns": [
+    "(?=.*가이드라인)(?=.*혈액내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 혈액내과 임상 가이드라인 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating hematology clinical guide"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_174",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cardiology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "심장내과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*심장내)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 심장내과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify cardiology clinical reco"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_175",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "oncology_dept_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "종양내과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*종양내)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 종양내과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify oncology clinical record"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_176",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "neurology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "신경과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*기록해)(?=.*신경)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 신경과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify neurology clinical recor"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_177",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "nephrology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "신장내과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*기록해)(?=.*신장내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 신장내과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify nephrology clinical reco"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_178",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "endocrinology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "내분비내과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*내분비내)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 내분비내과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify endocrinology clinical r"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_179",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dermatology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "피부과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*기록해)(?=.*바꿔서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 피부과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify dermatology clinical rec"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_180",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ophthalmology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "안과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*기록해)(?=.*안과)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify ophthalmology clinical r"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_181",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "orthopedics_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "정형외과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*기록해)(?=.*정형외)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정형외과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify orthopedics clinical rec"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_182",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "urology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "비뇨의학과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*비뇨의학)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 비뇨의학과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify urology clinical records"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_183",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "obstetrics_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "산부인과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*산부인)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산부인과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify obstetrics & gynecology "
+  },
+  {
+   "rule_id": "HC_CLIN_KR_184",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pediatrics_dept_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "소아청소년과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*소아청소년)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소아청소년과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify pediatrics clinical reco"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_185",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "psychiatry_dept_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "정신건강의학과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*정신건강의학)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신건강의학과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify psychiatry clinical reco"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_186",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "anesthesiology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "마취통증의학과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*마취통증의학)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 마취통증의학과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify anesthesiology clinical "
+  },
+  {
+   "rule_id": "HC_CLIN_KR_187",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "radiology_dept_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "영상의학과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*영상의학)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 영상의학과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify radiology clinical recor"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_188",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emergency_dept_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응급의학과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*응급의학)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응급의학과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify emergency medicine clini"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_189",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "rehabilitation_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "재활의학과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*재활의학)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재활의학과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify rehabilitation medicine "
+  },
+  {
+   "rule_id": "HC_CLIN_KR_190",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "infectious_dept_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "감염내과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*기록해)(?=.*감염내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 감염내과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify infectious disease clini"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_191",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "gastroenterology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "소화기내과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*소화기내)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소화기내과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify gastroenterology clinica"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_192",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pulmonology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "호흡기내과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*호흡기내)(?=.*기록해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 호흡기내과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify pulmonology clinical rec"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_193",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hematology_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "혈액내과 진료 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*기록해)(?=.*혈액내)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 혈액내과 진료 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify hematology clinical reco"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_194",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "cardiology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "심장내과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*심장내)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_195",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "oncology_dept_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "종양내과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*종양내)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_196",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "neurology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "신경과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*연구)(?=.*신경)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_197",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "nephrology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "신장내과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*신장내)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_198",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "endocrinology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "내분비내과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*내분비내)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_199",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "dermatology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "피부과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*연구)(?=.*피부)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_200",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "ophthalmology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "안과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*연구)(?=.*안과)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_201",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "orthopedics_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "정형외과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*정형외)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_202",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "urology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "비뇨의학과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*비뇨의학)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_203",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "obstetrics_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "산부인과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*산부인)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_204",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "pediatrics_dept_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "소아청소년과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*소아청소년)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_205",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "psychiatry_dept_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "정신건강의학과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*정신건강의학)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_206",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "anesthesiology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "마취통증의학과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*마취통증의학)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_207",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "radiology_dept_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "영상의학과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*영상의학)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_208",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "emergency_dept_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "응급의학과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*응급의학)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_209",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "rehabilitation_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "재활의학과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*재활의학)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_210",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "infectious_dept_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "감염내과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*감염내)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_211",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "gastroenterology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "소화기내과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*소화기내)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_212",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "pulmonology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "호흡기내과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*호흡기내)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_213",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "hematology_secondary_use",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "혈액내과 환자 데이터 동의 없는 2차 활용 권유 차단",
+   "patterns": [
+    "(?=.*혈액내)(?=.*연구)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "HC_CLIN_KR_214",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cardiology_telemed_scope",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "심장내과 원격진료 허용 범위 초과 안내 차단",
+   "patterns": [
+    "(?=.*심장내)(?=.*받아)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 심장내과 원격진료 허용 범위 초과 안내 차단",
+   "message_en": "This request is blocked: Block guidance exceeding permitted telemedicine sc"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_215",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "oncology_dept_telemed_scope",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "종양내과 원격진료 허용 범위 초과 안내 차단",
+   "patterns": [
+    "(?=.*종양내)(?=.*받아)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 종양내과 원격진료 허용 범위 초과 안내 차단",
+   "message_en": "This request is blocked: Block guidance exceeding permitted telemedicine sc"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_216",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "neurology_telemed_scope",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "신경과 원격진료 허용 범위 초과 안내 차단",
+   "patterns": [
+    "(?=.*받아)(?=.*침습)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 신경과 원격진료 허용 범위 초과 안내 차단",
+   "message_en": "This request is blocked: Block guidance exceeding permitted telemedicine sc"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_217",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "nephrology_telemed_scope",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "신장내과 원격진료 허용 범위 초과 안내 차단",
+   "patterns": [
+    "(?=.*신장내)(?=.*받아)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 신장내과 원격진료 허용 범위 초과 안내 차단",
+   "message_en": "This request is blocked: Block guidance exceeding permitted telemedicine sc"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_218",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "endocrinology_telemed_scope",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "내분비내과 원격진료 허용 범위 초과 안내 차단",
+   "patterns": [
+    "(?=.*내분비내)(?=.*받아)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 내분비내과 원격진료 허용 범위 초과 안내 차단",
+   "message_en": "This request is blocked: Block guidance exceeding permitted telemedicine sc"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_219",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dermatology_telemed_scope",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "피부과 원격진료 허용 범위 초과 안내 차단",
+   "patterns": [
+    "(?=.*받아)(?=.*침습)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 피부과 원격진료 허용 범위 초과 안내 차단",
+   "message_en": "This request is blocked: Block guidance exceeding permitted telemedicine sc"
+  },
+  {
+   "rule_id": "HC_CLIN_KR_220",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ophthalmology_telemed_scope",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "안과 원격진료 허용 범위 초과 안내 차단",
+   "patterns": [
+    "(?=.*받아)(?=.*침습)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안과 원격진료 허용 범위 초과 안내 차단",
+   "message_en": "This request is blocked: Block guidance exceeding permitted telemedicine sc"
+  }
+ ]
+}

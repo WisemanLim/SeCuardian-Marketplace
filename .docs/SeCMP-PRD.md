@@ -66,7 +66,7 @@
 | **F-WF** | **Workflow 내장 에이전트** | P0 | DAG 워크플로우 엔진 + Designer(React Flow). 7노드(trigger/agent/llm/condition/hitl/transform/notify), 실행 상태머신, SSE, retry. **자체 DAG 기본 + Dify DSL/API 호환 어댑터**(§7.2) |
 | **F-RAG** | **RAG/지식베이스 내장 에이전트** | P0 | 문서 수집→임베딩→벡터DB→하이브리드 검색(BM25+dense+RRF)→리랭크. pgvector 기본, Qdrant 확장 |
 | **F-PG** | **Playground 내장 에이전트** | P1 | 프롬프트/에이전트/RAG/워크플로우 대화형 실험·비교·평가(eval) 표면 |
-| **F-GRD** | **Guardrails 내장 에이전트** | P0 | wise-Guardrails(MCP Server, `/mcp/tools/validate_input\|validate_output`) 연동 거버넌스 에이전트. **1차는 `global`(PII/신용정보) 도메인 판정만 실기능**, 25종 업종 규칙셋은 카탈로그 조회만 가능(판정 미지원 — §7.8 Critical Finding). 에이전트별 도메인 활성화는 **SeCMP 자체 DB에서 소유·강제**(업스트림 미강제) |
+| **F-GRD** | **Guardrails 내장 에이전트** | P0 | wise-Guardrails(MCP Server, `/mcp/tools/validate_input\|validate_output`) 연동 거버넌스 에이전트. **`global`(PII/신용정보) 은 무조건 필수 판정**. **impl/21: 업종 도메인(금융·의료·제조·공공행정 등 24종) 규칙셋 전체를 에이전트 내부 데이터(`app/data/guardrails/`)로 관리**하고, classifier 규칙에는 **regex 를 생성**해 결정적 부분판정 + examplesPositive 휴리스틱으로 적용. 도메인 카탈로그에서 **필수(global) 외 도메인은 `필터적용` 토글**로 테스트 시 적용 유무를 반영(다도메인 동시 판정). 전체 ML classifier(패러프레이즈)까지의 판정은 여전히 로드맵. 에이전트별 도메인 활성화는 **SeCMP 자체 DB에서 소유·강제**(업스트림 미강제) |
 | **F-GOV** | **거버넌스·보안 공통** | P0 | OWASP LLM Top10 통제, HITL 게이트, 감사로그(tenant/user/prompt·model version), 시크릿 매니저 연동 |
 | **F-ENV** | **환경 분리 + 멀티테넌시 설정** | P0 | `.env.local`/dev/staging/prod. SaaS(LLM/Vector) 설정 포함 가능한 `.env.example`(하이브리드). 멀티테넌시 격리 수준 `.env` 확장(§7.4) |
 | **F-AI** | **AI Assistant / Orchestrator (필수 내장)** | P0 | SeCuardian Orchestrator(classify→gather→synthesize, in-proc `call_api`) + AI Assistant 를 **기본 필수 내장**(`tbl_agent_config.agent_key='assistant'`, `is_required=true`). Orchestrator 모델은 `orchestrator_model`/`domain_agent_model`(tbl_settings/env). **마켓플레이스·RAG·워크플로우가 공유 LLM(`app/services/llm.py`)·Assistant 를 차후 사용**(워크플로우 `llm` 노드 실동작이 1차 소비처). Claude 주 / Ollama 폴백 / degrade. (§7.11.1) |
@@ -87,7 +87,7 @@
 - 인프로세스 Addon의 **강한 샌드박스(컨테이너 격리)** — 1차는 admin-trust 경계 + Standalone export로 대응(§7 리스크 참조).
 - 대규모 분산 벡터DB(Milvus, 20M+) — 로드맵 후반(§8).
 - 워크플로우 **loop/sub-flow, cron 스케줄** — 1차 DAG(순차/분기/병렬)만. (Flow-Template와 동일 유보, 단 로드맵 명시)
-- **Guardrails 업종별(25종) 규칙셋의 실제 판정기 구현** — wise-Guardrails 자체에 판정 백엔드가 없음(§7.8.0). SeCMP는 카탈로그 노출까지만 담당하고, 판정기 개발은 wise-Guardrails 프로젝트의 별도 로드맵.
+- **Guardrails 업종별 규칙셋의 완전 ML classifier(패러프레이즈·문맥) 판정** — impl/21 에서 규칙 데이터 전체를 에이전트에 내재화하고 classifier 규칙에 **생성 regex + examplesPositive 휴리스틱**으로 결정적 부분판정까지는 제공하나, 학습형 분류기(임의 표현 탐지)는 여전히 로드맵(LLM classifier 옵션 §7.8.7).
 - Dify **런타임 이관**(엔진 교체) — 1차는 자체 DAG 유지. Dify는 §7.2.2의 향후 적용 방안으로만 설계(즉시 구현 아님).
 
 ---
@@ -467,6 +467,30 @@ GET    /api/guardrails/decisions?agent_key=&limit=  # guardrails_decision_log �
 2. **"`Guardrails-Service/scripts/` 도메인별 규칙셋 사용 가능하게"** → `guardrails_domain_catalog`가 카탈로그를 노출하되, **§7.8.0의 실판정 범위 한정을 함께 고지** — 사용 가능 = "조회·선택 가능"이지 25종 전체가 "판정 가능"은 아님을 제품적으로 명확히 함(허위 기능 표기 방지).
 3. **"도메인별 적용여부를 에이전트 단위로 토글"** → `agent_guardrail_config` 테이블 + `PUT /api/guardrails/agents/{agent_key}/config`로 정확히 충족. 업스트림이 인가를 강제하지 않으므로 **SeCMP가 유일한 강제 지점**이라는 점이 설계의 핵심.
 
+### 7.8.7 도메인별 필터 확장 (impl/21) — 규칙 데이터 내재화 + regex 생성 + 필터적용 토글
+
+**요구(사용자, 2026-07-08)**: `global`(PII/신용정보, **무조건 필수**) 외에도 wise-Guardrails 규칙 데이터를 참고해 **도메인별로 모두 적용**한다. 도메인 카탈로그에서 **필수 도메인 외에는 `필터적용` 토글**로 테스트 시 해당 필터의 적용 유무를 반영한다. 결과적으로 **모든 도메인 규칙 JSON 을 가드레일 에이전트가 내부 데이터로 관리**한다.
+
+**설계 결정(사용자 확정)**: "Regex subset + examplesPositive 휴리스틱"을 기본으로 하되, classifier 전용 산업 도메인 규칙에도 **regex 를 생성**해 에이전트 내부 데이터로 관리.
+
+- **데이터 내재화**: `scripts/build_guardrails_data.py` 가 wise-Guardrails `Guardrails-Service/scripts/*.kr.json`(+en) 을 읽어 `app/data/guardrails/<domain>.json` + `_manifest.json` 으로 컴파일(재실행 가능·멱등). 소스 경로는 `GUARDRAILS_SCRIPTS_DIR`(기본값 = wise-Guardrails scripts). 런타임은 wise-Guardrails 원본에 의존하지 않고 **컴파일된 내부 데이터만** 로드.
+- **regex 생성**: `patternType=regex|regex+classifier` 는 원본 `patterns.regex` 를 그대로 사용. `patternType=classifier`(regex 없음) 는 `examplesPositive`(+subCategory) 에서 한국어 키워드를 추출해 **보수적 키워드-공기(AND-of-lookahead) regex 를 생성**(`generated:true` 표기). 키워드 도출 실패 시 해당 규칙은 regex 없이 유지(오탐 억제).
+- **판정 경로**: `app/services/guardrails_rules.py`(컴파일 데이터 로드·regex 컴파일·캐시) → `guardrails_detector.detect_domain/decide_multi`(다도메인 동시 판정, 도메인별 breakdown + 통합 결정=최고 severity). 기존 `global` 13종 하드코딩은 컴파일 데이터 부재 시 폴백으로 유지(무데이터 CI 안전).
+- **필터적용 토글**: `guardrails_domain_catalog.filter_enabled`(신규 컬럼). `global` 은 `required`(항상 1, 토글 잠금). `PUT /api/guardrails/domains/{domain_key}/filter {enabled}` (admin). `/api/guardrails/test` 는 **global(필수) + filter_enabled=1 도메인**(또는 요청 `domains[]`)을 동시 평가.
+- **카탈로그 상태**: `functional`(regex 실판정, global) / `heuristic`(regex 생성·휴리스틱 적용) / `catalog_only`(규칙 없음). `regex_rule_count` 컬럼으로 실판정 가능 규칙 수 노출(허위 기능 표기 방지 — §7.8.0 원칙 유지).
+
+**impl/23 — 완전판정(LLM classifier) + 휴리스틱 과탐 완화**:
+- **LLM classifier(완전판정)**: `guardrails_classifier_enabled=true`(기본 off·비결정적·LLM 구성 필요) 시, `/test`(및 확장 시 게이트)가 regex 판정 후 **규칙 데이터를 LLM 메뉴로 제시해 패러프레이즈/문맥 위반을 판정**한다. 도메인당 `guardrails_classifier_max_rules`(기본 40) 규칙을 우선순위(priority)순으로 제시, regex 기매치 규칙은 제외. 공유 LLM(`call_ollama`, Claude/Ollama 폴백) JSON 응답 파싱 → 위반 rule_id 를 매치로 병합. LLM 미구성/장애/파싱실패 시 regex 결과로 **무중단 degrade**(결정적 폴백 유지). 결과 `source="rules+llm"`.
+- **휴리스틱 과탐 완화**: 생성 regex 의 오탐(단일 흔한 키워드, 예 "수수료")을 줄이기 위해 (1) **교차도메인 문서빈도(DF) 필터** — 여러 도메인 예시에 두루 등장하는 저정보 토큰 제외, (2) **단일 키워드 게이트** — 규칙당 키워드 2개 공기(AND) 우선, 단일 키워드는 저빈도(DF≤2)+길이≥3 일 때만 허용(그 외는 regex 미생성 → classifier 로 이관). 컴파일 데이터에 `description`·`priority` 추가(LLM 메뉴·정렬용).
+- **완전판정 요약**: regex(결정적, 무LLM) + LLM classifier(패러프레이즈, 옵션)의 2단으로 도메인 규칙을 **완전 판정**한다. classifier off 환경에서도 regex 로 결정적 부분판정은 항상 동작.
+- **룰셋 정제 — 실판정+휴리스틱 공존(impl/23)**: 각 규칙에 **detection mode 태그**(`mode`: `regex`=원본 실판정 / `heuristic`=생성 regex / `classifier`=LLM 전용)를 부여해 한 도메인 안에서 **실판정 규칙과 휴리스틱 규칙이 함께 적용**된다. 카탈로그는 `regex_rule_count`(실판정) + `heuristic_rule_count`(휴리스틱)를 분리 노출. 컴파일 시 rule_id·정규식 **중복 제거**로 룰셋을 정제.
+- **필터적용 토글 견고화(impl/23)**: 프론트 토글을 **낙관적 업데이트 + 오류 표면화**로 개선(무음 실패 제거). 백엔드 `PUT /domains/{key}/filter` 정상 확인. **전체 선택/해제 토글**을 도메인 체크박스와 동일 형태로 `필터적용 N/M 도메인` 우측에 배치(필수 도메인 제외 일괄 적용).
+- **emb_guardrails 룰셋 번들(impl/23)**: `addon-agents/zip/emb_guardrails/` ADDON 패키지에 컴파일 룰셋 데이터(`data/guardrails/`)를 **동봉**해 자기완결 배포되도록 함.
+
+### 7.8.8 내장 에이전트 ADDON 패키징 (impl/22) — 누락된 emb_ 패키지 생성
+
+추가 개발된 내장 에이전트(`marketplace`·`workflow`·`rag`·`playground`·`guardrails`)는 네이티브 라우터(Path A)로만 존재하고 `addon-agents/zip/` 에 **`emb_*` ADDON 패키지가 누락**돼 있었다(13종 보안 시스템 에이전트는 이미 존재). emb_ 규약(addon-agents/README §emb_ prefix)에 따라 `addon-agents/zip/emb_{marketplace,workflow,rag,playground,guardrails}/`(`-app.py`+`-meta.json`) + `.zip` 을 생성한다. `meta.json.base_agent` 는 원본 네이티브 라우터(`app/routers/router_{key}.py`, platform SeCuardian-Marketplace)를 가리키고, `-app.py` 는 로더 `/api/addon/emb_{key}` 마운트용 ADDON 판(대표 엔드포인트 이식, `from __future__ import annotations` 금지 — README 경고). 내장 에이전트 자체 key·표출명에는 emb_ 를 붙이지 않는다(패키징에만 적용).
+
 ### 7.9 비기능 요구사항 (NFR)
 
 | 범주 | 요구 |
@@ -512,9 +536,10 @@ GET    /api/guardrails/decisions?agent_key=&limit=  # guardrails_decision_log �
 
 **프론트 스택**(§4 확정): React 19 + Vite 7 + React-Router 7 + TanStack Query 5 + Tailwind 4 SPA(`front/`). dev 프록시(`/api`,`/health` → 백엔드 :8000). `make dev-fe`/`dev-be` 분리 기동.
 
-- **레이아웃**: 좌측 nav — 상단 스크롤 그룹(대시보드 / AI 어시스턴트 / 에이전트 / 내장 에이전트: 마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일) + **하단 고정: 사용자 관리(admin/supervisor) → 로그인 사용자 블록**(impl/12: '사용자'를 로그인 사용자 바로 위로 재배치). 헤더 역할 스위처(dev: `X-User`/`X-Role`/`X-Tenant-Id` 헤더 주입, 실 JWT/IAM 은 F-GOV 대체).
-- **화면**: 대시보드(`/api/agents` 카탈로그+헬스), 마켓플레이스(카탈로그·등록·설치/해제), 워크플로우(목록·**폼 기반 노드/엣지 편집기**·실행), 워크플로우 상세(상태·노드 타임라인·HITL 승인/거부·SSE), RAG(컬렉션·수집·하이브리드 검색).
+- **레이아웃**: 좌측 nav — 상단 스크롤 그룹(대시보드 / AI 어시스턴트 / 내장 에이전트: 마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일) + **하단 고정: 사용자 관리(admin/supervisor) → 로그인 사용자 블록**(impl/12). 헤더 역할 스위처(dev: `X-User`/`X-Role`/`X-Tenant-Id` 헤더 주입, 실 JWT/IAM 은 F-GOV 대체). **impl/20: 별도 `에이전트 관리` 메뉴 제거 — 마켓플레이스 메뉴로 통합**.
+- **화면**: 대시보드(`/api/agents` 카탈로그+헬스), **마켓플레이스 = 통합 에이전트 허브**(상단탭 `내장`(한정 7종: Orchestrator·AI 어시스턴트·마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일)/`시스템`(그 외)/`Addon`; 시스템 탭에 `자산 등록`+자산 카탈로그[로컬·원격 설치/해제]), 워크플로우(목록·**폼 기반 노드/엣지 편집기**·실행), 워크플로우 상세(상태·노드 타임라인·HITL 승인/거부·SSE), RAG(컬렉션·수집·하이브리드 검색). **내장 5종(마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일)은 `is_required=1`(REQUIRED) — 비활성 불가**(impl/20).
 - **접근성(KWCAG 2.2, govtech 하드 요구)**: 워크플로우 캔버스 대신 **키보드 전용 폼/리스트 편집기**를 1차 제공(React Flow 캔버스는 E3 확장). 포커스 가시성, `aria-label`, 스킵 링크, `role="alert"` 오류.
+- **화면 정렬 표준(impl/24)**: 모든 에이전트 화면 루트는 **`.page` 클래스**(`front/src/index.css`, `@apply w-full max-w-6xl p-4 sm:p-6`)로 **좌측정렬·반응형·최대폭 제한**을 통일한다. `mx-auto`(가운데 정렬) 금지. 신규 에이전트(내장·Addon) 개발 시 화면 최상위 컨테이너에 `.page` 를 적용하는 것을 기준으로 한다(addon-agents 가이드 반영). **예외: AI 어시스턴트(ChatPage)** 는 전체높이 채팅 레이아웃으로 현행 유지.
 
 **Setup Wizard(F-SETUP, SeCuardian F6 준용)** — `router_setup.py`(`/api/setup`, **인증 불필요**, setup 완료 전 상태):
 ```
@@ -618,7 +643,7 @@ POST /api/setup/complete       # tbl_settings.setup_completed = true
 |---|---|---|---|
 | **F-AI** AI Assistant/Orchestrator | ✅ | `app/agents/orchestrator.py`·`base_agent.py`, `router_agent.py`, `services/llm_fallback.py`·`ollama_warmup.py`, `rules/keyword_matcher.py`, seed `general`(is_required)+`chat` | 없음(핵심 준용 완료). 공유 `services/llm.py` 는 미분리(orchestrator 내부) |
 | **F-SETUP** Setup Wizard | ✅ | `router_setup.py`(`/api/setup/*`), `front/src/pages/setup/SetupWizard.tsx`, `tbl_users`·`tbl_settings` | 없음 |
-| **F-WEB** 웹 포털 | 🟡 | SPA: Login·Chat·Agents·Users·Settings·Profile·Addon(+modals) **+ Marketplace·Workflow·RAG·Playground·Guardrails(impl/3~6) + Dashboard(impl/8)**, `App.tsx` route 6종(루트=`/dashboard`) + nav/헤더타이틀/i18n(ko/en). 대시보드 요약+빠른링크. **impl/17: 실시간 위젯**(`/api/dashboard/summary`·`/activity`, 10초 폴링·활동 통계·최근활동). **impl/18: 워크플로우 React Flow 캔버스**. (tsc/build 0오류) | 편집형 캔버스·SSE 푸시·시계열 차트 로드맵 |
+| **F-WEB** 웹 포털 | 🟡 | SPA: Login·Chat·Users·Settings·Profile·Addon(+modals) **+ Marketplace·Workflow·RAG·Playground·Guardrails(impl/3~6) + Dashboard(impl/8)**, nav/헤더타이틀/i18n(ko/en). 대시보드 요약+빠른링크. **impl/17: 실시간 위젯**. **impl/18: 워크플로우 React Flow 캔버스**. **impl/20: 에이전트 관리↔마켓플레이스 통합** — `에이전트 관리` nav 제거, `/marketplace` 가 통합 허브(`내장`/`시스템`/`Addon` 3탭)를 렌더(`/agents`→`/marketplace` 리다이렉트), 시스템 탭에 `자산 등록`+자산 카탈로그 편입. (tsc/build 0오류) | 편집형 캔버스·SSE 푸시·시계열 차트 로드맵 |
 | **F-OPS** Makefile/DB 초기화 | 🟡 | 코어 타겟 `up/down/local-all/local-stop/dev-be/dev-fe/db-reset/seed/db-fresh/test/lint` + `ecosystem.config.js` + `scripts/{db_reset,seed,seed_local}.py` | ⚠ 삭제된 모니터 타겟(`keycloak-*`/`vault-*`/`harbor-*`/`wazuh-*`/`caddy-*`/`crowdsec-*` 등) 다수 잔존 → 정리 필요 |
 | **F-ENV** 환경 분리 | 🟡 | `.env.{local,dev,staging,prod}` + `.env.example`(코어 **+ MARKETPLACE_*/TENANT_*/GUARDRAILS_*/VECTOR_BACKEND, impl/1**), `config.py`(동일 필드), `docker-compose*.yml`. 신규 marketplace 테이블 `tenant_id` 선반영 | dev/staging/prod `.env.*` 파일에 신규키 반영 확인, 그 외 신규 테이블 `tenant_id` 지속 적용 |
 | **F-GOV** 거버넌스·보안 | 🟡 | `tbl_audit_log` 존재 | HITL 게이트/`tbl_hitl_approvals` 없음, OWASP 스코어카드·시크릿 매니저·SBOM 미구현 |
@@ -681,6 +706,10 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-09 | v0.19 | **impl/24 — 화면 정렬 표준화**(사용자 요구, §7.11). 대시보드·워크플로우·RAG·플레이그라운드·가드레일이 `max-w-4xl/5xl mx-auto`(가운데)로 제각각이던 것을 마켓플레이스식 **좌측정렬·반응형**으로 통일. `front/src/index.css` 에 **`.page` 표준 클래스**(`w-full max-w-6xl p-4 sm:p-6`) 정의 후 전 화면 루트에 적용, `mx-auto` 제거. addon-agents front(emb_server-shell + 템플릿 Board/ShellAgent/UserManager)도 동일 적용, addon 가이드에 표준 명시. **AI 어시스턴트(ChatPage)는 사용자 지시로 현행 유지(제외)**. 프론트 tsc/build 0오류. 시험 test/impl/22. |
+| 2026-07-09 | v0.18 | **impl/23 — F-GRD 완전판정(LLM classifier) + 생성 regex 과탐 완화**(사용자 요구, §7.8.7). (1) `guardrails_classifier_enabled`(기본 off) 시 `/test` 가 regex 후 규칙 메뉴(도메인당 `guardrails_classifier_max_rules`=40, priority순, 기매치 제외)를 LLM(`call_ollama`)에 제시해 패러프레이즈 위반 판정 → `decide_multi_llm`, `source="rules+llm"`, degrade-safe. (2) 컴파일러 `build_guardrails_data.py` 에 **교차도메인 DF 필터 + 단일 키워드 게이트**(DF≤2·len≥3만 단독 허용) 적용해 흔한 키워드 오탐 축소, 규칙에 `description`·`priority`·`mode` 추가·중복 제거. (3) 룰셋 정제 — 규칙별 **실판정(regex)+휴리스틱 공존**, 카탈로그 `regex_rule_count`+`heuristic_rule_count` 분리. (4) 프론트 `필터적용` 토글 **낙관적 업데이트+오류 표면화**(무음 실패 버그 수정). (5) `emb_guardrails` ADDON 에 룰셋 데이터 동봉. 룰스토어 `classifier_candidates()`, 프론트 판정 소스 표기. 시험 test/impl/21. |
+| 2026-07-08 | v0.17 | **impl/21 — F-GRD 도메인별 필터 확장 + impl/22 — 누락 emb_ 내장 패키지 생성**(사용자 추가 요구). **impl/21**(§7.8.7): wise-Guardrails 규칙 데이터 24개 업종 도메인 전체를 `scripts/build_guardrails_data.py` 로 `app/data/guardrails/` 에 컴파일 내재화, classifier 규칙에 **regex 생성**(generated). `guardrails_rules.py` 룰스토어 + `guardrails_detector.decide_multi`(다도메인). `guardrails_domain_catalog.filter_enabled` 컬럼 + `PUT /domains/{key}/filter` 토글(global=필수 잠금), `/test` 다도메인 평가. 프론트 카탈로그 `필터적용` 토글 + 도메인별 결과. **impl/22**(§7.8.8): `emb_{marketplace,workflow,rag,playground,guardrails}` ADDON 패키지 생성(`-app.py`+`-meta.json`+`.zip`, base_agent→네이티브 라우터). |
+| 2026-07-08 | v0.16 | **impl/20 — 에이전트 관리·마켓플레이스 통합(UI 재구성)**(사용자 추가 요구). (1) 내장 에이전트 **마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일 5종을 `is_required=1`(REQUIRED)** 로 승격(sqlite/pg `02_seed.sql` + 라이브 DB). (2) 에이전트 관리 상단탭을 **`내장 에이전트`(Orchestrator·AI 어시스턴트·마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일 7종 한정) / `시스템 에이전트`(그 외 보안 도메인 등) / `Addon 에이전트`** 3분류로 재구성(`BUILTIN_KEYS` 셋 기준). (3) 기존 마켓플레이스 화면의 **`자산 등록` 버튼을 시스템 에이전트 탭 상단**(Addon 탭 `새 Agent 만들기`와 동일 위치)으로 이동(`registerAsset` 재사용 모달). (4) **좌측 메뉴를 마켓플레이스로 통합** — `에이전트 관리` nav 제거, `/agents`→`/marketplace` 리다이렉트, `/marketplace` 가 통합 허브(3탭)를 렌더, 마켓플레이스 자산 카탈로그(로컬+원격)는 시스템 에이전트 탭 하단에 편입. 프론트 tsc/build 0오류. 백엔드/SQL 계약 무변경(is_required 값만 조정) |
 | 2026-07-08 | v0.15 | **impl/19 — F-PG 토큰 사용량 추적**(관측성 §7.9): `call_ollama` usage_out 연결 → `playground_runs.input_tokens/output_tokens`, 대시보드 토큰 합계·이력 노출(시험 6/6). **+ 브랜딩 통일**: "SeCuardian Platform" → "SeCuardian Marketplace" 전면 변경(orchestrator AI 어시스턴트 정체성 ko/en, AppLayout 헤더타이틀·로고). 잔여 0, boot 26 routes, 회귀 무영향 |
 | 2026-07-08 | v0.14 | **impl/13~18 — §9.5 잔여 6항목 전부 완료**(사용자 "잔여작업 진행", 네트워크 설치 승인). 설치: `@xyflow/react`·`pgvector`·`psycopg[binary]`·`python-gnupg`. **impl/13** F-GRD MCP Server 프록시(`guardrails_mcp.validate`, MCP 우선·실패시 로컬 폴백, 6/6). **impl/14** 로컬 자산 실 ZIP 배포(`marketplace_asset_blobs` + `deploy_zip` 공용 서비스, local install→무중단 마운트, 10/10). **impl/15** F-RAG pgvector 어댑터(`vector_backend` resolve·pg DDL·`<=>` ANN, sqlite 폴백 유지, 6/6). **impl/16** GPG detached 서명검증(`signature.py`, python-gnupg)+mTLS(CA번들·클라이언트인증서), 10/10. **impl/17** 대시보드 실시간 위젯(`/api/dashboard/summary`·`/activity`+10초 폴링, 10/10). **impl/18** F-WF React Flow 캔버스(`WorkflowCanvas`, 읽기전용 시각화, a11y 폼 병존). 전체 회귀: boot 26 routes, 백엔드 14차수 ALL PASS, ruff 신규 0오류, 프론트 tsc/build 0오류(2201 modules). **§9.5 잔여 = 외부 인프라 실측·로드맵만** |
 | 2026-07-08 | v0.1~v0.3 | 초안·Guardrails 상세 확정(기존 이력) |

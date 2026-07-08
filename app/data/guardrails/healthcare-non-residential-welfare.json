@@ -1,0 +1,3413 @@
+{
+ "domain_key": "healthcare-non-residential-welfare",
+ "display_name": "의료(비거주복지)",
+ "display_name_en": "Healthcare (Non-residential Welfare)",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 200,
+ "regex_rule_count": 200,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 200,
+ "rules": [
+  {
+   "rule_id": "HC_NWELF_KR_001",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "child_pii_expose",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "아동 복지대상자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*보호아동)(?=.*신상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동 복지대상자 개인정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of child welfare beneficiary PII"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_002",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "welfare_benefit_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "사회서비스 바우처·급여 부정 수급 지원 차단",
+   "patterns": [
+    "(?=.*바우처)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 사회서비스 바우처·급여 부정 수급 지원 차단",
+   "message_en": "This request is blocked: Block social service voucher/benefit fraud"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_003",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "domestic_violence_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "가정폭력·아동학대 신고 의무 회피 권유 차단",
+   "patterns": [
+    "(?=.*정황)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 가정폭력·아동학대 신고 의무 회피 권유 차단",
+   "message_en": "This request is blocked: Block evasion of domestic violence/child abuse rep"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_004",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "social_worker_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 620,
+   "description": "사회복지사·돌봄 종사자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*요양사)(?=.*집주소)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_005",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "unqualified_service_claim",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 무자격 돌봄·의료 서비스 제공 안내 차단",
+   "patterns": [
+    "(?=.*의료행위)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 무자격 돌봄·의료 서비스 제공 안내 차단",
+   "message_en": "This request is blocked: Block output advising unqualified care/medical ser"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_006",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "home_care_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "방문요양 관련 개인정보 유출 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_007",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "home_nursing_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "방문간호 관련 개인정보 유출 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_008",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "day_care_center_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "주간보호센터 관련 개인정보 유출 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_009",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "child_protection_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "아동보호 관련 개인정보 유출 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_010",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "disability_activity_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "장애인활동지원 관련 개인정보 유출 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_011",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "elderly_visit_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "노인돌봄 관련 개인정보 유출 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_012",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "community_welfare_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "지역사회복지 관련 개인정보 유출 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_013",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "counseling_service_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "상담서비스 관련 개인정보 유출 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_014",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "meal_delivery_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "식사배달 관련 개인정보 유출 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_015",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "emergency_welfare_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "긴급복지 관련 개인정보 유출 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_016",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "youth_support_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "청소년지원 관련 개인정보 유출 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_017",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "single_parent_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "한부모지원 관련 개인정보 유출 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_018",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "multicultural_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "다문화지원 관련 개인정보 유출 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_019",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "homeless_outreach_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "노숙인 아웃리치 관련 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_020",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "addiction_counseling_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "중독상담 관련 개인정보 유출 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_021",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "suicide_prevention_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "자살예방 관련 개인정보 유출 차단",
+   "patterns": [
+    "자살예방"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_022",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "vocational_rehab_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "직업재활 관련 개인정보 유출 차단",
+   "patterns": [
+    "직업재활"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_023",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "respite_visit_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "방문 단기돌봄 관련 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*단기돌봄)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_024",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "self_reliance_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "자활지원 관련 개인정보 유출 차단",
+   "patterns": [
+    "자활지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_025",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "dementia_support_pii_leak",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "치매지원 관련 개인정보 유출 차단",
+   "patterns": [
+    "치매지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_026",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "home_care_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방문요양 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문요양 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for home care"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_027",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "home_nursing_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방문간호 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문간호 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for home nursing"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_028",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "day_care_center_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "주간보호센터 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주간보호센터 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for day care cente"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_029",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "child_protection_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "아동보호 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동보호 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for child protecti"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_030",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disability_activity_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "장애인활동지원 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인활동지원 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for disability act"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_031",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "elderly_visit_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노인돌봄 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인돌봄 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for elderly visiti"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_032",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "community_welfare_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "지역사회복지 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지역사회복지 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for community welf"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_033",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "counseling_service_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "상담서비스 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 상담서비스 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for counseling ser"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_034",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "meal_delivery_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "식사배달 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식사배달 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for meal delivery"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_035",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emergency_welfare_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "긴급복지 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 긴급복지 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for emergency welf"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_036",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "youth_support_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "청소년지원 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 청소년지원 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for youth support"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_037",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "single_parent_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "한부모지원 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 한부모지원 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for single-parent "
+  },
+  {
+   "rule_id": "HC_NWELF_KR_038",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "multicultural_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "다문화지원 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 다문화지원 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for multicultural "
+  },
+  {
+   "rule_id": "HC_NWELF_KR_039",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "homeless_outreach_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노숙인 아웃리치 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 아웃리치 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for homeless outre"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_040",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "addiction_counseling_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "중독상담 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중독상담 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for addiction coun"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_041",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "suicide_prevention_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "자살예방 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "자살예방"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자살예방 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for suicide preven"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_042",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vocational_rehab_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "직업재활 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "직업재활"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 직업재활 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for vocational reh"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_043",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "respite_visit_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방문 단기돌봄 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "(?=.*단기돌봄)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문 단기돌봄 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for respite visit"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_044",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "self_reliance_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "자활지원 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "자활지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자활지원 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for self-reliance "
+  },
+  {
+   "rule_id": "HC_NWELF_KR_045",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dementia_support_compliance_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "치매지원 규제·인증 기준 위반 권유 차단",
+   "patterns": [
+    "치매지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매지원 규제·인증 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block regulatory/cert violation for dementia suppo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_046",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "home_care_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방문요양 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문요양 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for home care"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_047",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "home_nursing_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방문간호 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문간호 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for home nursing"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_048",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "day_care_center_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "주간보호센터 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주간보호센터 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for day care center"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_049",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "child_protection_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "아동보호 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동보호 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for child protection"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_050",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "disability_activity_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "장애인활동지원 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인활동지원 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for disability activit"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_051",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "elderly_visit_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노인돌봄 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인돌봄 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for elderly visiting c"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_052",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "community_welfare_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "지역사회복지 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지역사회복지 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for community welfare"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_053",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "counseling_service_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "상담서비스 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 상담서비스 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for counseling service"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_054",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "meal_delivery_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "식사배달 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식사배달 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for meal delivery"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_055",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "emergency_welfare_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "긴급복지 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 긴급복지 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for emergency welfare"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_056",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "youth_support_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "청소년지원 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 청소년지원 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for youth support"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_057",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "single_parent_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "한부모지원 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 한부모지원 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for single-parent supp"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_058",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "multicultural_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "다문화지원 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 다문화지원 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for multicultural supp"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_059",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "homeless_outreach_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노숙인 아웃리치 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 아웃리치 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for homeless outreach"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_060",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "addiction_counseling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "중독상담 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중독상담 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for addiction counseli"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_061",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "suicide_prevention_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "자살예방 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "자살예방"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자살예방 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for suicide prevention"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_062",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "vocational_rehab_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "직업재활 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "직업재활"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 직업재활 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for vocational rehab"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_063",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "respite_visit_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방문 단기돌봄 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*단기돌봄)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문 단기돌봄 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for respite visit"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_064",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "self_reliance_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "자활지원 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "자활지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자활지원 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for self-reliance supp"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_065",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "dementia_support_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "치매지원 작업·제품 안전 절차 생략 차단",
+   "patterns": [
+    "치매지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매지원 작업·제품 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block safety procedure skip for dementia support"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_066",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "home_care_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방문요양 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문요양 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for hom"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_067",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "home_nursing_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방문간호 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문간호 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for hom"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_068",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "day_care_center_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주간보호센터 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주간보호센터 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for day"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_069",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "child_protection_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "아동보호 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동보호 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for chi"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_070",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disability_activity_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인활동지원 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인활동지원 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for dis"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_071",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "elderly_visit_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인돌봄 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인돌봄 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for eld"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_072",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "community_welfare_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "지역사회복지 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지역사회복지 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for com"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_073",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "counseling_service_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "상담서비스 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 상담서비스 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for cou"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_074",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "meal_delivery_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "식사배달 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식사배달 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for mea"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_075",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emergency_welfare_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "긴급복지 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 긴급복지 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for eme"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_076",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "youth_support_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "청소년지원 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 청소년지원 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for you"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_077",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "single_parent_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "한부모지원 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 한부모지원 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for sin"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_078",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "multicultural_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "다문화지원 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 다문화지원 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for mul"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_079",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "homeless_outreach_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노숙인 아웃리치 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 아웃리치 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for hom"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_080",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "addiction_counseling_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "중독상담 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중독상담 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for add"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_081",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "suicide_prevention_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "자살예방 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "자살예방"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자살예방 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for sui"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_082",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vocational_rehab_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "직업재활 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "직업재활"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 직업재활 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for voc"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_083",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "respite_visit_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방문 단기돌봄 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*단기돌봄)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문 단기돌봄 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for res"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_084",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "self_reliance_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "자활지원 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "자활지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자활지원 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for sel"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_085",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dementia_support_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "치매지원 시험·검사 기록 위·변조 차단",
+   "patterns": [
+    "치매지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매지원 시험·검사 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block test/inspection record falsification for dem"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_086",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "home_care_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방문요양 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문요양 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for home care"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_087",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "home_nursing_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방문간호 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문간호 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for home nursing"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_088",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "day_care_center_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "주간보호센터 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주간보호센터 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for day care cent"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_089",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "child_protection_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "아동보호 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동보호 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for child protect"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_090",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "disability_activity_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "장애인활동지원 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인활동지원 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for disability ac"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_091",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "elderly_visit_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노인돌봄 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인돌봄 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for elderly visit"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_092",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "community_welfare_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "지역사회복지 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지역사회복지 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for community wel"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_093",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "counseling_service_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "상담서비스 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 상담서비스 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for counseling se"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_094",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "meal_delivery_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "식사배달 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식사배달 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for meal delivery"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_095",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "emergency_welfare_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "긴급복지 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 긴급복지 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for emergency wel"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_096",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "youth_support_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "청소년지원 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 청소년지원 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for youth support"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_097",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "single_parent_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "한부모지원 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 한부모지원 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for single-parent"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_098",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "multicultural_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "다문화지원 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 다문화지원 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for multicultural"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_099",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "homeless_outreach_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노숙인 아웃리치 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 아웃리치 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for homeless outr"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_100",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "addiction_counseling_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "중독상담 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중독상담 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for addiction cou"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_101",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "suicide_prevention_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "자살예방 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "자살예방"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자살예방 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for suicide preve"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_102",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "vocational_rehab_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "직업재활 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "직업재활"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 직업재활 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for vocational re"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_103",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "respite_visit_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "방문 단기돌봄 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "(?=.*단기돌봄)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문 단기돌봄 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for respite visit"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_104",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "self_reliance_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "자활지원 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "자활지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자활지원 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for self-reliance"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_105",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "dementia_support_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "치매지원 표시·인증·납품 사기 지원 차단",
+   "patterns": [
+    "치매지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매지원 표시·인증·납품 사기 지원 차단",
+   "message_en": "This request is blocked: Block labeling/cert/supply fraud for dementia supp"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_106",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "home_care_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "방문요양 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_107",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "home_nursing_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "방문간호 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_108",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "day_care_center_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "주간보호센터 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_109",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "child_protection_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "아동보호 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_110",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "disability_activity_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "장애인활동지원 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_111",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "elderly_visit_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "노인돌봄 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_112",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "community_welfare_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "지역사회복지 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_113",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "counseling_service_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "상담서비스 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_114",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "meal_delivery_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "식사배달 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_115",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "emergency_welfare_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "긴급복지 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_116",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "youth_support_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "청소년지원 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_117",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "single_parent_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "한부모지원 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_118",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "multicultural_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "다문화지원 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_119",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "homeless_outreach_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "노숙인 아웃리치 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_120",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "addiction_counseling_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "중독상담 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_121",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "suicide_prevention_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "자살예방 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "자살예방"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_122",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "vocational_rehab_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "직업재활 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "직업재활"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_123",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "respite_visit_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "방문 단기돌봄 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "(?=.*단기돌봄)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_124",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "self_reliance_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "자활지원 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "자활지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_125",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "dementia_support_ip_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "치매지원 공정·배합·설계 영업비밀 추론 차단",
+   "patterns": [
+    "치매지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_NWELF_KR_126",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "home_care_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방문요양 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문요양 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for hom"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_127",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "home_nursing_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방문간호 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문간호 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for hom"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_128",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "day_care_center_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주간보호센터 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주간보호센터 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for day"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_129",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "child_protection_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "아동보호 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동보호 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for chi"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_130",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disability_activity_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인활동지원 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인활동지원 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for dis"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_131",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "elderly_visit_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인돌봄 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인돌봄 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for eld"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_132",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "community_welfare_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "지역사회복지 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지역사회복지 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for com"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_133",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "counseling_service_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "상담서비스 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 상담서비스 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for cou"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_134",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "meal_delivery_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "식사배달 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식사배달 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for mea"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_135",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emergency_welfare_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "긴급복지 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 긴급복지 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for eme"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_136",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "youth_support_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "청소년지원 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 청소년지원 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for you"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_137",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "single_parent_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "한부모지원 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 한부모지원 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for sin"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_138",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "multicultural_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "다문화지원 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 다문화지원 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for mul"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_139",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "homeless_outreach_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노숙인 아웃리치 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 아웃리치 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for hom"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_140",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "addiction_counseling_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "중독상담 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중독상담 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for add"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_141",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "suicide_prevention_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "자살예방 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "자살예방"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자살예방 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for sui"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_142",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vocational_rehab_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "직업재활 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "직업재활"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 직업재활 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for voc"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_143",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "respite_visit_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방문 단기돌봄 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "(?=.*단기돌봄)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문 단기돌봄 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for res"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_144",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "self_reliance_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "자활지원 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "자활지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자활지원 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for sel"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_145",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dementia_support_emission_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "치매지원 배출·폐기물 위반 은폐 차단",
+   "patterns": [
+    "치매지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매지원 배출·폐기물 위반 은폐 차단",
+   "message_en": "This request is blocked: Block emission/waste violation concealment for dem"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_146",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "home_care_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 방문요양 허위 인증·효능 표방 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 방문요양 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for home care"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_147",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "home_nursing_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 방문간호 허위 인증·효능 표방 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 방문간호 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for home nursing"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_148",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "day_care_center_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 주간보호센터 허위 인증·효능 표방 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 주간보호센터 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for day care center"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_149",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "child_protection_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 아동보호 허위 인증·효능 표방 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 아동보호 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for child protection"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_150",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "disability_activity_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 장애인활동지원 허위 인증·효능 표방 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 장애인활동지원 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for disability activ"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_151",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "elderly_visit_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 노인돌봄 허위 인증·효능 표방 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 노인돌봄 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for elderly visiting"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_152",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "community_welfare_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 지역사회복지 허위 인증·효능 표방 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 지역사회복지 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for community welfar"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_153",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "counseling_service_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 상담서비스 허위 인증·효능 표방 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 상담서비스 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for counseling servi"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_154",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "meal_delivery_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 식사배달 허위 인증·효능 표방 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 식사배달 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for meal delivery"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_155",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "emergency_welfare_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 긴급복지 허위 인증·효능 표방 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 긴급복지 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for emergency welfar"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_156",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "youth_support_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 청소년지원 허위 인증·효능 표방 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 청소년지원 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for youth support"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_157",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "single_parent_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 한부모지원 허위 인증·효능 표방 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 한부모지원 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for single-parent su"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_158",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "multicultural_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 다문화지원 허위 인증·효능 표방 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 다문화지원 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for multicultural su"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_159",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "homeless_outreach_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 노숙인 아웃리치 허위 인증·효능 표방 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 노숙인 아웃리치 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for homeless outreac"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_160",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "addiction_counseling_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 중독상담 허위 인증·효능 표방 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 중독상담 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for addiction counse"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_161",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "suicide_prevention_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 자살예방 허위 인증·효능 표방 차단",
+   "patterns": [
+    "자살예방"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 자살예방 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for suicide preventi"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_162",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "vocational_rehab_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 직업재활 허위 인증·효능 표방 차단",
+   "patterns": [
+    "직업재활"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 직업재활 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for vocational rehab"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_163",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "respite_visit_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 방문 단기돌봄 허위 인증·효능 표방 차단",
+   "patterns": [
+    "(?=.*단기돌봄)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 방문 단기돌봄 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for respite visit"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_164",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "self_reliance_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 자활지원 허위 인증·효능 표방 차단",
+   "patterns": [
+    "자활지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 자활지원 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for self-reliance su"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_165",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "dementia_support_cert_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 치매지원 허위 인증·효능 표방 차단",
+   "patterns": [
+    "치매지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 치매지원 허위 인증·효능 표방 차단",
+   "message_en": "This request is blocked: Block output false cert/claim for dementia support"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_166",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "home_care_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방문요양 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문요양 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_167",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "home_nursing_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방문간호 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문간호 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_168",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "day_care_center_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주간보호센터 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주간보호센터 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_169",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "child_protection_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "아동보호 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동보호 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_170",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disability_activity_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인활동지원 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인활동지원 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_171",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "elderly_visit_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인돌봄 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인돌봄 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_172",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "community_welfare_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "지역사회복지 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지역사회복지 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_173",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "counseling_service_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "상담서비스 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 상담서비스 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_174",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "meal_delivery_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "식사배달 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식사배달 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_175",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emergency_welfare_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "긴급복지 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 긴급복지 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_176",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "youth_support_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "청소년지원 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 청소년지원 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_177",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "single_parent_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "한부모지원 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 한부모지원 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_178",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "multicultural_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "다문화지원 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 다문화지원 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_179",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "homeless_outreach_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노숙인 아웃리치 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 아웃리치 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_180",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "addiction_counseling_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "중독상담 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중독상담 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_181",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "suicide_prevention_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "자살예방 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "자살예방"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자살예방 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_182",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vocational_rehab_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "직업재활 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "직업재활"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 직업재활 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_183",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "respite_visit_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방문 단기돌봄 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "(?=.*단기돌봄)(?=.*방문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방문 단기돌봄 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_184",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "self_reliance_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "자활지원 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "자활지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자활지원 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_185",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dementia_support_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "치매지원 사고·하자·리콜 보고 누락 차단",
+   "patterns": [
+    "치매지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매지원 사고·하자·리콜 보고 누락 차단",
+   "message_en": "This request is blocked: Block accident/defect/recall reporting omission fo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_186",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "home_care_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 방문요양 규격·법령 날조 차단",
+   "patterns": [
+    "방문요양"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 방문요양 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating home care standards/laws"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_187",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "home_nursing_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 방문간호 규격·법령 날조 차단",
+   "patterns": [
+    "방문간호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 방문간호 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating home nursing standards/la"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_188",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "day_care_center_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 주간보호센터 규격·법령 날조 차단",
+   "patterns": [
+    "주간보호센터"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 주간보호센터 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating day care center standards"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_189",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "child_protection_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 아동보호 규격·법령 날조 차단",
+   "patterns": [
+    "아동보호"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 아동보호 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating child protection standard"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_190",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "disability_activity_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 장애인활동지원 규격·법령 날조 차단",
+   "patterns": [
+    "장애인활동지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 장애인활동지원 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating disability activity suppo"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_191",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "elderly_visit_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 노인돌봄 규격·법령 날조 차단",
+   "patterns": [
+    "노인돌봄"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 노인돌봄 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating elderly visiting care sta"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_192",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "community_welfare_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 지역사회복지 규격·법령 날조 차단",
+   "patterns": [
+    "지역사회복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 지역사회복지 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating community welfare standar"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_193",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "counseling_service_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 상담서비스 규격·법령 날조 차단",
+   "patterns": [
+    "상담서비스"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 상담서비스 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating counseling service standa"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_194",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "meal_delivery_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 식사배달 규격·법령 날조 차단",
+   "patterns": [
+    "식사배달"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 식사배달 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating meal delivery standards/l"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_195",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "emergency_welfare_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 긴급복지 규격·법령 날조 차단",
+   "patterns": [
+    "긴급복지"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 긴급복지 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating emergency welfare standar"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_196",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "youth_support_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 청소년지원 규격·법령 날조 차단",
+   "patterns": [
+    "청소년지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 청소년지원 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating youth support standards/l"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_197",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "single_parent_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 한부모지원 규격·법령 날조 차단",
+   "patterns": [
+    "한부모지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 한부모지원 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating single-parent support sta"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_198",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "multicultural_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 다문화지원 규격·법령 날조 차단",
+   "patterns": [
+    "다문화지원"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 다문화지원 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating multicultural support sta"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_199",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "homeless_outreach_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 노숙인 아웃리치 규격·법령 날조 차단",
+   "patterns": [
+    "(?=.*아웃리치)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 노숙인 아웃리치 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating homeless outreach standar"
+  },
+  {
+   "rule_id": "HC_NWELF_KR_200",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "addiction_counseling_standard_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 중독상담 규격·법령 날조 차단",
+   "patterns": [
+    "중독상담"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 중독상담 규격·법령 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating addiction counseling stan"
+  }
+ ]
+}

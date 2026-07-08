@@ -3,8 +3,22 @@ import client from "./client";
 export interface GuardrailsDomain {
   domain_key: string;
   display_name: string;
-  status: "functional" | "catalog_only";
+  status: "functional" | "heuristic" | "catalog_only";
   rule_count: number;
+  regex_rule_count: number;
+  real_rule_count?: number;
+  heuristic_rule_count?: number;
+  is_required: number;
+  filter_enabled: number;
+}
+
+export interface GuardrailsPerDomain {
+  domain: string;
+  decision: string;
+  riskScore: number;
+  matchedRules: string[];
+  matchedCount: number;
+  llmMatched?: string[];
 }
 
 export interface AgentGuardrailConfig {
@@ -23,6 +37,8 @@ export interface GuardrailsTestResult {
   redactedText: string;
   decisionId: string;
   evaluatedDomains: string[];
+  perDomain: GuardrailsPerDomain[];
+  source?: string;
 }
 
 export async function listDomains(): Promise<GuardrailsDomain[]> {
@@ -47,9 +63,19 @@ export async function setAgentConfig(
   return data;
 }
 
-export async function testText(text: string, domain = "global", agentKey?: string): Promise<GuardrailsTestResult> {
+export async function testText(
+  text: string, domains?: string[], agentKey?: string,
+): Promise<GuardrailsTestResult> {
   const { data } = await client.post<GuardrailsTestResult>("/guardrails/test", {
-    text, domain, agent_key: agentKey,
+    text, domains, agent_key: agentKey,
   });
+  return data;
+}
+
+/** 도메인 카탈로그 '필터적용' 토글(§7.8.7) — 필수(global) 도메인은 해제 불가(409). */
+export async function setDomainFilter(
+  domainKey: string, enabled: boolean,
+): Promise<{ domain_key: string; filter_enabled: boolean }> {
+  const { data } = await client.put(`/guardrails/domains/${domainKey}/filter`, { enabled });
   return data;
 }

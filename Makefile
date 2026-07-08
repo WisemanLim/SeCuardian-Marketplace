@@ -5,7 +5,7 @@
         dev-all dev-stop dev-logs \
         staging-all staging-stop staging-logs \
         prod-all prod-stop prod-logs \
-        db-reset seed db-fresh
+        db-reset seed db-fresh guardrails-data
 ENV ?= local
 
 # web(front) 이미지에서 배포된 ADDON 화면(front) 제외 여부 (front/Dockerfile 빌드 인자).
@@ -147,6 +147,9 @@ db-reset: ## DB 데이터 삭제 + 스키마 재생성 — 명시적 초기화 (
 
 seed:    ## 기본 설정 + 테스트 계정 삽입 (ENV=prod make seed)
 	$(_DB_RUN) python scripts/seed.py
+
+guardrails-data: ## F-GRD 도메인 규칙 데이터 재컴파일 (GUARDRAILS_SCRIPTS_DIR 로 소스 지정, §7.8.7)
+	$(_DB_RUN) python scripts/build_guardrails_data.py
 
 db-fresh: ## db-reset + seed 순차 실행 — 명시적 초기화 (FORCE=1 로 확인 생략)
 	$(_CONFIRM_DESTRUCTIVE)

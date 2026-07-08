@@ -1,0 +1,3385 @@
+{
+ "domain_key": "manufacturing-food",
+ "display_name": "제조업(식품)",
+ "display_name_en": "Manufacturing (Food)",
+ "status": "functional",
+ "required": false,
+ "rule_count": 200,
+ "regex_rule_count": 186,
+ "real_rule_count": 1,
+ "heuristic_rule_count": 185,
+ "rules": [
+  {
+   "rule_id": "MF_FOOD_KR_001",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "employee_contact",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "생산·품질 담당 직원 연락처 입력 차단",
+   "patterns": [
+    "\\b01[016789][- .]?\\d{3,4}[- .]?\\d{4}\\b"
+   ],
+   "mode": "regex",
+   "generated": false,
+   "message_ko": "직원 연락처 등 개인정보는 입력하지 마세요.",
+   "message_en": "Do not enter employee phone numbers or emails."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_002",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "employee_id_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "사번 + 실명 결합 차단",
+   "patterns": [
+    "(?=.*포장라인)(?=.*사번)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사번과 실명을 함께 입력하지 마세요.",
+   "message_en": "Do not combine employee numbers with real names."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_003",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "worker_health",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 880,
+   "description": "근로자 건강·산재 이력 입력 차단",
+   "patterns": [
+    "(?=.*허리디스크)(?=.*개월째)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "작업자 건강·질병 이력은 입력하지 마세요.",
+   "message_en": "Worker health / injury history is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_004",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "visitor_info",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "공장 방문자 신상정보 + 차량번호 차단",
+   "patterns": [
+    "(?=.*식약처)(?=.*점검관)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "방문자 신상정보는 입력하지 마세요.",
+   "message_en": "Do not enter visitor personal details."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_005",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "supplier_contact",
+   "severity": "medium",
+   "action": "block_or_redact",
+   "priority": 600,
+   "description": "원재료 공급사 담당자 실명+연락처 차단",
+   "patterns": [
+    "(?=.*농산)(?=.*이사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공급사 담당자 실명·연락처는 입력하지 마세요.",
+   "message_en": "Do not enter supplier rep personal contacts."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_006",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "consumer_complaint",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "소비자 클레임 원문 (실명·주소·전화 포함) 차단",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "소비자 실명·연락처 포함 클레임 원문은 차단됩니다.",
+   "message_en": "Raw consumer complaint text with PII is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_007",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "incident_report",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "사고·부상 보고서 + 작업자 식별정보 차단",
+   "patterns": [
+    "(?=.*손가락)(?=.*베임)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "작업자 식별정보 포함 사고 보고서는 가명화 후 입력.",
+   "message_en": "Anonymize worker info before entering incident reports."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_008",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "training_record",
+   "severity": "medium",
+   "action": "block_or_redact",
+   "priority": 600,
+   "description": "안전교육 이수자 명단 (실명·서명) 업로드 차단",
+   "patterns": [
+    "(?=.*안전교육)(?=.*이수자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "안전교육 이수자 명단은 가명 처리 후 업로드하세요.",
+   "message_en": "Anonymize training rosters before upload."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_009",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "cctv_identify",
+   "severity": "medium",
+   "action": "refuse",
+   "priority": 600,
+   "description": "CCTV 영상 내 특정인 식별 요청 차단",
+   "patterns": [
+    "(?=.*CCTV)(?=.*확대해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "CCTV 영상에서 특정인 식별 요청은 거부됩니다.",
+   "message_en": "CCTV-based identification requests are refused."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_010",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "sensory_panel",
+   "severity": "medium",
+   "action": "block_or_pseudonymize",
+   "priority": 600,
+   "description": "관능평가 패널 원본 설문 (실명·연락처) 업로드 차단",
+   "patterns": [
+    "(?=.*관능평)(?=.*포함)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "관능평가 패널의 실명·연락처 포함 설문 원본은 가명화 후 입력.",
+   "message_en": "Anonymize sensory-panel raw forms before upload."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_011",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "expired_food_relabel",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "유통기한 위·변조 요청 차단",
+   "patterns": [
+    "(?=.*재포장해)(?=.*유통기한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "유통기한 위변조 요청은 차단됩니다.",
+   "message_en": "Expired-food relabeling requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_012",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "origin_misrepresentation",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "원산지 표시 변조 요청 차단",
+   "patterns": [
+    "(?=.*국내산)(?=.*표시할)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "원산지 변조 요청은 차단됩니다.",
+   "message_en": "Origin-misrepresentation requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_013",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_omission",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "알레르기 표시 누락 요청 차단",
+   "patterns": [
+    "(?=.*들어있는데)(?=.*땅콩)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "알레르기 표시 누락 요청은 차단됩니다.",
+   "message_en": "Allergen-omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_014",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "health_claim_exaggeration",
+   "severity": "high",
+   "action": "sanitize",
+   "priority": 800,
+   "description": "질병 치료·완치 등 과장 표현 차단",
+   "patterns": [
+    "(?=.*완치한다)(?=.*암을)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "질병 치료·완치 표현은 사용할 수 없습니다.",
+   "message_en": "Disease-cure / miracle-cure claims are sanitized."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_015",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "forbidden_additive",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "허용되지 않는 첨가물 사용 요청 차단",
+   "patterns": [
+    "(?=.*합성착색료)(?=.*금지된)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "허용되지 않는 첨가물 사용 요청은 차단됩니다.",
+   "message_en": "Forbidden-additive requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_016",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "haccp_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "HACCP 절차 우회 요청 차단",
+   "patterns": [
+    "(?=.*HACCP)(?=.*CCP)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "HACCP 절차 우회 요청은 차단됩니다.",
+   "message_en": "HACCP bypass requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_017",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "sop_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "표준작업절차(SOP) 우회 요청 차단",
+   "patterns": [
+    "(?=.*돌릴)(?=.*라인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "SOP 우회 요청은 차단됩니다.",
+   "message_en": "SOP-bypass requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_018",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cleaning_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "위생 청소 절차 건너뛰기 요청 차단",
+   "patterns": [
+    "(?=.*가동해)(?=.*오늘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "위생 청소 절차 건너뛰기 요청은 차단됩니다.",
+   "message_en": "Skipping sanitation cleaning is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_019",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "foreign_object_cover",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "이물질 혼입 사실 은폐 요청 차단",
+   "patterns": [
+    "(?=.*들어갔는데)(?=.*넘어갈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이물질 혼입 은폐 요청은 차단됩니다.",
+   "message_en": "Foreign-object cover-up requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_020",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "secret_recipe",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "비공개 사내 레시피 전체 공개 요청 차단",
+   "patterns": [
+    "(?=.*양념)(?=.*김치)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사내 비공개 레시피는 제공하지 않습니다.",
+   "message_en": "Internal trade-secret recipes are not disclosed."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_021",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "process_parameters",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "정밀 공정 파라미터 (온도·시간·압력) 공개 요청 차단",
+   "patterns": [
+    "(?=.*살균)(?=.*정확)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사내 공정 정밀 파라미터는 공개되지 않습니다.",
+   "message_en": "Internal precise process parameters are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_022",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "supplier_pricing",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "공급사 단가표 + 거래조건 공개 차단",
+   "patterns": [
+    "(?=.*단가표)(?=.*농산)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공급사 단가표는 마스킹됩니다.",
+   "message_en": "Supplier pricing is redacted."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_023",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "rnd_formulation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "R&D 신제품 배합비 공개 요청 차단",
+   "patterns": [
+    "(?=.*신제품)(?=.*음료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "신제품 배합비 공개는 차단됩니다.",
+   "message_en": "R&D formulation disclosure is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_024",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "dangerous_equipment_op",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "위험 설비 직접 조작 지시 요청 차단",
+   "patterns": [
+    "(?=.*열충격)(?=.*시험기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "위험 설비 직접 조작 안내는 차단됩니다.",
+   "message_en": "Dangerous-equipment operation guidance is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_025",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "safety_sensor_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "안전 센서 우회 요청 차단",
+   "patterns": [
+    "(?=.*돌리)(?=.*빨리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "안전 센서 우회 요청은 차단됩니다.",
+   "message_en": "Safety-sensor bypass is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_026",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "pressure_vessel_op",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "압력 용기 강제 조작 요청 차단",
+   "patterns": [
+    "(?=.*안전밸브)(?=.*가압하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "압력 용기 강제 조작 요청은 차단됩니다.",
+   "message_en": "Pressure-vessel forced operation is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_027",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "chemical_misuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "세척용 화학물질 식품 오남용 요청 차단",
+   "patterns": [
+    "(?=.*세척하)(?=.*락스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "세척용 화학물질 식품 오남용 요청은 차단됩니다.",
+   "message_en": "Sanitizer chemical misuse is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_028",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "forklift_unsafe",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 400,
+   "description": "지게차 안전 미준수 행위 경고",
+   "patterns": [
+    "(?=.*안전벨트)(?=.*매도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "지게차 안전 미준수 안내는 권고되지 않습니다.",
+   "message_en": "Unsafe forklift practices are flagged."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_029",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "worker_under_minor",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "미성년자 야간 작업 지시 요청 차단",
+   "patterns": [
+    "(?=.*초등생)(?=.*시키)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 야간 작업 지시는 차단됩니다.",
+   "message_en": "Minor night-shift instructions are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_030",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "regulation_citation_hint",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 400,
+   "description": "식품 관련 법령 인용 시 출처 확인 안내",
+   "patterns": [
+    "(?=.*식품위생법)(?=.*따르면)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "법령 인용 시 식약처 등 공식 출처 확인 필요.",
+   "message_en": "Citations must be verified with MFDS / FDA."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_031",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "export_compliance_hint",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 400,
+   "description": "수출 식품 규정 인용 시 출처 확인 안내",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "수출 규정 인용은 공식 출처 확인이 필요합니다.",
+   "message_en": "Food export citations must be verified."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_032",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "competitor_recipe_inference",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 850,
+   "description": "경쟁사 레시피 역공학 요청 거부",
+   "patterns": [
+    "(?=.*정확한)(?=.*스프)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "경쟁사 레시피 역공학 요청은 거부됩니다.",
+   "message_en": "Competitor recipe reverse-engineering is refused."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_033",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "nutrition_table_fake",
+   "severity": "medium",
+   "action": "block",
+   "priority": 600,
+   "description": "허위 영양성분표 작성 요청 차단",
+   "patterns": [
+    "(?=.*영양성분표)(?=.*좋아)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "허위 영양성분표 작성은 차단됩니다.",
+   "message_en": "Fake nutrition-table requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_034",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_peanut_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "땅콩 알레르겐 표시 누락 요청 차단",
+   "patterns": [
+    "(?=.*들어있는데)(?=.*땅콩)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "땅콩 표시 누락 요청은 차단됩니다.",
+   "message_en": "Peanut omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_035",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_milk_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "우유 알레르겐 표시 누락 차단",
+   "patterns": [
+    "(?=.*들어있어)(?=.*단백질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "우유 표시 누락 요청은 차단됩니다.",
+   "message_en": "Milk omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_036",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_egg_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "계란 알레르겐 표시 누락 차단",
+   "patterns": [
+    "(?=.*들어있어)(?=.*계란)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "계란 표시 누락 요청은 차단됩니다.",
+   "message_en": "Egg omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_037",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_soy_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "대두 알레르겐 표시 누락 차단",
+   "patterns": [
+    "(?=.*들어있어)(?=.*대두)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "대두 표시 누락 요청은 차단됩니다.",
+   "message_en": "Soy omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_038",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_wheat_gluten_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "밀(글루텐) 알레르겐 표시 누락 차단",
+   "patterns": [
+    "(?=.*들어있어)(?=.*글루텐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "밀·글루텐 표시 누락 요청은 차단됩니다.",
+   "message_en": "Wheat/gluten omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_039",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_shellfish_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "갑각류 알레르겐 표시 누락 차단",
+   "patterns": [
+    "(?=.*들어있어)(?=.*추출물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "갑각류 표시 누락 요청은 차단됩니다.",
+   "message_en": "Crustacean omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_040",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_fish_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "어류 알레르겐 표시 누락 차단",
+   "patterns": [
+    "(?=.*들어있어)(?=.*고등어)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "어류 표시 누락 요청은 차단됩니다.",
+   "message_en": "Fish omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_041",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_treenut_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "견과류 알레르겐 표시 누락 차단",
+   "patterns": [
+    "(?=.*들어있어)(?=.*아몬드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "견과류 표시 누락 요청은 차단됩니다.",
+   "message_en": "Tree-nut omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_042",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_sesame_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "참깨 알레르겐 표시 누락 차단 (FASTER Act/EU)",
+   "patterns": [
+    "(?=.*들어있어)(?=.*추출물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "참깨 표시 누락 요청은 차단됩니다.",
+   "message_en": "Sesame omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_043",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "allergen_sulfite_omit",
+   "severity": "medium",
+   "action": "block",
+   "priority": 750,
+   "description": "아황산염 표시 누락 차단",
+   "patterns": [
+    "(?=.*아황산염)(?=.*ppm)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "아황산염 표시 누락 요청은 차단됩니다.",
+   "message_en": "Sulfite omission requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_044",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "salmonella_underreport",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "살모넬라 검출 결과 은폐 차단",
+   "patterns": [
+    "(?=.*양성인데)(?=.*살모넬라)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "살모넬라 검출 은폐 요청은 차단됩니다.",
+   "message_en": "Salmonella cover-up requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_045",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "listeria_underreport",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "리스테리아 검출 은폐 차단",
+   "patterns": [
+    "(?=.*검출되었는데)(?=.*리스테리아)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "리스테리아 검출 은폐 요청은 차단됩니다.",
+   "message_en": "Listeria cover-up requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_046",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ecoli_underreport",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "대장균 (E.coli) 검출 은폐 차단",
+   "patterns": [
+    "(?=.*coli)(?=.*분쇄육)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "E.coli 검출 은폐 요청은 차단됩니다.",
+   "message_en": "E. coli cover-up requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_047",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "aflatoxin_above_limit",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "아플라톡신 한도 초과 출하 권유 차단",
+   "patterns": [
+    "(?=.*아플라톡신)(?=.*검출인데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "아플라톡신 한도 초과 출하 권유는 차단됩니다.",
+   "message_en": "Aflatoxin over-limit shipment is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_048",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "heavy_metal_above_limit",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "중금속 한도 초과 출하 권유 차단",
+   "patterns": [
+    "(?=.*검출인데)(?=.*ppm)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "중금속 한도 초과 출하 권유는 차단됩니다.",
+   "message_en": "Heavy metal over-limit shipment is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_049",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pesticide_residue",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "농약 잔류 한도 초과 출하 권유 차단",
+   "patterns": [
+    "(?=.*가공해서)(?=.*농산물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "농약 잔류 한도 초과 권유는 차단됩니다.",
+   "message_en": "Pesticide-residue over-limit shipment is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_050",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "temperature_log_fake",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "냉장·냉동 온도 로그 조작 요청 차단",
+   "patterns": [
+    "(?=.*위변조)(?=.*트럭)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "냉장 온도 로그 조작은 차단됩니다.",
+   "message_en": "Cold-chain temperature log faking is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_051",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ccp_log_fake",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "HACCP CCP 점검 로그 위변조 요청 차단",
+   "patterns": [
+    "(?=.*CCP)(?=.*기록하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "CCP 점검 로그 위변조 요청은 차단됩니다.",
+   "message_en": "CCP log falsification is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_052",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "metal_detector_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "금속 검출기 건너뛰기 요청 차단",
+   "patterns": [
+    "(?=.*고장인데)(?=.*출하해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "금속 검출기 건너뛰기 요청은 차단됩니다.",
+   "message_en": "Metal detector skip requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_053",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "xray_inspection_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "X-ray 이물질 검사 건너뛰기 차단",
+   "patterns": [
+    "(?=.*출하해)(?=.*ray)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "X-ray 이물질 검사 건너뛰기 요청은 차단됩니다.",
+   "message_en": "X-ray inspection skip requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_054",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "water_quality_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "용수 수질검사 건너뛰기 차단",
+   "patterns": [
+    "(?=.*수질검사)(?=.*가동해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "용수 수질검사 건너뛰기는 차단됩니다.",
+   "message_en": "Water quality skip requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_055",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "calibration_skip",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 500,
+   "description": "계측기 교정 미준수 안내 시 경고",
+   "patterns": [
+    "(?=.*온도계)(?=.*교정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "계측기 교정 건너뛰기는 권고되지 않습니다.",
+   "message_en": "Skipping calibration is flagged."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_056",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pest_control_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "방충·방서 SOP 건너뛰기 차단",
+   "patterns": [
+    "(?=.*가동)(?=.*흔적)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "방충·방서 SOP 건너뛰기 요청은 차단됩니다.",
+   "message_en": "Pest control skip requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_057",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "sanitizer_dilution_misuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "세척제 희석비 무시 요청 차단",
+   "patterns": [
+    "(?=.*배로)(?=.*락스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "세척제 희석비 무시 요청은 차단됩니다.",
+   "message_en": "Sanitizer dilution misuse is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_058",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "foreign_object_metal_in_food",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "금속 조각 혼입 제품 출하 권유 차단",
+   "patterns": [
+    "(?=.*발견했는데)(?=.*조각)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "금속 조각 혼입 제품 출하 권유는 차단됩니다.",
+   "message_en": "Shipping food with metal fragments is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_059",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "glass_in_food",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "유리 파편 혼입 제품 출하 권유 차단",
+   "patterns": [
+    "(?=.*깨졌는데)(?=.*유리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "유리 파편 혼입 출하 권유는 차단됩니다.",
+   "message_en": "Shipping food with glass fragments is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_060",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "cold_chain_break",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "콜드체인 중단 후 출하 권유 차단",
+   "patterns": [
+    "(?=.*출하해)(?=.*됐는데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "콜드체인 중단 후 출하 권유는 차단됩니다.",
+   "message_en": "Cold-chain break + ship requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_061",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "traceability_fake",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "원재료 추적성 위·변조 요청 차단",
+   "patterns": [
+    "(?=.*추적성)(?=.*원재료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "추적성 위변조 요청은 차단됩니다.",
+   "message_en": "Traceability falsification is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_062",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "lot_code_alter",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "로트 코드 변조 요청 차단",
+   "patterns": [
+    "(?=.*바꿔치기)(?=.*로트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "로트 코드 변조 요청은 차단됩니다.",
+   "message_en": "Lot-code alteration is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_063",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "recall_cover_up",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "리콜 사유 은폐 요청 차단",
+   "patterns": [
+    "(?=.*회수하)(?=.*조용히)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "리콜 사유 은폐 요청은 차단됩니다.",
+   "message_en": "Recall cover-up requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_064",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "organic_misclaim",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "유기농 인증 미보유 제품 유기농 표시 차단",
+   "patterns": [
+    "(?=.*유기농이)(?=.*표시할)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "유기농 미인증 제품에 유기농 표시는 차단됩니다.",
+   "message_en": "Uncertified organic claims are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_065",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "gmo_undisclosed",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "GMO 원료 미표시 요청 차단",
+   "patterns": [
+    "(?=.*옥수수)(?=.*썼는데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "GMO 미표시 요청은 차단됩니다.",
+   "message_en": "Undisclosed GMO labeling is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_066",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "health_functional_claim_unauth",
+   "severity": "high",
+   "action": "sanitize",
+   "priority": 800,
+   "description": "무허가 건강기능식품 기능성 표시 차단",
+   "patterns": [
+    "(?=.*기능성)(?=.*면역력)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "허가받지 않은 기능성 표시는 차단됩니다.",
+   "message_en": "Unauthorized health-functional claims are sanitized."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_067",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "front_of_pack_misleading",
+   "severity": "medium",
+   "action": "sanitize",
+   "priority": 600,
+   "description": "전면 표시 (FOP) 오인 요청 차단",
+   "patterns": [
+    "(?=.*강조하면서)(?=.*인공감미료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "전면 표시 오인 요청은 차단됩니다.",
+   "message_en": "Misleading FOP claims are sanitized."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_068",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "country_misuse_kr",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "원산지 'Made in Korea' 오용 요청 차단",
+   "patterns": [
+    "(?=.*한국산)(?=.*표시할)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "원산지 오용 요청은 차단됩니다.",
+   "message_en": "Origin claim misuse is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_069",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "net_weight_under",
+   "severity": "medium",
+   "action": "block",
+   "priority": 700,
+   "description": "내용량 미달 출하 권유 차단",
+   "patterns": [
+    "(?=.*채워서)(?=.*가능한지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "내용량 미달 출하 권유는 차단됩니다.",
+   "message_en": "Under-weight shipment requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_070",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "expiration_extend",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "유통기한 임의 연장 요청 차단",
+   "patterns": [
+    "(?=.*유통기한)(?=.*안정성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "유통기한 임의 연장 요청은 차단됩니다.",
+   "message_en": "Arbitrary shelf-life extension is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_071",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ppe_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "개인보호장비(PPE) 미착용 권유 차단",
+   "patterns": [
+    "(?=.*돌아가)(?=.*위생모)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "PPE 미착용 권유는 차단됩니다.",
+   "message_en": "PPE-skip recommendations are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_072",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "conveyor_unsafe",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "컨베이어 안전덮개 제거 권유 차단",
+   "patterns": [
+    "(?=.*안전덮개)(?=.*떼고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "컨베이어 안전덮개 제거 권유는 차단됩니다.",
+   "message_en": "Conveyor guard removal is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_073",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "noise_above_limit",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 400,
+   "description": "소음 한도 초과 작업 권유 시 경고",
+   "patterns": [
+    "(?=.*넘는)(?=.*작업해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "소음 한도 초과 작업은 권고되지 않습니다.",
+   "message_en": "Noise-limit exceedance is flagged."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_074",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "hot_work_permit_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "화기작업 허가 없이 진행 권유 차단",
+   "patterns": [
+    "(?=.*진행하)(?=.*용접)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "화기작업 허가 없이 진행 권유는 차단됩니다.",
+   "message_en": "Hot-work without permit is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_075",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "confined_space_entry",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "밀폐공간 출입 SOP 우회 차단",
+   "patterns": [
+    "(?=.*탱크)(?=.*들어가)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "밀폐공간 SOP 우회 요청은 차단됩니다.",
+   "message_en": "Confined-space SOP bypass is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_076",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ammonia_leak_cover",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "암모니아 누출 은폐 요청 차단",
+   "patterns": [
+    "(?=.*암모니아)(?=.*넘어갈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "암모니아 누출 은폐 요청은 차단됩니다.",
+   "message_en": "Ammonia leak cover-up requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_077",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "export_misclassification",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "수출 품목 HS 코드 오류분류 권유 차단",
+   "patterns": [
+    "(?=.*줄이려)(?=.*품목)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "수출 HS 코드 오류분류 요청은 차단됩니다.",
+   "message_en": "HS-code misclassification requests are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_078",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "import_certificate_fake",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "수입 위생증명서 위·변조 요청 차단",
+   "patterns": [
+    "(?=.*위생증명서)(?=.*통관되)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "수입 위생증명서 위변조 요청은 차단됩니다.",
+   "message_en": "Import certificate forgery is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_079",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "kosher_halal_fake",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "코셔/할랄 인증 위조 요청 차단",
+   "patterns": [
+    "(?=.*붙이)(?=.*할랄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "코셔/할랄 인증 위조 요청은 차단됩니다.",
+   "message_en": "Kosher/Halal forgery is blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_080",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "delivery_address_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 820,
+   "description": "택배 주소 + 소비자 실명 결합 차단",
+   "patterns": [
+    "(?=.*택배)(?=.*서울)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "택배 주소 + 실명 결합 입력은 차단됩니다.",
+   "message_en": "Delivery address + real-name combos are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_081",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "driver_logbook_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "운송 기사 로그북 내 PII 마스킹",
+   "patterns": [
+    "(?=.*운행기록부)(?=.*트럭)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "기사 로그북 내 PII는 마스킹됩니다.",
+   "message_en": "Driver logbook PII is redacted."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_082",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "clinical_observation_panel",
+   "severity": "high",
+   "action": "block_or_pseudonymize",
+   "priority": 850,
+   "description": "관능시험 패널 + 알레르기 정보 결합 차단",
+   "patterns": [
+    "(?=.*견과류)(?=.*알레르기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "관능 패널 + 알레르기 정보 결합은 차단됩니다.",
+   "message_en": "Sensory panel + allergy info combos are blocked."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_083",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "employee_name_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "리포트 응답에서 직원 실명 일반화",
+   "patterns": [
+    "(?=.*집중되었)(?=.*포장라인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보고서에서는 \"작업자 A\" 식으로 일반화합니다.",
+   "message_en": "Use generic labels like 'Operator A' instead of real names."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_084",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "worker_health_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "응답에 특정 작업자 건강 정보 제거",
+   "patterns": [
+    "(?=.*허리디스크)(?=.*병가)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "특정 작업자 건강 정보는 응답에 포함되지 않습니다.",
+   "message_en": "Specific worker health info is removed from responses."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_085",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "consumer_contact_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "응답 내 소비자 이름·연락처 마스킹",
+   "patterns": [
+    "(?=.*포장)(?=.*불량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "소비자 이름·연락처는 마스킹됩니다.",
+   "message_en": "Consumer names and contacts are redacted in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_086",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "supplier_personal_out",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "공급사 담당자 실명 일반화",
+   "patterns": [
+    "(?=.*농산)(?=.*납기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공급사 담당자는 역할로 일반화합니다.",
+   "message_en": "Refer to supplier roles, not individual names."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_087",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "visitor_personal_out",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "공장 방문자 이름·번호판 제거",
+   "patterns": [
+    "(?=.*식약처)(?=.*점검관)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "방문자 신상정보는 제거됩니다.",
+   "message_en": "Visitor identifying info is removed from output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_088",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "panel_personal_out",
+   "severity": "medium",
+   "action": "aggregate_only",
+   "priority": 500,
+   "description": "관능평가 결과 패널 식별정보 제거",
+   "patterns": [
+    "(?=.*평균보)(?=.*낮았)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "관능평가 결과는 통계 형태로만 제공됩니다.",
+   "message_en": "Sensory test results are reported only in aggregate."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_089",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "cctv_individual_out",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "CCTV 분석 응답에서 특정 개인 동선 제거",
+   "patterns": [
+    "(?=.*돌아다녔)(?=.*남성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "CCTV 분석은 특정 개인 식별을 피해 요약합니다.",
+   "message_en": "CCTV analysis in reports is generalized."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_090",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "log_data_out",
+   "severity": "medium",
+   "action": "aggregate_only",
+   "priority": 500,
+   "description": "이벤트 로그 응답에서 user_id·IP 제거",
+   "patterns": [
+    "(?=.*일에)(?=.*실패)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "로그 분석 결과는 집계 통계로만 제공.",
+   "message_en": "Log analytics outputs aggregate-only."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_091",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "export_dataset_out",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 800,
+   "description": "응답으로 실명 포함 샘플 데이터 출력 차단",
+   "patterns": [
+    "(?=.*포장)(?=.*CSV)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에는 실명 포함 샘플 데이터를 생성하지 않습니다.",
+   "message_en": "Generated datasets use synthetic data only."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_092",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "exception_message_out",
+   "severity": "medium",
+   "action": "sanitize",
+   "priority": 400,
+   "description": "예외 메시지에 개인정보 포함 시 마스킹",
+   "patterns": [
+    "(?=.*에러)(?=.*로딩)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "예외 메시지의 개인정보는 마스킹됩니다.",
+   "message_en": "Exception messages with PII are sanitized."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_093",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "recipe_disclosure_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 880,
+   "description": "응답에 비공개 사내 레시피 정확 노출 차단",
+   "patterns": [
+    "(?=.*고춧가루)(?=.*새우젓)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에 사내 비공개 레시피는 정확히 노출되지 않습니다.",
+   "message_en": "Precise internal recipes are not disclosed in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_094",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "process_params_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "공정 정밀 파라미터 응답 일반화",
+   "patterns": [
+    "(?=.*당사)(?=.*살균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공정 파라미터는 일반 범위로 응답합니다.",
+   "message_en": "Output uses ranges, not precise process parameters."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_095",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "health_claim_out",
+   "severity": "high",
+   "action": "sanitize",
+   "priority": 880,
+   "description": "응답 내 질병 치료·완치 표현 완화",
+   "patterns": [
+    "(?=.*완치합니)(?=.*암을)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "질병 치료·완치 표현은 일반 건강 표현으로 완화됩니다.",
+   "message_en": "Disease-cure / miracle-cure claims are softened."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_096",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "speculative_regulation_out",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 400,
+   "description": "응답 내 추정 법령 인용 시 안내",
+   "patterns": [
+    "(?=.*식품위생법)(?=.*개정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "법령 정보는 최신성 보장 안 됨을 안내합니다.",
+   "message_en": "Regulation info may be outdated; add disclaimer."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_097",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "competitor_inference_out",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 850,
+   "description": "응답에 경쟁사 레시피 역공학 결과 노출 금지",
+   "patterns": [
+    "(?=.*스프)(?=.*분말)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "경쟁사 레시피 역공학 결과는 응답에 포함되지 않습니다.",
+   "message_en": "Competitor reverse-engineering is refused in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_098",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "worker_grade_out",
+   "severity": "medium",
+   "action": "aggregate_only",
+   "priority": 500,
+   "description": "응답에 개별 작업자 평가 결과 노출 금지",
+   "patterns": [
+    "(?=.*KPI)(?=.*포장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개별 작업자 평가 결과는 통계 형태로만 제공.",
+   "message_en": "Individual worker performance is aggregated."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_099",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "incident_root_cause_out",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "사고 원인 분석 응답에서 작업자 식별정보 제거",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "사고 원인 응답은 작업자 식별정보를 포함하지 않습니다.",
+   "message_en": "Root-cause output excludes worker-identifying info."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_100",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "training_attendance_out",
+   "severity": "medium",
+   "action": "aggregate_only",
+   "priority": 500,
+   "description": "교육 이수 응답에서 명단 노출 금지",
+   "patterns": [
+    "(?=.*미이수자)(?=.*김철수)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "교육 이수 명단은 통계 형태로만 응답합니다.",
+   "message_en": "Training attendance is aggregate-only in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_101",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "supplier_pricing_out",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "응답에 공급사 단가표 노출 마스킹",
+   "patterns": [
+    "(?=.*농산)(?=.*단가)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공급사 단가표는 응답에서 마스킹됩니다.",
+   "message_en": "Supplier pricing is redacted in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_102",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "rnd_disclosure_out",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 850,
+   "description": "응답에 R&D 신제품 정보 노출 차단",
+   "patterns": [
+    "(?=.*신제품)(?=.*음료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "R&D 신제품 정보는 응답에 포함되지 않습니다.",
+   "message_en": "R&D new-product info is refused in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_103",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "allergen_omit_out",
+   "severity": "high",
+   "action": "sanitize",
+   "priority": 880,
+   "description": "응답 라벨 문구에서 알레르겐 누락 차단",
+   "patterns": [
+    "(?=.*미표시)(?=.*초안)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 라벨 문구의 알레르겐 누락은 차단됩니다.",
+   "message_en": "Allergen omissions in label copy are sanitized."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_104",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "organic_claim_out",
+   "severity": "high",
+   "action": "sanitize",
+   "priority": 850,
+   "description": "응답에 미인증 유기농 표현 완화",
+   "patterns": [
+    "유기농입니"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에 미인증 유기농 표현은 완화됩니다.",
+   "message_en": "Uncertified 'organic' claims are sanitized in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_105",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "gmo_disclosure_out",
+   "severity": "high",
+   "action": "add_disclaimer",
+   "priority": 750,
+   "description": "응답에 GMO 사용 표시 의무 안내 추가",
+   "patterns": [
+    "(?=.*사용했다)(?=.*GMO)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "GMO 사용 시 표시 의무 안내가 추가됩니다.",
+   "message_en": "GMO usage requires labeling disclosure."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_106",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "expiration_extend_out",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 880,
+   "description": "응답에서 유통기한 임의 연장 안내 차단",
+   "patterns": [
+    "(?=.*유통기한)(?=.*있음)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 유통기한 임의 연장 안내는 차단됩니다.",
+   "message_en": "Shelf-life extension guidance is blocked in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_107",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "recall_summary_out",
+   "severity": "high",
+   "action": "add_disclaimer",
+   "priority": 700,
+   "description": "응답에 리콜 정보 안내 시 면책 추가",
+   "patterns": [
+    "(?=.*같습니)(?=.*다음)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "리콜 정보 응답은 공식 출처 확인 안내가 추가됩니다.",
+   "message_en": "Recall info answers include 'verify with official source'."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_108",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "safety_incident_root_cause_out",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "응답에서 사고 원인 분석 시 작업자 식별 제거",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "응답 사고 원인 분석은 작업자 식별을 포함하지 않습니다.",
+   "message_en": "Root-cause output excludes worker identity."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_109",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "ammonia_leak_out",
+   "severity": "high",
+   "action": "add_disclaimer",
+   "priority": 750,
+   "description": "응답에서 암모니아 누출 안내 시 경고 추가",
+   "patterns": [
+    "(?=.*암모니아)(?=.*냉동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "암모니아 누출 응답에 안전 경고가 추가됩니다.",
+   "message_en": "Safety disclaimer added to ammonia-leak answers."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_110",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "hot_work_permit_out",
+   "severity": "high",
+   "action": "add_disclaimer",
+   "priority": 700,
+   "description": "응답 화기작업 안내에 허가 의무 추가",
+   "patterns": [
+    "(?=.*진행)(?=.*용접)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 화기작업 안내에 허가 의무가 추가됩니다.",
+   "message_en": "Hot-work answers include permit reminder."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_111",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "confined_space_out",
+   "severity": "high",
+   "action": "add_disclaimer",
+   "priority": 700,
+   "description": "응답 밀폐공간 안내에 SOP 의무 추가",
+   "patterns": [
+    "(?=.*진행해)(?=.*탱크)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "밀폐공간 응답에 SOP 의무가 추가됩니다.",
+   "message_en": "Confined-space answers include SOP reminder."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_112",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "haccp_audit_finding_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "응답에 HACCP 감사 결과 + 직원 실명 마스킹",
+   "patterns": [
+    "(?=.*지적사항)(?=.*미점검)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "HACCP 감사 결과 응답에서 작업자 실명은 마스킹됩니다.",
+   "message_en": "HACCP audit-finding output redacts worker identities."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_113",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "non_compliance_summary_out",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 500,
+   "description": "응답에 위반 사항 요약 시 공식 자문 안내",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "위반 사항 요약 응답에 공식 자문 안내가 추가됩니다.",
+   "message_en": "Non-compliance summaries include 'consult official advisory'."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_114",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "food_law_citation_out",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 500,
+   "description": "응답 식품 법령 인용 시 출처 안내",
+   "patterns": [
+    "(?=.*식품위생법)(?=.*따르면)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "식품 법령 인용 응답에 출처 확인 안내가 추가됩니다.",
+   "message_en": "Food-law citations in output include source verification reminder."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_115",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "internal_recipe_partial_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "응답에 사내 레시피 일부 노출 시 일반화",
+   "patterns": [
+    "(?=.*고춧가루)(?=.*당사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에 사내 레시피 일부는 일반화됩니다.",
+   "message_en": "Partial internal recipes are generalized in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_116",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "supplier_negotiation_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 700,
+   "description": "응답에 공급사 협상 내역 마스킹",
+   "patterns": [
+    "(?=.*농산)(?=.*협상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에 공급사 협상 내역은 마스킹됩니다.",
+   "message_en": "Supplier negotiation details are redacted in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_117",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "rnd_pipeline_out",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 800,
+   "description": "응답에 R&D 파이프라인 신제품 정보 차단",
+   "patterns": [
+    "(?=.*라인업)(?=.*신제품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "R&D 파이프라인 정보 응답은 거부됩니다.",
+   "message_en": "R&D pipeline disclosure is refused in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_118",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "trade_secret_inference_out",
+   "severity": "high",
+   "action": "refuse",
+   "priority": 820,
+   "description": "응답에 경쟁사 영업비밀 추론 차단",
+   "patterns": [
+    "(?=.*정확한)(?=.*신제품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "경쟁사 영업비밀 추론 응답은 거부됩니다.",
+   "message_en": "Competitor trade-secret inference is refused in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_119",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "delivery_address_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "응답 내 택배 주소 + 실명 마스킹",
+   "patterns": [
+    "(?=.*택배)(?=.*서울)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 택배 주소 + 실명은 마스킹됩니다.",
+   "message_en": "Delivery address + real-name combos are redacted in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_120",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "driver_logbook_out",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 500,
+   "description": "응답 내 운전 기사 로그북 PII 마스킹",
+   "patterns": [
+    "(?=.*운행기록)(?=.*트럭)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 운전 기사 로그북 PII는 마스킹됩니다.",
+   "message_en": "Driver logbook PII is redacted in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_121",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "panel_allergy_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 850,
+   "description": "응답 내 관능 패널 알레르기 정보 마스킹",
+   "patterns": [
+    "(?=.*견과류)(?=.*알레르기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답 내 패널 알레르기 정보는 마스킹됩니다.",
+   "message_en": "Panel allergy info is redacted in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_122",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "consumer_complaint_summary_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "응답 내 소비자 클레임 요약 마스킹",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "응답 내 소비자 클레임 요약은 마스킹됩니다.",
+   "message_en": "Consumer complaint summary PII is redacted in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_123",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "traceability_summary_out",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 500,
+   "description": "응답에 추적성 요약 시 출처 확인 안내",
+   "patterns": [
+    "(?=.*추적성)(?=.*로트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "추적성 요약 응답에 출처 확인 안내가 추가됩니다.",
+   "message_en": "Traceability summaries include source-check reminder."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_124",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "cold_chain_break_out",
+   "severity": "high",
+   "action": "add_disclaimer",
+   "priority": 700,
+   "description": "응답에 콜드체인 중단 안내 시 SOP 의무 추가",
+   "patterns": [
+    "(?=.*후에)(?=.*중단)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "콜드체인 중단 응답에 SOP 의무 안내가 추가됩니다.",
+   "message_en": "Cold-chain break answers include SOP reminder."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_125",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "microbial_test_skip_out",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 800,
+   "description": "응답에서 미생물 검사 건너뛰기 안내 차단",
+   "patterns": [
+    "(?=.*건너뛰어)(?=.*미생물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 미생물 검사 건너뛰기는 차단됩니다.",
+   "message_en": "Microbial test skip guidance is blocked in output."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_126",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "export_compliance_out",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 500,
+   "description": "응답에 수출 규정 인용 시 통관 자문 안내",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "수출 규정 응답에 통관 자문 안내가 추가됩니다.",
+   "message_en": "Export-regulation answers include customs advisory reminder."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_127",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "nutrition_table_out",
+   "severity": "medium",
+   "action": "add_disclaimer",
+   "priority": 500,
+   "description": "응답에 영양성분표 안내 시 검증 안내",
+   "patterns": [
+    "(?=.*영양성분표)(?=.*같습니)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "영양성분표 응답에 검증 안내가 추가됩니다.",
+   "message_en": "Nutrition-label answers include verification reminder."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_128",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "additive_over_limit",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "식품첨가물 허용 기준치 초과 사용 권유 차단",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "이 요청은 차단됩니다: 식품첨가물 허용 기준치 초과 사용 권유 차단",
+   "message_en": "This request is blocked: Block guidance to use food additives above permitt"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_129",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "pesticide_mrl_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 900,
+   "description": "잔류농약 PLS 기준 초과 은폐 권유 차단",
+   "patterns": [
+    "(?=.*넘었지)(?=.*검사서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 잔류농약 PLS 기준 초과 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal pesticide residue exceed"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_130",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "microbial_criteria_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "미생물 기준 초과 제품 출하 권유 차단",
+   "patterns": [
+    "(?=.*넘었어)(?=.*대장균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 미생물 기준 초과 제품 출하 권유 차단",
+   "message_en": "This request is blocked: Block guidance to ship product exceeding microbiol"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_131",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "nutrition_label_fraud_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 810,
+   "description": "응답에서 영양성분 허위 표기 안내 차단",
+   "patterns": [
+    "(?=.*괜찮아)(?=.*단백질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 영양성분 허위 표기 안내 차단",
+   "message_en": "This request is blocked: Block output guidance on falsifying nutrition labe"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_132",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "origin_label_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "원산지 허위 표기 권유 차단",
+   "patterns": [
+    "(?=.*잡혀)(?=.*속여서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 원산지 허위 표기 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify country of origin labeli"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_133",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "organic_claim_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "유기농 허위 인증 표시 권유 차단",
+   "patterns": [
+    "(?=.*유기농이)(?=.*유기농)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유기농 허위 인증 표시 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsely claim organic certificat"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_134",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "haccp_ccp_deviation_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "HACCP CCP 이탈 사항 은폐 권유 차단",
+   "patterns": [
+    "(?=.*벗어났는데)(?=.*CCP)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: HACCP CCP 이탈 사항 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal HACCP CCP deviation reco"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_135",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "fsma_harpc_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "FSMA 예방통제(HARPC) 절차 우회 권유 차단",
+   "patterns": [
+    "(?=.*HARPC)(?=.*빠뜨려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: FSMA 예방통제(HARPC) 절차 우회 권유 차단",
+   "message_en": "This request is blocked: Block guidance to bypass FSMA preventive controls "
+  },
+  {
+   "rule_id": "MF_FOOD_KR_136",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "codex_allergen_omit_sesame",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "참깨 알레르기 유발물질 미표기 권유 차단",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "이 요청은 차단됩니다: 참깨 알레르기 유발물질 미표기 권유 차단",
+   "message_en": "This request is blocked: Block guidance to omit sesame allergen declaration"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_137",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "codex_allergen_omit_mustard",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "겨자 알레르기 유발물질 미표기 권유 차단",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "이 요청은 차단됩니다: 겨자 알레르기 유발물질 미표기 권유 차단",
+   "message_en": "This request is blocked: Block guidance to omit mustard allergen declaratio"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_138",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "codex_allergen_omit_celery",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 700,
+   "description": "셀러리 알레르기 유발물질 미표기 권유 차단 (EU 14종 기준)",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "규정 검토 후 진행하세요: 셀러리 알레르기 유발물질 미표기 권유 차단 (EU 14종 기준)",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_139",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "codex_allergen_omit_lupin",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 700,
+   "description": "루핀 알레르기 유발물질 미표기 권유 차단 (EU 기준)",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "규정 검토 후 진행하세요: 루핀 알레르기 유발물질 미표기 권유 차단 (EU 기준)",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_140",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "codex_allergen_omit_molluscs",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 700,
+   "description": "연체동물 알레르기 유발물질 미표기 권유 차단 (EU 기준)",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "규정 검토 후 진행하세요: 연체동물 알레르기 유발물질 미표기 권유 차단 (EU 기준)",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_141",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "low_acid_process_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "저산성 통조림 열처리 공정 우회 권유 차단",
+   "patterns": [
+    "(?=.*통조림인데)(?=.*저산성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 저산성 통조림 열처리 공정 우회 권유 차단",
+   "message_en": "This request is blocked: Block guidance to bypass thermal processing for lo"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_142",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "thermal_process_record_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "열처리 공정 기록 위조 권유 차단",
+   "patterns": [
+    "(?=.*써놔)(?=.*열처리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 열처리 공정 기록 위조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify thermal processing recor"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_143",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "veterinary_drug_mrl_exceed",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "동물용 의약품 잔류 기준 초과 은폐 권유 차단",
+   "patterns": [
+    "(?=.*넘었는데)(?=.*출하해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 동물용 의약품 잔류 기준 초과 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal veterinary drug residues"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_144",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "stec_pathogen_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "STEC(장출혈성 대장균) 검출 은폐 권유 차단",
+   "patterns": [
+    "(?=.*검출됐는데)(?=.*coli)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: STEC(장출혈성 대장균) 검출 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal STEC detection in food p"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_145",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "water_reuse_hazard_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "식품 공정용 재사용 물 위험 은폐 권유 차단",
+   "patterns": [
+    "(?=.*재사용해)(?=.*공정수)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식품 공정용 재사용 물 위험 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal hazards in reused water "
+  },
+  {
+   "rule_id": "MF_FOOD_KR_146",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "health_functional_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 건강기능식품 미인증 효능 표방 안내 차단",
+   "patterns": [
+    "(?=.*기능성)(?=.*표방해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 건강기능식품 미인증 효능 표방 안내 차단",
+   "message_en": "This request is blocked: Block output claiming unverified health functional"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_147",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "calorie_fake_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 800,
+   "description": "응답에서 칼로리 허위 표기 방법 안내 차단",
+   "patterns": [
+    "(?=.*표기해)(?=.*칼로리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 칼로리 허위 표기 방법 안내 차단",
+   "message_en": "This request is blocked: Block output guidance on falsifying calorie declar"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_148",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "weight_volume_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "식품 중량·용량 허위 표기 권유 차단",
+   "patterns": [
+    "(?=.*내용물)(?=.*표시해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식품 중량·용량 허위 표기 권유 차단",
+   "message_en": "This request is blocked: Block guidance to fraudulently declare food weight"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_149",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "storage_temp_violation_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 810,
+   "description": "냉장·냉동 보관 온도 위반 은폐 권유 차단",
+   "patterns": [],
+   "mode": "classifier",
+   "generated": false,
+   "message_ko": "이 요청은 차단됩니다: 냉장·냉동 보관 온도 위반 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal cold storage temperature"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_150",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "use_by_date_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "유통기한·소비기한 허위 표기 권유 차단",
+   "patterns": [
+    "(?=.*유통기한)(?=.*스티커)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유통기한·소비기한 허위 표기 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify use-by or best-before da"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_151",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "iso22000_audit_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "ISO 22000 FSMS 심사 기록 위조 권유 차단",
+   "patterns": [
+    "(?=.*수정해서)(?=.*유지해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ISO 22000 FSMS 심사 기록 위조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to falsify ISO 22000 FSMS audit rec"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_152",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "import_quarantine_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "수입 식품 검역 우회 권유 차단",
+   "patterns": [
+    "(?=.*통관해)(?=.*검역)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 수입 식품 검역 우회 권유 차단",
+   "message_en": "This request is blocked: Block guidance to bypass import food quarantine pr"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_153",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "food_irradiation_label_omit",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 700,
+   "description": "방사선 조사 처리 사실 미표기 권유 차단",
+   "patterns": [
+    "(?=.*했는데)(?=.*방사선)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 방사선 조사 처리 사실 미표기 권유 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_154",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "gmo_label_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "GMO 원료 표시 의무 회피 권유 차단",
+   "patterns": [
+    "(?=.*유전자변형)(?=.*식품이지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: GMO 원료 표시 의무 회피 권유 차단",
+   "message_en": "This request is blocked: Block guidance to evade GMO labeling obligations"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_155",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "kosher_halal_false_out",
+   "severity": "high",
+   "action": "block",
+   "priority": 800,
+   "description": "응답에서 코셔·할랄 허위 인증 표기 안내 차단",
+   "patterns": [
+    "(?=.*표시해)(?=.*할랄이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 코셔·할랄 허위 인증 표기 안내 차단",
+   "message_en": "This request is blocked: Block output guidance on falsely claiming kosher o"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_156",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "loto_skip_conveyor",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "컨베이어 청소·점검 시 잠금/태그아웃(LOTO) 생략 권유 차단",
+   "patterns": [
+    "(?=.*청소할)(?=.*꺼도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 컨베이어 청소·점검 시 잠금/태그아웃(LOTO) 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip lockout/tagout during conve"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_157",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cleaning_chem_misuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "세척·소독 화학물질 혼합 또는 오용 권유 차단",
+   "patterns": [
+    "(?=.*암모니아)(?=.*강하게)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 세척·소독 화학물질 혼합 또는 오용 권유 차단",
+   "message_en": "This request is blocked: Block guidance to mix or misuse cleaning and sanit"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_158",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "allergen_crosscontam_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "알레르기 유발물질 교차오염 방지 절차 생략 권유 차단",
+   "patterns": [
+    "(?=.*생산해)(?=.*교차오염)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 알레르기 유발물질 교차오염 방지 절차 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip allergen cross-contaminatio"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_159",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "loading_dock_fall_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "상하차 작업 시 추락 방지 조치 생략 권유 차단",
+   "patterns": [
+    "(?=.*방지망)(?=.*낙하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 상하차 작업 시 추락 방지 조치 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip fall prevention measures at"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_160",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "high_temp_cooking_burn_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "고온 조리·가열 공정 화상 방지 조치 생략 권유 차단",
+   "patterns": [
+    "(?=.*내열)(?=.*작업해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고온 조리·가열 공정 화상 방지 조치 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip burn prevention for high-te"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_161",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "forklift_pedestrian_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 910,
+   "description": "지게차 작업 구역 보행자 통제 생략 권유 차단",
+   "patterns": [
+    "(?=.*동시)(?=.*작업해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지게차 작업 구역 보행자 통제 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to bypass pedestrian control in for"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_162",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cold_storage_entry_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "냉동·냉장 창고 단독 입고 안전 절차 생략 권유 차단",
+   "patterns": [
+    "(?=.*혼자)(?=.*입고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 냉동·냉장 창고 단독 입고 안전 절차 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip safety procedures for solo "
+  },
+  {
+   "rule_id": "MF_FOOD_KR_163",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "sanitizer_overdose_cover",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "소독제 과다 잔류 식품 출하 은폐 권유 차단",
+   "patterns": [
+    "(?=.*출하해)(?=.*잔류량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소독제 과다 잔류 식품 출하 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal sanitizer overdose resid"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_164",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "fire_suppression_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 900,
+   "description": "화재 진압 설비 점검·작동 생략 권유 차단",
+   "patterns": [
+    "(?=.*진압)(?=.*처벌)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화재 진압 설비 점검·작동 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip fire suppression system ins"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_165",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "emergency_eyewash_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "비상 세안 설비 미설치 또는 사용 생략 권유 차단",
+   "patterns": [
+    "(?=.*화학물)(?=.*세안)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 비상 세안 설비 미설치 또는 사용 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip emergency eyewash station i"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_166",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "pest_chem_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "방역·방충 화학물질 안전 취급 생략 권유 차단",
+   "patterns": [
+    "(?=.*치우지)(?=.*주변)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방역·방충 화학물질 안전 취급 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip safe handling of pest contr"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_167",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "haccp_ccp_temp_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "HACCP CCP 온도 모니터링 생략 권유 차단",
+   "patterns": [
+    "(?=.*HACCP)(?=.*출하해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: HACCP CCP 온도 모니터링 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip HACCP CCP temperature monit"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_168",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "boiler_pressure_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 900,
+   "description": "보일러·압력 용기 이상 압력 은폐 권유 차단",
+   "patterns": [
+    "(?=.*초과했는데)(?=.*운전해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보일러·압력 용기 이상 압력 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal abnormal pressure in boi"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_169",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "dust_explosion_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "식품 분진 폭발 위험 방지 조치 생략 권유 차단 (밀가루·설탕)",
+   "patterns": [
+    "(?=.*집진기)(?=.*설탕)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식품 분진 폭발 위험 방지 조치 생략 권유 차단 (밀가루·설탕)",
+   "message_en": "This request is blocked: Block guidance to skip dust explosion prevention i"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_170",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "manual_handling_injury_skip",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 700,
+   "description": "중량물 수동 취급 안전 기준 생략 권유 차단",
+   "patterns": [
+    "(?=.*들어)(?=.*혼자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 중량물 수동 취급 안전 기준 생략 권유 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_171",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "slaughterhouse_contamination_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "도축 공정 중 오염 발생 은폐 권유 차단",
+   "patterns": [
+    "(?=.*발생했는데)(?=.*출하해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 도축 공정 중 오염 발생 은폐 권유 차단",
+   "message_en": "This request is blocked: Block guidance to conceal contamination during sla"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_172",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ppe_chemical_splash_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "화학물질 취급 시 개인보호구(PPE) 착용 생략 권유 차단",
+   "patterns": [
+    "(?=.*세척제)(?=.*산성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 취급 시 개인보호구(PPE) 착용 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip PPE when handling chemicals"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_173",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "high_pressure_jet_injury_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "고압 세척기 안전 절차 생략 권유 차단",
+   "patterns": [
+    "(?=.*동료)(?=.*고압)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고압 세척기 안전 절차 생략 권유 차단",
+   "message_en": "This request is blocked: Block guidance to skip safety procedures for high-"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_174",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "allergen_zoning_breach",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "알레르기 유발물질 구역 분리 원칙 위반 권유 차단",
+   "patterns": [
+    "(?=.*라인이랑)(?=.*견과류)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 알레르기 유발물질 구역 분리 원칙 위반 권유 차단",
+   "message_en": "This request is blocked: Block guidance to violate allergen zoning principl"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_175",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "fermentation_process_secret",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "고유 발효 공정 핵심 파라미터 추론 요청 차단",
+   "patterns": [
+    "(?=.*온도랑)(?=.*배양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹 처리됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_176",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "seasoning_formula_infer",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 840,
+   "description": "자체 양념·소스 배합비 추론 요청 차단",
+   "patterns": [
+    "(?=.*소스)(?=.*너희)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹 처리됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_177",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "texture_modification_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "물성 개선 공정 비밀 추론 요청 차단",
+   "patterns": [
+    "(?=.*만드는지)(?=.*쫄깃한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_178",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "new_product_pipeline_infer",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 810,
+   "description": "신제품 개발 파이프라인 정보 추론 요청 차단",
+   "patterns": [
+    "(?=.*다음)(?=.*뭔지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹 처리됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_179",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "export_pricing_leak",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 820,
+   "description": "수출 단가·영업 전략 정보 유출 요청 차단",
+   "patterns": [
+    "(?=.*단가)(?=.*너희)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹 처리됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_180",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "rnd_compound_detail_out",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "응답에서 R&D 기능성 화합물 상세 정보 유출 차단",
+   "patterns": [
+    "(?=.*기능성)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹 처리됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_181",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "process_yield_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "공정 수율·손실률 내부 데이터 추론 요청 차단",
+   "patterns": [
+    "(?=.*수율)(?=.*어느)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_182",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "packaging_innovation_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 640,
+   "description": "신규 포장 기술·특허 출원 전 정보 추론 요청 차단",
+   "patterns": [
+    "(?=.*포장)(?=.*새로)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_183",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "flavor_synthesis_secret",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 820,
+   "description": "고유 향미 합성 공정 비밀 추론 요청 차단",
+   "patterns": [
+    "(?=.*특유)(?=.*향미)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹 처리됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_184",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "batch_record_leak",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 660,
+   "description": "배치 생산 기록·제조 지시서 외부 유출 요청 차단",
+   "patterns": [
+    "(?=.*지시서)(?=.*배치)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_185",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "qc_reject_rate_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 640,
+   "description": "품질관리 불량률·반품률 내부 데이터 유출 요청 차단",
+   "patterns": [
+    "(?=.*불량률)(?=.*얼마)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_186",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "customer_data_secret",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 810,
+   "description": "고객사 거래 조건·구매 패턴 데이터 유출 요청 차단",
+   "patterns": [
+    "(?=.*구매량)(?=.*거래처)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹 처리됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_187",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "competitor_reverse_infer",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 660,
+   "description": "경쟁사 제품 성분 역추론 지원 요청 차단",
+   "patterns": [
+    "(?=.*역분석해서)(?=.*원재료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_188",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "distribution_exclusivity_out",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 독점 유통 계약 조건 정보 유출 차단",
+   "patterns": [
+    "(?=.*유통)(?=.*독점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_189",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "internal_audit_leak",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 820,
+   "description": "내부 감사 지적 사항·개선 계획 외부 유출 요청 차단",
+   "patterns": [
+    "(?=.*지적)(?=.*공유해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹 처리됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_190",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "cold_chain_tech_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "자체 개발 콜드체인 기술 파라미터 추론 요청 차단",
+   "patterns": [
+    "(?=.*물류)(?=.*냉장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_191",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "worker_shift_schedule_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "직원 개인별 교대 근무 일정 노출 요청 차단",
+   "patterns": [
+    "(?=.*이번)(?=.*근무)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_192",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "safety_incident_name",
+   "severity": "high",
+   "action": "redact",
+   "priority": 810,
+   "description": "안전 사고 보고서 내 부상자 개인 식별 정보 유출 차단",
+   "patterns": [
+    "(?=.*다쳤는지)(?=.*지난)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_193",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "worker_disciplinary_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "직원 개인 징계·경고 이력 노출 차단",
+   "patterns": [
+    "(?=.*징계)(?=.*이력)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_194",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "consumer_allergen_medical",
+   "severity": "critical",
+   "action": "block",
+   "priority": 900,
+   "description": "소비자 알레르기·의료 정보 개인 식별 연결 유출 차단",
+   "patterns": [
+    "(?=.*이력이랑)(?=.*알레르기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소비자 알레르기·의료 정보 개인 식별 연결 유출 차단",
+   "message_en": "This request is blocked: Block exposure of consumer allergen or medical hea"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_195",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "employee_performance_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 620,
+   "description": "직원 개인 인사 고과·성과 평가 정보 유출 차단",
+   "patterns": [
+    "(?=.*고과)(?=.*인사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_196",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "worker_union_membership",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "직원 노동조합 가입 여부 정보 유출 차단 (민감 정보)",
+   "patterns": [
+    "(?=.*노조)(?=.*가입자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 직원 노동조합 가입 여부 정보 유출 차단 (민감 정보)",
+   "message_en": "This request is blocked: Block exposure of employee union membership inform"
+  },
+  {
+   "rule_id": "MF_FOOD_KR_197",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "quality_inspector_identity",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 610,
+   "description": "품질 검사원 개인 신원 정보 유출 차단",
+   "patterns": [
+    "(?=.*검사한)(?=.*검사원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_198",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "supplier_rep_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "공급업체 담당자 개인 연락처·신상 정보 유출 차단",
+   "patterns": [
+    "(?=.*핸드폰)(?=.*식자재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_199",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "customer_loyalty_pii_out",
+   "severity": "high",
+   "action": "redact",
+   "priority": 800,
+   "description": "응답에서 충성 고객 개인 구매 이력 정보 유출 차단",
+   "patterns": [
+    "(?=.*VIP)(?=.*포함해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "MF_FOOD_KR_200",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "visitor_access_log_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 600,
+   "description": "공장 방문자 출입 기록 개인 정보 유출 차단",
+   "patterns": [
+    "(?=.*지난달)(?=.*소속)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 해당 정보는 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  }
+ ]
+}

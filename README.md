@@ -20,14 +20,26 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 | Orchestrator + AI Assistant (F-AI), Setup Wizard (F-SETUP) | ✅ 완료 |
 | Addon 핫디플로이 (ZIP 업로드·무중단 마운트) | ✅ 복원 |
 | 대시보드 (`/dashboard` — 서버상태+에이전트 요약+빠른링크) | ✅ 완료 |
-| Marketplace (F-MP: 카탈로그·설치·단일활성버전) — 백엔드+프론트 | 🟡 |
+| Marketplace (F-MP: 카탈로그·설치·단일활성버전, **에이전트 관리 통합 허브**) — 백엔드+프론트 | 🟡 |
 | Workflow (F-WF: DAG 엔진·7노드·retry·HITL·SSE) — 백엔드+a11y 폼 프론트 | 🟡 |
 | RAG (F-RAG: 청킹·BM25+dense·RRF 하이브리드검색) — 백엔드+프론트 | 🟡 |
 | Playground (F-PG: 프롬프트/모델/RAG 실험·A/B) — 백엔드+프론트 | 🟡 |
-| Guardrails (F-GRD: PII/신용정보 13종 실판정·에이전트토글·**Orchestrator 실시간 게이트**) — 백엔드+프론트 | 🟡 |
+| Guardrails (F-GRD: 실판정+휴리스틱 공존·**도메인 규칙 24종 내재화·필터적용 토글·다도메인·LLM classifier(옵션) 완전판정**·Orchestrator 게이트) — 백엔드+프론트 | 🟡 |
 | 환경 분리/키(F-ENV), 웹 포털(F-WEB), 거버넌스(F-GOV) | 🟡 부분 |
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
+>
+> **UI 구성(impl/20)**: 별도 `에이전트 관리` 메뉴 없이 **마켓플레이스 메뉴가 통합 에이전트 허브**다. 상단탭 3분류 — **내장 에이전트**(Orchestrator·AI 어시스턴트·마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일 7종 한정) / **시스템 에이전트**(보안 도메인 등 그 외) / **Addon 에이전트**(사용자 업로드). 내장 5종(마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일)은 **REQUIRED(비활성 불가)**. `자산 등록`은 시스템 에이전트 탭(Addon 탭 `새 Agent 만들기`와 동일 위치), 자산 카탈로그(로컬·원격)는 그 하단에 편입.
+>
+> **가드레일 도메인 필터(impl/20 §7.8.7)**: wise-Guardrails 규칙 **24개 도메인 전체를 에이전트 내부 데이터(`app/data/guardrails/`)로 관리**한다. `global`(PII/신용정보)은 무조건 필수, 업종 도메인(금융·의료·제조·공공행정 등)은 classifier 규칙에 **regex 를 생성**해 결정적 판정에 사용하며, 도메인 카탈로그의 **`필터적용` 토글**로 테스트 시 적용 여부를 반영(다도메인 동시 판정). 데이터 재빌드: `make guardrails-data` (`scripts/build_guardrails_data.py`).
+>
+> **완전판정 2단 구조(impl/23 §7.8.7)**: (1) **regex**(결정적) — 규칙별 `mode` 로 **실판정(원본 regex)+휴리스틱(생성 regex) 공존**(카탈로그에 `실판정 N · 휴리스틱 M` 분리 표시). (2) **LLM classifier**(옵션 `GUARDRAILS_CLASSIFIER_ENABLED=true`, 기본 off·비결정적) — regex 후 규칙 메뉴를 LLM 에 제시해 패러프레이즈/문맥 위반까지 판정, 미구성·장애 시 regex 로 degrade. 생성 regex 과탐은 **2개 키워드 공기(AND)+교차도메인 DF 필터**로 완화(단일 흔한 키워드 오탐 제거). 도메인 카탈로그에 **전체 선택/해제 토글**(`필터적용 N/M 도메인` 우측). emb_guardrails ADDON 패키지에 룰셋 데이터 동봉.
+>
+> **화면 정렬 표준(impl/24)**: 모든 에이전트 화면 루트를 **`.page` 클래스**(`front/src/index.css` = `w-full max-w-6xl p-4 sm:p-6`)로 **좌측정렬·반응형·최대폭 제한** 통일(`mx-auto` 금지). 신규 에이전트(내장·Addon) 개발 기준. **예외**: 전체높이 인터랙티브 레이아웃(AI 어시스턴트 등 채팅·터미널).
+>
+> **내장 에이전트 MCP 개방(impl/20)**: REQUIRED 내장 5종의 MCP 설정 잠금을 해제 — 7종 내장 에이전트 모두 MCP 서버로 노출 가능.
+>
+> **emb_ 내장 패키지(impl/20 §7.8.8)**: 내장 5종의 ADDON 패키지 `addon-agents/zip/emb_{marketplace,workflow,rag,playground,guardrails}` 를 생성(기존 13종 보안 에이전트와 동일 규약).
 
 ---
 
@@ -42,15 +54,18 @@ app/
                          setup·agent_config·agent_registry·a2a·mcp·mcp_config·
                          marketplace(F-MP)·workflow(F-WF)·rag(F-RAG)·playground(F-PG)·guardrails(F-GRD)
   services/              llm_fallback·ollama_warmup·mcp_proxy_server·openapi_to_mcp·
-                         workflow_engine(F-WF DAG)·embeddings+rag_pipeline(F-RAG)·guardrails_detector(F-GRD)
+                         workflow_engine(F-WF DAG)·embeddings+rag_pipeline(F-RAG)·
+                         guardrails_detector+guardrails_rules(F-GRD 다도메인 룰스토어)
+  data/guardrails/       도메인 규칙(생성 regex 포함) 컴파일 데이터 24 (scripts/build_guardrails_data.py)
   core/                  config(settings)·deps(JWT/RBAC)·security
   rules/                 keyword_matcher (Orchestrator 룰)
   db.py                  raw-SQL 헬퍼 (fetch_one/all·execute_write/insert·_PH·migrations)
 sql/{sqlite,pg}/         01_init.sql(멱등 DDL: 코어 + marketplace/workflow/rag/playground/guardrails)
                          02_seed.sql(에이전트/설정/도메인카탈로그 시드)
 front/src/
-  pages/                 chat·agents·users·settings·profile·addon·setup +
-                         marketplace·workflow·rag·playground·guardrails (내장 에이전트 5종)
+  pages/                 chat·users·settings·profile·addon·setup +
+                         marketplace(=agents 통합 허브: 내장/시스템/Addon 3탭+자산카탈로그)·
+                         workflow·rag·playground·guardrails (내장 에이전트 5종)
   api/                   백엔드 계약별 axios 클라이언트(1:1 대응)
 addon-agents/            Addon ZIP 자산 (deployed/ 는 런타임 bind-mount)
 test/impl/<Nth>/         구현 차수별 시험 시나리오·결과
@@ -211,9 +226,20 @@ curl -X POST http://localhost:8100/api/playground/run -H "Authorization: Bearer 
   -H 'Content-Type: application/json' -d '{"prompt":"hello world","rag_collection_id":1}'
 # → {"id":1,"response_text":"...","provider":"ollama|degraded","latency_ms":42,"citations_json":"[...]"}
 
-# ── Guardrails (F-GRD) — global PII 13종 판정 (Playground 연계) ──
+# ── Guardrails (F-GRD) — 도메인 카탈로그 + 다도메인 판정 (§7.8.7) ──
+curl http://localhost:8100/api/guardrails/domains -H "Authorization: Bearer $TOKEN"
+# → {"domains":[{"domain_key":"global","status":"functional","is_required":1,"filter_enabled":1,"regex_rule_count":247,...},
+#               {"domain_key":"finance-banking","status":"functional","filter_enabled":0,...}, ...]}
+# 도메인 '필터적용' 토글 (admin) — 필수(global)는 해제 불가(409)
+curl -X PUT http://localhost:8100/api/guardrails/domains/finance-banking/filter -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"enabled":true}'
+# 판정 시험 — 미지정 시 global(필수)+필터적용 도메인 동시 평가, domains 로 명시도 가능
 curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' -d '{"text":"email me at secret@corp.com","domain":"global"}'
+  -H 'Content-Type: application/json' -d '{"text":"고객확인 KYC 없이 계좌 개설 방법","domains":["global","finance-banking"]}'
+# → {"decision":"block","evaluatedDomains":["global","finance-banking"],
+#    "perDomain":[{"domain":"finance-banking","decision":"block","matchedCount":13,...}], ...}
+curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"text":"email me at secret@corp.com"}'
 # → {"decision":"redact",...}  저위험 PII(이메일/전화/IP) = 마스킹
 # 승격(impl/11): 고위험 1종(시크릿/신용정보/국가식별번호) → block, 2종+ → escalate
 curl -X POST http://localhost:8100/api/guardrails/test -H "Authorization: Bearer $TOKEN" \

@@ -1,0 +1,260 @@
+{
+ "source": "/Users/wise/Developer/wise-Guardrails/Guardrails-Service/scripts",
+ "generic_df_threshold": 6,
+ "domain_count": 23,
+ "domains": [
+  {
+   "domain_key": "arts-recreation",
+   "display_name": "예술·스포츠·여가",
+   "display_name_en": "Arts/Recreation",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 121,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 121
+  },
+  {
+   "domain_key": "finance-banking",
+   "display_name": "금융(은행)",
+   "display_name_en": "Finance (Banking)",
+   "status": "functional",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 200,
+   "real_rule_count": 2,
+   "heuristic_rule_count": 198
+  },
+  {
+   "domain_key": "finance-insurance",
+   "display_name": "금융(보험)",
+   "display_name_en": "Finance (Insurance)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 200,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 200
+  },
+  {
+   "domain_key": "finance-securities-misc",
+   "display_name": "금융(증권·기타)",
+   "display_name_en": "Finance (Securities/Misc)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 200,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 200
+  },
+  {
+   "domain_key": "global",
+   "display_name": "Global PII/신용정보",
+   "display_name_en": "Global PII / Financial",
+   "status": "functional",
+   "required": true,
+   "rule_count": 256,
+   "regex_rule_count": 253,
+   "real_rule_count": 57,
+   "heuristic_rule_count": 196
+  },
+  {
+   "domain_key": "healthcare-clinical",
+   "display_name": "의료(임상)",
+   "display_name_en": "Healthcare (Clinical)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 220,
+   "regex_rule_count": 220,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 220
+  },
+  {
+   "domain_key": "healthcare-non-residential-welfare",
+   "display_name": "의료(비거주복지)",
+   "display_name_en": "Healthcare (Non-residential Welfare)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 200,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 200
+  },
+  {
+   "domain_key": "healthcare-residential-welfare",
+   "display_name": "의료(거주복지)",
+   "display_name_en": "Healthcare (Residential Welfare)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 200,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 200
+  },
+  {
+   "domain_key": "manufacturing-apparel",
+   "display_name": "제조업(의류)",
+   "display_name_en": "Manufacturing (Apparel)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 63,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 63
+  },
+  {
+   "domain_key": "manufacturing-automotive",
+   "display_name": "제조업(자동차)",
+   "display_name_en": "Manufacturing (Automotive)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 200,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 200
+  },
+  {
+   "domain_key": "manufacturing-beverage",
+   "display_name": "제조업(음료)",
+   "display_name_en": "Manufacturing (Beverage)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 65,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 65
+  },
+  {
+   "domain_key": "manufacturing-chemical",
+   "display_name": "제조업(화학)",
+   "display_name_en": "Manufacturing (Chemical)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 200,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 200
+  },
+  {
+   "domain_key": "manufacturing-electrical",
+   "display_name": "제조업(전기)",
+   "display_name_en": "Manufacturing (Electrical)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 88,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 88
+  },
+  {
+   "domain_key": "manufacturing-electronics",
+   "display_name": "제조업(전자)",
+   "display_name_en": "Manufacturing (Electronics)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 200,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 200
+  },
+  {
+   "domain_key": "manufacturing-food",
+   "display_name": "제조업(식품)",
+   "display_name_en": "Manufacturing (Food)",
+   "status": "functional",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 186,
+   "real_rule_count": 1,
+   "heuristic_rule_count": 185
+  },
+  {
+   "domain_key": "manufacturing-machinery",
+   "display_name": "제조업(기계)",
+   "display_name_en": "Manufacturing (Machinery)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 102,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 102
+  },
+  {
+   "domain_key": "manufacturing-metal-primary",
+   "display_name": "제조업(1차금속)",
+   "display_name_en": "Manufacturing (Primary Metal)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 62,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 62
+  },
+  {
+   "domain_key": "manufacturing-other-transport",
+   "display_name": "제조업(기타운송장비)",
+   "display_name_en": "Manufacturing (Other Transport)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 120,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 120
+  },
+  {
+   "domain_key": "manufacturing-pharma",
+   "display_name": "제조업(제약)",
+   "display_name_en": "Manufacturing (Pharma)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 210,
+   "regex_rule_count": 209,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 209
+  },
+  {
+   "domain_key": "manufacturing-rubber-plastics",
+   "display_name": "제조업(고무·플라스틱)",
+   "display_name_en": "Manufacturing (Rubber/Plastics)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 111,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 111
+  },
+  {
+   "domain_key": "manufacturing-textile",
+   "display_name": "제조업(섬유)",
+   "display_name_en": "Manufacturing (Textile)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 83,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 83
+  },
+  {
+   "domain_key": "manufacturing-tobacco",
+   "display_name": "제조업(담배)",
+   "display_name_en": "Manufacturing (Tobacco)",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 102,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 102
+  },
+  {
+   "domain_key": "public-administration",
+   "display_name": "공공행정",
+   "display_name_en": "Public Administration",
+   "status": "heuristic",
+   "required": false,
+   "rule_count": 200,
+   "regex_rule_count": 200,
+   "real_rule_count": 0,
+   "heuristic_rule_count": 200
+  }
+ ]
+}

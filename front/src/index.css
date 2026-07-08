@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* 화면 정렬 표준(PRD §7.11, impl/24) — 모든 에이전트 화면 루트에 적용.
+   좌측정렬(mx-auto 금지) · 반응형 · 최대폭 제한. 신규 에이전트 개발 시 최상위 컨테이너 기준. */
+@layer components {
+  .page {
+    @apply w-full max-w-6xl p-4 sm:p-6;
+  }
+}
+
 /* Genians CI 그린(#86BC25) 브랜드 팔레트 — 기존 blue/indigo 계열 클래스를 그대로 두고
    Tailwind v4 테마 변수만 오버라이드해 플랫폼 메인 색상을 교체한다.
    출처: https://www.genians.co.kr (main CSS 강조색 #86BC25) */

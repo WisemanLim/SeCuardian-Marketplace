@@ -89,6 +89,15 @@ addon-agents/
   동적 로더(`spec_from_file_location`)가 모듈을 `sys.modules` 에 등록하지 않아
   pydantic 이 지연 어노테이션(request body 모델)을 해석하지 못해 500 오류가 발생합니다.
 
+### 화면 정렬 표준 (`-front.tsx`, PRD §7.11 impl/24)
+
+- 에이전트 화면(`-front.tsx`)의 **최상위 컨테이너에 `.page` 클래스**를 적용한다
+  (`front/src/index.css` 정의 = `w-full max-w-6xl p-4 sm:p-6`). **좌측정렬·반응형·최대폭 제한**으로 전 화면을 통일.
+- `mx-auto`(가운데 정렬) 금지, `max-w-4xl/5xl` 등 개별 폭 지정 금지 — `.page` 로 표준화.
+- 예: `<div className="page space-y-4"> … </div>` (그리드면 `page grid grid-cols-3 gap-4`).
+- **예외**: 채팅·터미널 등 **전체높이 인터랙티브 레이아웃**(`flex flex-col h-full`)은 `.page` 미적용
+  (AI 어시스턴트·ShellAgent·emb_server-shell 등). 그 외 콘텐츠·폼 화면은 모두 `.page` 준용.
+
 ---
 
 ## Agent 개발 절차 (Makefile 사용)

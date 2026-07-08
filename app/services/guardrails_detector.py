@@ -7,8 +7,11 @@ wise-Guardrails Detection-Engine 의 `register_global_privacy()` 13종 정규식
 25개 업종 규칙셋은 판정기가 없는 데이터 상태(PRD §7.8.0 Critical Finding)이므로
 이 모듈은 `global` 만 다룬다. 다른 domain_key 요청은 카탈로그 조회만 가능(§7.8.3).
 """
+import logging
 import re
 from dataclasses import dataclass
+
+logger = logging.getLogger("uvicorn.error")
 
 _PATTERNS: dict[str, re.Pattern] = {
     "pii.national_id_kr": re.compile(r"\b\d{6}-[1-4]\d{6}\b"),                    # 주민등록번호
@@ -86,7 +89,7 @@ _HIGH_RISK: frozenset[str] = frozenset({
 
 
 def decide(text: str) -> dict:
-    """PRD §7.8.2 응답 계약과 동일한 형태로 판정 결과를 반환.
+    """PRD §7.8.2 응답 계약과 동일한 형태로 판정 결과를 반환(내장 `global` 13종 폴백).
 
     승격 정책: 저위험 PII(이메일/전화/IP)만 → redact. 고위험 1종 → block.
     고위험 2종 이상(대량·복합 유출) → escalate(사람 검토).
@@ -112,4 +115,162 @@ def decide(text: str) -> dict:
         "categories": categories,
         "normalizedText": text,
         "redactedText": redact(text, matches),
+    }
+
+
+# ── 다도메인 판정 (PRD §7.8.7) ──────────────────────────────────────────
+# action → 결정 우선순위. block 최상위(콘텐츠 차단), escalate(사람 검토) 동급.
+_ACTION_RANK = {"block": 5, "escalate": 5, "sanitize": 3, "mask": 3, "redact": 3, "warn": 1, "allow": 0}
+_SEVERITY_SCORE = {"critical": 1.0, "high": 0.7, "medium": 0.4, "low": 0.2}
+
+
+def _domain_matches(text: str, domain: str):
+    """룰스토어 데이터 우선, 없으면 global 내장 폴백. RuleMatch 유사 객체 리스트 반환."""
+    from app.services import guardrails_rules as store
+    if store.available() and store.has_domain(domain):
+        return store.detect(text, domain)
+    if domain == "global":
+        # 내장 13종 → RuleMatch 호환(action/severity 부여)
+        out = []
+        for m in detect_global(text):
+            act = "block" if m.category in _HIGH_RISK else "redact"
+            sev = "critical" if m.category in _HIGH_RISK else "high"
+            out.append(store.RuleMatch(
+                rule_id=m.rule_id, domain="global", category=m.category,
+                action=act, severity=sev, span=m.span, matched_text=m.matched_text,
+            ))
+        return out
+    return []
+
+
+def _aggregate_decision(matches) -> tuple[str, float]:
+    if not matches:
+        return "allow", 0.0
+    top = max(matches, key=lambda m: _ACTION_RANK.get(m.action, 0))
+    rank = _ACTION_RANK.get(top.action, 0)
+    if rank >= 5:
+        decision = "block" if any(m.action == "block" for m in matches) else "escalate"
+    elif rank >= 3:
+        decision = "redact"
+    elif rank >= 1:
+        decision = "warn"
+    else:
+        decision = "allow"
+    sev = max((_SEVERITY_SCORE.get(m.severity, 0.4) for m in matches), default=0.0)
+    risk = round(min(1.0, sev + 0.03 * (len(matches) - 1)), 4)
+    return decision, risk
+
+
+def decide_multi(text: str, domains: list[str]) -> dict:
+    """여러 도메인 규칙을 동시 평가하고 통합 결정 + 도메인별 breakdown 을 반환(PRD §7.8.7).
+
+    통합 결정 = 매치 규칙 action 중 최상위(block>redact>warn). redactedText 는 전 매치 구간 마스킹.
+    """
+    all_matches: list = []
+    per_domain: list[dict] = []
+    seen: set[str] = set()
+    for dom in domains:
+        if dom in seen:
+            continue
+        seen.add(dom)
+        ms = _domain_matches(text, dom)
+        d_decision, d_risk = _aggregate_decision(ms)
+        per_domain.append({
+            "domain": dom, "decision": d_decision, "riskScore": d_risk,
+            "matchedRules": [m.rule_id for m in ms], "matchedCount": len(ms),
+        })
+        all_matches.extend(ms)
+
+    decision, risk = _aggregate_decision(all_matches)
+    from app.services import guardrails_rules as store
+    return {
+        "decision": decision,
+        "riskScore": risk,
+        "matchedRules": [m.rule_id for m in all_matches],
+        "categories": sorted({m.category for m in all_matches if m.category}),
+        "normalizedText": text,
+        "redactedText": redact(text, all_matches),
+        "evaluatedDomains": list(seen),
+        "perDomain": per_domain,
+        "source": "rules" if store.available() else "builtin",
+    }
+
+
+# ── LLM classifier (완전판정, PRD §7.8.7) — 패러프레이즈/문맥 위반 판정 ──
+_CLASSIFIER_SYSTEM = (
+    "You are a compliance guardrail classifier. Given a user TEXT and a numbered MENU of domain "
+    "violation rules (id | category | description), decide which rules the TEXT actually violates. "
+    "Judge intent/paraphrase, not keyword presence. Respond ONLY with a JSON array of violated rule ids, "
+    'e.g. ["FIN_BANK_KR_001"]. Empty array [] if none. No prose.'
+)
+
+
+async def _classify_llm(text: str, domain: str, exclude: set[str]):
+    """도메인 규칙 메뉴를 LLM 에 제시해 위반 rule_id 를 판정. 실패/미구성 시 [] (degrade)."""
+    import json as _json
+
+    from app.core.config import settings
+    from app.services import guardrails_rules as store
+    from app.services.llm_fallback import call_ollama
+
+    cands = store.classifier_candidates(domain, exclude, settings.guardrails_classifier_max_rules)
+    if not cands:
+        return []
+    menu = "\n".join(f"{c['rule_id']} | {c['sub_category']} | {c['description']}" for c in cands)
+    by_id = {c["rule_id"]: c for c in cands}
+    prompt = f"TEXT:\n{text}\n\nMENU:\n{menu}\n\nViolated rule ids as JSON array:"
+    try:
+        raw = await call_ollama([{"role": "user", "content": prompt}], _CLASSIFIER_SYSTEM)
+        start, end = raw.find("["), raw.rfind("]")
+        if start < 0 or end < 0:
+            return []
+        ids = _json.loads(raw[start:end + 1])
+    except Exception:  # noqa: BLE001 — LLM 장애/파싱 실패 → degrade
+        logger.warning("[guardrails] LLM classifier degrade (domain=%s)", domain)
+        return []
+    from app.services.guardrails_rules import RuleMatch
+    out = []
+    for rid in ids:
+        c = by_id.get(rid)
+        if not c:
+            continue
+        out.append(RuleMatch(rule_id=rid, domain=domain, category=c["sub_category"],
+                             action=c["action"], severity=c["severity"], span=(0, 0), matched_text=""))
+    return out
+
+
+async def decide_multi_llm(text: str, domains: list[str]) -> dict:
+    """regex(결정적) + LLM classifier(패러프레이즈, 옵션)의 2단 완전판정(§7.8.7).
+
+    `guardrails_classifier_enabled` off 면 regex 결과(decide_multi)만 반환.
+    """
+    from app.core.config import settings
+    base = decide_multi(text, domains)
+    if not settings.guardrails_classifier_enabled:
+        return base
+
+    all_matches: list = []
+    per_domain: list[dict] = []
+    for pd in base["perDomain"]:
+        dom = pd["domain"]
+        regex_matches = _domain_matches(text, dom)
+        excl = {m.rule_id for m in regex_matches}
+        llm_matches = await _classify_llm(text, dom, excl)
+        combined = regex_matches + llm_matches
+        d_decision, d_risk = _aggregate_decision(combined)
+        per_domain.append({
+            "domain": dom, "decision": d_decision, "riskScore": d_risk,
+            "matchedRules": [m.rule_id for m in combined], "matchedCount": len(combined),
+            "llmMatched": [m.rule_id for m in llm_matches],
+        })
+        all_matches.extend(combined)
+
+    decision, risk = _aggregate_decision(all_matches)
+    return {
+        "decision": decision, "riskScore": risk,
+        "matchedRules": [m.rule_id for m in all_matches],
+        "categories": sorted({m.category for m in all_matches if m.category}),
+        "normalizedText": text, "redactedText": redact(text, all_matches),
+        "evaluatedDomains": base["evaluatedDomains"], "perDomain": per_domain,
+        "source": "rules+llm",
     }

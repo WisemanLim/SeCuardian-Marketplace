@@ -51,36 +51,39 @@ with TestClient(m.app) as c:
     r = c.get("/api/guardrails/domains", headers=H)
     doms = {d["domain_key"]: d for d in r.json()["domains"]}
     chk(doms.get("global", {}).get("status") == "functional", f"global functional ({doms.get('global')})")
-    chk(doms.get("manufacturing-food", {}).get("status") == "catalog_only", "manufacturing-food catalog_only")
+    # impl/20 §7.8.7: 규칙 데이터 내재화로 업종 도메인도 functional/heuristic (더 이상 catalog_only 아님)
+    chk(doms.get("manufacturing-food", {}).get("status") in ("functional", "heuristic"),
+        f"manufacturing-food now applicable ({doms.get('manufacturing-food', {}).get('status')})")
 
     # 1) no PII -> allow
     r = c.post("/api/guardrails/test", headers=H, json={"text": "hello, nice weather today"})
     chk(r.status_code == 200 and r.json()["decision"] == "allow", f"clean text -> allow ({r.json()})")
     chk(r.json()["riskScore"] == 0.0, "riskScore 0 on allow")
 
-    # 2) each of 13 detectors fires
+    # 2) 각 PII 샘플이 global 판정에서 탐지됨 (impl/20 §7.8.7: global 이 컴파일 데이터 256규칙으로
+    #    확장되어 rule_id 체계가 바뀜 — 특정 레거시 id 대신 '탐지 발화(matchedRules 비어있지 않음)' 로 검증)
     all_ok = True
     for rule_id, sample in SAMPLES.items():
         rr = c.post("/api/guardrails/test", headers=H, json={"text": f"context: {sample} end"})
         matched = rr.json().get("matchedRules", [])
-        ok = rr.status_code == 200 and rule_id in matched
+        ok = rr.status_code == 200 and len(matched) > 0
         if not ok:
             all_ok = False
             print(f"  -> {rule_id} sample={sample!r} matched={matched}")
-    chk(all_ok, "all 13 global detectors fire on their sample")
+    chk(all_ok, "all 13 global PII samples detected")
 
     # 3) decision -> redact + redactedText masked
     r = c.post("/api/guardrails/test", headers=H, json={"text": "email me at secret@corp.com"})
     chk(r.json()["decision"] == "redact", f"PII -> redact ({r.json()['decision']})")
     chk("secret@corp.com" not in r.json()["redactedText"], f"redactedText masks PII ({r.json()['redactedText']})")
 
-    # 4) catalog_only domain -> 409
-    r = c.post("/api/guardrails/test", headers=H, json={"text": "x", "domain": "manufacturing-food"})
-    chk(r.status_code == 409, f"catalog_only domain test -> 409 ({r.status_code})")
+    # 4) 업종 도메인도 테스트 가능 (impl/20 §7.8.7: 더 이상 409 아님 — 규칙 내재화로 판정)
+    r = c.post("/api/guardrails/test", headers=H, json={"text": "x", "domains": ["manufacturing-food"]})
+    chk(r.status_code == 200, f"industry domain testable -> 200 ({r.status_code})")
 
-    # 5) unknown domain -> 404
-    r = c.post("/api/guardrails/test", headers=H, json={"text": "x", "domain": "nope"})
-    chk(r.status_code == 404, "unknown domain -> 404")
+    # 5) 미지 도메인은 관대 처리 (impl/20 §7.8.7: 다도메인 평가에서 매치 없이 통과 — 404 아님)
+    r = c.post("/api/guardrails/test", headers=H, json={"text": "x", "domains": ["nope"]})
+    chk(r.status_code == 200, f"unknown domain tolerant -> 200 ({r.status_code})")
 
     # 6) agent toggle — user forbidden, supervisor allowed
     r = c.put("/api/guardrails/agents/chat/config", headers=UH, json={"domain_key": "global", "enabled": True})

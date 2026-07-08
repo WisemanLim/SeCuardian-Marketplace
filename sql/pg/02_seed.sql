@@ -16,41 +16,41 @@ UPDATE tbl_agent_config SET agent_name = 'AI 어시스턴트', is_required = 1,
 
 -- 내장 에이전트: Marketplace (F-MP)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('marketplace', '마켓플레이스', 1, 0, '내장 에이전트', 2, '에이전트·워크플로우·RAG 파이프라인 자산을 탐색·설치·버전관리하는 마켓플레이스입니다.')
+VALUES ('marketplace', '마켓플레이스', 1, 1, '내장 에이전트', 2, '에이전트·워크플로우·RAG 파이프라인 자산을 탐색·설치·버전관리하는 마켓플레이스입니다.')
 ON CONFLICT (agent_key) DO NOTHING;
-UPDATE tbl_agent_config SET agent_name = '마켓플레이스', nav_group = '내장 에이전트',
+UPDATE tbl_agent_config SET agent_name = '마켓플레이스', nav_group = '내장 에이전트', is_required = 1,
   description = '에이전트·워크플로우·RAG 파이프라인 자산을 탐색·설치·버전관리하는 마켓플레이스입니다.',
   description_en = 'Marketplace to browse, install, and version agent/workflow/RAG-pipeline assets.' WHERE agent_key = 'marketplace';
 
 -- 내장 에이전트: Workflow (F-WF)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('workflow', '워크플로우', 1, 0, '내장 에이전트', 3, '에이전트·LLM·조건·HITL 노드를 DAG로 조합해 자동화하는 워크플로우 엔진입니다.')
+VALUES ('workflow', '워크플로우', 1, 1, '내장 에이전트', 3, '에이전트·LLM·조건·HITL 노드를 DAG로 조합해 자동화하는 워크플로우 엔진입니다.')
 ON CONFLICT (agent_key) DO NOTHING;
-UPDATE tbl_agent_config SET agent_name = '워크플로우', nav_group = '내장 에이전트',
+UPDATE tbl_agent_config SET agent_name = '워크플로우', nav_group = '내장 에이전트', is_required = 1,
   description = '에이전트·LLM·조건·HITL 노드를 DAG로 조합해 자동화하는 워크플로우 엔진입니다.',
   description_en = 'Workflow engine that composes agent/LLM/condition/HITL nodes into automated DAGs.' WHERE agent_key = 'workflow';
 
 -- 내장 에이전트: RAG (F-RAG)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('rag', 'RAG', 1, 0, '내장 에이전트', 4, '문서 수집→임베딩→하이브리드(BM25+dense+RRF) 검색을 제공하는 지식베이스 파이프라인입니다.')
+VALUES ('rag', 'RAG', 1, 1, '내장 에이전트', 4, '문서 수집→임베딩→하이브리드(BM25+dense+RRF) 검색을 제공하는 지식베이스 파이프라인입니다.')
 ON CONFLICT (agent_key) DO NOTHING;
-UPDATE tbl_agent_config SET agent_name = 'RAG', nav_group = '내장 에이전트',
+UPDATE tbl_agent_config SET agent_name = 'RAG', nav_group = '내장 에이전트', is_required = 1,
   description = '문서 수집→임베딩→하이브리드(BM25+dense+RRF) 검색을 제공하는 지식베이스 파이프라인입니다.',
   description_en = 'Knowledge base pipeline: document ingest → embedding → hybrid (BM25+dense+RRF) search.' WHERE agent_key = 'rag';
 
 -- 내장 에이전트: Playground (F-PG)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('playground', '플레이그라운드', 1, 0, '내장 에이전트', 5, '프롬프트·모델·RAG 컬렉션을 조합해 대화형으로 실험하는 도구입니다.')
+VALUES ('playground', '플레이그라운드', 1, 1, '내장 에이전트', 5, '프롬프트·모델·RAG 컬렉션을 조합해 대화형으로 실험하는 도구입니다.')
 ON CONFLICT (agent_key) DO NOTHING;
-UPDATE tbl_agent_config SET agent_name = '플레이그라운드', nav_group = '내장 에이전트',
+UPDATE tbl_agent_config SET agent_name = '플레이그라운드', nav_group = '내장 에이전트', is_required = 1,
   description = '프롬프트·모델·RAG 컬렉션을 조합해 대화형으로 실험하는 도구입니다.',
   description_en = 'Interactive tool to experiment by combining prompt, model, and RAG collections.' WHERE agent_key = 'playground';
 
 -- 내장 에이전트: Guardrails (F-GRD)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('guardrails', '가드레일', 1, 0, '내장 에이전트', 6, 'PII/신용정보 등 도메인 규칙셋을 요청/응답에 강제하는 거버넌스 에이전트입니다(1차: global 도메인 실판정).')
+VALUES ('guardrails', '가드레일', 1, 1, '내장 에이전트', 6, 'PII/신용정보 등 도메인 규칙셋을 요청/응답에 강제하는 거버넌스 에이전트입니다(1차: global 도메인 실판정).')
 ON CONFLICT (agent_key) DO NOTHING;
-UPDATE tbl_agent_config SET agent_name = '가드레일', nav_group = '내장 에이전트',
+UPDATE tbl_agent_config SET agent_name = '가드레일', nav_group = '내장 에이전트', is_required = 1,
   description = 'PII/신용정보 등 도메인 규칙셋을 요청/응답에 강제하는 거버넌스 에이전트입니다(1차: global 도메인 실판정).',
   description_en = 'Governance agent enforcing domain rule sets (PII/financial) on requests/responses (phase 1: global domain only).' WHERE agent_key = 'guardrails';
 

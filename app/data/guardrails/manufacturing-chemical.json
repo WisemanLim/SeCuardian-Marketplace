@@ -1,0 +1,3413 @@
+{
+ "domain_key": "manufacturing-chemical",
+ "display_name": "제조업(화학)",
+ "display_name_en": "Manufacturing (Chemical)",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 200,
+ "regex_rule_count": 200,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 200,
+ "rules": [
+  {
+   "rule_id": "MF_CHEM_KR_001",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "reach_registration_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "REACH 등록 없이 EU 수출 권유 차단",
+   "patterns": [
+    "(?=.*물질)(?=.*유럽)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: REACH 등록 없이 EU 수출 권유 차단",
+   "message_en": "This request is blocked: Block export to EU without REACH registration"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_002",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "kreach_obligation_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "K-REACH 등록·신고 의무 회피 권유 차단",
+   "patterns": [
+    "(?=.*REACH)(?=.*이상인데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: K-REACH 등록·신고 의무 회피 권유 차단",
+   "message_en": "This request is blocked: Block evasion of K-REACH registration obligations"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_003",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "tsca_reporting_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "TSCA 보고 의무 누락 권유 차단",
+   "patterns": [
+    "(?=.*TSCA)(?=.*수출)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: TSCA 보고 의무 누락 권유 차단",
+   "message_en": "This request is blocked: Block omission of TSCA reporting obligations"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_004",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "msds_tampering",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "물질안전보건자료(MSDS/SDS) 변조 권유 차단",
+   "patterns": [
+    "(?=.*위험성)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 물질안전보건자료(MSDS/SDS) 변조 권유 차단",
+   "message_en": "This request is blocked: Block guidance to tamper with MSDS/SDS"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_005",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emission_report_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "화학물질 배출량 보고 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*보고해줘)(?=.*대기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 배출량 보고 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block falsification of chemical emission reports"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_006",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ghs_mislabel",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "GHS 위험 경고 표지 오기재 권유 차단",
+   "patterns": [
+    "(?=.*그림문자)(?=.*빼고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: GHS 위험 경고 표지 오기재 권유 차단",
+   "message_en": "This request is blocked: Block GHS hazard label misrepresentation"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_007",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hazardous_permit_forge",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "유해화학물질 취급 허가 위조 권유 차단",
+   "patterns": [
+    "(?=.*허가증)(?=.*유해물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유해화학물질 취급 허가 위조 권유 차단",
+   "message_en": "This request is blocked: Block forgery of hazardous chemical handling permi"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_008",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "psm_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "공정안전관리(PSM) 절차 우회 권유 차단",
+   "patterns": [
+    "(?=.*위험설비)(?=.*PSM)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공정안전관리(PSM) 절차 우회 권유 차단",
+   "message_en": "This request is blocked: Block bypass of process safety management procedur"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_009",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "waste_disposal_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "지정폐기물 불법 처리 권유 차단",
+   "patterns": [
+    "(?=.*일반폐기물)(?=.*지정폐기물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지정폐기물 불법 처리 권유 차단",
+   "message_en": "This request is blocked: Block illegal hazardous waste disposal"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_010",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "chemical_accident_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "화학사고 발생 은폐 권유 차단",
+   "patterns": [
+    "(?=.*화학물질)(?=.*누출)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학사고 발생 은폐 권유 차단",
+   "message_en": "This request is blocked: Block concealment of chemical accidents"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_011",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "import_unauthorized_chem",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "미허가 화학물질 수입 권유 차단",
+   "patterns": [
+    "(?=.*수입하)(?=.*수입)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 미허가 화학물질 수입 권유 차단",
+   "message_en": "This request is blocked: Block import of unauthorized chemicals"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_012",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "prtr_underreport",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "화학물질 배출·이동량 과소 보고 권유 차단",
+   "patterns": [
+    "(?=.*배출이동량)(?=.*신고해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 배출·이동량 과소 보고 권유 차단",
+   "message_en": "This request is blocked: Block underreporting of PRTR release/transfer amou"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_013",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "scc_substance_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 고위험성 물질(SVHC) 함유 은폐 안내 차단",
+   "patterns": [
+    "(?=.*SVHC)(?=.*알리지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 고위험성 물질(SVHC) 함유 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing SVHC content"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_014",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "storage_separation_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "유해물질 혼재 보관 기준 위반 권유 차단",
+   "patterns": [
+    "(?=.*산화제랑)(?=.*가연물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유해물질 혼재 보관 기준 위반 권유 차단",
+   "message_en": "This request is blocked: Block violation of incompatible chemical storage s"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_015",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "transport_classification_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "위험물 운송 분류 허위 신고 권유 차단",
+   "patterns": [
+    "(?=.*위험물)(?=.*낮춰서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위험물 운송 분류 허위 신고 권유 차단",
+   "message_en": "This request is blocked: Block false hazmat transport classification"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_016",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "worker_blood_level_pii",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "근로자 혈중 화학물질 농도 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*혈중)(?=.*농도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 근로자 혈중 화학물질 농도 검사 결과 유출 차단",
+   "message_en": "This request is blocked: Block exposure of worker blood chemical level resu"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_017",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "occupational_disease_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "직업병 진단 기록 개인 식별 유출 차단",
+   "patterns": [
+    "(?=.*진단받)(?=.*직업병)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_018",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "exposure_incident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "화학물질 노출 사고 피해자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*당한)(?=.*작업자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_019",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "medical_surveillance_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "의학적 추적관찰 대상자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*발암물질)(?=.*추적관찰)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_020",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "contractor_exposure_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 620,
+   "description": "협력업체 작업자 노출 기록 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*하청)(?=.*작업자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_021",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "hazmat_transport_sop_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "위험물 운반·보관 SOP 우회 권유 차단",
+   "patterns": [
+    "(?=.*위험물)(?=.*운반)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위험물 운반·보관 SOP 우회 권유 차단",
+   "message_en": "This request is blocked: Block bypass of hazmat transport/storage SOP"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_022",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ppe_chem_critical_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 910,
+   "description": "고위험 화학물질 취급 시 PPE 생략 권유 차단",
+   "patterns": [
+    "(?=.*황산)(?=.*다룰)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고위험 화학물질 취급 시 PPE 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping PPE for high-risk chemical handling"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_023",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "confined_space_chem_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "화학물질 밀폐공간 작업 안전 절차 생략 권유 차단",
+   "patterns": [
+    "(?=.*화학탱크)(?=.*산소)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 밀폐공간 작업 안전 절차 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping confined space safety with chemical"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_024",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "spill_response_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "화학물질 누출·유출 대응 절차 생략 권유 차단",
+   "patterns": [
+    "(?=.*둬도)(?=.*소량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 누출·유출 대응 절차 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping chemical spill/leak response"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_025",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "loto_chem_system_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 910,
+   "description": "화학 설비 잠금/태그아웃(LOTO) 생략 권유 차단",
+   "patterns": [
+    "(?=.*배관)(?=.*화학)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학 설비 잠금/태그아웃(LOTO) 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping LOTO for chemical systems"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_026",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "reactive_chem_mishandle",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "반응성·인화성 화학물질 오취급 권유 차단",
+   "patterns": [
+    "(?=.*인화성)(?=.*근처)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반응성·인화성 화학물질 오취급 권유 차단",
+   "message_en": "This request is blocked: Block mishandling of reactive/flammable chemicals"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_027",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ventilation_skip_chem",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "화학물질 작업장 국소배기 생략 권유 차단",
+   "patterns": [
+    "(?=.*국소배기장치)(?=.*꺼놓)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 작업장 국소배기 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping local exhaust ventilation in chemic"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_028",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "gas_detector_disable",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "유독가스 감지기 무력화 권유 차단",
+   "patterns": [
+    "(?=.*꺼놓)(?=.*감지기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유독가스 감지기 무력화 권유 차단",
+   "message_en": "This request is blocked: Block disabling of toxic gas detectors"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_029",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "catalyst_ratio_secret",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 840,
+   "description": "촉매 배합비·반응 조건 영업비밀 추론 차단",
+   "patterns": [
+    "(?=.*압력)(?=.*반응)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_030",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "synthesis_route_secret",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "고유 합성 경로 영업비밀 추론 차단",
+   "patterns": [
+    "(?=.*역추적해줘)(?=.*경로)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_031",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "solvent_recovery_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "용제 회수 공정 기술 영업비밀 추론 차단",
+   "patterns": [
+    "(?=.*회수율이랑)(?=.*용제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_032",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "formulation_concentration_secret",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 830,
+   "description": "제품 배합 농도 영업비밀 추론 차단",
+   "patterns": [
+    "(?=.*농도)(?=.*성분)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_033",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "rd_compound_pipeline_secret",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 810,
+   "description": "R&D 신규 화합물 파이프라인 정보 추론 차단",
+   "patterns": [
+    "(?=.*화합물)(?=.*개발)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_034",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "sds_classification_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "SDS 위험성 분류 허위 작성 지원 차단",
+   "patterns": [
+    "(?=.*위험하게)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: SDS 위험성 분류 허위 작성 지원 차단",
+   "message_en": "This request is blocked: Block fraudulent SDS hazard classification"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_035",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "safety_cert_fraud_chem",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "화학물질 안전 인증 위조 지원 차단",
+   "patterns": [
+    "(?=.*받고)(?=.*인증서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 안전 인증 위조 지원 차단",
+   "message_en": "This request is blocked: Block fraudulent chemical safety certification"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_036",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "supply_substitution_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "화학 원료 무단 대체·혼입 사기 지원 차단",
+   "patterns": [
+    "(?=.*대체하)(?=.*원료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학 원료 무단 대체·혼입 사기 지원 차단",
+   "message_en": "This request is blocked: Block fraudulent chemical raw material substitutio"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_037",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "env_compliance_deception",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "환경 규제 준수 기만 행위 지원 차단",
+   "patterns": [
+    "(?=.*때만)(?=.*배출)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환경 규제 준수 기만 행위 지원 차단",
+   "message_en": "This request is blocked: Block environmental compliance deception"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_038",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "acid_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 산류 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*산류)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 산류 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising acids emission report falsif"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_039",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "base_alkali_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 염기·알칼리 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*알칼리)(?=.*염기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 염기·알칼리 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising bases/alkalis emission repor"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_040",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "oxidizer_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 산화제 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*산화제)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 산화제 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising oxidizers emission report fa"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_041",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "solvent_org_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 유기용제 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*설명해줘)(?=.*유기용제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 유기용제 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising organic solvents emission re"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_042",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "heavy_metal_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 중금속 화합물 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*중금속)(?=.*화합물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 중금속 화합물 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising heavy metal compounds emissi"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_043",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "pesticide_chem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 농약 원제 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*원제)(?=.*농약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 농약 원제 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising pesticide active ingredients"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_044",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "petrochem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 석유화학 제품 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*석유화학)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 석유화학 제품 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising petrochemicals emission repo"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_045",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "polymer_resin_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 고분자·수지 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*고분자)(?=.*수지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 고분자·수지 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising polymers/resins emission rep"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_046",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "flammable_gas_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 인화성 가스 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*인화성)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 인화성 가스 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising flammable gases emission rep"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_047",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "toxic_gas_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 독성 가스 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*독성)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 독성 가스 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising toxic gases emission report "
+  },
+  {
+   "rule_id": "MF_CHEM_KR_048",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "explosive_chem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 폭발성 물질 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*폭발성)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 폭발성 물질 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising explosive substances emissio"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_049",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "corrosive_chem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 부식성 물질 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*부식성)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 부식성 물질 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising corrosive substances emissio"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_050",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "carcinogen_chem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 발암물질 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*발암물질)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 발암물질 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising carcinogens emission report "
+  },
+  {
+   "rule_id": "MF_CHEM_KR_051",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "dye_pigment_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 염료·안료 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*염료)(?=.*안료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 염료·안료 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising dyes/pigments emission repor"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_052",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "adhesive_chem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 접착제 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*접착제)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 접착제 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising adhesives emission report fa"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_053",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "surfactant_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 계면활성제 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*계면활성제)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 계면활성제 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising surfactants emission report "
+  },
+  {
+   "rule_id": "MF_CHEM_KR_054",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "catalyst_chem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 촉매 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*촉매)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 촉매 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising catalysts emission report fa"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_055",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "fertilizer_chem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 비료 원료 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*비료)(?=.*원료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 비료 원료 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising fertilizer materials emissio"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_056",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "battery_chem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 전지 소재 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*전지)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 전지 소재 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising battery materials emission r"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_057",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "semiconductor_chem_emission_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 반도체 화학 배출량 허위 보고 안내 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*설명해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 반도체 화학 배출량 허위 보고 안내 차단",
+   "message_en": "This request is blocked: Block output advising semiconductor chemicals emis"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_058",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "acid_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 산류 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*산류)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 산류 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing acids SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_059",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "base_alkali_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 염기·알칼리 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*알칼리)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 염기·알칼리 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing bases/alkalis SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_060",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "oxidizer_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 산화제 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*산화제)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 산화제 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing oxidizers SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_061",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "solvent_org_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 유기용제 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*SDS)(?=.*유기용제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 유기용제 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing organic solvents SDS hazar"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_062",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "heavy_metal_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 중금속 화합물 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*중금속)(?=.*화합물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 중금속 화합물 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing heavy metal compounds SDS "
+  },
+  {
+   "rule_id": "MF_CHEM_KR_063",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "pesticide_chem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 농약 원제 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*원제)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 농약 원제 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing pesticide active ingredien"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_064",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "petrochem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 석유화학 제품 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*석유화학)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 석유화학 제품 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing petrochemicals SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_065",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "polymer_resin_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 고분자·수지 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*고분자)(?=.*수지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 고분자·수지 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing polymers/resins SDS hazard"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_066",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "flammable_gas_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 인화성 가스 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*인화성)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 인화성 가스 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing flammable gases SDS hazard"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_067",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "toxic_gas_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 독성 가스 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*SDS)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 독성 가스 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing toxic gases SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_068",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "explosive_chem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 폭발성 물질 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*폭발성)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 폭발성 물질 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing explosive substances SDS h"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_069",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "corrosive_chem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 부식성 물질 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*부식성)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 부식성 물질 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing corrosive substances SDS h"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_070",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "carcinogen_chem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 발암물질 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*발암물질)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 발암물질 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing carcinogens SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_071",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "dye_pigment_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 염료·안료 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*염료)(?=.*안료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 염료·안료 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing dyes/pigments SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_072",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "adhesive_chem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 접착제 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*접착제)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 접착제 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing adhesives SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_073",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "surfactant_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 계면활성제 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*계면활성제)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 계면활성제 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing surfactants SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_074",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "catalyst_chem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 촉매 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*촉매)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 촉매 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing catalysts SDS hazards"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_075",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "fertilizer_chem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 비료 원료 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*비료)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 비료 원료 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing fertilizer materials SDS h"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_076",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "battery_chem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 전지 소재 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*전지)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 전지 소재 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing battery materials SDS haza"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_077",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "semiconductor_chem_sds_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 반도체 화학 SDS 위험성 정보 은폐 안내 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*SDS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 반도체 화학 SDS 위험성 정보 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output concealing semiconductor chemicals SD"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_078",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "acid_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "산류 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*산류)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_079",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "base_alkali_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "염기·알칼리 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*알칼리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_080",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "oxidizer_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "산화제 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*산화제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_081",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "solvent_org_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "유기용제 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*유기용제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_082",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "heavy_metal_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "중금속 화합물 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*중금속)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_083",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "pesticide_chem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "농약 원제 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*원제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_084",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "petrochem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "석유화학 제품 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*석유화학)(?=.*건강검진)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_085",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "polymer_resin_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "고분자·수지 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*고분자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_086",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "flammable_gas_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "인화성 가스 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*인화성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_087",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "toxic_gas_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "독성 가스 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*독성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_088",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "explosive_chem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "폭발성 물질 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*폭발성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_089",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "corrosive_chem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "부식성 물질 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*부식성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_090",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "carcinogen_chem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "발암물질 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*발암물질)(?=.*건강검진)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_091",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "dye_pigment_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "염료·안료 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*염료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_092",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "adhesive_chem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "접착제 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*접착제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_093",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "surfactant_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "계면활성제 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*계면활성제)(?=.*건강검진)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_094",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "catalyst_chem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "촉매 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*촉매)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_095",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "fertilizer_chem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "비료 원료 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*비료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_096",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "battery_chem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "전지 소재 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*전지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_097",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "semiconductor_chem_worker_exposure_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "반도체 화학 취급 근로자 노출 검사 결과 유출 차단",
+   "patterns": [
+    "(?=.*건강검진)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_098",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "acid_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "산류 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*산류)(?=.*작업하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산류 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for acids"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_099",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "base_alkali_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "염기·알칼리 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*알칼리)(?=.*염기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 염기·알칼리 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for bases/alkalis"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_100",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "oxidizer_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "산화제 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*산화제)(?=.*작업하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산화제 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for oxidizers"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_101",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "solvent_org_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "유기용제 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*유기용제)(?=.*작업하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유기용제 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for organic solvent"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_102",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "heavy_metal_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "중금속 화합물 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*중금속)(?=.*화합물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중금속 화합물 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for heavy metal com"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_103",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "pesticide_chem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "농약 원제 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*원제)(?=.*농약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 농약 원제 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for pesticide activ"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_104",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "petrochem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "석유화학 제품 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*석유화학)(?=.*작업하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 석유화학 제품 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for petrochemicals"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_105",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "polymer_resin_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "고분자·수지 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*고분자)(?=.*수지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고분자·수지 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for polymers/resins"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_106",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "flammable_gas_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "인화성 가스 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*인화성)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 인화성 가스 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for flammable gases"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_107",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "toxic_gas_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "독성 가스 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*독성)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 독성 가스 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for toxic gases"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_108",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "explosive_chem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "폭발성 물질 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*폭발성)(?=.*물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 폭발성 물질 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for explosive subst"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_109",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "corrosive_chem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "부식성 물질 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*부식성)(?=.*물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 부식성 물질 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for corrosive subst"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_110",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "carcinogen_chem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "발암물질 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*발암물질)(?=.*작업하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 발암물질 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for carcinogens"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_111",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "dye_pigment_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "염료·안료 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*염료)(?=.*안료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 염료·안료 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for dyes/pigments"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_112",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "adhesive_chem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "접착제 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*접착제)(?=.*작업하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 접착제 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for adhesives"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_113",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "surfactant_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "계면활성제 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*계면활성제)(?=.*작업하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 계면활성제 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for surfactants"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_114",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "catalyst_chem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "촉매 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*촉매)(?=.*작업하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 촉매 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for catalysts"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_115",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "fertilizer_chem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "비료 원료 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*비료)(?=.*원료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 비료 원료 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for fertilizer mate"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_116",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "battery_chem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "전지 소재 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*전지)(?=.*소재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전지 소재 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for battery materia"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_117",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "semiconductor_chem_handling_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "반도체 화학 취급 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*화학)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 화학 취급 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Block skipping handling safety for semiconductor c"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_118",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "acid_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 산류 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*산류)(?=.*포함해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_119",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "base_alkali_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 염기·알칼리 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*알칼리)(?=.*염기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_120",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "oxidizer_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 산화제 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*산화제)(?=.*포함해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_121",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "solvent_org_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 유기용제 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*유기용제)(?=.*포함해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_122",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "heavy_metal_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 중금속 화합물 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*중금속)(?=.*화합물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_123",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "pesticide_chem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 농약 원제 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*원제)(?=.*농약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_124",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "petrochem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 석유화학 제품 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*석유화학)(?=.*포함해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_125",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "polymer_resin_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 고분자·수지 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*고분자)(?=.*수지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_126",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "flammable_gas_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 인화성 가스 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*인화성)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_127",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "toxic_gas_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 독성 가스 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*가스)(?=.*독성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_128",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "explosive_chem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 폭발성 물질 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*폭발성)(?=.*물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_129",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "corrosive_chem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 부식성 물질 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*부식성)(?=.*물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_130",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "carcinogen_chem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 발암물질 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*발암물질)(?=.*포함해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_131",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "dye_pigment_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 염료·안료 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*염료)(?=.*안료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_132",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "adhesive_chem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 접착제 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*접착제)(?=.*포함해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_133",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "surfactant_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 계면활성제 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*계면활성제)(?=.*포함해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_134",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "catalyst_chem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 촉매 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*촉매)(?=.*포함해줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_135",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "fertilizer_chem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 비료 원료 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*비료)(?=.*원료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_136",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "battery_chem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 전지 소재 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*전지)(?=.*소재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_137",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "semiconductor_chem_formula_secret",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 650,
+   "description": "응답에서 반도체 화학 배합·공정 영업비밀 유출 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*화학)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_CHEM_KR_138",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "acid_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "산류 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*산류)(?=.*위장하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산류 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for acids"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_139",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "base_alkali_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "염기·알칼리 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*알칼리)(?=.*염기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 염기·알칼리 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for bases/alkalis"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_140",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "oxidizer_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "산화제 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*산화제)(?=.*위장하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산화제 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for oxidizers"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_141",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "solvent_org_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "유기용제 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*유기용제)(?=.*위장하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유기용제 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for organic solvents"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_142",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "heavy_metal_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "중금속 화합물 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*중금속)(?=.*화합물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중금속 화합물 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for heavy metal compo"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_143",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pesticide_chem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "농약 원제 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*원제)(?=.*농약)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 농약 원제 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for pesticide active "
+  },
+  {
+   "rule_id": "MF_CHEM_KR_144",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "petrochem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "석유화학 제품 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*석유화학)(?=.*위장하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 석유화학 제품 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for petrochemicals"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_145",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "polymer_resin_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "고분자·수지 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*고분자)(?=.*수지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고분자·수지 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for polymers/resins"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_146",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "flammable_gas_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "인화성 가스 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*인화성)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 인화성 가스 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for flammable gases"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_147",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "toxic_gas_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "독성 가스 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*독성)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 독성 가스 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for toxic gases"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_148",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "explosive_chem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "폭발성 물질 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*폭발성)(?=.*물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 폭발성 물질 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for explosive substan"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_149",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "corrosive_chem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "부식성 물질 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*부식성)(?=.*물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 부식성 물질 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for corrosive substan"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_150",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "carcinogen_chem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "발암물질 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*발암물질)(?=.*위장하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 발암물질 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for carcinogens"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_151",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dye_pigment_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "염료·안료 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*염료)(?=.*안료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 염료·안료 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for dyes/pigments"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_152",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "adhesive_chem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "접착제 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*접착제)(?=.*위장하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 접착제 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for adhesives"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_153",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "surfactant_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "계면활성제 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*계면활성제)(?=.*위장하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 계면활성제 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for surfactants"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_154",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "catalyst_chem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "촉매 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*촉매)(?=.*위장하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 촉매 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for catalysts"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_155",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "fertilizer_chem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "비료 원료 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*비료)(?=.*원료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 비료 원료 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for fertilizer materi"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_156",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "battery_chem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "전지 소재 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*전지)(?=.*소재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전지 소재 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for battery materials"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_157",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "semiconductor_chem_waste_disposal_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "반도체 화학 폐기물 불법 처리 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*화학)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 화학 폐기물 불법 처리 차단",
+   "message_en": "This request is blocked: Block illegal waste disposal for semiconductor che"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_158",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "acid_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "산류 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*산류)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산류 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for acids"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_159",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "base_alkali_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "염기·알칼리 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*알칼리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 염기·알칼리 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for bases"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_160",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "oxidizer_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "산화제 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*산화제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산화제 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for oxidi"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_161",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "solvent_org_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "유기용제 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*운송)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유기용제 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for organ"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_162",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "heavy_metal_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "중금속 화합물 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*중금속)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중금속 화합물 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for heavy"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_163",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pesticide_chem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "농약 원제 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*원제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 농약 원제 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for pesti"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_164",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "petrochem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "석유화학 제품 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*석유화학)(?=.*위험등급)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 석유화학 제품 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for petro"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_165",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "polymer_resin_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "고분자·수지 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*고분자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고분자·수지 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for polym"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_166",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "flammable_gas_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "인화성 가스 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*인화성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 인화성 가스 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for flamm"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_167",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "toxic_gas_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "독성 가스 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 독성 가스 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for toxic"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_168",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "explosive_chem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "폭발성 물질 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*폭발성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 폭발성 물질 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for explo"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_169",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "corrosive_chem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "부식성 물질 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*부식성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 부식성 물질 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for corro"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_170",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "carcinogen_chem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "발암물질 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*발암물질)(?=.*위험등급)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 발암물질 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for carci"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_171",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dye_pigment_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "염료·안료 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*염료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 염료·안료 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for dyes/"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_172",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "adhesive_chem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "접착제 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*접착제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 접착제 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for adhes"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_173",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "surfactant_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "계면활성제 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*계면활성제)(?=.*위험등급)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 계면활성제 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for surfa"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_174",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "catalyst_chem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "촉매 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*촉매)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 촉매 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for catal"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_175",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "fertilizer_chem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "비료 원료 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*비료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 비료 원료 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for ferti"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_176",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "battery_chem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "전지 소재 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*전지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전지 소재 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for batte"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_177",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "semiconductor_chem_transport_misclass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "반도체 화학 운송 위험 분류 조작 차단",
+   "patterns": [
+    "(?=.*위험등급)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 화학 운송 위험 분류 조작 차단",
+   "message_en": "This request is blocked: Block transport hazard misclassification for semic"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_178",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "acid_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "산류 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*산류)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산류 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for acids"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_179",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "base_alkali_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "염기·알칼리 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*알칼리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 염기·알칼리 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for bases/alkalis"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_180",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "oxidizer_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "산화제 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*산화제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산화제 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for oxidizers"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_181",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "solvent_org_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "유기용제 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*분리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유기용제 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for organic solve"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_182",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "heavy_metal_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "중금속 화합물 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*중금속)(?=.*적재하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중금속 화합물 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for heavy metal c"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_183",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "pesticide_chem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "농약 원제 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*원제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 농약 원제 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for pesticide act"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_184",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "petrochem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "석유화학 제품 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*석유화학)(?=.*적재하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 석유화학 제품 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for petrochemical"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_185",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "polymer_resin_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "고분자·수지 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*고분자)(?=.*적재하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고분자·수지 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for polymers/resi"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_186",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "flammable_gas_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "인화성 가스 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*인화성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 인화성 가스 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for flammable gas"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_187",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "toxic_gas_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "독성 가스 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*독성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 독성 가스 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for toxic gases"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_188",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "explosive_chem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "폭발성 물질 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*폭발성)(?=.*적재하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 폭발성 물질 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for explosive sub"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_189",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "corrosive_chem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "부식성 물질 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*부식성)(?=.*적재하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 부식성 물질 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for corrosive sub"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_190",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "carcinogen_chem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "발암물질 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*발암물질)(?=.*적재하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 발암물질 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for carcinogens"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_191",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "dye_pigment_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "염료·안료 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*염료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 염료·안료 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for dyes/pigments"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_192",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "adhesive_chem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "접착제 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*접착제)(?=.*적재하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 접착제 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for adhesives"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_193",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "surfactant_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "계면활성제 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*계면활성제)(?=.*적재하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 계면활성제 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for surfactants"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_194",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "catalyst_chem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "촉매 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*촉매)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 촉매 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for catalysts"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_195",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "fertilizer_chem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "비료 원료 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*비료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 비료 원료 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for fertilizer ma"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_196",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "battery_chem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "전지 소재 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*전지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전지 소재 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for battery mater"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_197",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "semiconductor_chem_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "반도체 화학 보관 기준 위반 차단",
+   "patterns": [
+    "(?=.*적재하)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 화학 보관 기준 위반 차단",
+   "message_en": "This request is blocked: Block storage standard violation for semiconductor"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_198",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "acid_accident_cover",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 산류 사고·누출 은폐 안내 차단",
+   "patterns": [
+    "(?=.*산류)(?=.*누출)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 산류 사고·누출 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising concealment of acids acciden"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_199",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "base_alkali_accident_cover",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 염기·알칼리 사고·누출 은폐 안내 차단",
+   "patterns": [
+    "(?=.*알칼리)(?=.*염기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 염기·알칼리 사고·누출 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising concealment of bases/alkalis"
+  },
+  {
+   "rule_id": "MF_CHEM_KR_200",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "oxidizer_accident_cover",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 산화제 사고·누출 은폐 안내 차단",
+   "patterns": [
+    "(?=.*산화제)(?=.*누출)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 산화제 사고·누출 은폐 안내 차단",
+   "message_en": "This request is blocked: Block output advising concealment of oxidizers acc"
+  }
+ ]
+}

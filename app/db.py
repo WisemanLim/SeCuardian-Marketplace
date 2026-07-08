@@ -201,6 +201,12 @@ def _apply_pg_column_migrations() -> None:
         "ALTER TABLE tbl_agent_registry ADD COLUMN IF NOT EXISTS health_score NUMERIC(5,4) NOT NULL DEFAULT 1.0",
         "ALTER TABLE tbl_agent_registry ADD COLUMN IF NOT EXISTS last_heartbeat_at TIMESTAMP",
         "ALTER TABLE tbl_agent_registry ADD COLUMN IF NOT EXISTS lease_expires_at TIMESTAMP",
+        # F-GRD §7.8.7: 도메인 필터 확장
+        "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS regex_rule_count INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS real_rule_count INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS heuristic_rule_count INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS is_required INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS filter_enabled INTEGER NOT NULL DEFAULT 0",
         # F23: tbl_addon_agent_capabilities (new table)
         """CREATE TABLE IF NOT EXISTS tbl_addon_agent_capabilities (
             id SERIAL PRIMARY KEY, agent_key VARCHAR(50) NOT NULL,
@@ -310,6 +316,22 @@ async def apply_column_migrations() -> None:
         """)
         await conn.commit()
         logger.info("[db] tbl_addon_agent_capabilities ensured")
+
+    # guardrails_domain_catalog — 도메인 필터 확장 컬럼 (F-GRD §7.8.7)
+    async with aiosqlite.connect(_db_path()) as conn:
+        async with conn.execute("PRAGMA table_info(guardrails_domain_catalog)") as cur:
+            grd_cols = {row[1] async for row in cur}
+        for col, typedef in ([
+            ("regex_rule_count", "INTEGER NOT NULL DEFAULT 0"),
+            ("real_rule_count", "INTEGER NOT NULL DEFAULT 0"),
+            ("heuristic_rule_count", "INTEGER NOT NULL DEFAULT 0"),
+            ("is_required", "INTEGER NOT NULL DEFAULT 0"),
+            ("filter_enabled", "INTEGER NOT NULL DEFAULT 0"),
+        ] if grd_cols else []):
+            if col not in grd_cols:
+                await conn.execute(f"ALTER TABLE guardrails_domain_catalog ADD COLUMN {col} {typedef}")
+                logger.info("[db] added column guardrails_domain_catalog.%s", col)
+        await conn.commit()
 
 
 async def seed_default_admin() -> None:

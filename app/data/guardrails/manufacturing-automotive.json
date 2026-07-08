@@ -1,0 +1,3413 @@
+{
+ "domain_key": "manufacturing-automotive",
+ "display_name": "제조업(자동차)",
+ "display_name_en": "Manufacturing (Automotive)",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 200,
+ "regex_rule_count": 200,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 200,
+ "rules": [
+  {
+   "rule_id": "MF_AUTO_KR_001",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "safety_defect_coverup",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "차량 안전결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*내부에서)(?=.*말자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 안전결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Vehicle safety defect concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_002",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "recall_delay_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "리콜 지연·은폐 조력 차단",
+   "patterns": [
+    "(?=.*뒤로)(?=.*미룰)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 리콜 지연·은폐 조력 차단",
+   "message_en": "This request is blocked: Recall delay or concealment assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_003",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "airbag_defect_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "에어백 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*에어백)(?=.*삭제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 에어백 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Airbag defect concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_004",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "brake_failure_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "제동장치 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*브레이크)(?=.*숨기기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제동장치 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Brake failure concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_005",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "vehicle_fire_risk_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "차량 화재 위험 은폐 요청 차단",
+   "patterns": [
+    "(?=.*배터리)(?=.*은폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 화재 위험 은폐 요청 차단",
+   "message_en": "This request is blocked: Vehicle fire risk concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_006",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "autonomy_liability_evasion",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "자율주행 사고 책임 회피 조력 차단",
+   "patterns": [
+    "(?=.*ADAS)(?=.*오작동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자율주행 사고 책임 회피 조력 차단",
+   "message_en": "This request is blocked: Autonomous driving liability evasion assistance bl"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_007",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ota_update_risk_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "OTA 업데이트 위험성 은폐 요청 차단",
+   "patterns": [
+    "(?=.*OTA)(?=.*업데이트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: OTA 업데이트 위험성 은폐 요청 차단",
+   "message_en": "This request is blocked: OTA update risk concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_008",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "sotif_scenario_omit",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "SOTIF 위험 시나리오 의도적 누락 차단",
+   "patterns": [
+    "(?=.*SOTIF)(?=.*제외)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: SOTIF 위험 시나리오 의도적 누락 차단",
+   "message_en": "This request is blocked: Intentional SOTIF scenario omission blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_009",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cyber_vuln_automotive_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "커넥티드카 사이버보안 취약점 은폐 차단",
+   "patterns": [
+    "(?=.*해킹)(?=.*취약점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 커넥티드카 사이버보안 취약점 은폐 차단",
+   "message_en": "This request is blocked: Connected car cybersecurity vulnerability concealm"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_010",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "emission_defeat_device",
+   "severity": "critical",
+   "action": "block",
+   "priority": 995,
+   "description": "배출가스 조작 장치(defeat device) 설계 조력 차단",
+   "patterns": [
+    "(?=.*배출가스)(?=.*작동시키)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배출가스 조작 장치(defeat device) 설계 조력 차단",
+   "message_en": "This request is blocked: Emission defeat device design assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_011",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "fuel_economy_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "연비 데이터 위조 요청 차단",
+   "patterns": [
+    "(?=.*연비보)(?=.*공인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 연비 데이터 위조 요청 차단",
+   "message_en": "This request is blocked: Fuel economy data falsification request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_012",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "loto_automotive_assembly_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "조립라인 LOTO 절차 생략 조력 차단",
+   "patterns": [
+    "(?=.*금형)(?=.*진행하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 조립라인 LOTO 절차 생략 조력 차단",
+   "message_en": "This request is blocked: Assembly line LOTO procedure bypass assistance blo"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_013",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "press_die_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 875,
+   "description": "프레스 금형 안전장치 해제 조력 차단",
+   "patterns": [
+    "(?=.*교환)(?=.*금형)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 프레스 금형 안전장치 해제 조력 차단",
+   "message_en": "This request is blocked: Press die safety device bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_014",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "painting_fume_exposure_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "도장 공정 유해가스 노출 위험 무시 조력 차단",
+   "patterns": [
+    "(?=.*환기장치)(?=.*도장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 도장 공정 유해가스 노출 위험 무시 조력 차단",
+   "message_en": "This request is blocked: Painting process fume exposure risk bypass assista"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_015",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "weld_spark_ppe_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 855,
+   "description": "용접 불꽃·자외선 PPE 생략 조력 차단",
+   "patterns": [
+    "(?=.*예외)(?=.*자동화)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 용접 불꽃·자외선 PPE 생략 조력 차단",
+   "message_en": "This request is blocked: Welding spark/UV PPE bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_016",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "quality_gate_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "품질 게이트 우회 요청 차단",
+   "patterns": [
+    "(?=.*로직)(?=.*게이트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 품질 게이트 우회 요청 차단",
+   "message_en": "This request is blocked: Quality gate bypass request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_017",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "rollover_test_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "전복시험 데이터 위조 요청 차단",
+   "patterns": [
+    "(?=.*수정하)(?=.*전복)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전복시험 데이터 위조 요청 차단",
+   "message_en": "This request is blocked: Rollover test data falsification request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_018",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "crashtest_data_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "충돌시험 결과 은폐 요청 차단",
+   "patterns": [
+    "(?=.*NCAP)(?=.*충돌)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 충돌시험 결과 은폐 요청 차단",
+   "message_en": "This request is blocked: Crash test result concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_019",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "tire_defect_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "타이어 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*편마모)(?=.*타이어)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 타이어 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Tire defect concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_020",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "steering_failure_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "조향장치 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*스티어링)(?=.*오작동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 조향장치 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Steering failure concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_021",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "suspension_defect_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 958,
+   "description": "현가장치 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*서스펜션)(?=.*파단)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 현가장치 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Suspension defect concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_022",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "adas_malfunction_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 915,
+   "description": "ADAS 오작동 정보 은폐 요청 차단",
+   "patterns": [
+    "(?=.*ADAS)(?=.*긴급제동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ADAS 오작동 정보 은폐 요청 차단",
+   "message_en": "This request is blocked: ADAS malfunction information concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_023",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "ev_battery_defect_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "전기차 배터리 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*배터리)(?=.*생략)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기차 배터리 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: EV battery defect concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_024",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "fuel_leak_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "연료 누출 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*연료)(?=.*계통)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 연료 누출 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Fuel leak defect concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_025",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "seatbelt_defect_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "안전벨트 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*버클)(?=.*안전벨트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안전벨트 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Seatbelt defect concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_026",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "engine_stall_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 962,
+   "description": "주행 중 엔진 시동 꺼짐 결함 은폐 차단",
+   "patterns": [
+    "(?=.*시동)(?=.*주행)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주행 중 엔진 시동 꺼짐 결함 은폐 차단",
+   "message_en": "This request is blocked: Engine stall while driving defect concealment bloc"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_027",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "child_seat_anchor_defect",
+   "severity": "critical",
+   "action": "block",
+   "priority": 978,
+   "description": "유아용 시트 앵커 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*ISOFIX)(?=.*앵커)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유아용 시트 앵커 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Child seat anchor defect concealment request block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_028",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "transmission_defect_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 905,
+   "description": "변속기 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*DCT)(?=.*충격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 변속기 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Transmission defect concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_029",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "headlight_defect_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 895,
+   "description": "전조등 결함 은폐 요청 차단",
+   "patterns": [
+    "(?=.*전조등)(?=.*조도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전조등 결함 은폐 요청 차단",
+   "message_en": "This request is blocked: Headlight defect concealment request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_030",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "emission_test_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 988,
+   "description": "배출가스 검사 결과 조작 요청 차단",
+   "patterns": [
+    "(?=.*NOx)(?=.*SCR)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배출가스 검사 결과 조작 요청 차단",
+   "message_en": "This request is blocked: Emission test result manipulation request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_031",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "co2_target_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 968,
+   "description": "CO2 배출 목표 달성 데이터 위조 차단",
+   "patterns": [
+    "(?=.*플릿)(?=.*목표)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: CO2 배출 목표 달성 데이터 위조 차단",
+   "message_en": "This request is blocked: CO2 emission target data falsification blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_032",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "nox_standard_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 982,
+   "description": "NOx 배출 기준 우회 조력 차단",
+   "patterns": [
+    "(?=.*시험에서)(?=.*NOx)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: NOx 배출 기준 우회 조력 차단",
+   "message_en": "This request is blocked: NOx emission standard bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_033",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "hybrid_soc_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 935,
+   "description": "하이브리드 SOC 조건 위조 차단",
+   "patterns": [
+    "(?=.*WLTP)(?=.*SOC)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 하이브리드 SOC 조건 위조 차단",
+   "message_en": "This request is blocked: Hybrid SOC condition falsification blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_034",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "particulate_filter_defeat",
+   "severity": "critical",
+   "action": "block",
+   "priority": 987,
+   "description": "입자상물질 필터 무력화 조력 차단",
+   "patterns": [
+    "(?=.*DPF)(?=.*주기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 입자상물질 필터 무력화 조력 차단",
+   "message_en": "This request is blocked: Particulate filter defeat assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_035",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "worker_injury_coverup",
+   "severity": "high",
+   "action": "block",
+   "priority": 885,
+   "description": "작업장 재해 은폐 요청 차단",
+   "patterns": [
+    "(?=.*부상)(?=.*조력)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 작업장 재해 은폐 요청 차단",
+   "message_en": "This request is blocked: Workplace injury coverup request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_036",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "chemical_exposure_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 865,
+   "description": "유해화학물질 노출 기준 초과 무시 차단",
+   "patterns": [
+    "(?=.*허용기준)(?=.*괜찮은지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유해화학물질 노출 기준 초과 무시 차단",
+   "message_en": "This request is blocked: Chemical exposure limit exceedance ignorance block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_037",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "fire_extinguisher_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 845,
+   "description": "소화 장비 점검 생략 조력 차단",
+   "patterns": [
+    "(?=.*소화기)(?=.*가능한지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소화 장비 점검 생략 조력 차단",
+   "message_en": "This request is blocked: Fire extinguisher inspection skip assistance block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_038",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "forklift_safety_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "지게차 안전 규정 우회 조력 차단",
+   "patterns": [
+    "(?=.*운행)(?=.*운전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 지게차 안전 규정 우회 조력 차단",
+   "message_en": "This request is blocked: Forklift safety regulation bypass assistance block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_039",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "noise_exposure_ignore",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 820,
+   "description": "소음 노출 기준 초과 무시 조력 차단",
+   "patterns": [
+    "(?=.*청력보호구)(?=.*프레스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 소음 노출 기준 초과 무시 조력 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_040",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "confined_space_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 855,
+   "description": "밀폐공간 안전 절차 생략 조력 차단",
+   "patterns": [
+    "(?=.*연료탱크)(?=.*진행)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 밀폐공간 안전 절차 생략 조력 차단",
+   "message_en": "This request is blocked: Confined space safety procedure bypass blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_041",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "high_voltage_ev_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "전기차 고전압 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*절연장갑)(?=.*분해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기차 고전압 안전 절차 생략 차단",
+   "message_en": "This request is blocked: EV high voltage safety procedure skip blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_042",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "robot_safety_guard_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 875,
+   "description": "산업용 로봇 안전 가드 해제 조력 차단",
+   "patterns": [
+    "(?=.*펜스)(?=.*로봇)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 산업용 로봇 안전 가드 해제 조력 차단",
+   "message_en": "This request is blocked: Industrial robot safety guard bypass assistance bl"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_043",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "recall_scope_minimize",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "리콜 대상 차량 수 축소 조작 차단",
+   "patterns": [
+    "(?=.*VIN)(?=.*제외)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 리콜 대상 차량 수 축소 조작 차단",
+   "message_en": "This request is blocked: Recall scope vehicle count manipulation blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_044",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "defect_statistics_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "불량률 통계 위조 요청 차단",
+   "patterns": [
+    "(?=.*불량률)(?=.*수치)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 불량률 통계 위조 요청 차단",
+   "message_en": "This request is blocked: Defect rate statistics falsification request block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_045",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "safety_certification_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 972,
+   "description": "안전 인증 위조 요청 차단",
+   "patterns": [
+    "(?=.*인증서)(?=.*위조)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안전 인증 위조 요청 차단",
+   "message_en": "This request is blocked: Safety certification fraud request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_046",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "supplier_drawing_bom_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "공급사 도면·BOM 기밀 유출 차단",
+   "patterns": [
+    "(?=.*협력사)(?=.*부품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공급사 도면·BOM 기밀 유출 차단",
+   "message_en": "This request is blocked: Supplier drawing/BOM confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_047",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "ecu_calibration_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 895,
+   "description": "ECU 캘리브레이션 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*ECU)(?=.*엔진)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ECU 캘리브레이션 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: ECU calibration data confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_048",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "autonomous_algorithm_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "자율주행 알고리즘 기밀 유출 차단",
+   "patterns": [
+    "(?=.*자율주행)(?=.*소스코드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자율주행 알고리즘 기밀 유출 차단",
+   "message_en": "This request is blocked: Autonomous driving algorithm confidential leakage "
+  },
+  {
+   "rule_id": "MF_AUTO_KR_049",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "battery_cell_chemistry_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 945,
+   "description": "배터리 셀 화학 조성 기밀 유출 차단",
+   "patterns": [
+    "(?=.*조성비)(?=.*양극재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배터리 셀 화학 조성 기밀 유출 차단",
+   "message_en": "This request is blocked: Battery cell chemistry composition confidential le"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_050",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "vehicle_platform_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "차량 플랫폼 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*아키텍처)(?=.*차세대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 플랫폼 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Vehicle platform design confidential leakage block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_051",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "customer_preference_data_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "고객 선호 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*트림)(?=.*색상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고객 선호 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: Customer preference data confidential leakage bloc"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_052",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "lidar_calibration_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "라이다 캘리브레이션 파라미터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*라이)(?=.*캘리브레이션)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 라이다 캘리브레이션 파라미터 기밀 유출 차단",
+   "message_en": "This request is blocked: LiDAR calibration parameter confidential leakage b"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_053",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "adas_training_data_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 885,
+   "description": "ADAS 학습 데이터셋 기밀 유출 차단",
+   "patterns": [
+    "(?=.*어노테이션)(?=.*데이터셋)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ADAS 학습 데이터셋 기밀 유출 차단",
+   "message_en": "This request is blocked: ADAS training dataset confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_054",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "motor_control_parameter_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 875,
+   "description": "모터 제어 파라미터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*전기차)(?=.*토크)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 모터 제어 파라미터 기밀 유출 차단",
+   "message_en": "This request is blocked: Motor control parameter confidential leakage block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_055",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "hybrid_powertrain_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "하이브리드 파워트레인 기밀 유출 차단",
+   "patterns": [
+    "(?=.*HEV)(?=.*에너지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 하이브리드 파워트레인 기밀 유출 차단",
+   "message_en": "This request is blocked: Hybrid powertrain confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_056",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "nda_violation_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "NDA 위반 기밀 공유 조력 차단",
+   "patterns": [
+    "(?=.*NDA)(?=.*협력사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: NDA 위반 기밀 공유 조력 차단",
+   "message_en": "This request is blocked: NDA violation confidential sharing assistance bloc"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_057",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "competitor_reverse_engineering",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "경쟁사 제품 역설계 기밀 분석 조력 차단",
+   "patterns": [
+    "(?=.*변속기)(?=.*분해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경쟁사 제품 역설계 기밀 분석 조력 차단",
+   "message_en": "This request is blocked: Competitor product reverse engineering confidentia"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_058",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "unreleased_model_spec_leak",
+   "severity": "critical",
+   "action": "block",
+   "priority": 942,
+   "description": "미출시 차량 모델 사양 유출 차단",
+   "patterns": [
+    "(?=.*SUV)(?=.*차세대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 미출시 차량 모델 사양 유출 차단",
+   "message_en": "This request is blocked: Unreleased vehicle model specification leakage blo"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_059",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "supplier_pricing_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 855,
+   "description": "공급사 단가 협상 기밀 유출 차단",
+   "patterns": [
+    "(?=.*협상)(?=.*문서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공급사 단가 협상 기밀 유출 차단",
+   "message_en": "This request is blocked: Supplier unit price negotiation confidential leaka"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_060",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "production_plan_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "생산 계획 기밀 유출 차단",
+   "patterns": [
+    "(?=.*차종별)(?=.*수량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 생산 계획 기밀 유출 차단",
+   "message_en": "This request is blocked: Production plan confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_061",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "crash_test_proprietary_data",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "충돌시험 독점 데이터 유출 차단",
+   "patterns": [
+    "(?=.*충돌)(?=.*시뮬레이션)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 충돌시험 독점 데이터 유출 차단",
+   "message_en": "This request is blocked: Crash test proprietary data leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_062",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "warranty_cost_data_secret",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 780,
+   "description": "보증 수리 비용 데이터 기밀 유출 경고",
+   "patterns": [
+    "(?=.*차종별)(?=.*통계)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 보증 수리 비용 데이터 기밀 유출 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_063",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "r_and_d_roadmap_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 948,
+   "description": "R&D 로드맵 기밀 유출 차단",
+   "patterns": [
+    "(?=.*전동화)(?=.*로드맵)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: R&D 로드맵 기밀 유출 차단",
+   "message_en": "This request is blocked: R&D roadmap confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_064",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "joint_venture_confidential",
+   "severity": "high",
+   "action": "block",
+   "priority": 865,
+   "description": "합작법인 기밀 정보 유출 차단",
+   "patterns": [
+    "(?=.*합작)(?=.*차량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 합작법인 기밀 정보 유출 차단",
+   "message_en": "This request is blocked: Joint venture confidential information leakage blo"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_065",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "antenna_design_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 845,
+   "description": "차량 안테나 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*통신)(?=.*안테)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 안테나 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Vehicle antenna design confidential leakage blocke"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_066",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "active_suspension_algorithm",
+   "severity": "high",
+   "action": "block",
+   "priority": 868,
+   "description": "능동형 서스펜션 알고리즘 기밀 유출 차단",
+   "patterns": [
+    "(?=.*서스펜션)(?=.*능동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 능동형 서스펜션 알고리즘 기밀 유출 차단",
+   "message_en": "This request is blocked: Active suspension algorithm confidential leakage b"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_067",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "thermal_management_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 862,
+   "description": "열관리 시스템 기밀 유출 차단",
+   "patterns": [
+    "(?=.*열관리)(?=.*배터리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 열관리 시스템 기밀 유출 차단",
+   "message_en": "This request is blocked: Thermal management system confidential leakage blo"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_068",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "competitor_bid_intel",
+   "severity": "high",
+   "action": "block",
+   "priority": 855,
+   "description": "경쟁사 입찰 정보 부정 취득 조력 차단",
+   "patterns": [
+    "(?=.*제안서)(?=.*OEM)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경쟁사 입찰 정보 부정 취득 조력 차단",
+   "message_en": "This request is blocked: Improper acquisition of competitor bid information"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_069",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "paint_formula_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "차량 도료 배합 기밀 유출 차단",
+   "patterns": [
+    "(?=.*코드별)(?=.*칼라)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 도료 배합 기밀 유출 차단",
+   "message_en": "This request is blocked: Vehicle paint formula confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_070",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "wiring_harness_design_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 848,
+   "description": "와이어링 하네스 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*라우팅)(?=.*하네스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 와이어링 하네스 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Wiring harness design confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_071",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "software_defined_vehicle_ip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 944,
+   "description": "소프트웨어 정의 차량 IP 유출 차단",
+   "patterns": [
+    "(?=.*미들웨어)(?=.*차량용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소프트웨어 정의 차량 IP 유출 차단",
+   "message_en": "This request is blocked: Software-defined vehicle IP leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_072",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "charging_protocol_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 858,
+   "description": "전기차 충전 프로토콜 기밀 유출 차단",
+   "patterns": [
+    "(?=.*충전)(?=.*통신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기차 충전 프로토콜 기밀 유출 차단",
+   "message_en": "This request is blocked: EV charging protocol confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_073",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "vehicle_cybersecurity_key",
+   "severity": "critical",
+   "action": "block",
+   "priority": 946,
+   "description": "차량 사이버보안 암호키 유출 차단",
+   "patterns": [
+    "(?=.*암호화)(?=.*ECU)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 사이버보안 암호키 유출 차단",
+   "message_en": "This request is blocked: Vehicle cybersecurity encryption key leakage block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_074",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "autonomous_sim_data_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 872,
+   "description": "자율주행 시뮬레이션 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*시뮬레이터)(?=.*자율주행)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자율주행 시뮬레이션 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: Autonomous driving simulation data confidential le"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_075",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "manufacturing_process_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "제조 공정 기밀 유출 차단",
+   "patterns": [
+    "(?=.*전처리)(?=.*도장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제조 공정 기밀 유출 차단",
+   "message_en": "This request is blocked: Manufacturing process confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_076",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "powertrain_nda_breach",
+   "severity": "high",
+   "action": "block",
+   "priority": 882,
+   "description": "파워트레인 NDA 위반 유출 차단",
+   "patterns": [
+    "(?=.*엔진)(?=.*NDA)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 파워트레인 NDA 위반 유출 차단",
+   "message_en": "This request is blocked: Powertrain NDA breach leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_077",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "supply_chain_tier2_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 852,
+   "description": "2차 협력사 정보 기밀 유출 차단",
+   "patterns": [
+    "(?=.*리스트)(?=.*협력사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 2차 협력사 정보 기밀 유출 차단",
+   "message_en": "This request is blocked: Tier-2 supplier information confidential leakage b"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_078",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "advanced_material_formula",
+   "severity": "high",
+   "action": "block",
+   "priority": 856,
+   "description": "경량화 소재 배합 기밀 유출 차단",
+   "patterns": [
+    "(?=.*CFRP)(?=.*소재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경량화 소재 배합 기밀 유출 차단",
+   "message_en": "This request is blocked: Lightweight material formula confidential leakage "
+  },
+  {
+   "rule_id": "MF_AUTO_KR_079",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "emission_defeat_device_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "배출가스 조작장치 설계 조력 차단",
+   "patterns": [
+    "(?=.*활성화하)(?=.*SCR)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배출가스 조작장치 설계 조력 차단",
+   "message_en": "This request is blocked: Emission defeat device design assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_080",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "co2_report_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "CO2 보고서 위조 요청 차단",
+   "patterns": [
+    "(?=.*플릿)(?=.*수치)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: CO2 보고서 위조 요청 차단",
+   "message_en": "This request is blocked: CO2 report falsification request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_081",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "euro67_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "유로6/7 배출 기준 우회 조력 차단",
+   "patterns": [
+    "(?=.*유로)(?=.*적합)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유로6/7 배출 기준 우회 조력 차단",
+   "message_en": "This request is blocked: Euro 6/7 emission standard bypass assistance block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_082",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "type_approval_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 978,
+   "description": "형식승인 사기 요청 차단",
+   "patterns": [
+    "(?=.*형식승인)(?=.*위조)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 형식승인 사기 요청 차단",
+   "message_en": "This request is blocked: Type approval fraud request blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_083",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "recall_notification_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "리콜 통보 의무 생략 조력 차단",
+   "patterns": [
+    "(?=.*연기)(?=.*발견)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 리콜 통보 의무 생략 조력 차단",
+   "message_en": "This request is blocked: Recall notification obligation skip assistance blo"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_084",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "component_counterfeit_cert",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "위조 부품 인증서 사용 조력 차단",
+   "patterns": [
+    "(?=.*정품)(?=.*인증서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위조 부품 인증서 사용 조력 차단",
+   "message_en": "This request is blocked: Counterfeit component certificate use assistance b"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_085",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "homologation_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "자동차 형식승인 절차 우회 차단",
+   "patterns": [
+    "(?=.*미승인)(?=.*임시)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자동차 형식승인 절차 우회 차단",
+   "message_en": "This request is blocked: Automotive homologation procedure bypass blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_086",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "warranty_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "보증 수리 사기 조력 차단",
+   "patterns": [
+    "(?=.*교환)(?=.*부품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보증 수리 사기 조력 차단",
+   "message_en": "This request is blocked: Warranty fraud assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_087",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "vin_cloning_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 988,
+   "description": "차량 식별번호(VIN) 복제 조력 차단",
+   "patterns": [
+    "(?=.*VIN)(?=.*변조)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 식별번호(VIN) 복제 조력 차단",
+   "message_en": "This request is blocked: VIN cloning assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_088",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "odometer_rollback",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "주행거리 조작 조력 차단",
+   "patterns": [
+    "(?=.*주행거리)(?=.*계기판)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주행거리 조작 조력 차단",
+   "message_en": "This request is blocked: Odometer rollback assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_089",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "safety_recall_report_delay",
+   "severity": "critical",
+   "action": "block",
+   "priority": 968,
+   "description": "안전 결함 신고 지연 조력 차단",
+   "patterns": [
+    "(?=.*인지)(?=.*늦추)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안전 결함 신고 지연 조력 차단",
+   "message_en": "This request is blocked: Safety defect report delay assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_090",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "illegal_export_auto_tech",
+   "severity": "critical",
+   "action": "block",
+   "priority": 972,
+   "description": "자동차 기술 불법 수출 조력 차단",
+   "patterns": [
+    "(?=.*자동차)(?=.*금지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자동차 기술 불법 수출 조력 차단",
+   "message_en": "This request is blocked: Illegal automotive technology export assistance bl"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_091",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dealer_margin_fix",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "딜러 마진 담합 조력 차단",
+   "patterns": [
+    "(?=.*할인율)(?=.*딜러)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 딜러 마진 담합 조력 차단",
+   "message_en": "This request is blocked: Dealer margin fixing assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_092",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "parts_price_cartel",
+   "severity": "critical",
+   "action": "block",
+   "priority": 962,
+   "description": "부품 가격 담합 조력 차단",
+   "patterns": [
+    "(?=.*조율)(?=.*OEM)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 부품 가격 담합 조력 차단",
+   "message_en": "This request is blocked: Parts price cartel assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_093",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "emission_credit_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "배출 크레딧 사기 조력 차단",
+   "patterns": [
+    "(?=.*크레딧)(?=.*ZEV)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배출 크레딧 사기 조력 차단",
+   "message_en": "This request is blocked: Emission credit fraud assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_094",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "gdpr_telematics_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "텔레매틱스 GDPR 위반 조력 차단",
+   "patterns": [
+    "(?=.*텔레매틱스)(?=.*운전자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 텔레매틱스 GDPR 위반 조력 차단",
+   "message_en": "This request is blocked: Telematics GDPR violation assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_095",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "iatf_audit_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 925,
+   "description": "IATF 16949 감사 기록 위조 차단",
+   "patterns": [
+    "(?=.*IATF)(?=.*수정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: IATF 16949 감사 기록 위조 차단",
+   "message_en": "This request is blocked: IATF 16949 audit record falsification blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_096",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "safety_data_sheet_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 915,
+   "description": "물질안전보건자료(MSDS) 위조 차단",
+   "patterns": [
+    "(?=.*숨기기)(?=.*화학물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 물질안전보건자료(MSDS) 위조 차단",
+   "message_en": "This request is blocked: MSDS falsification blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_097",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "import_tariff_evasion",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "자동차 수입 관세 회피 조력 차단",
+   "patterns": [
+    "(?=.*절감)(?=.*관세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자동차 수입 관세 회피 조력 차단",
+   "message_en": "This request is blocked: Vehicle import tariff evasion assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_098",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "safety_label_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 895,
+   "description": "안전 라벨 위조 조력 차단",
+   "patterns": [
+    "(?=.*연비)(?=.*라벨)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안전 라벨 위조 조력 차단",
+   "message_en": "This request is blocked: Safety label falsification assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_099",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "noise_regulation_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "소음 규제 우회 조력 차단",
+   "patterns": [
+    "(?=.*활성화)(?=.*저소음)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소음 규제 우회 조력 차단",
+   "message_en": "This request is blocked: Noise regulation bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_100",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "used_car_disclosure_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "중고차 고지 의무 위반 조력 차단",
+   "patterns": [
+    "(?=.*침수차)(?=.*숨기기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중고차 고지 의무 위반 조력 차단",
+   "message_en": "This request is blocked: Used car disclosure obligation violation assistanc"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_101",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "fleet_data_manipulation",
+   "severity": "high",
+   "action": "block",
+   "priority": 885,
+   "description": "플릿 데이터 조작 조력 차단",
+   "patterns": [
+    "(?=.*플릿)(?=.*평균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 플릿 데이터 조작 조력 차단",
+   "message_en": "This request is blocked: Fleet data manipulation assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_102",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "crash_avoidance_cert_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 958,
+   "description": "충돌 회피 시스템 인증 사기 차단",
+   "patterns": [
+    "(?=.*충돌)(?=.*성능)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 충돌 회피 시스템 인증 사기 차단",
+   "message_en": "This request is blocked: Crash avoidance system certification fraud blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_103",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "maintenance_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 888,
+   "description": "정비 이력 위조 조력 차단",
+   "patterns": [
+    "(?=.*완료)(?=.*생성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정비 이력 위조 조력 차단",
+   "message_en": "This request is blocked: Maintenance record falsification assistance blocke"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_104",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "autonomous_approval_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "자율주행 임시운행 허가 우회 차단",
+   "patterns": [
+    "(?=.*자율주행)(?=.*임시운행)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자율주행 임시운행 허가 우회 차단",
+   "message_en": "This request is blocked: Autonomous driving temporary operation permit bypa"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_105",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "carbon_credit_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 892,
+   "description": "탄소 크레딧 위조 조력 차단",
+   "patterns": [
+    "(?=.*ETS)(?=.*배출권)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 탄소 크레딧 위조 조력 차단",
+   "message_en": "This request is blocked: Carbon credit falsification assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_106",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "product_liability_coverup",
+   "severity": "critical",
+   "action": "block",
+   "priority": 964,
+   "description": "제조물 책임 은폐 조력 차단",
+   "patterns": [
+    "(?=.*인한)(?=.*은폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제조물 책임 은폐 조력 차단",
+   "message_en": "This request is blocked: Product liability concealment assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_107",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "regulatory_filing_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 878,
+   "description": "규제 신고 생략 조력 차단",
+   "patterns": [
+    "(?=.*생략)(?=.*변경)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 규제 신고 생략 조력 차단",
+   "message_en": "This request is blocked: Regulatory filing skip assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_108",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "certificate_of_conformity_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 966,
+   "description": "적합성 인증서 위조 차단",
+   "patterns": [
+    "(?=.*부적합)(?=.*적합)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 적합성 인증서 위조 차단",
+   "message_en": "This request is blocked: Certificate of conformity fraud blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_109",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "labor_law_violation_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "노동법 위반 조력 차단",
+   "patterns": [
+    "(?=.*최저임금)(?=.*지급)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노동법 위반 조력 차단",
+   "message_en": "This request is blocked: Labor law violation assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_110",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "product_spec_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 962,
+   "description": "제품 사양서 위조 조력 차단",
+   "patterns": [
+    "(?=.*사양서)(?=.*성능)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제품 사양서 위조 조력 차단",
+   "message_en": "This request is blocked: Product specification falsification assistance blo"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_111",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "material_compliance_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 898,
+   "description": "소재 적합성 인증 위조 차단",
+   "patterns": [
+    "(?=.*합격)(?=.*부품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소재 적합성 인증 위조 차단",
+   "message_en": "This request is blocked: Material compliance certification falsification bl"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_112",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "inspection_record_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 876,
+   "description": "검사 기록 누락 조력 차단",
+   "patterns": [
+    "(?=.*체크)(?=.*완료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 검사 기록 누락 조력 차단",
+   "message_en": "This request is blocked: Inspection record omission assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_113",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "advertising_claim_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 868,
+   "description": "허위 광고 주장 조력 차단",
+   "patterns": [
+    "(?=.*연비)(?=.*게재)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 허위 광고 주장 조력 차단",
+   "message_en": "This request is blocked: False advertising claim assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_114",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "driver_behavior_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 900,
+   "description": "운전자 행동 데이터 PII 차단",
+   "patterns": [
+    "(?=.*가능한)(?=.*전송)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_115",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "telematics_location_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 895,
+   "description": "텔레매틱스 위치 PII 차단",
+   "patterns": [
+    "(?=.*특정인)(?=.*GPS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_116",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "vehicle_owner_identity",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 890,
+   "description": "차량 소유자 신원 정보 차단",
+   "patterns": [
+    "(?=.*등록번호)(?=.*자동차)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_117",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "connected_car_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 885,
+   "description": "커넥티드카 PII 데이터 차단",
+   "patterns": [
+    "(?=.*커넥티드카)(?=.*탑승자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_118",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "accident_victim_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 920,
+   "description": "교통사고 피해자 PII 차단",
+   "patterns": [
+    "(?=.*교통사)(?=.*공유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_119",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "vehicle_tracking_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 900,
+   "description": "차량 위치 추적 PII 차단",
+   "patterns": [
+    "(?=.*특정인)(?=.*추적)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_120",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "employee_personal_data",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 885,
+   "description": "자동차 공장 직원 개인정보 차단",
+   "patterns": [
+    "(?=.*생산직)(?=.*포함)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_121",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_telematics_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 880,
+   "description": "보험 텔레매틱스 PII 차단",
+   "patterns": [
+    "(?=.*UBI)(?=.*텔레매틱스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_122",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "recall_owner_contact_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 840,
+   "description": "리콜 대상 차량 소유자 연락처 PII 차단",
+   "patterns": [
+    "(?=.*리콜)(?=.*소유자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_123",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "maintenance_customer_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 830,
+   "description": "정비 고객 개인정보 차단",
+   "patterns": [
+    "(?=.*정비소)(?=.*수리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_124",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "driver_license_scan",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 875,
+   "description": "운전면허증 스캔 데이터 차단",
+   "patterns": [
+    "(?=.*운전면허증)(?=.*이미지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_125",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "fleet_driver_personal_data",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 820,
+   "description": "법인 차량 운전자 개인정보 차단",
+   "patterns": [
+    "(?=.*플릿)(?=.*열람)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_126",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "accident_police_report_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 865,
+   "description": "교통사고 경찰 보고서 PII 차단",
+   "patterns": [
+    "(?=.*경찰)(?=.*조서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_127",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "biometric_driver_data",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 895,
+   "description": "운전자 생체인식 데이터 차단",
+   "patterns": [
+    "(?=.*얼굴인식)(?=.*운전자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_128",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "charging_session_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 825,
+   "description": "전기차 충전 세션 PII 차단",
+   "patterns": [
+    "(?=.*충전)(?=.*세션)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_129",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "dealer_customer_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 835,
+   "description": "딜러 고객 개인정보 차단",
+   "patterns": [
+    "(?=.*딜러)(?=.*공유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_130",
+   "io_type": "output",
+   "category": "pii",
+   "sub_category": "vehicle_data_resell",
+   "severity": "high",
+   "action": "block",
+   "priority": 878,
+   "description": "차량 데이터 무단 재판매 조력 차단",
+   "patterns": [
+    "(?=.*수집된)(?=.*자에)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 데이터 무단 재판매 조력 차단",
+   "message_en": "This request is blocked: Vehicle data unauthorized resale assistance blocke"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_131",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "connected_car_voice_data",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 882,
+   "description": "차량 내 음성 데이터 PII 차단",
+   "patterns": [
+    "(?=.*커넥티드카)(?=.*명령)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_132",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "roof_crush_test_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 963,
+   "description": "차량 지붕 압괴 시험 결과 위조 차단",
+   "patterns": [
+    "(?=.*지붕)(?=.*강도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 지붕 압괴 시험 결과 위조 차단",
+   "message_en": "This request is blocked: Roof crush test result falsification blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_133",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "pedestrian_safety_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 967,
+   "description": "보행자 안전 결함 은폐 차단",
+   "patterns": [
+    "(?=.*보행자)(?=.*손상)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보행자 안전 결함 은폐 차단",
+   "message_en": "This request is blocked: Pedestrian safety defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_134",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "child_occupant_safety_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 976,
+   "description": "어린이 탑승자 안전 결함 은폐 차단",
+   "patterns": [
+    "(?=.*오작동)(?=.*탑승)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 어린이 탑승자 안전 결함 은폐 차단",
+   "message_en": "This request is blocked: Child occupant safety defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_135",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "lane_departure_system_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 908,
+   "description": "차선 이탈 방지 시스템 결함 은폐 차단",
+   "patterns": [
+    "(?=.*오작동)(?=.*LDW)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차선 이탈 방지 시스템 결함 은폐 차단",
+   "message_en": "This request is blocked: Lane departure prevention system defect concealmen"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_136",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "adaptive_cruise_defect_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 906,
+   "description": "어댑티브 크루즈 컨트롤 결함 은폐 차단",
+   "patterns": [
+    "(?=.*오작동)(?=.*ACC)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 어댑티브 크루즈 컨트롤 결함 은폐 차단",
+   "message_en": "This request is blocked: Adaptive cruise control defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_137",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ecu_hack_vulnerability_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 902,
+   "description": "ECU 해킹 취약점 은폐 차단",
+   "patterns": [
+    "(?=.*ECU)(?=.*해킹)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ECU 해킹 취약점 은폐 차단",
+   "message_en": "This request is blocked: ECU hacking vulnerability concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_138",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "powertrain_warranty_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 898,
+   "description": "파워트레인 결함 보증 은폐 차단",
+   "patterns": [
+    "(?=.*파워트레인)(?=.*결함)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 파워트레인 결함 보증 은폐 차단",
+   "message_en": "This request is blocked: Powertrain defect warranty concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_139",
+   "io_type": "output",
+   "category": "safety",
+   "sub_category": "ev_range_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 969,
+   "description": "전기차 주행거리 위조 차단",
+   "patterns": [
+    "(?=.*주행거리)(?=.*충전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기차 주행거리 위조 차단",
+   "message_en": "This request is blocked: EV driving range falsification blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_140",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "thermal_runaway_response_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 983,
+   "description": "배터리 열폭주 대응 미흡 은폐 차단",
+   "patterns": [
+    "(?=.*오작동)(?=.*열폭주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배터리 열폭주 대응 미흡 은폐 차단",
+   "message_en": "This request is blocked: Battery thermal runaway response inadequacy concea"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_141",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "charging_safety_defect_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 907,
+   "description": "충전 안전 결함 은폐 차단",
+   "patterns": [
+    "(?=.*충전)(?=.*은폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 충전 안전 결함 은폐 차단",
+   "message_en": "This request is blocked: Charging safety defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_142",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "oem_platform_data_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 864,
+   "description": "OEM 플랫폼 공유 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*OEM)(?=.*플랫폼)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: OEM 플랫폼 공유 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: OEM platform shared data confidential leakage bloc"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_143",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "laser_welding_param_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 842,
+   "description": "레이저 용접 파라미터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*브레이징)(?=.*차체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 레이저 용접 파라미터 기밀 유출 차단",
+   "message_en": "This request is blocked: Laser welding parameter confidential leakage block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_144",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "noise_vibration_data_secret",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 796,
+   "description": "NVH 측정 데이터 기밀 유출 경고",
+   "patterns": [
+    "(?=.*진동)(?=.*특허)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: NVH 측정 데이터 기밀 유출 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_145",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "advanced_lighting_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 844,
+   "description": "차량 조명 시스템 기밀 유출 차단",
+   "patterns": [
+    "(?=.*매트릭스)(?=.*헤드램프)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 조명 시스템 기밀 유출 차단",
+   "message_en": "This request is blocked: Vehicle lighting system confidential leakage block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_146",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "calibration_bench_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 846,
+   "description": "캘리브레이션 벤치 설정 기밀 유출 차단",
+   "patterns": [
+    "(?=.*ECU)(?=.*벤치)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 캘리브레이션 벤치 설정 기밀 유출 차단",
+   "message_en": "This request is blocked: Calibration bench configuration confidential leaka"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_147",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "tpms_bypass_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 872,
+   "description": "TPMS 경보 시스템 우회 조력 차단",
+   "patterns": [
+    "(?=.*공기압)(?=.*비활성화)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: TPMS 경보 시스템 우회 조력 차단",
+   "message_en": "This request is blocked: TPMS warning system bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_148",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "abs_bypass_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 874,
+   "description": "ABS 시스템 우회 조력 차단",
+   "patterns": [
+    "(?=.*제동)(?=.*안전장치)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ABS 시스템 우회 조력 차단",
+   "message_en": "This request is blocked: ABS system bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_149",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "esc_bypass_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 876,
+   "description": "ESC 시스템 우회 조력 차단",
+   "patterns": [
+    "(?=.*안정화)(?=.*전자식)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ESC 시스템 우회 조력 차단",
+   "message_en": "This request is blocked: ESC system bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_150",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "crash_notification_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 862,
+   "description": "자동 충돌 통보 시스템 비활성화 조력 차단",
+   "patterns": [
+    "(?=.*충돌)(?=.*무력화)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자동 충돌 통보 시스템 비활성화 조력 차단",
+   "message_en": "This request is blocked: Automatic crash notification system deactivation b"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_151",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "data_retention_violation",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 818,
+   "description": "차량 데이터 보존 기간 위반 경고",
+   "patterns": [
+    "(?=.*삭제)(?=.*무시)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 차량 데이터 보존 기간 위반 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_152",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "vehicle_inspection_cert_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 966,
+   "description": "자동차 검사 인증 위조 차단",
+   "patterns": [
+    "(?=.*불합격)(?=.*합격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자동차 검사 인증 위조 차단",
+   "message_en": "This request is blocked: Vehicle inspection certification fraud blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_153",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "autonomous_data_log_delete",
+   "severity": "critical",
+   "action": "block",
+   "priority": 957,
+   "description": "자율주행 사고 데이터 로그 삭제 조력 차단",
+   "patterns": [
+    "(?=.*자율주행)(?=.*직후)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자율주행 사고 데이터 로그 삭제 조력 차단",
+   "message_en": "This request is blocked: Autonomous driving accident data log deletion bloc"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_154",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "type_approval_doc_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 961,
+   "description": "형식승인 서류 위조 조력 차단",
+   "patterns": [
+    "(?=.*수정)(?=.*제출)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 형식승인 서류 위조 조력 차단",
+   "message_en": "This request is blocked: Type approval document falsification assistance bl"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_155",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "safety_standard_exemption_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 877,
+   "description": "안전 기준 면제 남용 차단",
+   "patterns": [
+    "(?=.*종료)(?=.*면제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안전 기준 면제 남용 차단",
+   "message_en": "This request is blocked: Safety standard exemption abuse blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_156",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "green_washing_auto",
+   "severity": "high",
+   "action": "block",
+   "priority": 863,
+   "description": "자동차 그린워싱 허위 홍보 차단",
+   "patterns": [
+    "(?=.*중립)(?=.*탄소)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자동차 그린워싱 허위 홍보 차단",
+   "message_en": "This request is blocked: Automotive greenwashing false promotion blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_157",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "fleet_emission_report_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 971,
+   "description": "플릿 배출가스 보고 사기 차단",
+   "patterns": [
+    "(?=.*플릿)(?=.*평균)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 플릿 배출가스 보고 사기 차단",
+   "message_en": "This request is blocked: Fleet emission report fraud blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_158",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "autonomous_sim_result_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 929,
+   "description": "자율주행 시뮬레이션 결과 위조 차단",
+   "patterns": [
+    "(?=.*자율주행)(?=.*시뮬레이션)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자율주행 시뮬레이션 결과 위조 차단",
+   "message_en": "This request is blocked: Autonomous driving simulation result falsification"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_159",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ev_charging_safety_cert_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 893,
+   "description": "전기차 충전 안전 인증 사기 차단",
+   "patterns": [
+    "(?=.*충전기)(?=.*충전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기차 충전 안전 인증 사기 차단",
+   "message_en": "This request is blocked: EV charging safety certification fraud blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_160",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "used_parts_cert_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 867,
+   "description": "중고 부품 신품 인증 위조 차단",
+   "patterns": [
+    "(?=.*신품)(?=.*중고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중고 부품 신품 인증 위조 차단",
+   "message_en": "This request is blocked: Used parts new-part certification fraud blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_161",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "label_mileage_claim_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 869,
+   "description": "연비 라벨 허위 표시 차단",
+   "patterns": [
+    "(?=.*과장)(?=.*연비)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 연비 라벨 허위 표시 차단",
+   "message_en": "This request is blocked: Fuel economy label false display blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_162",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "battery_capacity_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 973,
+   "description": "전기차 배터리 용량 허위 표시 차단",
+   "patterns": [
+    "(?=.*kWh)(?=.*과장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기차 배터리 용량 허위 표시 차단",
+   "message_en": "This request is blocked: EV battery capacity false display blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_163",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "geo_fencing_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 828,
+   "description": "지오펜싱 기반 PII 차단",
+   "patterns": [
+    "(?=.*지오펜싱)(?=.*구역)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_164",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "infotainment_personal_data",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 832,
+   "description": "인포테인먼트 개인 데이터 차단",
+   "patterns": [
+    "(?=.*인포테인먼트)(?=.*동기화)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_165",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "emergency_contact_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "차량 긴급 연락처 PII 차단",
+   "patterns": [
+    "(?=.*긴급)(?=.*차량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_166",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "insurance_fraud_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 872,
+   "description": "자동차 보험 사기 관련 PII 차단",
+   "patterns": [
+    "(?=.*조회)(?=.*타인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_167",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "v2x_data_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 826,
+   "description": "V2X 통신 데이터 PII 차단",
+   "patterns": [
+    "(?=.*통신)(?=.*활용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_168",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "auto_loan_customer_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 833,
+   "description": "자동차 할부 고객 개인정보 차단",
+   "patterns": [
+    "(?=.*신용정보)(?=.*할부)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_169",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "warranty_claimant_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 831,
+   "description": "보증 청구 고객 개인정보 차단",
+   "patterns": [
+    "(?=.*수리)(?=.*보증)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_170",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "vehicle_recall_victim_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 868,
+   "description": "리콜 피해 고객 개인정보 차단",
+   "patterns": [
+    "(?=.*리콜)(?=.*제공)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_171",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "connected_car_child_data",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 896,
+   "description": "커넥티드카 아동 동승자 데이터 차단",
+   "patterns": [
+    "(?=.*탑승)(?=.*감지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_172",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "autonomous_passenger_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 887,
+   "description": "자율주행 탑승객 개인정보 차단",
+   "patterns": [
+    "(?=.*로보택시)(?=.*탑승객)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_173",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "abs_sensor_defect_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 959,
+   "description": "ABS 센서 결함 은폐 차단",
+   "patterns": [
+    "(?=.*오작동)(?=.*ABS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ABS 센서 결함 은폐 차단",
+   "message_en": "This request is blocked: ABS sensor defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_174",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ev_motor_defect_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 961,
+   "description": "전기차 구동모터 결함 은폐 차단",
+   "patterns": [
+    "(?=.*구동모터)(?=.*과열)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기차 구동모터 결함 은폐 차단",
+   "message_en": "This request is blocked: EV drive motor defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_175",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "glass_defect_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 897,
+   "description": "자동차 유리 결함 은폐 차단",
+   "patterns": [
+    "(?=.*전면)(?=.*유리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자동차 유리 결함 은폐 차단",
+   "message_en": "This request is blocked: Automotive glass defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_176",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "door_latch_defect_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 974,
+   "description": "도어 래치 결함 은폐 차단",
+   "patterns": [
+    "(?=.*도어)(?=.*열림)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 도어 래치 결함 은폐 차단",
+   "message_en": "This request is blocked: Door latch defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_177",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "fuel_cap_defect_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 894,
+   "description": "연료 캡 결함 은폐 차단",
+   "patterns": [
+    "(?=.*증발가스)(?=.*연료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 연료 캡 결함 은폐 차단",
+   "message_en": "This request is blocked: Fuel cap defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_178",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "speed_limiter_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 891,
+   "description": "속도 제한 장치 우회 조력 차단",
+   "patterns": [
+    "(?=.*ISA)(?=.*속도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 속도 제한 장치 우회 조력 차단",
+   "message_en": "This request is blocked: Speed limiter bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_179",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "windshield_wiper_defect_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 886,
+   "description": "와이퍼 시스템 결함 은폐 차단",
+   "patterns": [
+    "(?=.*와이퍼)(?=.*모터)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 와이퍼 시스템 결함 은폐 차단",
+   "message_en": "This request is blocked: Windshield wiper system defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_180",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "vehicle_os_architecture_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 943,
+   "description": "차량 OS 아키텍처 기밀 유출 차단",
+   "patterns": [
+    "(?=.*운영체제)(?=.*커널)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 OS 아키텍처 기밀 유출 차단",
+   "message_en": "This request is blocked: Vehicle OS architecture confidential leakage block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_181",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "hmi_design_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 849,
+   "description": "차량 HMI 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*프레임워크)(?=.*클러스터)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 HMI 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Vehicle HMI design confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_182",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "v2x_protocol_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 851,
+   "description": "V2X 통신 프로토콜 기밀 유출 차단",
+   "patterns": [
+    "(?=.*독자)(?=.*프로토콜)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: V2X 통신 프로토콜 기밀 유출 차단",
+   "message_en": "This request is blocked: V2X communication protocol confidential leakage bl"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_183",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "powertrain_calibration_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 867,
+   "description": "파워트레인 캘리브레이션 기밀 유출 차단",
+   "patterns": [
+    "(?=.*연료)(?=.*분사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 파워트레인 캘리브레이션 기밀 유출 차단",
+   "message_en": "This request is blocked: Powertrain calibration confidential leakage blocke"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_184",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "vehicle_safety_sim_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 853,
+   "description": "차량 안전 시뮬레이션 기밀 유출 차단",
+   "patterns": [
+    "(?=.*FEM)(?=.*해석)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 안전 시뮬레이션 기밀 유출 차단",
+   "message_en": "This request is blocked: Vehicle safety simulation confidential leakage blo"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_185",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "ev_battery_management_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 941,
+   "description": "전기차 배터리 관리 시스템 기밀 유출 차단",
+   "patterns": [
+    "(?=.*SOC)(?=.*배터리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기차 배터리 관리 시스템 기밀 유출 차단",
+   "message_en": "This request is blocked: EV battery management system confidential leakage "
+  },
+  {
+   "rule_id": "MF_AUTO_KR_186",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "advanced_driver_model_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 877,
+   "description": "운전자 모델링 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*운전자)(?=.*행동)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 운전자 모델링 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: Driver modeling data confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_187",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "driveline_noise_secret",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 797,
+   "description": "구동계 소음 저감 기술 기밀 유출 경고",
+   "patterns": [
+    "(?=.*구동계)(?=.*저감)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 구동계 소음 저감 기술 기밀 유출 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_AUTO_KR_188",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "odometer_cert_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 984,
+   "description": "주행거리 인증서 위조 차단",
+   "patterns": [
+    "(?=.*주행거리)(?=.*중고차)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주행거리 인증서 위조 차단",
+   "message_en": "This request is blocked: Odometer certificate falsification blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_189",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "safety_equipment_counterfeit",
+   "severity": "critical",
+   "action": "block",
+   "priority": 964,
+   "description": "위조 안전장치 판매 조력 차단",
+   "patterns": [
+    "(?=.*에어백)(?=.*정품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위조 안전장치 판매 조력 차단",
+   "message_en": "This request is blocked: Counterfeit safety equipment sale assistance block"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_190",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vehicle_finance_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 839,
+   "description": "자동차 금융 사기 조력 차단",
+   "patterns": [
+    "(?=.*담보)(?=.*이중)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자동차 금융 사기 조력 차단",
+   "message_en": "This request is blocked: Vehicle finance fraud assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_191",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "parts_substitution_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 866,
+   "description": "부품 대체 사기 조력 차단",
+   "patterns": [
+    "(?=.*비정품)(?=.*정품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 부품 대체 사기 조력 차단",
+   "message_en": "This request is blocked: Parts substitution fraud assistance blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_192",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "autonomous_approval_doc_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 953,
+   "description": "자율주행 인증 서류 위조 차단",
+   "patterns": [
+    "(?=.*자율주행)(?=.*기능)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 자율주행 인증 서류 위조 차단",
+   "message_en": "This request is blocked: Autonomous driving certification document fraud bl"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_193",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "seat_defect_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 893,
+   "description": "시트 구조 결함 은폐 차단",
+   "patterns": [
+    "(?=.*파손)(?=.*시트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 시트 구조 결함 은폐 차단",
+   "message_en": "This request is blocked: Seat structure defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_194",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "mirror_visibility_defect",
+   "severity": "high",
+   "action": "block",
+   "priority": 884,
+   "description": "후사경 시인성 결함 은폐 차단",
+   "patterns": [
+    "(?=.*사각지대)(?=.*거울)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 후사경 시인성 결함 은폐 차단",
+   "message_en": "This request is blocked: Rear view mirror visibility defect concealment blo"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_195",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "park_brake_defect_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 977,
+   "description": "주차 브레이크 결함 은폐 차단",
+   "patterns": [
+    "(?=.*브레이크)(?=.*전자식)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주차 브레이크 결함 은폐 차단",
+   "message_en": "This request is blocked: Parking brake defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_196",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "coolant_system_defect",
+   "severity": "high",
+   "action": "block",
+   "priority": 896,
+   "description": "냉각 시스템 결함 은폐 차단",
+   "patterns": [
+    "(?=.*냉각수)(?=.*생략)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 냉각 시스템 결함 은폐 차단",
+   "message_en": "This request is blocked: Cooling system defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_197",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "power_window_defect_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 883,
+   "description": "파워 윈도우 끼임 결함 은폐 차단",
+   "patterns": [
+    "(?=.*안티핀치)(?=.*윈도우)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 파워 윈도우 끼임 결함 은폐 차단",
+   "message_en": "This request is blocked: Power window pinch defect concealment blocked"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_198",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "crash_simulation_model_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 854,
+   "description": "충돌 해석 시뮬레이션 모델 기밀 유출 차단",
+   "patterns": [
+    "(?=.*충돌)(?=.*시뮬레이션)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 충돌 해석 시뮬레이션 모델 기밀 유출 차단",
+   "message_en": "This request is blocked: Crash simulation model confidential leakage blocke"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_199",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "advanced_lighting_control_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 843,
+   "description": "차량 조명 제어 알고리즘 기밀 유출 차단",
+   "patterns": [
+    "(?=.*헤드램프)(?=.*ADB)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 차량 조명 제어 알고리즘 기밀 유출 차단",
+   "message_en": "This request is blocked: Vehicle lighting control algorithm confidential le"
+  },
+  {
+   "rule_id": "MF_AUTO_KR_200",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "ev_charging_algorithm_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 857,
+   "description": "전기차 충전 제어 알고리즘 기밀 유출 차단",
+   "patterns": [
+    "(?=.*스케줄링)(?=.*충전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기차 충전 제어 알고리즘 기밀 유출 차단",
+   "message_en": "This request is blocked: EV charging control algorithm confidential leakage"
+  }
+ ]
+}

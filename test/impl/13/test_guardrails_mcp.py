@@ -68,7 +68,9 @@ settings.guardrails_mcp_url = ""
 # ── integration: /api/guardrails/test 가 MCP 경로 사용(미설정 시 local) ──
 with TestClient(m.app) as c:
     r = c.post("/api/guardrails/test", headers=H, json={"text": "email a@b.com", "domain": "global"})
-    chk(r.status_code == 200 and r.json().get("source") == "local", f"/test MCP 미설정 -> local source ({r.json().get('source')})")
+    # impl/20 §7.8.7: /test 는 로컬 룰스토어(decide_multi) 경로 → source='rules'(데이터 존재) | 'builtin' | 'local'
+    chk(r.status_code == 200 and r.json().get("source") in ("rules", "builtin", "local"),
+        f"/test 로컬 판정 source ({r.json().get('source')})")
     chk(r.json()["decision"] == "redact", "/test 로컬 판정 정상")
 
 print("\n=== RESULT:", "ALL PASS" if not fails else f"{len(fails)} FAIL: {fails}")

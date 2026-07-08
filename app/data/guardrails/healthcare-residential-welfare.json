@@ -1,0 +1,3413 @@
+{
+ "domain_key": "healthcare-residential-welfare",
+ "display_name": "의료(거주복지)",
+ "display_name_en": "Healthcare (Residential Welfare)",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 200,
+ "regex_rule_count": 200,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 200,
+ "rules": [
+  {
+   "rule_id": "HC_RWELF_KR_001",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "ltci_benefit_misrepresent",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "장기요양 급여 부정 청구 권유 차단",
+   "patterns": [
+    "(?=.*장기요양)(?=.*조작해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장기요양 급여 부정 청구 권유 차단",
+   "message_en": "This request is blocked: Block fraudulent long-term care insurance benefit "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_002",
+   "io_type": "both",
+   "category": "pii",
+   "sub_category": "resident_pii_leak",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "입소자 개인 식별·의료 정보 유출 차단",
+   "patterns": [
+    "(?=.*기록이랑)(?=.*입소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 입소자 개인 식별·의료 정보 유출 차단",
+   "message_en": "This request is blocked: Block exposure of resident personal/medical data"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_003",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "facility_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "시설 안전·소방 점검 생략 권유 차단",
+   "patterns": [
+    "(?=.*약자)(?=.*피난)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 시설 안전·소방 점검 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping facility safety/fire inspection"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_004",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "caregiver_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "입소자 학대·방임 은폐 권유 차단",
+   "patterns": [
+    "(?=.*입소자)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 입소자 학대·방임 은폐 권유 차단",
+   "message_en": "This request is blocked: Block concealment of resident abuse or neglect"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_005",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "nursing_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "요양·간호 기록 위·변조 권유 차단",
+   "patterns": [
+    "(?=.*일지)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양·간호 기록 위·변조 권유 차단",
+   "message_en": "This request is blocked: Block falsification of nursing/care records"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_006",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "restraint_unlawful",
+   "severity": "critical",
+   "action": "block",
+   "priority": 930,
+   "description": "입소자 신체 억제 부당 적용 권유 차단",
+   "patterns": [
+    "(?=.*입소자)(?=.*묶어둬)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 입소자 신체 억제 부당 적용 권유 차단",
+   "message_en": "This request is blocked: Block unlawful physical restraint of residents"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_007",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "medication_admin_unqualified",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "무자격자 투약·의료행위 권유 차단",
+   "patterns": [
+    "(?=.*요양보호사)(?=.*임의)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 무자격자 투약·의료행위 권유 차단",
+   "message_en": "This request is blocked: Block unqualified medication administration"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_008",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "welfare_subsidy_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "복지시설 보조금 부정 수급 지원 차단",
+   "patterns": [
+    "(?=.*인건비)(?=.*지원금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 복지시설 보조금 부정 수급 지원 차단",
+   "message_en": "This request is blocked: Block welfare facility subsidy fraud"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_009",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "infection_control_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "집단 시설 감염 관리 생략 권유 차단",
+   "patterns": [
+    "(?=.*운영해)(?=.*격리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 집단 시설 감염 관리 생략 권유 차단",
+   "message_en": "This request is blocked: Block skipping infection control in congregate fac"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_010",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "guardian_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "보호자 동의 없는 처치·정보제공 권유 차단",
+   "patterns": [
+    "(?=.*입소자)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 보호자 동의 없는 처치·정보제공 권유 차단",
+   "message_en": "This request is blocked: Block care/info sharing without guardian consent"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_011",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "end_of_life_misguide_welfare",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "응답에서 요양 입소자 임종 의료 결정 오인 안내 차단",
+   "patterns": [
+    "(?=.*입소자)(?=.*연명치료)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 요양 입소자 임종 의료 결정 오인 안내 차단",
+   "message_en": "This request is blocked: Block output misguiding end-of-life decisions for "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_012",
+   "io_type": "both",
+   "category": "fraud",
+   "sub_category": "disability_grade_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "장애 등급 조작 급여 수급 지원 차단",
+   "patterns": [
+    "(?=.*높여)(?=.*장애)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애 등급 조작 급여 수급 지원 차단",
+   "message_en": "This request is blocked: Block disability grade manipulation for benefits"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_013",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "nursing_home_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "요양원 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*진료기록)(?=.*요양원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_014",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "ltc_facility_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "장기요양시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_015",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "disabled_residence_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "장애인 거주시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_016",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "elderly_welfare_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "노인복지시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_017",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "dementia_care_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "치매전담시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_018",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "rehab_residence_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "재활요양시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_019",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "group_home_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "공동생활가정 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_020",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "respite_care_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "단기보호시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_021",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "hospice_facility_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "호스피스 시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*진료기록)(?=.*입소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_022",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "convalescent_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "요양병원 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*진료기록)(?=.*요양병원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_023",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "assisted_living_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "주거복지시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*주거복지시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_024",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "child_residence_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "아동양육시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*아동양육시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_025",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "shelter_residence_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "장애인 단기거주 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*단기거주)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_026",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "vulnerable_shelter_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "취약계층 보호시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*보호시설)(?=.*취약계층)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_027",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "senior_housing_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "노인공동주택 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*노인공동주택)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_028",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "daycare_residence_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "주야간보호시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*주야간보호시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_029",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "medical_welfare_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "의료복지시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*의료복지시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_030",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "psychiatric_residence_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "정신요양시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*정신요양시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_031",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "maternal_residence_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "모자보호시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*모자보호시설)(?=.*진료기록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_032",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "homeless_shelter_resident_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 820,
+   "description": "노숙인 시설 입소자 개인정보 유출 차단",
+   "patterns": [
+    "(?=.*진료기록)(?=.*입소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted for privacy protection."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_033",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "nursing_home_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "요양원 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*요양원)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양원 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for nursing home"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_034",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ltc_facility_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "장기요양시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장기요양시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for long-term care fac"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_035",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disabled_residence_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "장애인 거주시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 거주시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for disabled residenti"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_036",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "elderly_welfare_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노인복지시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인복지시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for elderly welfare fa"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_037",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dementia_care_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "치매전담시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매전담시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for dementia care unit"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_038",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "rehab_residence_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "재활요양시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재활요양시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for rehabilitation res"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_039",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "group_home_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "공동생활가정 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공동생활가정 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for group home"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_040",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "respite_care_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "단기보호시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 단기보호시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for respite care facil"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_041",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hospice_facility_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "호스피스 시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*수급법)(?=.*호스피스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 호스피스 시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for hospice facility"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_042",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "convalescent_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "요양병원 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*요양병원)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양병원 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for convalescent hospi"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_043",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "assisted_living_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "주거복지시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*주거복지시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주거복지시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for assisted living"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_044",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "child_residence_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "아동양육시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*아동양육시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동양육시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for child residential "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_045",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "shelter_residence_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "장애인 단기거주 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*단기거주)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 단기거주 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for disability short-s"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_046",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vulnerable_shelter_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "취약계층 보호시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*보호시설)(?=.*취약계층)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 취약계층 보호시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for vulnerable shelter"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_047",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "senior_housing_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노인공동주택 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*노인공동주택)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인공동주택 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for senior housing"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_048",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "daycare_residence_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "주야간보호시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*주야간보호시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주야간보호시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for day-night care fac"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_049",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "medical_welfare_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "의료복지시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*의료복지시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료복지시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for medical welfare fa"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_050",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "psychiatric_residence_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "정신요양시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*정신요양시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신요양시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for psychiatric reside"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_051",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "maternal_residence_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "모자보호시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*모자보호시설)(?=.*수급법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 모자보호시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for maternal shelter"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_052",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "homeless_shelter_benefit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "노숙인 시설 급여·보조금 부정 청구 차단",
+   "patterns": [
+    "(?=.*수급법)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 시설 급여·보조금 부정 청구 차단",
+   "message_en": "This request is blocked: Block benefit/subsidy fraud for homeless shelter"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_053",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "nursing_home_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "요양원 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*요양원)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양원 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for nursi"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_054",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ltc_facility_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장기요양시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장기요양시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for long-"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_055",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "disabled_residence_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인 거주시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 거주시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for disab"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_056",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "elderly_welfare_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인복지시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인복지시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for elder"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_057",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "dementia_care_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "치매전담시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매전담시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for demen"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_058",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "rehab_residence_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "재활요양시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재활요양시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for rehab"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_059",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "group_home_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "공동생활가정 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공동생활가정 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for group"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_060",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "respite_care_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "단기보호시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 단기보호시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for respi"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_061",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "hospice_facility_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "호스피스 시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*호스피스)(?=.*시설)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 호스피스 시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for hospi"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_062",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "convalescent_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "요양병원 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*요양병원)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양병원 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for conva"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_063",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "assisted_living_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주거복지시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*주거복지시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주거복지시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for assis"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_064",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "child_residence_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "아동양육시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*아동양육시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동양육시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for child"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_065",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "shelter_residence_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인 단기거주 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*단기거주)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 단기거주 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for disab"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_066",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "vulnerable_shelter_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "취약계층 보호시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*보호시설)(?=.*취약계층)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 취약계층 보호시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for vulne"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_067",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "senior_housing_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인공동주택 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*노인공동주택)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인공동주택 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for senio"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_068",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "daycare_residence_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주야간보호시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*주야간보호시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주야간보호시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for day-n"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_069",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "medical_welfare_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "의료복지시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*의료복지시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료복지시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for medic"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_070",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "psychiatric_residence_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "정신요양시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*정신요양시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신요양시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for psych"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_071",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "maternal_residence_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "모자보호시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*모자보호시설)(?=.*대피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 모자보호시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for mater"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_072",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "homeless_shelter_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노숙인 시설 안전·소방·감염 관리 생략 차단",
+   "patterns": [
+    "(?=.*노숙인)(?=.*시설)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 시설 안전·소방·감염 관리 생략 차단",
+   "message_en": "This request is blocked: Block safety/fire/infection control skip for homel"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_073",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "nursing_home_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "요양원 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*요양원)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양원 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for nursing home"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_074",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ltc_facility_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장기요양시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장기요양시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for long-term care"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_075",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disabled_residence_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인 거주시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 거주시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for disabled resid"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_076",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "elderly_welfare_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인복지시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인복지시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for elderly welfar"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_077",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dementia_care_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "치매전담시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매전담시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for dementia care "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_078",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "rehab_residence_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "재활요양시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재활요양시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for rehabilitation"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_079",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "group_home_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "공동생활가정 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공동생활가정 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for group home"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_080",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "respite_care_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "단기보호시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 단기보호시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for respite care f"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_081",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hospice_facility_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "호스피스 시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*호스피스)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 호스피스 시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for hospice facili"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_082",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "convalescent_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "요양병원 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*요양병원)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양병원 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for convalescent h"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_083",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "assisted_living_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주거복지시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*주거복지시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주거복지시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for assisted livin"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_084",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "child_residence_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "아동양육시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*아동양육시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동양육시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for child resident"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_085",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "shelter_residence_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인 단기거주 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*단기거주)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 단기거주 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for disability sho"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_086",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vulnerable_shelter_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "취약계층 보호시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*보호시설)(?=.*취약계층)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 취약계층 보호시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for vulnerable she"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_087",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "senior_housing_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인공동주택 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*노인공동주택)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인공동주택 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for senior housing"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_088",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "daycare_residence_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주야간보호시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*주야간보호시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주야간보호시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for day-night care"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_089",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "medical_welfare_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "의료복지시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*의료복지시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료복지시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for medical welfar"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_090",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "psychiatric_residence_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "정신요양시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*정신요양시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신요양시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for psychiatric re"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_091",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "maternal_residence_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "모자보호시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*모자보호시설)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 모자보호시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for maternal shelt"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_092",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "homeless_shelter_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노숙인 시설 요양·간호 기록 위·변조 차단",
+   "patterns": [
+    "(?=.*노숙인)(?=.*요양)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 시설 요양·간호 기록 위·변조 차단",
+   "message_en": "This request is blocked: Block care record falsification for homeless shelt"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_093",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "nursing_home_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "요양원 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*요양원)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양원 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for nursing home"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_094",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "ltc_facility_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "장기요양시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장기요양시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for long-term care"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_095",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "disabled_residence_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "장애인 거주시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*장애인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 거주시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for disabled resid"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_096",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "elderly_welfare_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "노인복지시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인복지시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for elderly welfar"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_097",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "dementia_care_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "치매전담시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매전담시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for dementia care "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_098",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "rehab_residence_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "재활요양시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재활요양시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for rehabilitation"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_099",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "group_home_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "공동생활가정 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공동생활가정 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for group home"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_100",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "respite_care_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "단기보호시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 단기보호시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for respite care f"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_101",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "hospice_facility_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "호스피스 시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*호스피스)(?=.*시설)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 호스피스 시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for hospice facili"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_102",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "convalescent_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "요양병원 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*요양병원)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양병원 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for convalescent h"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_103",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "assisted_living_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "주거복지시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*주거복지시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주거복지시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for assisted livin"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_104",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "child_residence_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "아동양육시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*아동양육시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동양육시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for child resident"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_105",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "shelter_residence_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "장애인 단기거주 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*단기거주)(?=.*장애인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 단기거주 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for disability sho"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_106",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "vulnerable_shelter_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "취약계층 보호시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*보호시설)(?=.*취약계층)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 취약계층 보호시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for vulnerable she"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_107",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "senior_housing_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "노인공동주택 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*노인공동주택)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인공동주택 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for senior housing"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_108",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "daycare_residence_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "주야간보호시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*주야간보호시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주야간보호시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for day-night care"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_109",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "medical_welfare_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "의료복지시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*의료복지시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료복지시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for medical welfar"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_110",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "psychiatric_residence_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "정신요양시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*정신요양시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신요양시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for psychiatric re"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_111",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "maternal_residence_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "모자보호시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*모자보호시설)(?=.*학대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 모자보호시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for maternal shelt"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_112",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "homeless_shelter_abuse_cover",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "노숙인 시설 입소자 학대·방임 은폐 차단",
+   "patterns": [
+    "(?=.*노숙인)(?=.*시설)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 시설 입소자 학대·방임 은폐 차단",
+   "message_en": "This request is blocked: Block abuse/neglect concealment for homeless shelt"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_113",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "nursing_home_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 요양원 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*요양원)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 요양원 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating nursing home care guideli"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_114",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "ltc_facility_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 장기요양시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 장기요양시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating long-term care facility c"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_115",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "disabled_residence_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 장애인 거주시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 장애인 거주시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating disabled residential faci"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_116",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "elderly_welfare_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 노인복지시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 노인복지시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating elderly welfare facility "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_117",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "dementia_care_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 치매전담시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 치매전담시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating dementia care unit care g"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_118",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "rehab_residence_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 재활요양시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 재활요양시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating rehabilitation residence "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_119",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "group_home_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 공동생활가정 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 공동생활가정 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating group home care guideline"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_120",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "respite_care_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 단기보호시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 단기보호시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating respite care facility car"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_121",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "hospice_facility_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 호스피스 시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*호스피스)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 호스피스 시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating hospice facility care gui"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_122",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "convalescent_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 요양병원 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*요양병원)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 요양병원 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating convalescent hospital car"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_123",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "assisted_living_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 주거복지시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*주거복지시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 주거복지시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating assisted living care guid"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_124",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "child_residence_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 아동양육시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*아동양육시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 아동양육시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating child residential facilit"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_125",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "shelter_residence_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 장애인 단기거주 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*단기거주)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 장애인 단기거주 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating disability short-stay car"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_126",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "vulnerable_shelter_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 취약계층 보호시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*취약계층)(?=.*보호시설)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 취약계층 보호시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating vulnerable shelter care g"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_127",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "senior_housing_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 노인공동주택 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*노인공동주택)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 노인공동주택 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating senior housing care guide"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_128",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "daycare_residence_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 주야간보호시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*주야간보호시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 주야간보호시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating day-night care facility c"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_129",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "medical_welfare_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 의료복지시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*의료복지시설)(?=.*지침)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 의료복지시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating medical welfare facility "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_130",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "psychiatric_residence_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 정신요양시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*정신요양시설)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 정신요양시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating psychiatric residence car"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_131",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "maternal_residence_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 모자보호시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*모자보호시설)(?=.*지침)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 모자보호시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating maternal shelter care gui"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_132",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "homeless_shelter_guideline_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 820,
+   "description": "응답에서 노숙인 시설 돌봄 기준 날조 차단",
+   "patterns": [
+    "(?=.*노숙인)(?=.*돌봄)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 응답에서 노숙인 시설 돌봄 기준 날조 차단",
+   "message_en": "This request is blocked: Block output fabricating homeless shelter care gui"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_133",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "nursing_home_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "요양원 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*무자격자)(?=.*요양원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양원 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at nursing "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_134",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ltc_facility_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장기요양시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장기요양시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at long-ter"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_135",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "disabled_residence_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인 거주시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 거주시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at disabled"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_136",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "elderly_welfare_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인복지시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인복지시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at elderly "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_137",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "dementia_care_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "치매전담시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매전담시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at dementia"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_138",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "rehab_residence_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "재활요양시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재활요양시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at rehabili"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_139",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "group_home_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "공동생활가정 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공동생활가정 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at group ho"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_140",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "respite_care_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "단기보호시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 단기보호시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at respite "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_141",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "hospice_facility_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "호스피스 시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*무자격자)(?=.*호스피스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 호스피스 시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at hospice "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_142",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "convalescent_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "요양병원 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*요양병원)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양병원 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at convales"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_143",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "assisted_living_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주거복지시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*주거복지시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주거복지시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at assisted"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_144",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "child_residence_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "아동양육시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*아동양육시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동양육시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at child re"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_145",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "shelter_residence_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인 단기거주 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*단기거주)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 단기거주 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at disabili"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_146",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "vulnerable_shelter_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "취약계층 보호시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*보호시설)(?=.*취약계층)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 취약계층 보호시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at vulnerab"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_147",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "senior_housing_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인공동주택 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*노인공동주택)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인공동주택 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at senior h"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_148",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "daycare_residence_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주야간보호시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*주야간보호시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주야간보호시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at day-nigh"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_149",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "medical_welfare_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "의료복지시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*의료복지시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료복지시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at medical "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_150",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "psychiatric_residence_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "정신요양시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*정신요양시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신요양시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at psychiat"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_151",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "maternal_residence_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "모자보호시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*모자보호시설)(?=.*무자격자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 모자보호시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at maternal"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_152",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "homeless_shelter_unqualified_practice",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노숙인 시설 무자격 의료·투약 행위 차단",
+   "patterns": [
+    "(?=.*무자격자)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 시설 무자격 의료·투약 행위 차단",
+   "message_en": "This request is blocked: Block unqualified care/medication acts at homeless"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_153",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "nursing_home_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "요양원 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*요양원)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양원 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at nursing"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_154",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ltc_facility_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "장기요양시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장기요양시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at long-te"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_155",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "disabled_residence_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "장애인 거주시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*장애인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 거주시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at disable"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_156",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "elderly_welfare_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "노인복지시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인복지시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at elderly"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_157",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dementia_care_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "치매전담시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매전담시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at dementi"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_158",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "rehab_residence_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "재활요양시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재활요양시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at rehabil"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_159",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "group_home_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "공동생활가정 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공동생활가정 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at group h"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_160",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "respite_care_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "단기보호시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 단기보호시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at respite"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_161",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hospice_facility_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "호스피스 시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*호스피스)(?=.*시설)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 호스피스 시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at hospice"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_162",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "convalescent_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "요양병원 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*요양병원)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양병원 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at convale"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_163",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "assisted_living_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "주거복지시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*주거복지시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주거복지시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at assiste"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_164",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "child_residence_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "아동양육시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*아동양육시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동양육시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at child r"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_165",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "shelter_residence_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "장애인 단기거주 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*단기거주)(?=.*장애인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 단기거주 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at disabil"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_166",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "vulnerable_shelter_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "취약계층 보호시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*보호시설)(?=.*취약계층)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 취약계층 보호시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at vulnera"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_167",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "senior_housing_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "노인공동주택 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*노인공동주택)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인공동주택 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at senior "
+  },
+  {
+   "rule_id": "HC_RWELF_KR_168",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "daycare_residence_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "주야간보호시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*주야간보호시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주야간보호시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at day-nig"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_169",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "medical_welfare_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "의료복지시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*의료복지시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료복지시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at medical"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_170",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "psychiatric_residence_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "정신요양시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*정신요양시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신요양시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at psychia"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_171",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "maternal_residence_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "모자보호시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*모자보호시설)(?=.*보호자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 모자보호시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at materna"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_172",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "homeless_shelter_consent_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 830,
+   "description": "노숙인 시설 보호자 동의 없는 처치·정보제공 차단",
+   "patterns": [
+    "(?=.*노숙인)(?=.*시설)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 시설 보호자 동의 없는 처치·정보제공 차단",
+   "message_en": "This request is blocked: Block care/info sharing without consent at homeles"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_173",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "nursing_home_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "요양원 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*요양원)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양원 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at nu"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_174",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "ltc_facility_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장기요양시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장기요양시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at lo"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_175",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "disabled_residence_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인 거주시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 거주시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at di"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_176",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "elderly_welfare_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인복지시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인복지시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at el"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_177",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "dementia_care_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "치매전담시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 치매전담시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at de"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_178",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "rehab_residence_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "재활요양시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 재활요양시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at re"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_179",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "group_home_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "공동생활가정 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공동생활가정 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at gr"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_180",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "respite_care_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "단기보호시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 단기보호시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at re"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_181",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "hospice_facility_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "호스피스 시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*퇴소자)(?=.*호스피스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 호스피스 시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at ho"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_182",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "convalescent_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "요양병원 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*요양병원)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 요양병원 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at co"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_183",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "assisted_living_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주거복지시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*주거복지시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주거복지시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at as"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_184",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "child_residence_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "아동양육시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*아동양육시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아동양육시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at ch"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_185",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "shelter_residence_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "장애인 단기거주 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*단기거주)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 장애인 단기거주 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at di"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_186",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "vulnerable_shelter_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "취약계층 보호시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*보호시설)(?=.*취약계층)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 취약계층 보호시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at vu"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_187",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "senior_housing_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노인공동주택 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*노인공동주택)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노인공동주택 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at se"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_188",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "daycare_residence_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "주야간보호시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*주야간보호시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 주야간보호시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at da"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_189",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "medical_welfare_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "의료복지시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*의료복지시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 의료복지시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at me"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_190",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "psychiatric_residence_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "정신요양시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*정신요양시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 정신요양시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at ps"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_191",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "maternal_residence_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "모자보호시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*모자보호시설)(?=.*퇴소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 모자보호시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at ma"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_192",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "homeless_shelter_discharge_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "노숙인 시설 퇴소·전원 처리 부정 차단",
+   "patterns": [
+    "(?=.*퇴소자)(?=.*노숙인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 노숙인 시설 퇴소·전원 처리 부정 차단",
+   "message_en": "This request is blocked: Block fraudulent discharge/transfer handling at ho"
+  },
+  {
+   "rule_id": "HC_RWELF_KR_193",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "nursing_home_quality_standard_halluc",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 요양원 평가·인증 기준 날조 차단",
+   "patterns": [
+    "(?=.*요양원)(?=.*만점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 요양원 평가·인증 기준 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_194",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "ltc_facility_quality_standard_halluc",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 장기요양시설 평가·인증 기준 날조 차단",
+   "patterns": [
+    "(?=.*장기요양시설)(?=.*만점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 장기요양시설 평가·인증 기준 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_195",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "disabled_residence_quality_standard_halluc",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 장애인 거주시설 평가·인증 기준 날조 차단",
+   "patterns": [
+    "(?=.*거주시설)(?=.*만점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 장애인 거주시설 평가·인증 기준 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_196",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "elderly_welfare_quality_standard_halluc",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 노인복지시설 평가·인증 기준 날조 차단",
+   "patterns": [
+    "(?=.*노인복지시설)(?=.*만점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 노인복지시설 평가·인증 기준 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_197",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "dementia_care_quality_standard_halluc",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 치매전담시설 평가·인증 기준 날조 차단",
+   "patterns": [
+    "(?=.*치매전담시설)(?=.*만점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 치매전담시설 평가·인증 기준 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_198",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "rehab_residence_quality_standard_halluc",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 재활요양시설 평가·인증 기준 날조 차단",
+   "patterns": [
+    "(?=.*재활요양시설)(?=.*만점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 재활요양시설 평가·인증 기준 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_199",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "group_home_quality_standard_halluc",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 공동생활가정 평가·인증 기준 날조 차단",
+   "patterns": [
+    "(?=.*공동생활가정)(?=.*만점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 공동생활가정 평가·인증 기준 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "HC_RWELF_KR_200",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "respite_care_quality_standard_halluc",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 680,
+   "description": "응답에서 단기보호시설 평가·인증 기준 날조 차단",
+   "patterns": [
+    "(?=.*단기보호시설)(?=.*만점)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 응답에서 단기보호시설 평가·인증 기준 날조 차단",
+   "message_en": "Please verify compliance before proceeding."
+  }
+ ]
+}

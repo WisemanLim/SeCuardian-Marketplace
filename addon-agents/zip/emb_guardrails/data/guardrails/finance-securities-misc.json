@@ -1,0 +1,3413 @@
+{
+ "domain_key": "finance-securities-misc",
+ "display_name": "금융(증권·기타)",
+ "display_name_en": "Finance (Securities/Misc)",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 200,
+ "regex_rule_count": 200,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 200,
+ "rules": [
+  {
+   "rule_id": "FIN_SEC_KR_001",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insider_trading_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 995,
+   "description": "내부자 거래 지원 차단",
+   "patterns": [
+    "(?=.*매수하면)(?=.*벌어)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "내부자 거래 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_002",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "market_manipulation_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "시장 조작 지원 차단",
+   "patterns": [
+    "(?=.*올리려)(?=.*퍼뜨리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "시장 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_003",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "front_running_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "선취 매매(front-running) 지원 차단",
+   "patterns": [
+    "(?=.*주문)(?=.*매수해서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "선취 매매(front-running) 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_004",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "nav_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "펀드 순자산가치(NAV) 허위 보고 차단",
+   "patterns": [
+    "(?=.*높이)(?=.*부풀려서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "펀드 순자산가치(NAV) 허위 보고 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_005",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "structured_product_risk_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "구조화 상품 위험 은폐 차단",
+   "patterns": [
+    "(?=.*구간)(?=.*ELS)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "구조화 상품 위험 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_006",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "margin_call_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "마진 콜 조작 지원 차단",
+   "patterns": [
+    "(?=.*증거금)(?=.*계속하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "마진 콜 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_007",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dark_pool_abuse",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "다크 풀 시장 남용 지원 차단",
+   "patterns": [
+    "(?=.*감시)(?=.*다크)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "다크 풀 시장 남용 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_008",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "short_selling_abuse",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "공매도 남용 지원 차단",
+   "patterns": [
+    "(?=.*공매)(?=.*종목)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공매도 남용 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_009",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "spac_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "스팩(SPAC) 합병 사기 지원 차단",
+   "patterns": [
+    "(?=.*SPAC)(?=.*작성법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "스팩(SPAC) 합병 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_010",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "crowdfunding_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "증권형 크라우드펀딩 허위 안내 차단",
+   "patterns": [
+    "(?=.*크라우드펀딩)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권형 크라우드펀딩 허위 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_011",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "investment_advisory_misrepresent",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "투자 자문 허위 정보 제공 차단",
+   "patterns": [
+    "(?=.*조언해)(?=.*확실한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "투자 자문 허위 정보 제공 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_012",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "fiduciary_breach_securities",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "증권 수탁자 의무 위반 차단",
+   "patterns": [
+    "(?=.*증권사)(?=.*짜줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 수탁자 의무 위반 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_013",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "suitability_assessment_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "투자 적합성 평가 생략 지원 차단",
+   "patterns": [
+    "(?=.*ETF)(?=.*레버리지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "투자 적합성 평가 생략 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_014",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "conflict_of_interest_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "이해 충돌 은폐 차단",
+   "patterns": [
+    "(?=.*보유한)(?=.*증권사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이해 충돌 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_015",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "research_report_bias_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "리서치 보고서 편향 은폐 차단",
+   "patterns": [
+    "(?=.*부정적)(?=.*내줘)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "리서치 보고서 편향 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_016",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "order_routing_conflict",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "주문 처리 경로 이해충돌 차단",
+   "patterns": [
+    "(?=.*증권사)(?=.*최선)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주문 처리 경로 이해충돌 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_017",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "payment_for_order_flow_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "주문 흐름 대가 수수 은폐 차단",
+   "patterns": [
+    "(?=.*주문)(?=.*흐름)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주문 흐름 대가 수수 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_018",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "naked_short_selling",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "무차입 공매도 지원 차단",
+   "patterns": [
+    "(?=.*공매도하)(?=.*빌리지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "무차입 공매도 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_019",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "circuit_breaker_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "서킷 브레이커 회피 차단",
+   "patterns": [
+    "(?=.*주문)(?=.*일시)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "서킷 브레이커 회피 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_020",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "position_limit_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "포지션 한도 우회 차단",
+   "patterns": [
+    "(?=.*포지션)(?=.*나눠)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "포지션 한도 우회 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_021",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "securities_disclosure_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "증권 공시 허위 기재 차단",
+   "patterns": [
+    "(?=.*보이려)(?=.*분기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 공시 허위 기재 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_022",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "earnings_manipulation_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "실적 조작 지원 차단",
+   "patterns": [
+    "(?=.*창의적)(?=.*맞추려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "실적 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_023",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "proxy_fight_manipulation",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "위임장 대결 조작 지원 차단",
+   "patterns": [
+    "(?=.*위임장)(?=.*이용하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "위임장 대결 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_024",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "delisting_manipulation_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "상장 폐지 회피 조작 지원 차단",
+   "patterns": [
+    "(?=.*감사인)(?=.*압박하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "상장 폐지 회피 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_025",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "tender_offer_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "공개 매수 조작 지원 차단",
+   "patterns": [
+    "(?=.*매수)(?=.*주주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공개 매수 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_026",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "ipo_manipulation_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "기업 공개(IPO) 조작 지원 차단",
+   "patterns": [
+    "(?=.*IPO)(?=.*공모)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "기업 공개(IPO) 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_027",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "insider_tipping_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "내부 정보 누설(tipping) 지원 차단",
+   "patterns": [
+    "(?=.*귀띔해주)(?=.*지인)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "내부 정보 누설(tipping) 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_028",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "securities_fraud_cover_up",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "증권 사기 은폐 지원 차단",
+   "patterns": [
+    "(?=.*인멸하)(?=.*증거)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 사기 은폐 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_029",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "high_frequency_trading_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "고빈도 매매(HFT) 남용 지원 차단",
+   "patterns": [
+    "(?=.*HFT)(?=.*불리하게)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "고빈도 매매(HFT) 남용 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_030",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "algorithmic_trading_manipulation",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "알고리즘 매매 시장 조작 차단",
+   "patterns": [
+    "(?=.*취소하)(?=.*주문)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "알고리즘 매매 시장 조작 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_031",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "bond_manipulation_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "채권 시세 조작 지원 차단",
+   "patterns": [
+    "(?=.*회사채)(?=.*스프레드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "채권 시세 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_032",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "etf_manipulation_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "ETF 시세 조작 지원 차단",
+   "patterns": [
+    "(?=.*괴리율)(?=.*ETF)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "ETF 시세 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_033",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "derivatives_mis_selling",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "파생상품 불완전 판매 지원 차단",
+   "patterns": [
+    "(?=.*파생)(?=.*가능성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "파생상품 불완전 판매 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_034",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hedge_fund_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "헤지 펀드 사기 지원 차단",
+   "patterns": [
+    "(?=.*헤지)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "헤지 펀드 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_035",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "mutual_fund_churning_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "펀드 과잉 매매(churning) 지원 차단",
+   "patterns": [
+    "(?=.*불필요하게)(?=.*교체하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "펀드 과잉 매매(churning) 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_036",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "securities_license_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "증권업 인가 없이 영업 지원 차단",
+   "patterns": [
+    "(?=.*무인)(?=.*증권)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권업 인가 없이 영업 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_037",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "fund_manager_self_dealing",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "펀드 매니저 자기 거래 지원 차단",
+   "patterns": [
+    "(?=.*매니저)(?=.*이용해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "펀드 매니저 자기 거래 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_038",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "penny_stock_manipulation",
+   "severity": "high",
+   "action": "block",
+   "priority": 940,
+   "description": "저가 주식(penny stock) 시세 조작 지원 차단",
+   "patterns": [
+    "(?=.*시세)(?=.*투자자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "저가 주식(penny stock) 시세 조작 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_039",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "securities_margin_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "신용 거래 증거금 사기 차단",
+   "patterns": [
+    "(?=.*증거금)(?=.*계속하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "신용 거래 증거금 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_040",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "securities_short_squeeze_manipulate",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "공매도 강제 청산(short squeeze) 조작 차단",
+   "patterns": [
+    "(?=.*극대화하)(?=.*조직적)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "공매도 강제 청산(short squeeze) 조작 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_041",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "securities_embargo_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "증권 공시 엠바고 위반 차단",
+   "patterns": [
+    "(?=.*유출하)(?=.*엠바)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 공시 엠바고 위반 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_042",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "mifid_transaction_reporting_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "MiFID II 거래 보고 우회 차단",
+   "patterns": [
+    "(?=.*MiFID)(?=.*피하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "MiFID II 거래 보고 우회 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_043",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "securities_whistleblower_suppress",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "증권 내부 고발자 압박 차단",
+   "patterns": [
+    "(?=.*고발자)(?=.*협박하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 내부 고발자 압박 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_044",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "fatca_securities_reporting_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "증권 FATCA 보고 누락 차단",
+   "patterns": [
+    "(?=.*미국인)(?=.*FATCA)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 FATCA 보고 누락 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_045",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "securities_record_keeping_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "증권 기록 보관 의무 회피 차단",
+   "patterns": [
+    "(?=.*삭제하)(?=.*통신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 기록 보관 의무 회피 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_046",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "best_execution_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "최선 집행 의무 회피 차단",
+   "patterns": [
+    "(?=.*선택하)(?=.*증권사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "최선 집행 의무 회피 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_047",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "securities_cold_calling_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "증권 불법 전화 권유(cold calling) 차단",
+   "patterns": [
+    "(?=.*권유하)(?=.*투자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 불법 전화 권유(cold calling) 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_048",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "securities_concentration_risk_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "포트폴리오 집중 리스크 은폐 차단",
+   "patterns": [
+    "(?=.*단일)(?=.*집중)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "포트폴리오 집중 리스크 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_049",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "securities_tax_evasion_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "증권 양도세 탈루 지원 차단",
+   "patterns": [
+    "(?=.*양도세)(?=.*회피하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 양도세 탈루 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_050",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "pump_and_dump_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 995,
+   "description": "주가 부양 후 매도(pump and dump) 사기 차단",
+   "patterns": [
+    "(?=.*추천해서)(?=.*올린)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주가 부양 후 매도(pump and dump) 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_051",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "ponzi_scheme_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 995,
+   "description": "폰지 사기 지원 차단",
+   "patterns": [
+    "(?=.*돈으)(?=.*지급하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "폰지 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_052",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "securities_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "증권 사기 지원 차단",
+   "patterns": [
+    "(?=.*유치하)(?=.*재무)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_053",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "false_prospectus_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "허위 투자 설명서 작성 지원 차단",
+   "patterns": [
+    "(?=.*설명서)(?=.*축소하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "허위 투자 설명서 작성 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_054",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "broker_misconduct_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "브로커 불법 행위 지원 차단",
+   "patterns": [
+    "(?=.*모르게)(?=.*빼돌리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "브로커 불법 행위 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_055",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "churning_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "과잉 매매(churning) 사기 차단",
+   "patterns": [
+    "(?=.*불필요하게)(?=.*챙기려)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "과잉 매매(churning) 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_056",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "spoofing_layering_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "스푸핑·레이어링 시장 조작 차단",
+   "patterns": [
+    "(?=.*스푸핑)(?=.*매수세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "스푸핑·레이어링 시장 조작 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_057",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "wash_trading_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "자전 거래(wash trading) 지원 차단",
+   "patterns": [
+    "(?=.*반복해서)(?=.*거래량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자전 거래(wash trading) 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_058",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "boiler_room_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "보일러 룸 사기 지원 차단",
+   "patterns": [
+    "(?=.*강압)(?=.*콜센터)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "보일러 룸 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_059",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "affinity_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "친분 기반 투자 사기(affinity fraud) 차단",
+   "patterns": [
+    "(?=.*동창회)(?=.*단체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "친분 기반 투자 사기(affinity fraud) 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_060",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "pyramid_scheme_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "다단계 피라미드 투자 사기 차단",
+   "patterns": [
+    "(?=.*피라미드)(?=.*운영법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "다단계 피라미드 투자 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_061",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "unregistered_securities_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "미등록 증권 판매 지원 차단",
+   "patterns": [
+    "(?=.*미등록)(?=.*주식)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미등록 증권 판매 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_062",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "pre_ipo_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "Pre-IPO 투자 사기 차단",
+   "patterns": [
+    "(?=.*임박하다)(?=.*IPO)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "Pre-IPO 투자 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_063",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "reverse_merger_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "역합병 증권 사기 차단",
+   "patterns": [
+    "(?=.*상장사)(?=.*역합병)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "역합병 증권 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_064",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "crypto_securities_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "암호화폐 증권 사기 지원 차단",
+   "patterns": [
+    "(?=.*먹튀하)(?=.*암호화폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "암호화폐 증권 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_065",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "securities_identity_theft_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "증권 계좌 명의 도용 차단",
+   "patterns": [
+    "(?=.*개설해서)(?=.*거래하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 계좌 명의 도용 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_066",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "securities_market_cornering",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "증권 시장 매점(cornering) 차단",
+   "patterns": [
+    "(?=.*청산시키)(?=.*지배력)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 시장 매점(cornering) 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_067",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "account_statement_forgery_securities",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "증권 계좌 잔액 허위 확인서 작성 차단",
+   "patterns": [
+    "(?=.*잔액)(?=.*증권)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 계좌 잔액 허위 확인서 작성 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_068",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "securities_signal_selling_scam",
+   "severity": "high",
+   "action": "block",
+   "priority": 950,
+   "description": "무허가 주식 리딩 사기 차단",
+   "patterns": [
+    "(?=.*운영해서)(?=.*리딩방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "무허가 주식 리딩 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_069",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "securities_market_manipulation_social",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "SNS 이용 증권 시장 조작 차단",
+   "patterns": [
+    "(?=.*유명인)(?=.*추천)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "SNS 이용 증권 시장 조작 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_070",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "securities_transfer_agent_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "증권 명의 개서 사기 차단",
+   "patterns": [
+    "(?=.*경영권)(?=.*탈취하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 명의 개서 사기 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_071",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "fund_redemption_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "펀드 환매 사기 지원 차단",
+   "patterns": [
+    "(?=.*환매)(?=.*불가)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "펀드 환매 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_072",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "securities_ponzi_cover_up",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "증권 폰지 사기 은폐 차단",
+   "patterns": [
+    "(?=.*막으려)(?=.*인멸하)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 폰지 사기 은폐 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_073",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "binary_options_fraud_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "이진 옵션 사기 지원 차단",
+   "patterns": [
+    "(?=.*이진)(?=.*무등록)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이진 옵션 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_074",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "securities_ai_manipulation_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "AI 이용 증권 시장 조작 차단",
+   "patterns": [
+    "(?=.*자동화하)(?=.*시세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "AI 이용 증권 시장 조작 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_075",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "investor_identity_combo",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 870,
+   "description": "투자자 신원·계좌 정보 결합 차단",
+   "patterns": [
+    "(?=.*저장해)(?=.*투자자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "투자자 신원·계좌 정보 결합 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_076",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "portfolio_data_linkage",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 860,
+   "description": "포트폴리오·개인 신원 연계 차단",
+   "patterns": [
+    "(?=.*출력해)(?=.*포트폴리오)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "포트폴리오·개인 신원 연계 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_077",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "trading_activity_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "거래 행위·개인 신원 결합 차단",
+   "patterns": [
+    "(?=.*매수)(?=.*매도)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "거래 행위·개인 신원 결합 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_078",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "beneficial_owner_pii",
+   "severity": "critical",
+   "action": "block_or_redact",
+   "priority": 940,
+   "description": "실소유주 신원 정보 차단",
+   "patterns": [
+    "(?=.*실소유주)(?=.*주주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "실소유주 신원 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_079",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "fund_manager_identity",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 840,
+   "description": "펀드 매니저 개인 신원 정보 차단",
+   "patterns": [
+    "(?=.*매니저)(?=.*펀드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "펀드 매니저 개인 신원 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_080",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "analyst_identity_trading_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 840,
+   "description": "애널리스트 신원·거래 정보 결합 차단",
+   "patterns": [
+    "(?=.*애널리스트)(?=.*리포트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "애널리스트 신원·거래 정보 결합 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_081",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "institutional_investor_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "기관 투자자 운용 담당자 개인정보 차단",
+   "patterns": [
+    "(?=.*포트폴리오)(?=.*투자자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "기관 투자자 운용 담당자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_082",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "crypto_wallet_investor_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 855,
+   "description": "암호화폐 지갑·투자자 신원 결합 차단",
+   "patterns": [
+    "(?=.*암호화폐)(?=.*투자자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "암호화폐 지갑·투자자 신원 결합 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_083",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "securities_customer_financial_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 850,
+   "description": "증권사 고객 금융 개인정보 차단",
+   "patterns": [
+    "(?=.*규모)(?=.*증권)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권사 고객 금융 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_084",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "securities_minor_account_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 860,
+   "description": "미성년자 증권 계좌 개인정보 차단",
+   "patterns": [
+    "(?=.*부모)(?=.*증권)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "미성년자 증권 계좌 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_085",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "foreign_investor_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 840,
+   "description": "외국인 투자자 개인정보 차단",
+   "patterns": [
+    "(?=.*외국인)(?=.*국적)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "외국인 투자자 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_086",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "derivatives_counterparty_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 845,
+   "description": "파생상품 거래 상대방 개인정보 차단",
+   "patterns": [
+    "(?=.*파생상품)(?=.*상대방)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "파생상품 거래 상대방 개인정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_087",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "securities_ai_training_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 860,
+   "description": "AI 모델 학습용 투자자 개인정보 이용 차단",
+   "patterns": [
+    "(?=.*훈련해)(?=.*투자자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "AI 모델 학습용 투자자 개인정보 이용 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_088",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "securities_law_fabrication",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "증권 법령 날조 차단",
+   "patterns": [
+    "(?=.*자본시장법상)(?=.*허용돼)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 법령 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_089",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "regulatory_filing_false",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "규제 제출 서류 허위 내용 차단",
+   "patterns": [
+    "(?=.*사업보고서)(?=.*금감원)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규제 제출 서류 허위 내용 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_090",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "fund_performance_fabrication",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "펀드 수익률 날조 차단",
+   "patterns": [
+    "(?=.*코스피)(?=.*펀드예)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "펀드 수익률 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_091",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "analyst_rating_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "애널리스트 투자 의견 날조 차단",
+   "patterns": [
+    "(?=.*증권사)(?=.*종목)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "애널리스트 투자 의견 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_092",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "ipo_pricing_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "IPO 공모가 허위 정보 차단",
+   "patterns": [
+    "(?=.*공모가)(?=.*IPO)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "IPO 공모가 허위 정보 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_093",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "credit_rating_fabrication",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "신용 등급 날조 차단",
+   "patterns": [
+    "(?=.*받았어)(?=.*신용평)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "신용 등급 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_094",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "regulatory_body_false_approval",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "규제 기관 허위 승인 주장 차단",
+   "patterns": [
+    "(?=.*상품이에)(?=.*승인한)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규제 기관 허위 승인 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_095",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "securities_market_condition_false",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "증권 시장 상황 허위 주장 차단",
+   "patterns": [
+    "(?=.*진입했어)(?=.*코스피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "증권 시장 상황 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_096",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "iosco_regulation_fabrication",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "IOSCO 규정 날조 차단",
+   "patterns": [
+    "(?=.*IOSCO)(?=.*사기예)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "IOSCO 규정 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_097",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "derivatives_risk_false_claim",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "파생상품 위험 허위 주장 차단",
+   "patterns": [
+    "(?=.*ETF)(?=.*레버리지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "파생상품 위험 허위 주장 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_098",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "stock_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "주식 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*단계별)(?=.*시세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주식 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_099",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "bond_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "채권 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*단계별)(?=.*시세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "채권 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_100",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "fund_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "펀드 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*단계별)(?=.*시세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "펀드 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_101",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "etf_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "ETF 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*ETF)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "ETF 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_102",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "derivative_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "파생상품 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*파생상품)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "파생상품 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_103",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "futures_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "선물 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*단계별)(?=.*시세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "선물 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_104",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "options_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "옵션 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*단계별)(?=.*시세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "옵션 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_105",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "reit_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "리츠 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*리츠)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "리츠 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_106",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "structured_note_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "파생결합증권 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*파생결합증권)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "파생결합증권 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_107",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "crypto_asset_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "가상자산 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*가상자산)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "가상자산 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_108",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "forex_margin_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "FX마진 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*단계별)(?=.*시세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "FX마진 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_109",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "commodity_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "상품 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*단계별)(?=.*시세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "상품 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_110",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "spac_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "스팩 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*스팩)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "스팩 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_111",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "convertible_bond_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "전환사채 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*전환사채)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "전환사채 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_112",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "warrant_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "워런트 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*워런트)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "워런트 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_113",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "swap_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "스왑 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*단계별)(?=.*스왑)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "스왑 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_114",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "mbs_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "주택저당증권 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*주택저당증권)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주택저당증권 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_115",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "abs_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "자산유동화증권 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*자산유동화증권)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자산유동화증권 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_116",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "money_market_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "단기금융 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*단기금융)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "단기금융 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_117",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "private_equity_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "사모펀드 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*사모펀드)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사모펀드 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_118",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "venture_fund_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "벤처펀드 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*벤처펀드)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "벤처펀드 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_119",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "elw_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "주식워런트증권 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*주식워런트증권)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주식워런트증권 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_120",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "dr_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "예탁증서 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*예탁증서)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "예탁증서 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_121",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "bw_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 920,
+   "description": "신주인수권부사채 시세조종 지원 차단",
+   "patterns": [
+    "(?=.*신주인수권부사채)(?=.*단계별)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "신주인수권부사채 시세조종 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_122",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "stock_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 주식 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*아닌데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 주식 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_123",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "bond_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 채권 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*아닌데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 채권 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_124",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "fund_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 펀드 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*아닌데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 펀드 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_125",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "etf_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 ETF 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*ETF)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 ETF 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_126",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "derivative_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 파생상품 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*파생상품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 파생상품 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_127",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "futures_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 선물 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*아닌데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 선물 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_128",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "options_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 옵션 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*아닌데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 옵션 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_129",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "reit_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 리츠 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*리츠)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 리츠 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_130",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "structured_note_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 파생결합증권 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*파생결합증권)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 파생결합증권 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_131",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "crypto_asset_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 가상자산 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*가상자산)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 가상자산 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_132",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "forex_margin_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 FX마진 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*아닌데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 FX마진 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_133",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "commodity_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 상품 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*아닌데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 상품 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_134",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "spac_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 스팩 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*스팩)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 스팩 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_135",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "convertible_bond_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 전환사채 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*전환사채)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 전환사채 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_136",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "warrant_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 워런트 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*워런트)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 워런트 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_137",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "swap_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 스왑 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*보장된다)(?=.*아닌데)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 스왑 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_138",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "mbs_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 주택저당증권 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*주택저당증권)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 주택저당증권 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_139",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "abs_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 자산유동화증권 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*자산유동화증권)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 자산유동화증권 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_140",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "money_market_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 단기금융 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*단기금융)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 단기금융 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_141",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "private_equity_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 사모펀드 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*사모펀드)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 사모펀드 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_142",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "venture_fund_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 벤처펀드 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*벤처펀드)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 벤처펀드 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_143",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "elw_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 주식워런트증권 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*주식워런트증권)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 주식워런트증권 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_144",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "dr_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 예탁증서 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*예탁증서)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 예탁증서 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_145",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "bw_misselling",
+   "severity": "high",
+   "action": "block",
+   "priority": 850,
+   "description": "응답에서 신주인수권부사채 불완전판매 안내 차단",
+   "patterns": [
+    "(?=.*신주인수권부사채)(?=.*보장된다)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 신주인수권부사채 불완전판매 안내 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_146",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "stock_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "주식 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주식 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_147",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "bond_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "채권 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "채권 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_148",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "fund_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "펀드 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "펀드 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_149",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "etf_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "ETF 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*ETF)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "ETF 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_150",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "derivative_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "파생상품 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "파생상품 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_151",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "futures_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "선물 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "선물 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_152",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "options_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "옵션 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "옵션 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_153",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "reit_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "리츠 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "리츠 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_154",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "structured_note_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "파생결합증권 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*파생결합증권)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "파생결합증권 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_155",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "crypto_asset_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "가상자산 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*가상자산)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "가상자산 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_156",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "forex_margin_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "FX마진 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "FX마진 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_157",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "commodity_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "상품 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "상품 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_158",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "spac_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "스팩 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "스팩 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_159",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "convertible_bond_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "전환사채 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*전환사채)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "전환사채 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_160",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "warrant_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "워런트 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*워런트)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "워런트 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_161",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "swap_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "스왑 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*계좌주)(?=.*잔고)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "스왑 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_162",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "mbs_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "주택저당증권 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*주택저당증권)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주택저당증권 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_163",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "abs_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "자산유동화증권 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*자산유동화증권)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "자산유동화증권 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_164",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "money_market_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "단기금융 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*단기금융)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "단기금융 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_165",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "private_equity_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "사모펀드 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*사모펀드)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "사모펀드 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_166",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "venture_fund_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "벤처펀드 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*벤처펀드)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "벤처펀드 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_167",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "elw_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "주식워런트증권 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*주식워런트증권)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주식워런트증권 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_168",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "dr_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "예탁증서 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*예탁증서)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "예탁증서 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_169",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "bw_investor_pii",
+   "severity": "high",
+   "action": "redact",
+   "priority": 830,
+   "description": "신주인수권부사채 투자자 개인·거래 정보 유출 차단",
+   "patterns": [
+    "(?=.*신주인수권부사채)(?=.*계좌주)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "신주인수권부사채 투자자 개인·거래 정보 유출 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_170",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "stock_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 주식 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*수익률)(?=.*보장이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 주식 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_171",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "bond_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 채권 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*수익률)(?=.*보장이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 채권 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_172",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "fund_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 펀드 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*수익률)(?=.*보장이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 펀드 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_173",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "etf_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 ETF 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*ETF)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 ETF 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_174",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "derivative_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 파생상품 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*파생상품)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 파생상품 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_175",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "futures_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 선물 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*수익률)(?=.*보장이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 선물 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_176",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "options_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 옵션 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*수익률)(?=.*보장이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 옵션 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_177",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "reit_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 리츠 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*리츠)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 리츠 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_178",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "structured_note_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 파생결합증권 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*파생결합증권)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 파생결합증권 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_179",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "crypto_asset_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 가상자산 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*가상자산)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 가상자산 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_180",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "forex_margin_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 FX마진 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*수익률)(?=.*보장이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 FX마진 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_181",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "commodity_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 상품 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*수익률)(?=.*보장이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 상품 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_182",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "spac_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 스팩 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*스팩)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 스팩 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_183",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "convertible_bond_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 전환사채 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*전환사채)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 전환사채 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_184",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "warrant_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 워런트 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*워런트)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 워런트 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_185",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "swap_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 스왑 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*수익률)(?=.*보장이)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 스왑 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_186",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "mbs_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 주택저당증권 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*주택저당증권)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 주택저당증권 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_187",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "abs_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 자산유동화증권 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*자산유동화증권)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 자산유동화증권 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_188",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "money_market_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 단기금융 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*단기금융)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 단기금융 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_189",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "private_equity_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 사모펀드 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*사모펀드)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 사모펀드 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_190",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "venture_fund_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 벤처펀드 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*벤처펀드)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 벤처펀드 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_191",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "elw_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 주식워런트증권 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*주식워런트증권)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 주식워런트증권 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_192",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "dr_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 예탁증서 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*예탁증서)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 예탁증서 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_193",
+   "io_type": "output",
+   "category": "hallucination",
+   "sub_category": "bw_perf_halluc",
+   "severity": "high",
+   "action": "block",
+   "priority": 840,
+   "description": "응답에서 신주인수권부사채 수익률·실적 날조 차단",
+   "patterns": [
+    "(?=.*신주인수권부사채)(?=.*수익률)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "응답에서 신주인수권부사채 수익률·실적 날조 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_194",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "stock_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "주식 투자 사기 지원 차단",
+   "patterns": [
+    "(?=.*모으)(?=.*투자금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "주식 투자 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_195",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "bond_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "채권 투자 사기 지원 차단",
+   "patterns": [
+    "(?=.*모으)(?=.*투자금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "채권 투자 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_196",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "fund_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "펀드 투자 사기 지원 차단",
+   "patterns": [
+    "(?=.*모으)(?=.*투자금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "펀드 투자 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_197",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "etf_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "ETF 투자 사기 지원 차단",
+   "patterns": [
+    "(?=.*ETF)(?=.*모으)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "ETF 투자 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_198",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "derivative_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "파생상품 투자 사기 지원 차단",
+   "patterns": [
+    "(?=.*모으)(?=.*파생상품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "파생상품 투자 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_199",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "futures_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "선물 투자 사기 지원 차단",
+   "patterns": [
+    "(?=.*모으)(?=.*투자금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "선물 투자 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  },
+  {
+   "rule_id": "FIN_SEC_KR_200",
+   "io_type": "input",
+   "category": "fraud",
+   "sub_category": "options_fraud_assist",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "옵션 투자 사기 지원 차단",
+   "patterns": [
+    "(?=.*모으)(?=.*투자금)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "옵션 투자 사기 지원 차단 관련 입력이 차단되었습니다.",
+   "message_en": "This content violates securities regulations and is blocked."
+  }
+ ]
+}

@@ -1,0 +1,3413 @@
+{
+ "domain_key": "manufacturing-electronics",
+ "display_name": "제조업(전자)",
+ "display_name_en": "Manufacturing (Electronics)",
+ "status": "heuristic",
+ "required": false,
+ "rule_count": 200,
+ "regex_rule_count": 200,
+ "real_rule_count": 0,
+ "heuristic_rule_count": 200,
+ "rules": [
+  {
+   "rule_id": "MF_ELEC_KR_001",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "process_recipe_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "반도체 공정 레시피 기밀 유출 차단",
+   "patterns": [
+    "(?=.*DRAM)(?=.*식각)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 공정 레시피 기밀 유출 차단",
+   "message_en": "This request is blocked: Semiconductor process recipe confidential leakage "
+  },
+  {
+   "rule_id": "MF_ELEC_KR_002",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "chip_design_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 958,
+   "description": "칩 설계 레이아웃 기밀 유출 차단",
+   "patterns": [
+    "(?=.*레이아웃)(?=.*SoC)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 칩 설계 레이아웃 기밀 유출 차단",
+   "message_en": "This request is blocked: Chip design layout confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_003",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "fab_process_parameter",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "팹 공정 파라미터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*FinFET)(?=.*산화막)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 팹 공정 파라미터 기밀 유출 차단",
+   "message_en": "This request is blocked: Fab process parameter confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_004",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "rd_roadmap_infer",
+   "severity": "critical",
+   "action": "block",
+   "priority": 950,
+   "description": "반도체 R&D 로드맵 기밀 유출 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*일정)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 R&D 로드맵 기밀 유출 차단",
+   "message_en": "This request is blocked: Semiconductor R&D roadmap confidential leakage blo"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_005",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "wafer_yield_data_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "웨이퍼 수율 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*웨이퍼)(?=.*공유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 웨이퍼 수율 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: Wafer yield data confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_006",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "packaging_tech_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 918,
+   "description": "반도체 패키징 기술 기밀 유출 차단",
+   "patterns": [
+    "(?=.*Wafer)(?=.*Chip)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 패키징 기술 기밀 유출 차단",
+   "message_en": "This request is blocked: Semiconductor packaging technology confidential le"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_007",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "firmware_ip_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "펌웨어 소스코드 기밀 유출 차단",
+   "patterns": [
+    "(?=.*임베디드)(?=.*펌웨어)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 펌웨어 소스코드 기밀 유출 차단",
+   "message_en": "This request is blocked: Firmware source code confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_008",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "product_spec_prerelease",
+   "severity": "critical",
+   "action": "block",
+   "priority": 945,
+   "description": "미출시 제품 사양 기밀 유출 차단",
+   "patterns": [
+    "(?=.*사양서)(?=.*차세대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 미출시 제품 사양 기밀 유출 차단",
+   "message_en": "This request is blocked: Pre-release product specification confidential lea"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_009",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "supply_chain_structure_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 905,
+   "description": "공급망 구조 기밀 유출 차단",
+   "patterns": [
+    "(?=.*공급사)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공급망 구조 기밀 유출 차단",
+   "message_en": "This request is blocked: Supply chain structure confidential leakage blocke"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_010",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "competitor_fab_reverse_infer",
+   "severity": "high",
+   "action": "block",
+   "priority": 888,
+   "description": "경쟁사 팹 공정 역추론 조력 차단",
+   "patterns": [
+    "(?=.*TEM)(?=.*역추론)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 경쟁사 팹 공정 역추론 조력 차단",
+   "message_en": "This request is blocked: Competitor fab process reverse inference assistanc"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_011",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "mask_design_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 952,
+   "description": "포토마스크 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*포토마스크)(?=.*레이아웃)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 포토마스크 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Photomask design confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_012",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "test_program_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 898,
+   "description": "반도체 테스트 프로그램 기밀 유출 차단",
+   "patterns": [
+    "(?=.*ATE)(?=.*프로그램)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 테스트 프로그램 기밀 유출 차단",
+   "message_en": "This request is blocked: Semiconductor test program confidential leakage bl"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_013",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "eda_tool_license_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 882,
+   "description": "EDA 툴 라이선스 기밀 유출 차단",
+   "patterns": [
+    "(?=.*라이선스)(?=.*EDA)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: EDA 툴 라이선스 기밀 유출 차단",
+   "message_en": "This request is blocked: EDA tool license confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_014",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "silicon_ip_core_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 948,
+   "description": "실리콘 IP 코어 기밀 유출 차단",
+   "patterns": [
+    "(?=.*CPU)(?=.*코어)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 실리콘 IP 코어 기밀 유출 차단",
+   "message_en": "This request is blocked: Silicon IP core confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_015",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "memory_architecture_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 942,
+   "description": "메모리 아키텍처 기밀 유출 차단",
+   "patterns": [
+    "(?=.*메모리)(?=.*HBM)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 메모리 아키텍처 기밀 유출 차단",
+   "message_en": "This request is blocked: Memory architecture confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_016",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "analog_circuit_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 895,
+   "description": "아날로그 회로 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*고성능)(?=.*ADC)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아날로그 회로 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Analog circuit design confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_017",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "dsp_algorithm_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 892,
+   "description": "DSP 알고리즘 기밀 유출 차단",
+   "patterns": [
+    "(?=.*신호처리)(?=.*독자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: DSP 알고리즘 기밀 유출 차단",
+   "message_en": "This request is blocked: DSP algorithm confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_018",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "power_management_ic_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 885,
+   "description": "전원관리 IC 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*PMIC)(?=.*회로)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전원관리 IC 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Power management IC design confidential leakage bl"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_019",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "nda_partner_tech_leak",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "NDA 파트너 기술 기밀 유출 차단",
+   "patterns": [
+    "(?=.*파트너사)(?=.*NDA)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: NDA 파트너 기술 기밀 유출 차단",
+   "message_en": "This request is blocked: NDA partner technology confidential leakage blocke"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_020",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "tapeout_schedule_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 875,
+   "description": "테이프아웃 일정 기밀 유출 차단",
+   "patterns": [
+    "(?=.*테이프아웃)(?=.*차세대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 테이프아웃 일정 기밀 유출 차단",
+   "message_en": "This request is blocked: Tapeout schedule confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_021",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "materials_composition_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 878,
+   "description": "반도체 소재 조성 기밀 유출 차단",
+   "patterns": [
+    "(?=.*low)(?=.*유전체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 소재 조성 기밀 유출 차단",
+   "message_en": "This request is blocked: Semiconductor material composition confidential le"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_022",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "pcb_layout_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 872,
+   "description": "PCB 레이아웃 기밀 유출 차단",
+   "patterns": [
+    "(?=.*레이아웃)(?=.*PCB)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: PCB 레이아웃 기밀 유출 차단",
+   "message_en": "This request is blocked: PCB layout confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_023",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "fpga_bitstream_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "FPGA 비트스트림 기밀 유출 차단",
+   "patterns": [
+    "(?=.*비트스트림)(?=.*FPGA)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: FPGA 비트스트림 기밀 유출 차단",
+   "message_en": "This request is blocked: FPGA bitstream confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_024",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "antenna_rf_design_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 868,
+   "description": "RF 안테나 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*mmWave)(?=.*안테)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: RF 안테나 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: RF antenna design confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_025",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "software_stack_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 886,
+   "description": "반도체 소프트웨어 스택 기밀 유출 차단",
+   "patterns": [
+    "(?=.*드라이버)(?=.*소스코드)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 소프트웨어 스택 기밀 유출 차단",
+   "message_en": "This request is blocked: Semiconductor software stack confidential leakage "
+  },
+  {
+   "rule_id": "MF_ELEC_KR_026",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "calibration_data_ic_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 862,
+   "description": "IC 캘리브레이션 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*계수)(?=.*캘리브레이션)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: IC 캘리브레이션 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: IC calibration data confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_027",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "test_socket_design_secret",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 820,
+   "description": "테스트 소켓 설계 기밀 유출 경고",
+   "patterns": [
+    "(?=.*소켓)(?=.*테스트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 테스트 소켓 설계 기밀 유출 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_028",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "yield_improvement_know_how",
+   "severity": "high",
+   "action": "block",
+   "priority": 888,
+   "description": "수율 개선 노하우 기밀 유출 차단",
+   "patterns": [
+    "(?=.*수율)(?=.*개선)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 수율 개선 노하우 기밀 유출 차단",
+   "message_en": "This request is blocked: Yield improvement know-how confidential leakage bl"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_029",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "packaging_substrate_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "패키징 기판 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*레이아웃)(?=.*패키지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 패키징 기판 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Packaging substrate design confidential leakage bl"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_030",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "simulation_model_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 876,
+   "description": "반도체 시뮬레이션 모델 기밀 유출 차단",
+   "patterns": [
+    "(?=.*TCAD)(?=.*시뮬레이션)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 시뮬레이션 모델 기밀 유출 차단",
+   "message_en": "This request is blocked: Semiconductor simulation model confidential leakag"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_031",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "advanced_node_process_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 956,
+   "description": "첨단 노드 공정 기밀 유출 차단",
+   "patterns": [
+    "(?=.*게이트올어라운드)(?=.*레시피)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 첨단 노드 공정 기밀 유출 차단",
+   "message_en": "This request is blocked: Advanced node process confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_032",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "ai_chip_architecture_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 944,
+   "description": "AI 칩 아키텍처 기밀 유출 차단",
+   "patterns": [
+    "(?=.*메모리)(?=.*대역폭)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: AI 칩 아키텍처 기밀 유출 차단",
+   "message_en": "This request is blocked: AI chip architecture confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_033",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "sensor_fusion_algorithm",
+   "severity": "high",
+   "action": "block",
+   "priority": 904,
+   "description": "센서 퓨전 알고리즘 기밀 유출 차단",
+   "patterns": [
+    "(?=.*ToF)(?=.*퓨전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 센서 퓨전 알고리즘 기밀 유출 차단",
+   "message_en": "This request is blocked: Sensor fusion algorithm confidential leakage block"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_034",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "bonding_wire_process_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 858,
+   "description": "본딩 와이어 공정 기밀 유출 차단",
+   "patterns": [
+    "(?=.*와이어)(?=.*본딩)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 본딩 와이어 공정 기밀 유출 차단",
+   "message_en": "This request is blocked: Bonding wire process confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_035",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "photoresist_formula_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 938,
+   "description": "포토레지스트 배합 기밀 유출 차단",
+   "patterns": [
+    "(?=.*포토레지스트)(?=.*EUV)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 포토레지스트 배합 기밀 유출 차단",
+   "message_en": "This request is blocked: Photoresist formula confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_036",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "cmp_slurry_formula_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 866,
+   "description": "CMP 슬러리 배합 기밀 유출 차단",
+   "patterns": [
+    "(?=.*CMP)(?=.*슬러리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: CMP 슬러리 배합 기밀 유출 차단",
+   "message_en": "This request is blocked: CMP slurry formula confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_037",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "interconnect_technology_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 940,
+   "description": "배선 기술 기밀 유출 차단",
+   "patterns": [
+    "(?=.*후면전원공급)(?=.*BSPD)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배선 기술 기밀 유출 차단",
+   "message_en": "This request is blocked: Interconnect technology confidential leakage block"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_038",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "device_characterization_data",
+   "severity": "high",
+   "action": "block",
+   "priority": 872,
+   "description": "소자 특성화 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*특성)(?=.*소자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소자 특성화 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: Device characterization data confidential leakage "
+  },
+  {
+   "rule_id": "MF_ELEC_KR_039",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "chip_packaging_roadmap",
+   "severity": "critical",
+   "action": "block",
+   "priority": 936,
+   "description": "칩 패키징 로드맵 기밀 유출 차단",
+   "patterns": [
+    "(?=.*패키징)(?=.*차세대)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 칩 패키징 로드맵 기밀 유출 차단",
+   "message_en": "This request is blocked: Chip packaging roadmap confidential leakage blocke"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_040",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "supply_chain_chip_allocation",
+   "severity": "high",
+   "action": "block",
+   "priority": 882,
+   "description": "칩 할당 정보 기밀 유출 차단",
+   "patterns": [
+    "(?=.*고객사별)(?=.*할당량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 칩 할당 정보 기밀 유출 차단",
+   "message_en": "This request is blocked: Chip allocation information confidential leakage b"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_041",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "test_failure_analysis_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 874,
+   "description": "불량 분석 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*유출)(?=.*불량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 불량 분석 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: Failure analysis data confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_042",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "photolithography_condition_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 946,
+   "description": "포토리소그래피 조건 기밀 유출 차단",
+   "patterns": [
+    "(?=.*리소그래피)(?=.*OPC)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 포토리소그래피 조건 기밀 유출 차단",
+   "message_en": "This request is blocked: Photolithography condition confidential leakage bl"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_043",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "epitaxy_process_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 890,
+   "description": "에피택시 공정 기밀 유출 차단",
+   "patterns": [
+    "(?=.*SiGe)(?=.*에피택시)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 에피택시 공정 기밀 유출 차단",
+   "message_en": "This request is blocked: Epitaxy process confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_044",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "diffusion_implant_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 884,
+   "description": "확산·이온주입 공정 기밀 유출 차단",
+   "patterns": [
+    "(?=.*이온주입)(?=.*도즈)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 확산·이온주입 공정 기밀 유출 차단",
+   "message_en": "This request is blocked: Diffusion/ion implant process confidential leakage"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_045",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "metrology_data_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "계측 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*계측)(?=.*통계)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 계측 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: Metrology data confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_046",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "etch_chemistry_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 934,
+   "description": "식각 화학물질 조성 기밀 유출 차단",
+   "patterns": [
+    "(?=.*플라즈마)(?=.*식각)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 식각 화학물질 조성 기밀 유출 차단",
+   "message_en": "This request is blocked: Etching chemistry composition confidential leakage"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_047",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "thermal_process_recipe",
+   "severity": "high",
+   "action": "block",
+   "priority": 876,
+   "description": "열처리 공정 레시피 기밀 유출 차단",
+   "patterns": [
+    "(?=.*RTP)(?=.*열처리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 열처리 공정 레시피 기밀 유출 차단",
+   "message_en": "This request is blocked: Thermal process recipe confidential leakage blocke"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_048",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "chip_verification_tb_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 864,
+   "description": "칩 검증 테스트벤치 기밀 유출 차단",
+   "patterns": [
+    "(?=.*테스트벤치)(?=.*RTL)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 칩 검증 테스트벤치 기밀 유출 차단",
+   "message_en": "This request is blocked: Chip verification testbench confidential leakage b"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_049",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "custom_cell_library_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 896,
+   "description": "표준 셀 라이브러리 기밀 유출 차단",
+   "patterns": [
+    "(?=.*라이브러리)(?=.*독자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 표준 셀 라이브러리 기밀 유출 차단",
+   "message_en": "This request is blocked: Standard cell library confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_050",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "tsmc_sec_info_leak",
+   "severity": "critical",
+   "action": "block",
+   "priority": 953,
+   "description": "파운드리 서비스 기밀 유출 차단",
+   "patterns": [
+    "(?=.*파운드리)(?=.*파트너)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 파운드리 서비스 기밀 유출 차단",
+   "message_en": "This request is blocked: Foundry service confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_051",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "ip_licensing_terms_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 878,
+   "description": "IP 라이선싱 조건 기밀 유출 차단",
+   "patterns": [
+    "(?=.*라이선스)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: IP 라이선싱 조건 기밀 유출 차단",
+   "message_en": "This request is blocked: IP licensing terms confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_052",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "export_control_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 990,
+   "description": "수출 통제 우회 조력 차단",
+   "patterns": [
+    "(?=.*품목)(?=.*통제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 수출 통제 우회 조력 차단",
+   "message_en": "This request is blocked: Export control bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_053",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "ear_eccn_misclassify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "EAR ECCN 코드 허위 분류 차단",
+   "patterns": [
+    "(?=.*ECCN)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: EAR ECCN 코드 허위 분류 차단",
+   "message_en": "This request is blocked: EAR ECCN code false classification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_054",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "itar_tech_transfer_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 988,
+   "description": "ITAR 기술 이전 은폐 조력 차단",
+   "patterns": [
+    "(?=.*국방)(?=.*전자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ITAR 기술 이전 은폐 조력 차단",
+   "message_en": "This request is blocked: ITAR technology transfer concealment assistance bl"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_055",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "rohs_substance_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 975,
+   "description": "RoHS 유해물질 함유 은폐 차단",
+   "patterns": [
+    "(?=.*RoHS)(?=.*적합)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: RoHS 유해물질 함유 은폐 차단",
+   "message_en": "This request is blocked: RoHS hazardous substance concealment blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_056",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "ce_mark_false",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "CE 마크 허위 표시 차단",
+   "patterns": [
+    "(?=.*부착)(?=.*마크)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: CE 마크 허위 표시 차단",
+   "message_en": "This request is blocked: CE marking false display blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_057",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "fcc_auth_bypass",
+   "severity": "critical",
+   "action": "block",
+   "priority": 968,
+   "description": "FCC 인증 우회 조력 차단",
+   "patterns": [
+    "(?=.*FCC)(?=.*무선)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: FCC 인증 우회 조력 차단",
+   "message_en": "This request is blocked: FCC authorization bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_058",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "weee_reporting_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 910,
+   "description": "WEEE 보고 의무 생략 조력 차단",
+   "patterns": [
+    "(?=.*전자제품)(?=.*WEEE)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: WEEE 보고 의무 생략 조력 차단",
+   "message_en": "This request is blocked: WEEE reporting obligation skip assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_059",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "component_counterfeit_cert_elec",
+   "severity": "critical",
+   "action": "block",
+   "priority": 965,
+   "description": "위조 전자부품 인증 조력 차단",
+   "patterns": [
+    "(?=.*칩에)(?=.*조력)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위조 전자부품 인증 조력 차단",
+   "message_en": "This request is blocked: Counterfeit electronic component certification ass"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_060",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "strategic_export_unauthorized",
+   "severity": "critical",
+   "action": "block",
+   "priority": 982,
+   "description": "전략물자 무허가 수출 조력 차단",
+   "patterns": [
+    "(?=.*거짓)(?=.*해제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전략물자 무허가 수출 조력 차단",
+   "message_en": "This request is blocked: Strategic item unauthorized export assistance bloc"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_061",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "dual_use_item_reclassify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "이중용도 품목 허위 재분류 차단",
+   "patterns": [
+    "(?=.*민수용)(?=.*군사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 이중용도 품목 허위 재분류 차단",
+   "message_en": "This request is blocked: Dual-use item false reclassification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_062",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "eps_safety_cert_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "전기용품 안전 인증 사기 차단",
+   "patterns": [
+    "전기용품"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기용품 안전 인증 사기 차단",
+   "message_en": "This request is blocked: Electrical product safety certification fraud bloc"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_063",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "eps_compliance_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 930,
+   "description": "전기용품 안전기준 위반 은폐 차단",
+   "patterns": [
+    "(?=.*전기용품)(?=.*안전기준)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기용품 안전기준 위반 은폐 차단",
+   "message_en": "This request is blocked: Electrical product safety standard violation conce"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_064",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "rohs_exemption_fraud",
+   "severity": "critical",
+   "action": "block",
+   "priority": 958,
+   "description": "RoHS 면제 허위 신청 차단",
+   "patterns": [
+    "(?=.*RoHS)(?=.*해당)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: RoHS 면제 허위 신청 차단",
+   "message_en": "This request is blocked: RoHS exemption false application blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_065",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "reach_svhc_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 920,
+   "description": "REACH SVHC 물질 함유 은폐 차단",
+   "patterns": [
+    "(?=.*공급사)(?=.*미통보)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: REACH SVHC 물질 함유 은폐 차단",
+   "message_en": "This request is blocked: REACH SVHC substance concealment blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_066",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "battery_directive_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 928,
+   "description": "배터리 규정 위반 은폐 차단",
+   "patterns": [
+    "(?=.*배터리)(?=.*은폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배터리 규정 위반 은폐 차단",
+   "message_en": "This request is blocked: Battery directive violation concealment blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_067",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emc_cert_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 940,
+   "description": "EMC 인증 사기 차단",
+   "patterns": [
+    "(?=.*EMC)(?=.*불합격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: EMC 인증 사기 차단",
+   "message_en": "This request is blocked: EMC certification fraud blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_068",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "safety_critical_component_cert",
+   "severity": "critical",
+   "action": "block",
+   "priority": 962,
+   "description": "안전 핵심 부품 인증 위조 차단",
+   "patterns": [
+    "(?=.*필수)(?=.*인증서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 안전 핵심 부품 인증 위조 차단",
+   "message_en": "This request is blocked: Safety critical component certification falsificat"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_069",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "product_recall_elec_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "전기제품 리콜 생략 조력 차단",
+   "patterns": [
+    "(?=.*전기용품)(?=.*결함)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기제품 리콜 생략 조력 차단",
+   "message_en": "This request is blocked: Electrical product recall skip assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_070",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "counterfeit_component_use",
+   "severity": "critical",
+   "action": "block",
+   "priority": 958,
+   "description": "위조 부품 사용 조력 차단",
+   "patterns": [
+    "(?=.*커패시터)(?=.*정품)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위조 부품 사용 조력 차단",
+   "message_en": "This request is blocked: Counterfeit component use assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_071",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pcb_flammability_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 918,
+   "description": "PCB 난연성 등급 위조 차단",
+   "patterns": [
+    "(?=.*PCB)(?=.*불합격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: PCB 난연성 등급 위조 차단",
+   "message_en": "This request is blocked: PCB flammability rating falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_072",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "energy_efficiency_label_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 905,
+   "description": "에너지 효율 등급 허위 표시 차단",
+   "patterns": [
+    "(?=.*에너지)(?=.*소비)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 에너지 효율 등급 허위 표시 차단",
+   "message_en": "This request is blocked: Energy efficiency rating false display blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_073",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "import_compliance_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 895,
+   "description": "수입 적합성 서류 위조 차단",
+   "patterns": [
+    "(?=.*전기용품)(?=.*수입)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 수입 적합성 서류 위조 차단",
+   "message_en": "This request is blocked: Import compliance document falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_074",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "material_declaration_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 908,
+   "description": "소재 선언서 위조 차단",
+   "patterns": [
+    "(?=.*IPC)(?=.*선언서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 소재 선언서 위조 차단",
+   "message_en": "This request is blocked: Material declaration fraud blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_075",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "eps_registration_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 878,
+   "description": "전기용품 안전 등록 생략 조력 차단",
+   "patterns": [
+    "(?=.*전기용품)(?=.*유통)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기용품 안전 등록 생략 조력 차단",
+   "message_en": "This request is blocked: Electrical product safety registration skip assist"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_076",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "waste_battery_dispose_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 888,
+   "description": "배터리 불법 폐기 조력 차단",
+   "patterns": [
+    "(?=.*리튬)(?=.*폐기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배터리 불법 폐기 조력 차단",
+   "message_en": "This request is blocked: Battery illegal disposal assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_077",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "ewaste_export_illegal",
+   "severity": "critical",
+   "action": "block",
+   "priority": 968,
+   "description": "전자폐기물 불법 수출 조력 차단",
+   "patterns": [
+    "(?=.*폐전자제품)(?=.*WEEE)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자폐기물 불법 수출 조력 차단",
+   "message_en": "This request is blocked: E-waste illegal export assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_078",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "chemical_safety_msds_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 912,
+   "description": "화학물질 MSDS 위조 차단",
+   "patterns": [
+    "(?=.*기재)(?=.*화학물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 MSDS 위조 차단",
+   "message_en": "This request is blocked: Chemical safety MSDS falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_079",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "conflict_minerals_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 898,
+   "description": "분쟁광물 허위 보고 차단",
+   "patterns": [
+    "(?=.*OECD)(?=.*분쟁광물)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 분쟁광물 허위 보고 차단",
+   "message_en": "This request is blocked: Conflict minerals false reporting blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_080",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "product_safety_incident_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 958,
+   "description": "제품 안전사고 은폐 차단",
+   "patterns": [
+    "(?=.*전기용품)(?=.*감전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제품 안전사고 은폐 차단",
+   "message_en": "This request is blocked: Product safety incident concealment blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_081",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "supply_chain_audit_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 895,
+   "description": "공급망 감사 사기 차단",
+   "patterns": [
+    "(?=.*준비)(?=.*위조)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공급망 감사 사기 차단",
+   "message_en": "This request is blocked: Supply chain audit fraud blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_082",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "sanctions_evade_elec",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "제재 국가 수출 제재 우회 차단",
+   "patterns": [
+    "(?=.*전자부품)(?=.*금수)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제재 국가 수출 제재 우회 차단",
+   "message_en": "This request is blocked: Sanctions country export restriction evasion block"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_083",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "third_party_audit_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 882,
+   "description": "제3자 감사 허위 보고 차단",
+   "patterns": [
+    "(?=.*기관)(?=.*위조)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제3자 감사 허위 보고 차단",
+   "message_en": "This request is blocked: Third-party audit false reporting blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_084",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "product_origin_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 888,
+   "description": "제품 원산지 허위 표시 차단",
+   "patterns": [
+    "(?=.*통제)(?=.*수출)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제품 원산지 허위 표시 차단",
+   "message_en": "This request is blocked: Product origin false marking blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_085",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "import_duty_evasion_elec",
+   "severity": "high",
+   "action": "block",
+   "priority": 868,
+   "description": "전자제품 관세 회피 조력 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*관세)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자제품 관세 회피 조력 차단",
+   "message_en": "This request is blocked: Electronic product tariff evasion assistance block"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_086",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "safety_recall_elec_delay",
+   "severity": "critical",
+   "action": "block",
+   "priority": 955,
+   "description": "전기제품 안전 리콜 지연 조력 차단",
+   "patterns": [
+    "(?=.*전기용품)(?=.*발견)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기제품 안전 리콜 지연 조력 차단",
+   "message_en": "This request is blocked: Electrical product safety recall delay assistance "
+  },
+  {
+   "rule_id": "MF_ELEC_KR_087",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "unauthorized_freq_band_use",
+   "severity": "high",
+   "action": "block",
+   "priority": 925,
+   "description": "무허가 주파수 대역 사용 조력 차단",
+   "patterns": [
+    "(?=.*GHz)(?=.*무선)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 무허가 주파수 대역 사용 조력 차단",
+   "message_en": "This request is blocked: Unauthorized frequency band use assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_088",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emi_filter_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 898,
+   "description": "EMI 필터 우회 조력 차단",
+   "patterns": [
+    "(?=.*EMI)(?=.*제거)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: EMI 필터 우회 조력 차단",
+   "message_en": "This request is blocked: EMI filter bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_089",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "product_liability_elec_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 960,
+   "description": "전기제품 제조물 책임 은폐 차단",
+   "patterns": [
+    "(?=.*제조물)(?=.*인멸)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기제품 제조물 책임 은폐 차단",
+   "message_en": "This request is blocked: Electrical product liability concealment blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_090",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "rma_fraud_elec",
+   "severity": "high",
+   "action": "block",
+   "priority": 875,
+   "description": "전자제품 RMA 사기 조력 차단",
+   "patterns": [
+    "(?=.*RMA)(?=.*기간)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자제품 RMA 사기 조력 차단",
+   "message_en": "This request is blocked: Electronic product RMA fraud assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_091",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hazardous_material_dispose_illegal",
+   "severity": "high",
+   "action": "block",
+   "priority": 902,
+   "description": "유해물질 불법 폐기 조력 차단",
+   "patterns": [
+    "(?=.*폐전자부품)(?=.*수은)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유해물질 불법 폐기 조력 차단",
+   "message_en": "This request is blocked: Hazardous material illegal disposal assistance blo"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_092",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "manufacturing_record_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 885,
+   "description": "제조 기록 위조 조력 차단",
+   "patterns": [
+    "(?=.*작성)(?=.*제조)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 제조 기록 위조 조력 차단",
+   "message_en": "This request is blocked: Manufacturing record falsification assistance bloc"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_093",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "spec_compliance_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 956,
+   "description": "사양 적합성 위조 차단",
+   "patterns": [
+    "(?=.*전기제품)(?=.*은폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 사양 적합성 위조 차단",
+   "message_en": "This request is blocked: Specification compliance falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_094",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "advertising_spec_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "전자제품 사양 허위 광고 차단",
+   "patterns": [
+    "(?=.*메모리)(?=.*용량)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자제품 사양 허위 광고 차단",
+   "message_en": "This request is blocked: Electronic product specification false advertising"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_095",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "customs_misclassify",
+   "severity": "high",
+   "action": "block",
+   "priority": 878,
+   "description": "관세 품목 허위 분류 차단",
+   "patterns": [
+    "(?=.*민간용)(?=.*군사)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 관세 품목 허위 분류 차단",
+   "message_en": "This request is blocked: Customs item false classification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_096",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "license_exception_abuse",
+   "severity": "critical",
+   "action": "block",
+   "priority": 978,
+   "description": "EAR 라이선스 예외 남용 차단",
+   "patterns": [
+    "(?=.*라이선스)(?=.*EAR)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: EAR 라이선스 예외 남용 차단",
+   "message_en": "This request is blocked: EAR license exception abuse blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_097",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "green_washing_elec",
+   "severity": "high",
+   "action": "block",
+   "priority": 862,
+   "description": "전자제품 그린워싱 차단",
+   "patterns": [
+    "(?=.*주장)(?=.*재활용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자제품 그린워싱 차단",
+   "message_en": "This request is blocked: Electronic product greenwashing blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_098",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "product_end_of_life_falsify",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 828,
+   "description": "제품 수명 종료 정보 허위 기재 경고",
+   "patterns": [
+    "(?=.*WEEE)(?=.*연장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 제품 수명 종료 정보 허위 기재 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_099",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "environmental_permit_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 898,
+   "description": "환경 허가 위반 조력 차단",
+   "patterns": [
+    "(?=.*오염물질)(?=.*은폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환경 허가 위반 조력 차단",
+   "message_en": "This request is blocked: Environmental permit violation assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_100",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "fire_safety_cert_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 963,
+   "description": "화재 안전 인증 위조 차단",
+   "patterns": [
+    "(?=.*불합격)(?=.*합격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화재 안전 인증 위조 차단",
+   "message_en": "This request is blocked: Fire safety certification falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_101",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "iec_standard_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 954,
+   "description": "IEC 표준 준수 위조 차단",
+   "patterns": [
+    "(?=.*IEC)(?=.*불합격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: IEC 표준 준수 위조 차단",
+   "message_en": "This request is blocked: IEC standard compliance falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_102",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "esd_procedure_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 900,
+   "description": "ESD 방지 절차 생략 조력 차단",
+   "patterns": [
+    "(?=.*정전기)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ESD 방지 절차 생략 조력 차단",
+   "message_en": "This request is blocked: ESD prevention procedure skip assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_103",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "battery_thermal_runaway_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 985,
+   "description": "배터리 열폭주 위험 은폐 차단",
+   "patterns": [
+    "(?=.*리튬)(?=.*배터리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배터리 열폭주 위험 은폐 차단",
+   "message_en": "This request is blocked: Battery thermal runaway risk concealment blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_104",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "high_voltage_pcb_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 895,
+   "description": "고전압 PCB 안전 절차 생략 조력 차단",
+   "patterns": [
+    "(?=.*PCB)(?=.*고전압)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고전압 PCB 안전 절차 생략 조력 차단",
+   "message_en": "This request is blocked: High voltage PCB safety procedure skip assistance "
+  },
+  {
+   "rule_id": "MF_ELEC_KR_105",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "solder_fume_exposure",
+   "severity": "high",
+   "action": "block",
+   "priority": 885,
+   "description": "납땜 흄 노출 위험 무시 조력 차단",
+   "patterns": [
+    "(?=.*플럭스)(?=.*되는지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 납땜 흄 노출 위험 무시 조력 차단",
+   "message_en": "This request is blocked: Solder fume exposure risk ignorance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_106",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cleanroom_chem_elec_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "클린룸 화학물질 취급 절차 생략 조력 차단",
+   "patterns": [
+    "(?=.*클린룸)(?=.*화학물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 클린룸 화학물질 취급 절차 생략 조력 차단",
+   "message_en": "This request is blocked: Cleanroom chemical handling procedure skip assista"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_107",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "lithium_fire_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 980,
+   "description": "리튬 배터리 화재 위험 은폐 차단",
+   "patterns": [
+    "(?=.*리튬)(?=.*배터리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 리튬 배터리 화재 위험 은폐 차단",
+   "message_en": "This request is blocked: Lithium battery fire risk concealment blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_108",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "laser_safety_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 878,
+   "description": "레이저 안전 절차 우회 조력 차단",
+   "patterns": [
+    "(?=.*Class)(?=.*레이저)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 레이저 안전 절차 우회 조력 차단",
+   "message_en": "This request is blocked: Laser safety procedure bypass assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_109",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "chemical_storage_violation",
+   "severity": "high",
+   "action": "block",
+   "priority": 870,
+   "description": "화학물질 보관 기준 위반 조력 차단",
+   "patterns": [
+    "(?=.*혼합)(?=.*염기)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 보관 기준 위반 조력 차단",
+   "message_en": "This request is blocked: Chemical storage standard violation assistance blo"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_110",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "wafer_fab_chemical_exposure",
+   "severity": "high",
+   "action": "block",
+   "priority": 875,
+   "description": "팹 화학물질 노출 기준 위반 조력 차단",
+   "patterns": [
+    "(?=.*실란)(?=.*가스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 팹 화학물질 노출 기준 위반 조력 차단",
+   "message_en": "This request is blocked: Fab chemical exposure standard violation assistanc"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_111",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cleanroom_fire_hazard",
+   "severity": "high",
+   "action": "block",
+   "priority": 882,
+   "description": "클린룸 화재 위험 은폐 조력 차단",
+   "patterns": [
+    "(?=.*클린룸)(?=.*요소)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 클린룸 화재 위험 은폐 조력 차단",
+   "message_en": "This request is blocked: Cleanroom fire hazard concealment assistance block"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_112",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "radiation_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 888,
+   "description": "방사선 안전 절차 생략 조력 차단",
+   "patterns": [
+    "(?=.*ray)(?=.*차폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방사선 안전 절차 생략 조력 차단",
+   "message_en": "This request is blocked: Radiation safety procedure skip assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_113",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "nitrogen_asphyxiation_risk",
+   "severity": "high",
+   "action": "block",
+   "priority": 878,
+   "description": "질소 질식 위험 무시 조력 차단",
+   "patterns": [
+    "(?=.*질소)(?=.*진입)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 질소 질식 위험 무시 조력 차단",
+   "message_en": "This request is blocked: Nitrogen asphyxiation risk ignorance assistance bl"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_114",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "hydrofluoric_acid_safety",
+   "severity": "high",
+   "action": "block",
+   "priority": 895,
+   "description": "불산 취급 안전 절차 위반 조력 차단",
+   "patterns": [
+    "(?=.*내산성)(?=.*가능한지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 불산 취급 안전 절차 위반 조력 차단",
+   "message_en": "This request is blocked: Hydrofluoric acid handling safety procedure violat"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_115",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "plasma_equipment_safety",
+   "severity": "high",
+   "action": "block",
+   "priority": 872,
+   "description": "플라즈마 장비 안전 절차 생략 조력 차단",
+   "patterns": [
+    "(?=.*유지보수)(?=.*플라즈마)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 플라즈마 장비 안전 절차 생략 조력 차단",
+   "message_en": "This request is blocked: Plasma equipment safety procedure skip assistance "
+  },
+  {
+   "rule_id": "MF_ELEC_KR_116",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cvd_toxic_gas_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 885,
+   "description": "CVD 독성 가스 안전 절차 우회 조력 차단",
+   "patterns": [
+    "(?=.*CVD)(?=.*경보)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: CVD 독성 가스 안전 절차 우회 조력 차단",
+   "message_en": "This request is blocked: CVD toxic gas safety procedure bypass assistance b"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_117",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "ion_implanter_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 868,
+   "description": "이온주입기 안전 절차 생략 조력 차단",
+   "patterns": [
+    "(?=.*이온주입기)(?=.*고전압부)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 이온주입기 안전 절차 생략 조력 차단",
+   "message_en": "This request is blocked: Ion implanter safety procedure skip assistance blo"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_118",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cmp_slurry_safety_skip",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 842,
+   "description": "CMP 슬러리 화학 안전 절차 생략 경고",
+   "patterns": [
+    "(?=.*CMP)(?=.*슬러리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: CMP 슬러리 화학 안전 절차 생략 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_119",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "explosion_proof_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 892,
+   "description": "방폭 설비 기준 우회 조력 차단",
+   "patterns": [
+    "(?=.*비방폭)(?=.*방폭)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 방폭 설비 기준 우회 조력 차단",
+   "message_en": "This request is blocked: Explosion-proof equipment standard bypass assistan"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_120",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "label_hazard_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 880,
+   "description": "위험물 라벨 위조 조력 차단",
+   "patterns": [
+    "(?=.*GHS)(?=.*작성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위험물 라벨 위조 조력 차단",
+   "message_en": "This request is blocked: Hazardous material label falsification assistance "
+  },
+  {
+   "rule_id": "MF_ELEC_KR_121",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "electrical_safety_cert_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 970,
+   "description": "전기제품 안전 결함 은폐 차단",
+   "patterns": [
+    "(?=.*전기용품)(?=.*감전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기제품 안전 결함 은폐 차단",
+   "message_en": "This request is blocked: Electrical product safety defect concealment block"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_122",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "gas_leak_detection_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 875,
+   "description": "가스 누출 감지 시스템 우회 조력 차단",
+   "patterns": [
+    "(?=.*비활성화)(?=.*감지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 가스 누출 감지 시스템 우회 조력 차단",
+   "message_en": "This request is blocked: Gas leak detection system bypass assistance blocke"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_123",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "solvent_fire_risk_hide",
+   "severity": "high",
+   "action": "block",
+   "priority": 872,
+   "description": "용제 화재 위험 은폐 조력 차단",
+   "patterns": [
+    "(?=.*IPA)(?=.*발화)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 용제 화재 위험 은폐 조력 차단",
+   "message_en": "This request is blocked: Solvent fire risk concealment assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_124",
+   "io_type": "both",
+   "category": "safety",
+   "sub_category": "toxic_waste_illegal_dump",
+   "severity": "critical",
+   "action": "block",
+   "priority": 968,
+   "description": "독성 폐기물 불법 투기 조력 차단",
+   "patterns": [
+    "(?=.*방류)(?=.*폐수)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 독성 폐기물 불법 투기 조력 차단",
+   "message_en": "This request is blocked: Toxic waste illegal dumping assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_125",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "overload_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 862,
+   "description": "전기 과부하 안전 장치 우회 차단",
+   "patterns": [
+    "(?=.*과전류)(?=.*제거)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기 과부하 안전 장치 우회 차단",
+   "message_en": "This request is blocked: Electrical overload safety device bypass blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_126",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "employee_invention_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 890,
+   "description": "직무발명 신고서 개인정보 차단",
+   "patterns": [
+    "(?=.*직무발명)(?=.*발명자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_127",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "chip_test_participant_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 885,
+   "description": "칩 테스트 참여자 개인정보 차단",
+   "patterns": [
+    "(?=.*사용성)(?=.*참여자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_128",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "defect_report_pii_elec",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 880,
+   "description": "전자제품 결함 보고서 개인정보 차단",
+   "patterns": [
+    "(?=.*원문)(?=.*결함)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_129",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "employee_health_record_elec",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 895,
+   "description": "반도체 공장 직원 건강 기록 차단",
+   "patterns": [
+    "(?=.*검진)(?=.*화학물질)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_130",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "fab_worker_personal_data",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 840,
+   "description": "팹 작업자 개인정보 차단",
+   "patterns": [
+    "(?=.*근무)(?=.*사번)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_131",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "customer_product_usage_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 835,
+   "description": "고객 제품 사용 데이터 PII 차단",
+   "patterns": [
+    "(?=.*전자제품)(?=.*공유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_132",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "supplier_employee_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 828,
+   "description": "공급사 직원 개인정보 차단",
+   "patterns": [
+    "(?=.*공급사)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_133",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "qa_tester_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 832,
+   "description": "QA 테스터 개인정보 차단",
+   "patterns": [
+    "(?=.*테스터)(?=.*테스트)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_134",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "patent_inventor_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 845,
+   "description": "특허 발명자 개인정보 차단",
+   "patterns": [
+    "(?=.*발명자)(?=.*특허)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_135",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "safety_incident_victim_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 875,
+   "description": "산업재해 피해자 개인정보 차단",
+   "patterns": [
+    "(?=.*산업재해)(?=.*상해)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_136",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "biometric_access_data_elec",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 878,
+   "description": "클린룸 생체인식 출입 데이터 차단",
+   "patterns": [
+    "(?=.*클린룸)(?=.*출입)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_137",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "engineer_personal_assignment",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 822,
+   "description": "엔지니어 개인 배치 정보 차단",
+   "patterns": [
+    "(?=.*엔지니어)(?=.*배치)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_138",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "rf_shielding_design_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 847,
+   "description": "RF 차폐 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*케이스)(?=.*차폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: RF 차폐 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: RF shielding design confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_139",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "display_panel_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 939,
+   "description": "디스플레이 패널 기밀 유출 차단",
+   "patterns": [
+    "(?=.*OLED)(?=.*기밀)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 디스플레이 패널 기밀 유출 차단",
+   "message_en": "This request is blocked: Display panel confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_140",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "image_sensor_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 937,
+   "description": "이미지 센서 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*CMOS)(?=.*픽셀)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 이미지 센서 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Image sensor design confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_141",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "power_ic_design_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 873,
+   "description": "전력 반도체 IC 설계 기밀 유출 차단",
+   "patterns": [
+    "(?=.*디바이스)(?=.*GaN)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전력 반도체 IC 설계 기밀 유출 차단",
+   "message_en": "This request is blocked: Power semiconductor IC design confidential leakage"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_142",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "memory_controller_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 935,
+   "description": "메모리 컨트롤러 IP 기밀 유출 차단",
+   "patterns": [
+    "(?=.*DRAM)(?=.*컨트롤러)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 메모리 컨트롤러 IP 기밀 유출 차단",
+   "message_en": "This request is blocked: Memory controller IP confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_143",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "semiconductor_packaging_ip",
+   "severity": "high",
+   "action": "block",
+   "priority": 869,
+   "description": "반도체 패키지 IP 기밀 유출 차단",
+   "patterns": [
+    "(?=.*WLP)(?=.*패키지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 패키지 IP 기밀 유출 차단",
+   "message_en": "This request is blocked: Semiconductor package IP confidential leakage bloc"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_144",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "interface_protocol_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 863,
+   "description": "인터페이스 프로토콜 기밀 유출 차단",
+   "patterns": [
+    "(?=.*고속)(?=.*인터페이스)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 인터페이스 프로토콜 기밀 유출 차단",
+   "message_en": "This request is blocked: Interface protocol confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_145",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "wafer_inspection_data_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 861,
+   "description": "웨이퍼 검사 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*웨이퍼)(?=.*결함)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 웨이퍼 검사 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: Wafer inspection data confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_146",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "advanced_packaging_roadmap",
+   "severity": "critical",
+   "action": "block",
+   "priority": 933,
+   "description": "어드밴스드 패키징 로드맵 기밀 유출 차단",
+   "patterns": [
+    "(?=.*칩렛)(?=.*아키텍처)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 어드밴스드 패키징 로드맵 기밀 유출 차단",
+   "message_en": "This request is blocked: Advanced packaging roadmap confidential leakage bl"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_147",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "analog_mixed_signal_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 871,
+   "description": "아날로그 혼합신호 회로 기밀 유출 차단",
+   "patterns": [
+    "(?=.*혼합신호)(?=.*DAC)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 아날로그 혼합신호 회로 기밀 유출 차단",
+   "message_en": "This request is blocked: Analog mixed-signal circuit confidential leakage b"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_148",
+   "io_type": "both",
+   "category": "ip",
+   "sub_category": "neural_network_chip_secret",
+   "severity": "critical",
+   "action": "block",
+   "priority": 931,
+   "description": "뉴럴 네트워크 칩 아키텍처 기밀 유출 차단",
+   "patterns": [
+    "(?=.*프로세서)(?=.*메모리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 뉴럴 네트워크 칩 아키텍처 기밀 유출 차단",
+   "message_en": "This request is blocked: Neural network chip architecture confidential leak"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_149",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "chip_test_coverage_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 859,
+   "description": "칩 테스트 커버리지 데이터 기밀 유출 차단",
+   "patterns": [
+    "(?=.*커버리지)(?=.*DFT)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 칩 테스트 커버리지 데이터 기밀 유출 차단",
+   "message_en": "This request is blocked: Chip test coverage data confidential leakage block"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_150",
+   "io_type": "input",
+   "category": "ip",
+   "sub_category": "back_end_process_secret",
+   "severity": "high",
+   "action": "block",
+   "priority": 865,
+   "description": "후공정 기밀 유출 차단",
+   "patterns": [
+    "(?=.*형성)(?=.*범프)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 후공정 기밀 유출 차단",
+   "message_en": "This request is blocked: Back-end process confidential leakage blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_151",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "semiconductor_import_cert_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 882,
+   "description": "반도체 수입 인증 위조 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*인증서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 수입 인증 위조 차단",
+   "message_en": "This request is blocked: Semiconductor import certification fraud blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_152",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "compliance_test_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 888,
+   "description": "적합성 시험 생략 조력 차단",
+   "patterns": [
+    "(?=.*건너뛰기)(?=.*적합성)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 적합성 시험 생략 조력 차단",
+   "message_en": "This request is blocked: Compliance test skip assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_153",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "product_liability_suppress",
+   "severity": "critical",
+   "action": "block",
+   "priority": 957,
+   "description": "전자제품 결함 피해 증거 은폐 차단",
+   "patterns": [
+    "(?=.*제조물)(?=.*삭제)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자제품 결함 피해 증거 은폐 차단",
+   "message_en": "This request is blocked: Electronic product defect damage evidence concealm"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_154",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "hazmat_transport_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 892,
+   "description": "유해물질 운송 서류 위조 차단",
+   "patterns": [
+    "(?=.*위험물)(?=.*운송)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 유해물질 운송 서류 위조 차단",
+   "message_en": "This request is blocked: Hazardous material transport document falsificatio"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_155",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "iso_cert_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 952,
+   "description": "ISO 인증서 위조 차단",
+   "patterns": [
+    "(?=.*ISO)(?=.*인증서)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: ISO 인증서 위조 차단",
+   "message_en": "This request is blocked: ISO certificate falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_156",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "safety_incident_elec_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 953,
+   "description": "전자 제조 안전사고 은폐 조력 차단",
+   "patterns": [
+    "(?=.*클린룸)(?=.*미신)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자 제조 안전사고 은폐 조력 차단",
+   "message_en": "This request is blocked: Electronics manufacturing safety incident concealm"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_157",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "supply_chain_compliance_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 886,
+   "description": "공급망 컴플라이언스 서류 사기 차단",
+   "patterns": [
+    "(?=.*컴플라이언스)(?=.*공급망)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공급망 컴플라이언스 서류 사기 차단",
+   "message_en": "This request is blocked: Supply chain compliance document fraud blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_158",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "technology_transfer_unauthorized",
+   "severity": "critical",
+   "action": "block",
+   "priority": 976,
+   "description": "무단 기술 이전 조력 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*이전)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 무단 기술 이전 조력 차단",
+   "message_en": "This request is blocked: Unauthorized technology transfer assistance blocke"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_159",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "chip_marking_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 874,
+   "description": "칩 마킹 위조 조력 차단",
+   "patterns": [
+    "(?=.*마킹)(?=.*부착)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 칩 마킹 위조 조력 차단",
+   "message_en": "This request is blocked: Chip marking falsification assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_160",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "environmental_report_falsify",
+   "severity": "high",
+   "action": "block",
+   "priority": 897,
+   "description": "환경 보고서 위조 차단",
+   "patterns": [
+    "(?=.*화학물질)(?=.*위조)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 환경 보고서 위조 차단",
+   "message_en": "This request is blocked: Environmental report falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_161",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "recycled_material_cert_fraud",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 832,
+   "description": "재활용 소재 인증 위조 경고",
+   "patterns": [
+    "(?=.*재활용)(?=.*친환경)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 재활용 소재 인증 위조 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_162",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "eps_import_registration_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 877,
+   "description": "전기용품 수입 신고 생략 조력 차단",
+   "patterns": [
+    "(?=.*전기용품)(?=.*통관)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기용품 수입 신고 생략 조력 차단",
+   "message_en": "This request is blocked: Electrical product import registration skip assist"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_163",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "oem_spec_compliance_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 884,
+   "description": "OEM 사양 적합성 위조 차단",
+   "patterns": [
+    "(?=.*미충족)(?=.*OEM)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: OEM 사양 적합성 위조 차단",
+   "message_en": "This request is blocked: OEM specification compliance fraud blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_164",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "electronic_waste_cert_fraud",
+   "severity": "high",
+   "action": "block",
+   "priority": 879,
+   "description": "전자폐기물 처리 인증 위조 차단",
+   "patterns": [
+    "(?=.*전자폐기물)(?=.*적법)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자폐기물 처리 인증 위조 차단",
+   "message_en": "This request is blocked: Electronic waste disposal certification fraud bloc"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_165",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "product_defect_notice_skip",
+   "severity": "critical",
+   "action": "block",
+   "priority": 951,
+   "description": "전기제품 결함 고지 의무 생략 차단",
+   "patterns": [
+    "(?=.*전기용품)(?=.*고지)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전기제품 결함 고지 의무 생략 차단",
+   "message_en": "This request is blocked: Electrical product defect notification obligation "
+  },
+  {
+   "rule_id": "MF_ELEC_KR_166",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "fire_incident_elec_hide",
+   "severity": "critical",
+   "action": "block",
+   "priority": 961,
+   "description": "전자제품 화재 사고 은폐 차단",
+   "patterns": [
+    "(?=.*전자제품)(?=.*은폐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자제품 화재 사고 은폐 차단",
+   "message_en": "This request is blocked: Electronic product fire incident concealment block"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_167",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "export_license_doc_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 979,
+   "description": "수출 허가 서류 위조 차단",
+   "patterns": [
+    "(?=.*허가서)(?=.*수출)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 수출 허가 서류 위조 차단",
+   "message_en": "This request is blocked: Export license document falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_168",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "end_user_cert_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 977,
+   "description": "최종 사용자 인증서 위조 차단",
+   "patterns": [
+    "(?=.*최종)(?=.*사용자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 최종 사용자 인증서 위조 차단",
+   "message_en": "This request is blocked: End-user certificate falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_169",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "rohs_test_result_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 966,
+   "description": "RoHS 시험 결과 위조 차단",
+   "patterns": [
+    "(?=.*RoHS)(?=.*불합격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: RoHS 시험 결과 위조 차단",
+   "message_en": "This request is blocked: RoHS test result falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_170",
+   "io_type": "both",
+   "category": "compliance",
+   "sub_category": "ccc_cert_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 956,
+   "description": "중국 CCC 인증 위조 차단",
+   "patterns": [
+    "(?=.*CCC)(?=.*부착)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 중국 CCC 인증 위조 차단",
+   "message_en": "This request is blocked: China CCC certification falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_171",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "supply_embargo_violation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 983,
+   "description": "공급 금수 조치 위반 차단",
+   "patterns": [
+    "(?=.*전자부품)(?=.*공급)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공급 금수 조치 위반 차단",
+   "message_en": "This request is blocked: Supply embargo violation blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_172",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "aoi_inspection_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 862,
+   "description": "AOI 자동 광학 검사 생략 조력 차단",
+   "patterns": [
+    "(?=.*PCB)(?=.*AOI)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: AOI 자동 광학 검사 생략 조력 차단",
+   "message_en": "This request is blocked: AOI automatic optical inspection skip assistance b"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_173",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "smt_reflow_safety_skip",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 843,
+   "description": "SMT 리플로우 안전 절차 생략 경고",
+   "patterns": [
+    "(?=.*리플로우)(?=.*오븐)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: SMT 리플로우 안전 절차 생략 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_174",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "pcb_conformal_coat_skip",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 841,
+   "description": "PCB 방습 코팅 생략 경고",
+   "patterns": [
+    "(?=.*전자제품)(?=.*방습)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: PCB 방습 코팅 생략 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_175",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "epoxy_fume_exposure",
+   "severity": "high",
+   "action": "block",
+   "priority": 866,
+   "description": "에폭시 수지 흄 노출 위험 무시 차단",
+   "patterns": [
+    "(?=.*에폭시)(?=.*접착)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 에폭시 수지 흄 노출 위험 무시 차단",
+   "message_en": "This request is blocked: Epoxy resin fume exposure risk ignorance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_176",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "cleanroom_suit_bypass",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 836,
+   "description": "클린룸 방진복 착용 생략 경고",
+   "patterns": [
+    "(?=.*클린룸)(?=.*복장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 클린룸 방진복 착용 생략 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_177",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "solder_lead_safety",
+   "severity": "high",
+   "action": "block",
+   "priority": 872,
+   "description": "납 함유 솔더 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*호흡기)(?=.*솔더)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 납 함유 솔더 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Lead solder safety procedure skip blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_178",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "pcb_drill_dust_exposure",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 839,
+   "description": "PCB 드릴링 분진 노출 경고",
+   "patterns": [
+    "(?=.*PCB)(?=.*드릴링)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: PCB 드릴링 분진 노출 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_179",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "battery_assembly_safety_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 883,
+   "description": "배터리 조립 안전 절차 생략 차단",
+   "patterns": [
+    "(?=.*리튬)(?=.*조립)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 배터리 조립 안전 절차 생략 차단",
+   "message_en": "This request is blocked: Battery assembly safety procedure skip blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_180",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "static_discharge_fab_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 878,
+   "description": "팹 정전기 방전 절차 생략 조력 차단",
+   "patterns": [
+    "(?=.*웨이퍼)(?=.*ESD)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 팹 정전기 방전 절차 생략 조력 차단",
+   "message_en": "This request is blocked: Fab static discharge procedure skip assistance blo"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_181",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "toxic_chemical_storage_elec",
+   "severity": "high",
+   "action": "block",
+   "priority": 876,
+   "description": "전자 제조 독성 화학물질 보관 위반 차단",
+   "patterns": [
+    "(?=.*HCl)(?=.*혼합)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 전자 제조 독성 화학물질 보관 위반 차단",
+   "message_en": "This request is blocked: Electronics manufacturing toxic chemical storage v"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_182",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "high_temp_process_safety",
+   "severity": "high",
+   "action": "block",
+   "priority": 864,
+   "description": "고온 공정 안전 절차 위반 차단",
+   "patterns": [
+    "(?=.*확산)(?=.*내열)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 고온 공정 안전 절차 위반 차단",
+   "message_en": "This request is blocked: High temperature process safety procedure violatio"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_183",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "laser_dicing_safety",
+   "severity": "high",
+   "action": "block",
+   "priority": 860,
+   "description": "레이저 다이싱 안전 절차 위반 차단",
+   "patterns": [
+    "(?=.*미착용)(?=.*다이싱)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 레이저 다이싱 안전 절차 위반 차단",
+   "message_en": "This request is blocked: Laser dicing safety procedure violation blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_184",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "chemical_neutralization_skip",
+   "severity": "high",
+   "action": "block",
+   "priority": 869,
+   "description": "화학물질 중화 처리 생략 조력 차단",
+   "patterns": [
+    "(?=.*방류)(?=.*중화)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 화학물질 중화 처리 생략 조력 차단",
+   "message_en": "This request is blocked: Chemical neutralization treatment skip assistance "
+  },
+  {
+   "rule_id": "MF_ELEC_KR_185",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "consumer_device_usage_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 830,
+   "description": "소비자 전자기기 사용 PII 차단",
+   "patterns": [
+    "(?=.*스마트폰)(?=.*수집)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_186",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "iot_sensor_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 827,
+   "description": "IoT 센서 PII 데이터 차단",
+   "patterns": [
+    "(?=.*IoT)(?=.*수집)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_187",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "semiconductor_customer_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 876,
+   "description": "반도체 고객사 담당자 PII 차단",
+   "patterns": [
+    "(?=.*고객사)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_188",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "fab_visitor_log_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 824,
+   "description": "팹 방문자 출입 기록 PII 차단",
+   "patterns": [
+    "(?=.*반도체)(?=.*방문자)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_189",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "product_recall_customer_pii",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 873,
+   "description": "전자제품 리콜 고객 PII 차단",
+   "patterns": [
+    "(?=.*통보용)(?=.*활용)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_190",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "employee_overtime_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 821,
+   "description": "반도체 공장 직원 초과근무 기록 PII 차단",
+   "patterns": [
+    "(?=.*초과근무)(?=.*공유)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_191",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "warranty_customer_device_pii",
+   "severity": "medium",
+   "action": "redact",
+   "priority": 829,
+   "description": "전자제품 보증 고객 기기 PII 차단",
+   "patterns": [
+    "(?=.*시리얼)(?=.*수리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "개인정보 보호를 위해 마스킹 처리됩니다.",
+   "message_en": "Personal information has been redacted."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_192",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "pcb_assembly_quality_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 871,
+   "description": "PCB 조립 품질 기준 우회 차단",
+   "patterns": [
+    "(?=.*PCB)(?=.*조립)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: PCB 조립 품질 기준 우회 차단",
+   "message_en": "This request is blocked: PCB assembly quality standard bypass blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_193",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "firmware_security_bypass",
+   "severity": "high",
+   "action": "block",
+   "priority": 891,
+   "description": "펌웨어 보안 취약점 은폐 차단",
+   "patterns": [
+    "(?=.*펌웨어)(?=.*패치)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 펌웨어 보안 취약점 은폐 차단",
+   "message_en": "This request is blocked: Firmware security vulnerability concealment blocke"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_194",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "emc_test_manipulation",
+   "severity": "critical",
+   "action": "block",
+   "priority": 944,
+   "description": "EMC 시험 조작 차단",
+   "patterns": [
+    "(?=.*EMC)(?=.*합격)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: EMC 시험 조작 차단",
+   "message_en": "This request is blocked: EMC test manipulation blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_195",
+   "io_type": "input",
+   "category": "pii",
+   "sub_category": "iot_device_pii_unauthorized",
+   "severity": "high",
+   "action": "block_or_redact",
+   "priority": 874,
+   "description": "IoT 기기 무단 개인정보 수집 차단",
+   "patterns": [
+    "(?=.*IoT)(?=.*수집)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "민감 정보 보호를 위해 차단 또는 마스킹됩니다.",
+   "message_en": "Blocked or redacted to protect sensitive information."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_196",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "chip_supply_monopoly_abuse",
+   "severity": "high",
+   "action": "block",
+   "priority": 848,
+   "description": "반도체 공급 독점 남용 조력 차단",
+   "patterns": [
+    "(?=.*남용)(?=.*반도체)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 반도체 공급 독점 남용 조력 차단",
+   "message_en": "This request is blocked: Semiconductor supply monopoly abuse assistance blo"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_197",
+   "io_type": "input",
+   "category": "safety",
+   "sub_category": "process_safety_cert_falsify",
+   "severity": "critical",
+   "action": "block",
+   "priority": 948,
+   "description": "공정 안전 인증 위조 차단",
+   "patterns": [
+    "(?=.*인증서)(?=.*관리)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 공정 안전 인증 위조 차단",
+   "message_en": "This request is blocked: Process safety certification falsification blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_198",
+   "io_type": "input",
+   "category": "compliance",
+   "sub_category": "product_eol_data_hide",
+   "severity": "medium",
+   "action": "warn",
+   "priority": 825,
+   "description": "제품 수명 종료 정보 은폐 경고",
+   "patterns": [
+    "(?=.*WEEE)(?=.*연장)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "규정 검토 후 진행하세요: 제품 수명 종료 정보 은폐 경고",
+   "message_en": "Please verify compliance before proceeding."
+  },
+  {
+   "rule_id": "MF_ELEC_KR_199",
+   "io_type": "output",
+   "category": "ip",
+   "sub_category": "insider_ip_leak_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 947,
+   "description": "내부자 IP 유출 조력 차단",
+   "patterns": [
+    "(?=.*유출하도록)(?=.*도움)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 내부자 IP 유출 조력 차단",
+   "message_en": "This request is blocked: Insider IP leakage assistance blocked"
+  },
+  {
+   "rule_id": "MF_ELEC_KR_200",
+   "io_type": "output",
+   "category": "compliance",
+   "sub_category": "counterfeit_ic_supply_assist",
+   "severity": "critical",
+   "action": "block",
+   "priority": 969,
+   "description": "위조 IC 공급망 유입 조력 차단",
+   "patterns": [
+    "(?=.*넣는)(?=.*공급망)"
+   ],
+   "mode": "heuristic",
+   "generated": true,
+   "message_ko": "이 요청은 차단됩니다: 위조 IC 공급망 유입 조력 차단",
+   "message_en": "This request is blocked: Counterfeit IC supply chain infiltration assistanc"
+  }
+ ]
+}

@@ -58,7 +58,7 @@ export default function DashboardPage() {
   }, {});
 
   return (
-    <div className="p-4 max-w-4xl mx-auto space-y-6">
+    <div className="page space-y-6">
       <div>
         <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
           {t("nav.dashboard") ?? "대시보드"}

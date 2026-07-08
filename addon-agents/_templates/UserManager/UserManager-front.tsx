@@ -322,7 +322,7 @@ export default function UserManagerPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="page space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         {/* 타이틀은 상단 헤더(AppLayout)가 에이전트명으로 표시 — 본문에는 설명만 (가이드 규칙) */}

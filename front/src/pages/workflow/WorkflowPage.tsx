@@ -278,7 +278,7 @@ export default function WorkflowPage() {
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="page">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("nav.workflow") ?? "워크플로우"}</h1>
