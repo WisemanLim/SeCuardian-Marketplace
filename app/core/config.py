@@ -101,6 +101,7 @@ class Settings(BaseSettings):
 
     # Workflow 엔진 (F-WF, §7.2)
     workflow_node_max_retries: int = 3   # 노드 실패 재시도 횟수 (max_attempts = +1)
+    workflow_webhook_rate_limit_per_min: int = 30   # webhook 트리거 인메모리 rate limit(단일 프로세스, §7.2.4.1)
 
     # RAG (F-RAG, §7.5)
     rag_embedding_dim: int = 256   # 로컬 해싱 임베더 차원(오프라인/폐쇄망 기본, pgvector 확장 시 재검토)

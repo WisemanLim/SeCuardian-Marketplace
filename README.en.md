@@ -22,8 +22,8 @@ bases (RAG).
 | Addon hot-deploy (ZIP upload · live mount) | ✅ Restored |
 | Dashboard (`/dashboard` — server status + agent summary + quick links) | ✅ Done |
 | Marketplace (F-MP: catalog · install · single active version, **unified agent-management hub**) — backend+frontend | 🟡 |
-| Workflow (F-WF: DAG engine · 8 nodes[+http] · retry · HITL · SSE · **component palette · webhook trigger · editable canvas · Dify DSL Import**) — backend+a11y form frontend | 🟡 |
-| RAG (F-RAG: chunking · BM25+dense · RRF hybrid search) — backend+frontend | 🟡 |
+| Workflow (F-WF: DAG engine · 8 nodes[+http] · retry · HITL · SSE · **component palette · webhook trigger (rotation+HMAC+rate limit) · full-screen builder (palette drag & drop + inspector) · Dify DSL Import · partial-edit PATCH**) — backend+a11y form frontend | 🟡 |
+| RAG (F-RAG: chunking · BM25+dense · RRF hybrid search · **pgvector benchmark done**) — backend+frontend | 🟡 |
 | Playground (F-PG: prompt/model/RAG experimentation · A/B) — backend+frontend | 🟡 |
 | Guardrails (F-GRD: real+heuristic coexist · **24 domain rulesets vendored · filter toggle · multi-domain · LLM classifier (optional) full judgment** · Orchestrator gate) — backend+frontend | 🟡 |
 | Env separation/keys (F-ENV), Web portal (F-WEB), Governance (F-GOV) | 🟡 Partial |
@@ -36,11 +36,17 @@ bases (RAG).
 >
 > **Workflow component palette (impl/25 · physical `test/impl/23`, §7.2.3)**: `GET /api/workflow/components` scans built-in (7), system, and addon agents' OpenAPI endpoints and exposes each as a `{agent name}-{capability}` component in real time (no new table — reuses Orchestrator's existing dynamic endpoint discovery). Clicking a palette item on the Workflow screen inserts a preconfigured `agent` node (agent_key/method/path); on run, it actually calls that API, forwarding the actor's own Bearer token (a workflow cannot act beyond the requester's own permissions). A new `http` node (8th type) supports calling arbitrary external URLs directly. When `config.path` is omitted the `agent` node keeps its v1 stub behavior (backward compatible).
 >
-> **Webhook ingress trigger (impl/26 · physical `test/impl/24`, §7.2.4)**: creating a `trigger_type="webhook"` workflow makes the server generate a secret and **expose it only once, in the create response** (only a bcrypt hash is stored in the DB). External systems call `POST /api/workflows/{id}/trigger/webhook` with an `X-Webhook-Secret` header — **no JWT required**. The server looks up the workflow **creator's current role** and mints a scoped, ephemeral token so `agent`/`http` nodes run with that identity (inherits the actor-scoped principle from §7.2.3 — if the creator can't be found, the run proceeds without a token and only that node fails safely). Secret rotation, HMAC payload signing, and rate limiting are deferred.
+> **Webhook ingress trigger (impl/26 · physical `test/impl/24`, §7.2.4)**: creating a `trigger_type="webhook"` workflow makes the server generate a secret and **expose it only once, in the create response**. External systems call `POST /api/workflows/{id}/trigger/webhook` with an `X-Webhook-Secret` header — **no JWT required**. The server looks up the workflow **creator's current role** and mints a scoped, ephemeral token so `agent`/`http` nodes run with that identity (inherits the actor-scoped principle from §7.2.3 — if the creator can't be found, the run proceeds without a token and only that node fails safely).
+>
+> **Webhook security hardening (impl/29 · physical `test/impl/27`, §7.2.4.1)**: secret storage moved from **one-way bcrypt to reversible Fernet encryption** (rotation and HMAC verification both need the plaintext back; the key is derived from `JWT_SECRET_KEY`, no new env var). `POST .../trigger/webhook/rotate` (admin/supervisor) reissues a secret and immediately invalidates the old one. `X-Webhook-Signature: sha256=<hmac>` is now supported (GitHub-style convention — the secret itself never has to travel on every call) — either that header or the existing `X-Webhook-Secret` is enough to pass (backward compatible). Per-workflow in-memory rate limiting (default 30/min, `WORKFLOW_WEBHOOK_RATE_LIMIT_PER_MIN`) is added — **single-process only**; pair it with reverse-proxy/API-gateway rate limiting for a stronger guarantee.
 >
 > **Editable (drag) canvas (impl/27 · physical `test/impl/25`, §7.2.5)**: `WorkflowCanvas` (React Flow) is promoted from read-only visualization to editable — **drag nodes to move, drag handles to connect, select + Backspace/Delete to remove**. Coordinates are stored in `definition_json.nodes[].position` (a schema-less JSON column, so **no backend change**); nodes without a position fall back to the existing BFS auto-layout. **KWCAG 2.2**: the canvas itself is mouse-centric and not an accessibility target — the existing a11y form editor (`DefinitionEditor`) keeps running in parallel, sharing the exact same nodes/edges state as the canvas, so keyboard-only users can still complete every operation (add/remove nodes & edges, insert components).
 >
+> **Full-screen workflow builder (impl/32 · physical `test/impl/30`, §7.2.8)**: the impl/27 mini canvas (a 320px widget inside the create panel) was judged unusable in practice, so the workflow editor was rebuilt as the **palette → canvas drag & drop → inspector** three-pane builder pattern shared by Flowise/Dify/n8n. `WorkflowBuilderPage` at `/workflow/builder` (new) and `/workflow/builder/:id` (edit existing) — a **left palette** (8 node types + §7.2.3 components with search; HTML5 drag plus click-to-insert), a **center full-height canvas** (custom nodes with type-colored headers and config summaries, `screenToFlowPosition` drop placement, connect/move/delete), and a **right inspector** (structured per-type forms for agent/llm/condition/http/notify plus a JSON fallback, and **inline edge `when` editing** — closing the §7.2.5 deferral; renaming a node remaps its edges automatically). On the backend, `PATCH /api/workflows/{id}` is **extended to partial editing** (`name`/`description`/`definition_json`; a definition change bumps `version` +1; the bare `{"enabled"}` call stays backward compatible). **Licensing**: only the UX pattern of Flowise (Apache-2.0)/Dify is referenced — no code copied; the implementation is our own on React Flow (MIT). KWCAG 2.2 is preserved via the existing a11y form editor, palette click-insert, and standard labeled inspector forms.
+>
 > **Dify DSL Import adapter (impl/28 · physical `test/impl/26`, §7.2.6, mode A)**: `POST /api/workflows/import/dify-dsl` converts a Dify Studio export YAML into a SeCMP `definition_json` per the §7.2.2 mapping table (`start→trigger` · `llm→llm` · `if-else→condition` · `knowledge-retrieval→agent(rag)` · `http-request→http` · `tool→agent` · `answer/end→notify`). **Lenient parsing** — `code` and unrecognized node types are replaced with a `transform` placeholder instead of crashing, reported in `warnings[]`; dangling edges are skipped the same way. Imported workflows are **always created with `enabled=false`** (forces human review). The original YAML and DSL version are kept in `dify_dsl_source`/`dify_dsl_version` (round-trip ready). Execution still runs on SeCMP's own engine (mode B delegate execution and mode C remain roadmap).
+>
+> **pgvector real-infra benchmark (impl/31 · physical `test/impl/29`, §7.5.1)**: `docker-compose.yml`'s postgres image was **permanently switched to `pgvector/pgvector:pg17`** (the old `postgres:17-alpine` had no `vector` extension, so it was silently falling back to the local path — a latent gap now fixed). Against a real container with `CREATE EXTENSION vector` confirmed, the pgvector code path (`VECTOR_BACKEND=pgvector`) was exercised end-to-end with an identifier-query eval set (N=40) — **Recall@10=1.000, p95=20.8ms** (both well past the PRD §5 targets of 0.89/250ms). Paraphrase-style dense-only recall still needs re-evaluation once the embedding model is swapped (roadmap).
 >
 > **Two-tier full judgment (impl/23 §7.8.7)**: (1) **regex** (deterministic) — each rule tagged with a `mode`, so **real (original regex) + heuristic (generated regex) coexist** (catalog shows `real N · heuristic M`). (2) **LLM classifier** (optional `GUARDRAILS_CLASSIFIER_ENABLED=true`, default off / non-deterministic) — after regex, presents the rule menu to the LLM to judge paraphrase/contextual violations; degrades to regex when unconfigured/unavailable. Generated-regex over-matching is mitigated by **2-keyword co-occurrence (AND) + cross-domain DF filter** (removes single common-keyword false positives). The catalog has a **select-all / deselect-all toggle** (right of `Filter N/M domains`). The emb_guardrails ADDON bundles the ruleset data.
 >
@@ -252,6 +258,24 @@ curl -X POST http://localhost:8100/api/workflows -H "Authorization: Bearer $TOKE
 curl -X POST http://localhost:8100/api/workflows/3/trigger/webhook -H "X-Webhook-Secret: <secret above>" \
   -H 'Content-Type: application/json' -d '{"event":"deploy-finished"}'
 # → {"id":5,"status":"completed","trigger_source":"webhook",...}  (agent/http nodes run as the creator)
+# HMAC signature mode (impl/29 §7.2.4.1) — the secret itself never travels on the wire
+BODY='{"event":"deploy-finished"}'
+SIG="sha256=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "<secret above>" | cut -d' ' -f2)"
+curl -X POST http://localhost:8100/api/workflows/3/trigger/webhook -H "X-Webhook-Signature: $SIG" \
+  -H 'Content-Type: application/json' -d "$BODY"
+# Rotate the secret — old one is invalidated immediately
+curl -X POST http://localhost:8100/api/workflows/3/trigger/webhook/rotate -H "Authorization: Bearer $TOKEN"
+# → {"id":3,...,"webhook_secret":"<new plaintext, only in this response>"}
+
+# enabled toggle (impl/30 §7.2.7) — e.g. reviewing a Dify import (always disabled) before enabling it
+curl -X PATCH http://localhost:8100/api/workflows/4 -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"enabled":true}'
+# → {"id":4,"enabled":true,...}
+
+# Partial edit (impl/32 §7.2.8) — the builder's save path. A definition change bumps version +1
+curl -X PATCH http://localhost:8100/api/workflows/4 -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"name":"renamed","definition_json":{"nodes":[{"id":"t","type":"trigger","position":{"x":40,"y":120}}],"edges":[]}}'
+# → {"id":4,"name":"renamed","version":2,...}  (omitted fields preserved; an empty body {} returns 422)
 
 # Dify DSL Import (impl/28 §7.2.6, mode A) — paste YAML → SeCMP workflow (always created disabled)
 curl -X POST http://localhost:8100/api/workflows/import/dify-dsl -H "Authorization: Bearer $TOKEN" \
@@ -324,6 +348,10 @@ python test/impl/19/test_playground_tokens.py  # F-PG token usage tracking (6 as
 python test/impl/23/test_workflow_components.py  # F-WF component palette+real invoke+http node (18 asserts)
 python test/impl/24/test_workflow_webhook.py     # F-WF webhook ingress trigger (15 asserts)
 python test/impl/26/test_dify_dsl_import.py      # F-WF Dify DSL Import adapter mode A (30 asserts)
+python test/impl/27/test_webhook_security.py     # F-WF webhook security hardening (rotate/HMAC/rate limit) (12 asserts)
+python test/impl/28/test_workflow_enabled_toggle.py  # F-WF enabled toggle PATCH (11 asserts)
+python test/impl/29/test_pgvector_benchmark.py     # F-RAG pgvector benchmark (7 asserts, needs real PostgreSQL: docker compose up -d postgres)
+python test/impl/30/test_workflow_builder_patch.py # F-WF full-screen builder partial-edit PATCH (17 asserts)
 make lint                                   # ruff
 cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # frontend type-check + build
 ```
@@ -351,15 +379,23 @@ are **all done in impl/13~18**. **impl/25 (physical `test/impl/23`) — F-WF com
 invocation + http node — done** (§7.2.3). **impl/26 (physical `test/impl/24`) — F-WF webhook ingress trigger —
 done** (§7.2.4). **impl/27 (physical `test/impl/25`) — F-WF editable canvas — done** (§7.2.5).
 **impl/28 (physical `test/impl/26`) — F-WF Dify DSL Import mode A — done** (§7.2.6).
-All 4 user-specified sequential items (webhook → editable canvas → Dify DSL Import → other) are
-complete. What remains is external-infra validation & roadmap:
+**impl/29 (physical `test/impl/27`) — F-WF webhook security hardening — done** (§7.2.4.1,
+rotation+HMAC+rate limit).
+**impl/30 (physical `test/impl/28`) — F-WF `enabled` toggle PATCH — done** (§7.2.7).
+**impl/31 (physical `test/impl/29`) — F-RAG pgvector real-infra benchmark — done** (§7.5.1,
+Recall@10=1.000 · p95=20.8ms).
+**impl/32 (physical `test/impl/30`) — F-WF full-screen workflow builder — done** (§7.2.8,
+Flowise/Dify-style rebuild + partial-edit PATCH).
+All 4 user-specified sequential items plus all 3 follow-up items are now complete. What remains is
+external-infra validation & roadmap:
 
-- **Real-infra validation**: pgvector benchmark (Recall@10≥0.89 · p95≤250ms, PostgreSQL+extension), mTLS handshake (private CA), real wise-Guardrails MCP integration (code & fallback done).
+- **Real-infra validation (remaining)**: mTLS handshake (private CA), real wise-Guardrails MCP integration (code & fallback done). pgvector benchmark is done (impl/31).
 - **Embedding model swap**: local hashing → sentence-transformers/OpenAI (pin embedding_version).
 - **Multi-tenancy namespace/physical, Qdrant** — roadmap (P5).
 - **Code node**: needs a sandbox security review first (§3 Out of Scope).
-- **Webhook secret rotation · HMAC payload signing · rate limiting** — deferred in impl/26 (§7.2.4).
-- **Canvas edge `when` inline editing, node resize/grouping/undo-redo** — deferred in impl/27 (§7.2.5).
+- **Distributed webhook rate limiting** (single-process → shared across instances), documenting the "rotate webhook secrets after JWT_SECRET_KEY rotation" ops procedure — deferred in impl/29 (§7.2.4.1).
+- ~~Full workflow edit PATCH~~ — **done (impl/32, §7.2.8)**. Changing the trigger type is still create-time only.
+- ~~Canvas edge `when` inline editing~~ — **done (impl/32 inspector, §7.2.8)**. **Node grouping/undo-redo/copy-paste/auto-layout/run-status overlay** — deferred in impl/32 (§7.2.8).
 - **Dify mode B (Delegate)/mode C (Round-trip), file upload, real Dify instance validation** — deferred in impl/28 (§7.2.6).
 - **F-PG cost tracking** (once Claude is wired), eval execution.
 - **Ops docs**: GPG key rotation, mTLS cert issuance procedures.

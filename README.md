@@ -21,8 +21,8 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 | Addon 핫디플로이 (ZIP 업로드·무중단 마운트) | ✅ 복원 |
 | 대시보드 (`/dashboard` — 서버상태+에이전트 요약+빠른링크) | ✅ 완료 |
 | Marketplace (F-MP: 카탈로그·설치·단일활성버전, **에이전트 관리 통합 허브**) — 백엔드+프론트 | 🟡 |
-| Workflow (F-WF: DAG 엔진·8노드[+http]·retry·HITL·SSE·**컴포넌트 팔레트·webhook 트리거·편집형 캔버스·Dify DSL Import**) — 백엔드+a11y 폼 프론트 | 🟡 |
-| RAG (F-RAG: 청킹·BM25+dense·RRF 하이브리드검색) — 백엔드+프론트 | 🟡 |
+| Workflow (F-WF: DAG 엔진·8노드[+http]·retry·HITL·SSE·**컴포넌트 팔레트·webhook 트리거(로테이션+HMAC+rate limit)·풀스크린 빌더(팔레트 drag&drop+인스펙터)·Dify DSL Import·부분 편집 PATCH**) — 백엔드+a11y 폼 프론트 | 🟡 |
+| RAG (F-RAG: 청킹·BM25+dense·RRF 하이브리드검색·**pgvector 실측완료**) — 백엔드+프론트 | 🟡 |
 | Playground (F-PG: 프롬프트/모델/RAG 실험·A/B) — 백엔드+프론트 | 🟡 |
 | Guardrails (F-GRD: 실판정+휴리스틱 공존·**도메인 규칙 24종 내재화·필터적용 토글·다도메인·LLM classifier(옵션) 완전판정**·Orchestrator 게이트) — 백엔드+프론트 | 🟡 |
 | 환경 분리/키(F-ENV), 웹 포털(F-WEB), 거버넌스(F-GOV) | 🟡 부분 |
@@ -35,11 +35,17 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 >
 > **워크플로우 컴포넌트 팔레트(impl/25·물리 `test/impl/23`, §7.2.3)**: `GET /api/workflow/components` 가 내장(7종)/시스템/Addon 에이전트의 OpenAPI 엔드포인트를 스캔해 `{에이전트명}-{기능}` 형태 컴포넌트로 실시간 노출한다(신규 테이블 없음, Orchestrator 의 기존 동적 탐지 재사용). 워크플로우 화면에서 팔레트 항목 클릭 시 사전설정된 `agent` 노드(agent_key/method/path)가 삽입되고, 실행 시 실제 API를 호출한다(actor 의 Bearer 토큰 그대로 전달 — 워크플로우가 실행자 권한 이상으로 동작 불가). 신규 `http` 노드(8번째 타입)로 외부 URL 직접 호출도 지원. `agent` 노드는 `config.path` 미지정 시 기존 v1 스텁 동작 그대로 유지(하위호환).
 >
-> **webhook 수신 트리거(impl/26·물리 `test/impl/24`, §7.2.4)**: `trigger_type="webhook"` 워크플로우 생성 시 서버가 시크릿을 생성해 **응답에 1회만 노출**(DB 에는 bcrypt 해시만 저장). 외부 시스템은 `POST /api/workflows/{id}/trigger/webhook` 을 `X-Webhook-Secret` 헤더로 호출 — **JWT 불필요**. 워크플로우 **생성자의 현재 역할**을 조회해 스코프된 임시 토큰을 발급, `agent`/`http` 노드가 그 권한으로 동작(§7.2.3 actor-scoped 원칙 계승 — 생성자를 못 찾으면 무토큰 실행, 해당 노드만 안전하게 실패). 시크릿 로테이션·HMAC 서명·rate limiting 은 1차 유보.
+> **webhook 수신 트리거(impl/26·물리 `test/impl/24`, §7.2.4)**: `trigger_type="webhook"` 워크플로우 생성 시 서버가 시크릿을 생성해 **응답에 1회만 노출**. 외부 시스템은 `POST /api/workflows/{id}/trigger/webhook` 을 `X-Webhook-Secret` 헤더로 호출 — **JWT 불필요**. 워크플로우 **생성자의 현재 역할**을 조회해 스코프된 임시 토큰을 발급, `agent`/`http` 노드가 그 권한으로 동작(§7.2.3 actor-scoped 원칙 계승 — 생성자를 못 찾으면 무토큰 실행, 해당 노드만 안전하게 실패).
+>
+> **webhook 보안 강화(impl/29·물리 `test/impl/27`, §7.2.4.1)**: 시크릿 저장을 **bcrypt(단방향) → Fernet 대칭암호**로 전환(로테이션·HMAC 검증에 평문 복원 필요, 키는 `JWT_SECRET_KEY` 파생·신규 env 불요). `POST .../trigger/webhook/rotate`(admin/supervisor) 로 재발급(구 시크릿 즉시 무효). `X-Webhook-Signature: sha256=<hmac>` 헤더 지원(GitHub 컨벤션, 시크릿 자체를 매 호출 전송 안 해도 됨) — 기존 `X-Webhook-Secret` 과 **둘 중 하나만 유효하면 통과**(하위호환). 워크플로우별 인메모리 rate limit(기본 분당 30회, `WORKFLOW_WEBHOOK_RATE_LIMIT_PER_MIN`) — **단일 프로세스 한정**, 강한 보장은 리버스프록시 레벨 병행 권장.
 >
 > **편집형(드래그) 캔버스(impl/27·물리 `test/impl/25`, §7.2.5)**: `WorkflowCanvas`(React Flow)를 읽기전용 시각화에서 편집형으로 승격 — **노드 드래그 이동·핸들 연결·Backspace/Delete 삭제**. 좌표는 `definition_json.nodes[].position`(스키마 없는 JSON 컬럼이라 **백엔드 변경 없음**)에 저장, 좌표 없는 노드는 기존 BFS 자동배치 폴백. **KWCAG 2.2**: 캔버스는 마우스 중심이라 접근성 대상이 아니며, 기존 a11y 폼 편집기(`DefinitionEditor`)가 캔버스와 **동일한 nodes/edges 상태를 공유하는 대체편집기**로 계속 병행되어 키보드 전용 사용자도 전체 기능(노드/엣지 추가·삭제·컴포넌트 삽입)을 완결할 수 있다.
 >
+> **풀스크린 워크플로우 빌더(impl/32·물리 `test/impl/30`, §7.2.8)**: impl/27 미니 캔버스(생성 패널 내 320px)가 실사용 불가 판정됨에 따라, Flowise/Dify/n8n 공통의 **팔레트 → 캔버스 drag&drop → 인스펙터** 3분할 빌더로 재구현. `/workflow/builder`(신규)·`/workflow/builder/:id`(기존 편집) 라우트의 `WorkflowBuilderPage` — **좌측 팔레트**(8종 노드 타입 + §7.2.3 컴포넌트 검색, HTML5 드래그·클릭 삽입 병행), **중앙 풀높이 캔버스**(타입별 색상 헤더·config 요약 커스텀 노드, `screenToFlowPosition` 드롭 배치, 연결·이동·삭제), **우측 인스펙터**(agent/llm/condition/http/notify 타입별 구조화 폼 + JSON 폴백 + **엣지 `when` 직접 편집** — §7.2.5 유보 해소, 노드 ID 변경 시 엣지 자동 리매핑). 백엔드는 `PATCH /api/workflows/{id}` 를 **부분 편집으로 확장**(`name`/`description`/`definition_json`, definition 변경 시 `version` +1, `{"enabled"}` 단독 하위호환). **라이선스**: Flowise(Apache-2.0)/Dify UX 패턴만 참조, 코드 복제 없음 — React Flow(MIT) 자체 구현. KWCAG 2.2 는 기존 a11y 폼 편집기 병행 + 팔레트 클릭 삽입 + 인스펙터 표준 폼으로 유지.
+>
 > **Dify DSL Import 어댑터(impl/28·물리 `test/impl/26`, §7.2.6, 모드 A)**: `POST /api/workflows/import/dify-dsl` 가 Dify Studio export YAML을 §7.2.2 매핑표(`start→trigger`·`llm→llm`·`if-else→condition`·`knowledge-retrieval→agent(rag)`·`http-request→http`·`tool→agent`·`answer/end→notify`)대로 SeCMP `definition_json`으로 변환한다. **관용적 파싱** — `code`·미인식 타입은 크래시 대신 `transform` 플레이스홀더로 대체하고 `warnings[]`로 보고, 댕글링 엣지도 크래시 없이 skip. 가져온 워크플로우는 **항상 `enabled=false`**(사람 검토 강제). 원본 YAML/DSL 버전은 `dify_dsl_source`/`dify_dsl_version` 컬럼에 보관(round-trip 대비). 실행은 SeCMP 자체 엔진(모드 B 위임 실행·모드 C 는 로드맵).
+>
+> **pgvector 실측 벤치마크(impl/31·물리 `test/impl/29`, §7.5.1)**: `docker-compose.yml` postgres 이미지를 **`pgvector/pgvector:pg17` 로 영구 교체**(구 `postgres:17-alpine` 은 `vector` 확장이 없어 조용히 local 폴백하던 잠재 결함 수정). 실 컨테이너에서 `CREATE EXTENSION vector` 확인 후 `VECTOR_BACKEND=pgvector` 실경로로 식별자 질의 세트(N=40) 실측 — **Recall@10=1.000, p95=20.8ms**(PRD §5 목표 0.89/250ms 대비 초과 달성). 파라프레이즈형 dense 단독 성능은 임베딩 모델 교체(로드맵) 후 별도 재평가 필요.
 >
 > **완전판정 2단 구조(impl/23 §7.8.7)**: (1) **regex**(결정적) — 규칙별 `mode` 로 **실판정(원본 regex)+휴리스틱(생성 regex) 공존**(카탈로그에 `실판정 N · 휴리스틱 M` 분리 표시). (2) **LLM classifier**(옵션 `GUARDRAILS_CLASSIFIER_ENABLED=true`, 기본 off·비결정적) — regex 후 규칙 메뉴를 LLM 에 제시해 패러프레이즈/문맥 위반까지 판정, 미구성·장애 시 regex 로 degrade. 생성 regex 과탐은 **2개 키워드 공기(AND)+교차도메인 DF 필터**로 완화(단일 흔한 키워드 오탐 제거). 도메인 카탈로그에 **전체 선택/해제 토글**(`필터적용 N/M 도메인` 우측). emb_guardrails ADDON 패키지에 룰셋 데이터 동봉.
 >
@@ -251,6 +257,24 @@ curl -X POST http://localhost:8100/api/workflows -H "Authorization: Bearer $TOKE
 curl -X POST http://localhost:8100/api/workflows/3/trigger/webhook -H "X-Webhook-Secret: <위 secret>" \
   -H 'Content-Type: application/json' -d '{"event":"deploy-finished"}'
 # → {"id":5,"status":"completed","trigger_source":"webhook",...}  (agent/http 노드는 생성자 역할로 실행)
+# HMAC 서명 방식(impl/29 §7.2.4.1) — 시크릿 자체를 매 호출 전송 안 함
+BODY='{"event":"deploy-finished"}'
+SIG="sha256=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "<위 secret>" | cut -d' ' -f2)"
+curl -X POST http://localhost:8100/api/workflows/3/trigger/webhook -H "X-Webhook-Signature: $SIG" \
+  -H 'Content-Type: application/json' -d "$BODY"
+# 시크릿 재발급(로테이션) — 구 시크릿 즉시 무효
+curl -X POST http://localhost:8100/api/workflows/3/trigger/webhook/rotate -H "Authorization: Bearer $TOKEN"
+# → {"id":3,...,"webhook_secret":"<신규 평문, 이 응답에서만 노출>"}
+
+# enabled 토글(impl/30 §7.2.7) — Dify 가져오기(항상 비활성)를 검토 후 활성화하는 흐름 등
+curl -X PATCH http://localhost:8100/api/workflows/4 -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"enabled":true}'
+# → {"id":4,"enabled":true,...}
+
+# 부분 편집(impl/32 §7.2.8) — 빌더 저장 경로. definition_json 변경 시 version +1
+curl -X PATCH http://localhost:8100/api/workflows/4 -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"name":"renamed","definition_json":{"nodes":[{"id":"t","type":"trigger","position":{"x":40,"y":120}}],"edges":[]}}'
+# → {"id":4,"name":"renamed","version":2,...}  (미전달 필드 보존, 빈 바디 {} 는 422)
 
 # Dify DSL Import(impl/28 §7.2.6, 모드 A) — YAML 붙여넣기 → SeCMP 워크플로우(항상 비활성 생성)
 curl -X POST http://localhost:8100/api/workflows/import/dify-dsl -H "Authorization: Bearer $TOKEN" \
@@ -323,6 +347,10 @@ python test/impl/19/test_playground_tokens.py  # F-PG 토큰 사용량 추적 (6
 python test/impl/23/test_workflow_components.py  # F-WF 컴포넌트 팔레트+실호출+http 노드 (18 assert)
 python test/impl/24/test_workflow_webhook.py     # F-WF webhook 수신 트리거 (15 assert)
 python test/impl/26/test_dify_dsl_import.py      # F-WF Dify DSL Import 어댑터 모드 A (30 assert)
+python test/impl/27/test_webhook_security.py     # F-WF webhook 보안 강화(로테이션/HMAC/rate limit) (12 assert)
+python test/impl/28/test_workflow_enabled_toggle.py  # F-WF enabled 토글 PATCH (11 assert)
+python test/impl/29/test_pgvector_benchmark.py     # F-RAG pgvector 실측 (7 assert, 실 PostgreSQL 필요: docker compose up -d postgres)
+python test/impl/30/test_workflow_builder_patch.py # F-WF 풀스크린 빌더 PATCH 부분 편집 (17 assert)
 make lint                                   # ruff
 cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # 프론트 타입체크+빌드
 ```
@@ -350,15 +378,19 @@ cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # 프론트 타입�
 **impl/26(물리 `test/impl/24`) — F-WF webhook 수신 트리거 완료**(§7.2.4).
 **impl/27(물리 `test/impl/25`) — F-WF 편집형 캔버스 완료**(§7.2.5).
 **impl/28(물리 `test/impl/26`) — F-WF Dify DSL Import 모드 A 완료**(§7.2.6).
-사용자 순차 지정 4항목(webhook→편집형 캔버스→Dify DSL Import→기타) 모두 완료. 남은 것은 외부
-인프라 실측·로드맵:
+**impl/29(물리 `test/impl/27`) — F-WF webhook 보안 강화 완료**(§7.2.4.1, 로테이션+HMAC+rate limit).
+**impl/30(물리 `test/impl/28`) — F-WF `enabled` 토글 PATCH 완료**(§7.2.7).
+**impl/31(물리 `test/impl/29`) — F-RAG pgvector 실측 벤치마크 완료**(§7.5.1, Recall@10=1.000·p95=20.8ms).
+**impl/32(물리 `test/impl/30`) — F-WF 풀스크린 워크플로우 빌더 완료**(§7.2.8, Flowise/Dify 준용 재구현 + PATCH 부분 편집).
+사용자 순차 지정 4항목 + 후속 3항목 **전부 완료**. 남은 것은 외부 인프라 실측·로드맵:
 
-- **실 인프라 실측**: pgvector 벤치마크(Recall@10≥0.89·p95≤250ms, PostgreSQL+확장), mTLS 핸드셰이크(사설 CA), 실 wise-Guardrails MCP 통합(코드·폴백 완료).
+- **실 인프라 실측(잔여)**: mTLS 핸드셰이크(사설 CA), 실 wise-Guardrails MCP 통합(코드·폴백 완료). pgvector 벤치마크는 완료(impl/31).
 - **임베딩 모델 교체**: 로컬 해싱 → sentence-transformers/OpenAI(embedding_version 고정).
 - **멀티테넌시 namespace/physical, Qdrant** — 로드맵(P5).
 - **code 노드**: 샌드박스 보안 검토 선행(§3 하지 않을 것).
-- **webhook 시크릿 로테이션·HMAC 서명·rate limiting** — impl/26 1차 유보(§7.2.4).
-- **캔버스 엣지 `when` 직접 편집, 노드 리사이즈/그룹핑/undo-redo** — impl/27 1차 유보(§7.2.5).
+- **webhook rate limit 분산화**(단일 프로세스→멀티 인스턴스 공유), `JWT_SECRET_KEY` 로테이션 시 webhook 재발급 운영절차 문서화 — impl/29 1차 유보(§7.2.4.1).
+- ~~워크플로우 이름/정의 편집 PATCH~~ — **완료(impl/32, §7.2.8)**. 트리거 타입 변경은 여전히 생성 시에만.
+- ~~캔버스 엣지 `when` 직접 편집~~ — **완료(impl/32 인스펙터, §7.2.8)**. **노드 그룹핑/undo-redo/복사붙여넣기/자동 레이아웃/실행 오버레이** — impl/32 1차 유보(§7.2.8).
 - **Dify 모드 B(Delegate)/모드 C(Round-trip), 파일 업로드, 실 Dify 인스턴스 검증** — impl/28 1차 유보(§7.2.6).
 - **F-PG cost 추적**(Claude 연동 시), eval 실행.
 - **운영 문서**: GPG 키 로테이션·mTLS 인증서 발급 절차.

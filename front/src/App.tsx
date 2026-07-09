@@ -10,6 +10,7 @@ import ProfilePage from "./pages/profile/ProfilePage";
 import AddonAgentPage from "./pages/addon/AddonAgentPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import WorkflowPage from "./pages/workflow/WorkflowPage";
+import WorkflowBuilderPage from "./pages/workflow/WorkflowBuilderPage";
 import RagPage from "./pages/rag/RagPage";
 import PlaygroundPage from "./pages/playground/PlaygroundPage";
 import GuardrailsPage from "./pages/guardrails/GuardrailsPage";
@@ -55,6 +56,9 @@ export default function App() {
         {/* 마켓플레이스 = 통합 에이전트 허브(내장/시스템/Addon 탭 + 자산 카탈로그) */}
         <Route path="/marketplace" element={<LayoutRoute><AgentsPage /></LayoutRoute>} />
         <Route path="/workflow" element={<LayoutRoute><WorkflowPage /></LayoutRoute>} />
+        {/* impl/32(§7.2.8) — Flowise/Dify 준용 풀스크린 빌더(신규/기존 편집) */}
+        <Route path="/workflow/builder" element={<LayoutRoute><WorkflowBuilderPage /></LayoutRoute>} />
+        <Route path="/workflow/builder/:id" element={<LayoutRoute><WorkflowBuilderPage /></LayoutRoute>} />
         <Route path="/rag" element={<LayoutRoute><RagPage /></LayoutRoute>} />
         <Route path="/playground" element={<LayoutRoute><PlaygroundPage /></LayoutRoute>} />
         <Route path="/guardrails" element={<LayoutRoute><GuardrailsPage /></LayoutRoute>} />

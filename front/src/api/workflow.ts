@@ -143,3 +143,24 @@ export async function importDifyDsl(dsl: string): Promise<DifyImportResult> {
   const { data } = await client.post<DifyImportResult>("/workflows/import/dify-dsl", { dsl });
   return data;
 }
+
+/** impl/29(§7.2.4.1) — webhook 시크릿 재발급(로테이션). 신규 평문은 이 응답에만 1회 노출. */
+export async function rotateWebhookSecret(workflowId: number): Promise<Workflow> {
+  const { data } = await client.post<Workflow>(`/workflows/${workflowId}/trigger/webhook/rotate`);
+  return data;
+}
+
+/** impl/30(§7.2.7) — 활성/비활성 토글(1차 범위, 이름·정의 편집은 범위 밖). */
+export async function setWorkflowEnabled(workflowId: number, enabled: boolean): Promise<Workflow> {
+  const { data } = await client.patch<Workflow>(`/workflows/${workflowId}`, { enabled });
+  return data;
+}
+
+/** impl/32(§7.2.8) — 부분 편집(빌더 저장 경로). definition_json 전달 시 서버가 version +1. */
+export async function updateWorkflow(
+  workflowId: number,
+  body: { name?: string; description?: string; definition_json?: WorkflowDefinition; enabled?: boolean },
+): Promise<Workflow> {
+  const { data } = await client.patch<Workflow>(`/workflows/${workflowId}`, body);
+  return data;
+}

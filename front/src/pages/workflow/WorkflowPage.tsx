@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   Workflow, WorkflowNode, WorkflowEdge, WorkflowRun, WorkflowNodeRun, WorkflowComponent,
   NODE_TYPES, listWorkflows, createWorkflow, runWorkflow, getRun, getRunNodes,
-  approveHitl, cancelRun, listComponents, importDifyDsl,
+  approveHitl, cancelRun, listComponents, importDifyDsl, rotateWebhookSecret, setWorkflowEnabled,
 } from "../../api/workflow";
 import { useLocale } from "../../hooks/useLocale";
 import WorkflowCanvas from "./WorkflowCanvas";
@@ -339,6 +340,7 @@ function RunPanel({ run, onRefresh }: { run: WorkflowRun; onRefresh: () => void 
 
 export default function WorkflowPage() {
   const { t } = useLocale();
+  const navigate = useNavigate();
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState("");
@@ -395,6 +397,16 @@ export default function WorkflowPage() {
     setActiveRuns((m) => ({ ...m, [wfId]: run }));
   }
 
+  async function handleRotateSecret(wf: Workflow) {
+    const wfr = await rotateWebhookSecret(wf.id);
+    if (wfr.webhook_secret) setWebhookBanner({ workflowId: wfr.id, secret: wfr.webhook_secret });
+  }
+
+  async function handleToggleEnabled(wf: Workflow) {
+    await setWorkflowEnabled(wf.id, !wf.enabled);
+    load();
+  }
+
   return (
     <div className="page">
       <div className="flex items-center justify-between mb-4">
@@ -402,10 +414,18 @@ export default function WorkflowPage() {
           <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("nav.workflow") ?? "워크플로우"}</h1>
           <p className="text-xs text-gray-500 mt-0.5">에이전트·LLM·조건·HITL 노드를 DAG로 조합해 자동화합니다.</p>
         </div>
-        <button onClick={() => setShowCreate((v) => !v)}
-          className="text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">
-          {showCreate ? "닫기" : "+ 새 워크플로우"}
-        </button>
+        <div className="flex items-center gap-2">
+          {/* impl/32(§7.2.8) — Flowise/Dify 준용 풀스크린 빌더(팔레트 drag&drop) */}
+          <button onClick={() => navigate("/workflow/builder")}
+            className="text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">
+            + 새 워크플로우(빌더)
+          </button>
+          <button onClick={() => setShowCreate((v) => !v)}
+            title="키보드 전용 폼 편집기(KWCAG 2.2 대체 편집기)"
+            className="text-sm px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
+            {showCreate ? "닫기" : "+ 새 워크플로우(폼)"}
+          </button>
+        </div>
       </div>
 
       <DifyImportPanel onImported={load} />
@@ -485,6 +505,22 @@ export default function WorkflowPage() {
                   className="text-xs px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-40">
                   실행
                 </button>
+                <button onClick={() => navigate(`/workflow/builder/${wf.id}`)}
+                  title="풀스크린 빌더에서 정의 편집(impl/32 §7.2.8)"
+                  className="text-xs px-2 py-1 rounded border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                  빌더 편집
+                </button>
+                <button onClick={() => handleToggleEnabled(wf)}
+                  title="impl/30(§7.2.7) — 활성/비활성 토글"
+                  className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
+                  {wf.enabled ? "비활성화" : "활성화"}
+                </button>
+                {wf.trigger_type === "webhook" && (
+                  <button onClick={() => handleRotateSecret(wf)} title="webhook 시크릿 재발급(impl/29 §7.2.4.1) — 구 시크릿 즉시 무효"
+                    className="text-xs px-2 py-1 rounded border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30">
+                    시크릿 재발급
+                  </button>
+                )}
               </div>
             </div>
             {activeRuns[wf.id] && (

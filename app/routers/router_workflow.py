@@ -8,28 +8,39 @@ impl/23(PRD §7.2.3): /workflow/components — 내장/시스템/Addon 에이전�
 테이블 없음). run/hitl 요청의 Bearer 토큰을 actor_token 으로 워크플로우 엔진에 전달해, agent 노드의
 실 API 호출이 실행 요청자 권한 이상으로 동작하지 않도록 한다(actor-scoped, 권한 상승 없음).
 
-impl/26(PRD §7.2.4): /workflows/{id}/trigger/webhook — JWT 없이 X-Webhook-Secret(bcrypt 검증)로
-워크플로우를 트리거하는 무인증 수신 엔드포인트. 워크플로우 생성자의 현재 역할을 조회해 스코프된
-임시 actor 토큰을 발급, agent/http 노드가 그 권한 이상으로 동작하지 않게 한다(§7.2.3 원칙 계승).
+impl/26(PRD §7.2.4): /workflows/{id}/trigger/webhook — JWT 없이 X-Webhook-Secret 또는
+X-Webhook-Signature(HMAC, impl/29)로 워크플로우를 트리거하는 무인증 수신 엔드포인트.
+워크플로우 생성자의 현재 역할을 조회해 스코프된 임시 actor 토큰을 발급, agent/http 노드가
+그 권한 이상으로 동작하지 않게 한다(§7.2.3 원칙 계승).
 
 impl/28(PRD §7.2.6): /workflows/import/dify-dsl — Dify DSL Import 어댑터 모드 A. YAML 텍스트를
 `app.services.dify_dsl_adapter` 로 SeCMP definition_json 으로 변환해 워크플로우를 생성한다.
 매핑 불가 노드는 크래시 대신 transform 플레이스홀더로 대체하고 warnings 로 보고, 가져온
 워크플로우는 항상 enabled=false 로 생성해 사람 검토를 강제한다.
 
+impl/29(PRD §7.2.4.1): webhook 보안 강화. 시크릿 저장을 bcrypt(단방향, impl/26)에서
+Fernet 대칭암호(재사용 가능한 의존성)로 전환 — 로테이션(/rotate)과 HMAC 서명 검증에
+평문 복원이 필요했기 때문. 키는 JWT_SECRET_KEY 파생(신규 env 불요). 워크플로우별 인메모리
+고정윈도우 rate limit 도 함께 추가(단일 프로세스 한정, §6 리스크로 명시).
+
 참조: SeCuardian-Marketplace-v0 router_workflow 를 async raw-SQL 로 이식.
 """
+import base64
+import hashlib
+import hmac
 import json
 import secrets
+import time
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from cryptography.fernet import Fernet, InvalidToken
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from app.core.config import settings
 from app.core.deps import get_current_user, require_role
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.security import create_access_token
 from app.db import _PH, execute_insert, execute_write, fetch_all, fetch_one
 from app.services.dify_dsl_adapter import DifyDslError, import_dify_dsl
 from app.services.workflow_engine import NODE_TYPES, NodeError, execute_run, resume_hitl
@@ -43,6 +54,43 @@ _BUILTIN_KEYS = {"general", "chat", "marketplace", "workflow", "rag", "playgroun
 
 def _tenant() -> str:
     return settings.tenant_default_id or "default"
+
+
+# ---------- webhook 시크릿 암호화·HMAC·rate limit (impl/29, §7.2.4.1) ----------
+def _fernet() -> Fernet:
+    """JWT_SECRET_KEY 파생 키(신규 env 불요) — 키 로테이션 시 기존 webhook 시크릿도 무효화됨(§6)."""
+    key = base64.urlsafe_b64encode(hashlib.sha256(settings.jwt_secret_key.encode()).digest())
+    return Fernet(key)
+
+
+def _encrypt_secret(secret: str) -> str:
+    return _fernet().encrypt(secret.encode()).decode()
+
+
+def _decrypt_secret(enc: str) -> str | None:
+    try:
+        return _fernet().decrypt(enc.encode()).decode()
+    except (InvalidToken, ValueError):
+        return None
+
+
+def _verify_hmac_signature(secret: str, raw_body: bytes, signature_header: str) -> bool:
+    prefix = "sha256="
+    if not signature_header.startswith(prefix):
+        return False
+    expected = hmac.new(secret.encode(), raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature_header[len(prefix):])
+
+
+_webhook_hits: dict[int, list[float]] = {}  # workflow_id -> 최근 요청 타임스탬프(인메모리, 단일 프로세스)
+
+
+def _rate_limited(workflow_id: int) -> bool:
+    now = time.monotonic()
+    hits = [t for t in _webhook_hits.get(workflow_id, []) if now - t < 60]
+    hits.append(now)
+    _webhook_hits[workflow_id] = hits
+    return len(hits) > settings.workflow_webhook_rate_limit_per_min
 
 
 class WorkflowCreate(BaseModel):
@@ -82,7 +130,9 @@ def _validate_definition(defn: dict) -> None:
 
 def _wf_out(row: dict) -> dict:
     trigger_config = json.loads(row.get("trigger_config_json") or "{}")
-    trigger_config.pop("webhook_secret_hash", None)  # impl/26 — 해시도 응답에 노출하지 않음
+    # impl/26/29 — 시크릿(현재·구버전 필드 모두)은 어떤 응답에도 노출하지 않음
+    trigger_config.pop("webhook_secret_hash", None)
+    trigger_config.pop("webhook_secret_enc", None)
     return {**row, "definition_json": json.loads(row.get("definition_json") or "{}"),
             "trigger_config_json": trigger_config,
             "enabled": bool(row.get("enabled"))}
@@ -174,9 +224,10 @@ async def create_workflow(
     trigger_config = dict(body.trigger_config_json)
     webhook_secret: str | None = None
     if body.trigger_type == "webhook":
-        # impl/26(§7.2.4) — 평문은 이 응답에만 1회 노출, DB 에는 해시만 저장.
+        # impl/26/29(§7.2.4·7.2.4.1) — 평문은 이 응답에만 1회 노출, DB 에는 Fernet 암호문만 저장
+        # (로테이션·HMAC 검증에 평문 복원이 필요해 bcrypt 대신 대칭암호 사용).
         webhook_secret = secrets.token_urlsafe(32)
-        trigger_config["webhook_secret_hash"] = hash_password(webhook_secret)
+        trigger_config["webhook_secret_enc"] = _encrypt_secret(webhook_secret)
     wid = await execute_insert(
         f"INSERT INTO workflows "
         f"(tenant_id, name, description, definition_json, trigger_type, trigger_config_json, enabled, created_by) "
@@ -195,6 +246,49 @@ async def create_workflow(
 @router.get("/workflows/{workflow_id}")
 async def get_workflow(workflow_id: int, user: dict = Depends(get_current_user)):
     return _wf_out(await _get_wf(workflow_id, _tenant()))
+
+
+class WorkflowUpdate(BaseModel):
+    """impl/30(§7.2.7) enabled 토글 → impl/32(§7.2.8) 부분 편집으로 확장(전 필드 optional, 하위호환)."""
+    enabled: bool | None = None
+    name: str | None = Field(default=None, min_length=1, max_length=128)
+    description: str | None = None
+    definition_json: dict | None = None
+
+
+@router.patch("/workflows/{workflow_id}")
+async def update_workflow(
+    workflow_id: int, body: WorkflowUpdate, user: dict = Depends(require_role("admin", "supervisor"))
+):
+    """impl/32(§7.2.8) — 부분 편집: enabled/name/description/definition_json.
+
+    definition_json 전달 시 생성과 동일하게 재검증하고 version 을 +1 한다(빌더 저장 경로).
+    """
+    tid = _tenant()
+    await _get_wf(workflow_id, tid)  # 404 if not found
+    sets: list[str] = []
+    params: list = []
+    if body.enabled is not None:
+        sets.append(f"enabled = {_PH}")
+        params.append(1 if body.enabled else 0)
+    if body.name is not None:
+        sets.append(f"name = {_PH}")
+        params.append(body.name)
+    if body.description is not None:
+        sets.append(f"description = {_PH}")
+        params.append(body.description)
+    if body.definition_json is not None:
+        _validate_definition(body.definition_json)
+        sets.append(f"definition_json = {_PH}")
+        params.append(json.dumps(body.definition_json, ensure_ascii=False))
+        sets.append("version = version + 1")
+    if not sets:
+        raise HTTPException(422, "no fields to update")
+    await execute_write(
+        f"UPDATE workflows SET {', '.join(sets)}, updated_at = CURRENT_TIMESTAMP WHERE id = {_PH}",
+        (*params, workflow_id),
+    )
+    return _wf_out(await _get_wf(workflow_id, tid))
 
 
 class DifyDslImportRequest(BaseModel):
@@ -267,26 +361,67 @@ async def _actor_token_for_creator(created_by: str) -> str | None:
     return create_access_token({"sub": row["user_id"], "role": row["role"], "username": created_by})
 
 
+@router.post("/workflows/{workflow_id}/trigger/webhook/rotate", status_code=201)
+async def rotate_webhook_secret(
+    workflow_id: int, user: dict = Depends(require_role("admin", "supervisor"))
+):
+    """impl/29(§7.2.4.1) — webhook 시크릿 재발급. 신규 평문은 이 응답에만 1회 노출, 구 시크릿 즉시 무효."""
+    tid = _tenant()
+    wf = await _get_wf(workflow_id, tid)
+    if wf.get("trigger_type") != "webhook":
+        raise HTTPException(409, "workflow is not webhook-triggered")
+    trigger_config = json.loads(wf.get("trigger_config_json") or "{}")
+    new_secret = secrets.token_urlsafe(32)
+    trigger_config["webhook_secret_enc"] = _encrypt_secret(new_secret)
+    trigger_config.pop("webhook_secret_hash", None)  # impl/26 구필드 정리(있었다면)
+    await execute_write(
+        f"UPDATE workflows SET trigger_config_json = {_PH}, updated_at = CURRENT_TIMESTAMP WHERE id = {_PH}",
+        (json.dumps(trigger_config, ensure_ascii=False), workflow_id),
+    )
+    out = _wf_out(await _get_wf(workflow_id, tid))
+    out["webhook_secret"] = new_secret
+    return out
+
+
 @router.post("/workflows/{workflow_id}/trigger/webhook", status_code=201)
 async def trigger_webhook(
-    workflow_id: int, body: dict | None = None,
+    workflow_id: int, request: Request,
     x_webhook_secret: str | None = Header(default=None),
+    x_webhook_signature: str | None = Header(default=None),
 ):
-    """impl/26(§7.2.4) — 무인증 외부 수신 엔드포인트. X-Webhook-Secret 을 저장된 해시와 비교."""
+    """impl/26/29(§7.2.4·7.2.4.1) — 무인증 외부 수신 엔드포인트.
+
+    X-Webhook-Secret(직접비교) 또는 X-Webhook-Signature(HMAC-SHA256, 시크릿 미전송) 중
+    하나만 유효하면 통과 — 하위호환 유지. 워크플로우별 인메모리 rate limit 적용(단일 프로세스).
+    """
     tid = _tenant()
     wf = await _get_wf(workflow_id, tid)
     if wf.get("trigger_type") != "webhook":
         raise HTTPException(404, "workflow is not webhook-triggered")
     if not wf.get("enabled"):
         raise HTTPException(409, "workflow disabled")
+    if _rate_limited(workflow_id):
+        raise HTTPException(429, "webhook rate limit exceeded")
+
     trigger_config = json.loads(wf.get("trigger_config_json") or "{}")
-    secret_hash = trigger_config.get("webhook_secret_hash")
-    if not secret_hash or not x_webhook_secret or not verify_password(x_webhook_secret, secret_hash):
-        raise HTTPException(401, "invalid or missing X-Webhook-Secret")
+    secret_enc = trigger_config.get("webhook_secret_enc")
+    secret = _decrypt_secret(secret_enc) if secret_enc else None
+    raw_body = await request.body()
+    authorized = bool(secret) and (
+        (x_webhook_secret is not None and hmac.compare_digest(x_webhook_secret, secret))
+        or (x_webhook_signature is not None and _verify_hmac_signature(secret, raw_body, x_webhook_signature))
+    )
+    if not authorized:
+        raise HTTPException(401, "invalid or missing X-Webhook-Secret / X-Webhook-Signature")
+
+    try:
+        payload = json.loads(raw_body) if raw_body else {}
+    except json.JSONDecodeError:
+        payload = {}
     run_id = await execute_insert(
         f"INSERT INTO workflow_runs (tenant_id, workflow_id, status, trigger_source, input_json) "
         f"VALUES ({_PH}, {_PH}, 'pending', 'webhook', {_PH})",
-        (tid, workflow_id, json.dumps(body or {}, ensure_ascii=False)),
+        (tid, workflow_id, json.dumps(payload, ensure_ascii=False)),
     )
     run = await _get_run(run_id, tid)
     run["_actor_token"] = await _actor_token_for_creator(wf.get("created_by") or "")
