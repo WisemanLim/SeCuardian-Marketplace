@@ -31,7 +31,9 @@ bases (RAG).
 
 > All 5 built-in agents have working backend+frontend (tests PASS). 🟡 = extension items remain (remote registry, React Flow canvas, pgvector, MCP proxy, etc). Details: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
-> **UI layout (impl/20)**: there is no separate `Agent Management` menu — the **Marketplace menu is the unified agent hub**. Three top tabs: **Built-in Agents** (limited to Orchestrator, AI Assistant, Marketplace, Workflow, RAG, Playground, Guardrails), **System Agents** (security domains, etc.), **Addon Agents** (user-uploaded). The 5 built-ins (Marketplace/Workflow/RAG/Playground/Guardrails) are **REQUIRED (cannot be disabled)**. `Register Asset` sits on the System Agents tab (same position as `New Agent` on the Addon tab); the asset catalog (local + remote) is embedded below it.
+> **UI layout (impl/20 → impl/36, physical `test/impl/34`, §7.6.1 tab merge)**: there is no separate `Agent Management` menu — the **Marketplace menu is the unified agent hub**. Two top tabs: **Built-in Agents** (all `tbl_agent_config` rows: Orchestrator, AI Assistant, Marketplace, Workflow, RAG, Playground, Guardrails + catalog-installed agents), **Addon Agents** (user-uploaded). The 5 built-ins (Marketplace/Workflow/RAG/Playground/Guardrails) are **REQUIRED (cannot be disabled)**. `Register Asset` and the asset catalog (local + remote) live on the Built-in tab (same position as `New Agent` on the Addon tab). The register modal supports **attaching a scaffold-format addon ZIP** — hot-deployed on install.
+>
+> **Security agents moved to the asset catalog (impl/36, §7.6.1)**: the 13 SeCuardian security built-ins formerly shown on the 'System Agents' tab (vasca-cve, cilium-netpol, teler-ids, shuffle-soar, neosync-dlp, otel-collector, teleport-pam, velociraptor-dfir, ai-redteam, isms-p-evidence, behavior-noti, agentic-soc, ai-eval-gate) are now provided as **asset-catalog entries (marketplace_assets, category=security)** — registered by `make seed-security` (with zip blobs) and installed from the catalog. Their 13 packages live under **`marketplace-assets/security/`** (§7.6.1-6 `emb_` abolished, §7.6.1-7 `addon-agents/zip` abolished). `make seed` performs the base seed (settings, accounts) only.
 >
 > **Guardrails domain filters (impl/20 §7.8.7)**: all **24 wise-Guardrails domain rulesets are vendored as agent-internal data (`app/data/guardrails/`)**. `global` (PII/financial) is always required; industry domains (finance/healthcare/manufacturing/public-admin, …) get **generated regex** for their classifier rules, and each non-required domain has a **`Filter` toggle** in the catalog to include/exclude it at test time (multi-domain evaluation). Rebuild data: `make guardrails-data` (`scripts/build_guardrails_data.py`).
 >
@@ -49,13 +51,13 @@ bases (RAG).
 >
 > **pgvector real-infra benchmark (impl/31 · physical `test/impl/29`, §7.5.1)**: `docker-compose.yml`'s postgres image was **permanently switched to `pgvector/pgvector:pg17`** (the old `postgres:17-alpine` had no `vector` extension, so it was silently falling back to the local path — a latent gap now fixed). Against a real container with `CREATE EXTENSION vector` confirmed, the pgvector code path (`VECTOR_BACKEND=pgvector`) was exercised end-to-end with an identifier-query eval set (N=40) — **Recall@10=1.000, p95=20.8ms** (both well past the PRD §5 targets of 0.89/250ms). Paraphrase-style dense-only recall still needs re-evaluation once the embedding model is swapped (roadmap).
 >
-> **Two-tier full judgment (impl/23 §7.8.7)**: (1) **regex** (deterministic) — each rule tagged with a `mode`, so **real (original regex) + heuristic (generated regex) coexist** (catalog shows `real N · heuristic M`). (2) **LLM classifier** (optional `GUARDRAILS_CLASSIFIER_ENABLED=true`, default off / non-deterministic) — after regex, presents the rule menu to the LLM to judge paraphrase/contextual violations; degrades to regex when unconfigured/unavailable. Generated-regex over-matching is mitigated by **2-keyword co-occurrence (AND) + cross-domain DF filter** (removes single common-keyword false positives). The catalog has a **select-all / deselect-all toggle** (right of `Filter N/M domains`). The emb_guardrails ADDON bundles the ruleset data.
+> **Two-tier full judgment (impl/23 §7.8.7)**: (1) **regex** (deterministic) — each rule tagged with a `mode`, so **real (original regex) + heuristic (generated regex) coexist** (catalog shows `real N · heuristic M`). (2) **LLM classifier** (optional `GUARDRAILS_CLASSIFIER_ENABLED=true`, default off / non-deterministic) — after regex, presents the rule menu to the LLM to judge paraphrase/contextual violations; degrades to regex when unconfigured/unavailable. Generated-regex over-matching is mitigated by **2-keyword co-occurrence (AND) + cross-domain DF filter** (removes single common-keyword false positives). The catalog has a **select-all / deselect-all toggle** (right of `Filter N/M domains`). The guardrails ADDON bundles the ruleset data.
 >
 > **Screen alignment standard (impl/24)**: every agent screen root uses the **`.page` class** (`front/src/index.css` = `w-full max-w-6xl p-4 sm:p-6`) for **left-aligned, responsive, width-capped** layout (no `mx-auto`). Baseline for all new agents (built-in & addon). **Exception**: full-height interactive layouts (chat/terminal, e.g. AI Assistant).
 >
 > **Built-in MCP unlock (impl/20)**: the MCP lock on the REQUIRED built-in 5 is removed — all 7 built-in agents can be exposed as MCP servers.
 >
-> **emb_ built-in packages (impl/20 §7.8.8)**: ADDON packages `addon-agents/zip/emb_{marketplace,workflow,rag,playground,guardrails}` are created (same convention as the 13 security agents).
+> **Asset directory (impl/38 §7.6.1-7)**: all asset sources are unified under `marketplace-assets/<category>/` — security(13)·builtin(5: marketplace·workflow·rag·playground·guardrails)·addon(5: scaffold templates)·utilities(6: UserManager·server-shell·4 pure ADDONs). `addon-agents/{zip,_templates}` abolished (only deployed/ remains); template lookup path = `marketplace-assets/addon`.
 >
 > **Multilingual agent display names (impl/35 · physical `test/impl/33`, §7.11.2-4 — cloned from SeCuardian impl/56)**: new `tbl_agent_config.agent_names` JSON (`{"ko":..,"en":..}`) — the 7 built-in agents are seeded with English display names (마켓플레이스→Marketplace, 워크플로우→Workflow, …), fixing Korean names remaining in the English UI. Idempotent `{"ko": agent_name}` backfill at startup; meta.json `display_name` accepts the dict form (normalized & synced on upload). Applied with the same fallback chain as descriptions to agent cards, left nav, header title, and the Guardrails agent selector.
 >
@@ -86,7 +88,7 @@ sql/{sqlite,pg}/         01_init.sql (idempotent DDL: core + marketplace/workflo
                          02_seed.sql (agent/settings/domain-catalog seed)
 front/src/
   pages/                 chat·users·settings·profile·addon·setup +
-                         marketplace(=unified agent hub: Built-in/System/Addon 3 tabs + asset catalog)·
+                         marketplace(=unified agent hub: Built-in/Addon 2 tabs + asset catalog, §7.6.1)·
                          workflow·rag·playground·guardrails (5 built-in agents)
   api/                   axios client per backend contract (1:1)
 addon-agents/            Addon ZIP assets (deployed/ is runtime bind-mount)
@@ -155,8 +157,9 @@ make staging-all / make prod-all    # uses each .env.<env>
 ### DB init
 ```bash
 make db-reset       # recreate schema (FORCE=1 skips confirm)
-make seed           # default settings + test accounts
-make db-fresh       # reset + seed
+make seed           # base seed only — default settings + test accounts
+make seed-security  # register the 13 security agents in the asset catalog (§7.6.1, explicit)
+make db-fresh       # reset + seed (base) — run make seed-security separately if needed
 ```
 
 ---

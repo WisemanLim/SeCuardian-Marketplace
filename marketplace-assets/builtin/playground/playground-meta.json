@@ -1,0 +1,28 @@
+{
+  "key": "playground",
+  "name": "플레이그라운드 (내장 ADDON판)",
+  "type": "service",
+  "description": "프롬프트·모델 조합 대화형 LLM 실험 환경을 제공하는 플레이그라운드 내장 에이전트 ADDON 판 (router_playground 패키징). Ollama 연동으로 실 LLM 호출을 시도하며, 미구성/장애 시 degrade 텍스트로 무중단 응답합니다. 실행 이력은 인메모리 deque 로 보관합니다.",
+  "description_en": "Playground built-in agent ADDON packaging (router_playground). Provides interactive LLM experimentation with prompt/model combinations. Calls Ollama for real LLM inference and gracefully degrades when unconfigured. Run history is kept in an in-memory deque.",
+  "version": "1.0.0",
+  "endpoints": [
+    {"method": "GET", "path": "/status", "auth": true, "description": "Playground agent status (Ollama URL/model, run count)"},
+    {"method": "POST", "path": "/run", "auth": true, "description": "Execute a prompt via Ollama (degrades gracefully)"},
+    {"method": "GET", "path": "/runs", "auth": true, "description": "List recent run history (newest first)"},
+    {"method": "GET", "path": "/runs/{run_id}", "auth": true, "description": "Get single run detail"},
+    {"method": "DELETE", "path": "/runs", "auth": true, "description": "Clear all in-memory run history"}
+  ],
+  "env_vars": [
+    {"name": "PLAYGROUND_ENABLED", "default": "true", "description": "Enable playground LLM execution"},
+    {"name": "PLAYGROUND_OLLAMA_URL", "default": "http://localhost:11434", "description": "Ollama base URL for LLM calls"},
+    {"name": "PLAYGROUND_OLLAMA_MODEL", "default": "llama3.2", "description": "Default Ollama model name"},
+    {"name": "PLAYGROUND_MAX_RUNS", "default": "200", "description": "Max in-memory run history"}
+  ],
+  "dependencies": ["httpx"],
+  "db_tables": [],
+  "base_agent": {
+    "agent_key": "playground",
+    "source": "app/routers/router_playground.py",
+    "platform": "SeCuardian-Marketplace"
+  }
+}

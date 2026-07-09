@@ -7,7 +7,7 @@ import {
   getMcpConfig, upsertMcpConfig, getMcpStatus, deleteMcpConfig, McpConfig, McpStatusColor,
 } from "../../api/mcpConfig";
 import { getUiConfig } from "../../api/settings";
-import { registerAsset, ASSET_KINDS } from "../../api/marketplace";
+import { registerAsset, uploadAssetZip, ASSET_KINDS } from "../../api/marketplace";
 import { getAuth } from "../../store/auth";
 import { pickDescription } from "../../store/locale";
 import { useLocale } from "../../hooks/useLocale";
@@ -118,19 +118,21 @@ function AgentAvatar({ agentKey, name }: { agentKey: string; name: string }) {
   );
 }
 
-// 내장 에이전트 한정 7종 — Orchestrator·AI 어시스턴트·마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일.
-// 그 외 tbl_agent_config 행(보안 도메인 등)은 '시스템 에이전트'로 분류.
+// 코어 내장 7종 — Orchestrator·AI 어시스턴트·마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일.
+// §7.6.1: 탭 분류에는 미사용(내장/시스템 탭 통합) — MCP 노출 판정(required 에이전트 허용)에만 사용.
 const BUILTIN_KEYS = new Set([
   "general", "chat", "marketplace", "workflow", "rag", "playground", "guardrails",
 ]);
 
-type Tab = "builtin" | "system" | "addon";
+type Tab = "builtin" | "addon";
 
-// 마켓플레이스 자산 등록 모달 — '시스템 에이전트' 탭 상단 '자산 등록' 버튼에서 호출.
+// 마켓플레이스 자산 등록 모달 — '내장 에이전트'(통합) 탭 상단 '자산 등록' 버튼에서 호출.
 // 기존 마켓플레이스 화면의 등록 폼을 에이전트 관리로 통합(요구 R+, registerAsset 재사용).
+// §7.6.1: addon ZIP(스캐폴드 형식 {key}-app.py + {key}-meta.json) 첨부 시 설치에서 hot-deploy.
 function AssetRegisterModal({ onClose }: Readonly<{ onClose: () => void }>) {
   const { t } = useLocale();
   const [form, setForm] = useState({ asset_key: "", name: "", kind: "agent", description: "" });
+  const [zipFile, setZipFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -140,6 +142,7 @@ function AssetRegisterModal({ onClose }: Readonly<{ onClose: () => void }>) {
     setBusy(true);
     try {
       await registerAsset(form);
+      if (zipFile) await uploadAssetZip(form.asset_key.trim(), zipFile);
       onClose();
     } catch (e) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
@@ -181,6 +184,14 @@ function AssetRegisterModal({ onClose }: Readonly<{ onClose: () => void }>) {
             {t("agent.assetDesc")}
             <input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
+          </label>
+          {/* §7.6.1: addon ZIP(스캐폴드 형식) 첨부 — 선택 사항, 설치 시 hot-deploy */}
+          <label className="text-xs text-gray-500 col-span-2">
+            {t("agent.assetZip")}
+            <input type="file" accept=".zip"
+              onChange={(e) => setZipFile(e.target.files?.[0] ?? null)}
+              className="mt-0.5 w-full text-sm text-gray-500 file:mr-2 file:text-xs file:px-2 file:py-1 file:rounded file:border file:border-gray-300 dark:file:border-gray-600 file:bg-gray-50 dark:file:bg-gray-800 file:text-gray-600 dark:file:text-gray-300" />
+            <span className="block mt-0.5 text-[11px] text-gray-400">{t("agent.assetZipHint")}</span>
           </label>
           {error && <p role="alert" className="text-xs text-red-500 col-span-2">{error}</p>}
           <button onClick={submit} disabled={busy}
@@ -371,9 +382,8 @@ export default function AgentsPage() {
   }
 
   const userAddonKeys = new Set(addons.filter((a) => !a.is_builtin).map((a) => a.agent_key));
-  // 내장(한정 7종) / 시스템(그 외) 분리 — 둘 다 tbl_agent_config 소스, 사용자 Addon 은 제외
-  const builtinConfigs = configs.filter((c) => !userAddonKeys.has(c.agent_key) && BUILTIN_KEYS.has(c.agent_key));
-  const systemConfigs = configs.filter((c) => !userAddonKeys.has(c.agent_key) && !BUILTIN_KEYS.has(c.agent_key));
+  // §7.6.1 탭 통합: tbl_agent_config 전체(사용자 Addon 제외)를 '내장 에이전트' 단일 탭으로 표시
+  const builtinConfigs = configs.filter((c) => !userAddonKeys.has(c.agent_key));
   const userAddons = addons.filter((a) => !a.is_builtin);
   // export 가능 대상 = tbl_addon_agents 에 소스가 등록된 에이전트 (내장 포함) — F26/F27
   const exportableKeys = new Set(addons.map((a) => a.agent_key));
@@ -639,10 +649,10 @@ export default function AgentsPage() {
       {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 */}
       <p className="text-sm text-gray-500 dark:text-gray-400">{t("agent.pageDesc")}</p>
 
-      {/* Tabs: 내장 / 시스템 / ADDON */}
+      {/* Tabs: 내장(통합) / ADDON — §7.6.1 내장·시스템 탭 통합 */}
       <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
         <div className="flex gap-1">
-          {(["builtin", "system", "addon"] as Tab[]).map((tb) => (
+          {(["builtin", "addon"] as Tab[]).map((tb) => (
             <button
               key={tb}
               type="button"
@@ -655,13 +665,13 @@ export default function AgentsPage() {
             >
               {t(`agent.${tb}`)}
               <span className="ml-1.5 text-[11px] font-normal text-gray-400 dark:text-gray-500">
-                {tb === "builtin" ? builtinConfigs.length : tb === "system" ? systemConfigs.length : userAddons.length}
+                {tb === "builtin" ? builtinConfigs.length : userAddons.length}
               </span>
             </button>
           ))}
         </div>
-        {/* 시스템 에이전트 → '자산 등록'(마켓플레이스), Addon → '새 Agent 만들기' — 동일 위치 (R+) */}
-        {tab === "system" && isAdmin && (
+        {/* 내장(통합) → '자산 등록'(마켓플레이스), Addon → '새 Agent 만들기' — 동일 위치 (R+, §7.6.1) */}
+        {tab === "builtin" && isAdmin && (
           <button
             type="button"
             onClick={() => setShowAssetRegister(true)}
@@ -683,26 +693,17 @@ export default function AgentsPage() {
         )}
       </div>
 
-      {/* Card deck */}
+      {/* Card deck — §7.6.1: 통합 '내장 에이전트' 탭 = 전체 config 카드 + 자산 카탈로그 */}
       {tab === "builtin" && (
-        builtinConfigs.length === 0 ? (
-          <p className="text-sm text-gray-400 dark:text-gray-500">{t("agent.noAgents")}</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {builtinConfigs.map((c) => <BuiltinCard key={c.agent_key} c={c} />)}
-          </div>
-        )
-      )}
-      {tab === "system" && (
         <div className="space-y-6">
-          {systemConfigs.length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500">{t("agent.noSystem")}</p>
+          {builtinConfigs.length === 0 ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500">{t("agent.noAgents")}</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {systemConfigs.map((c) => <BuiltinCard key={c.agent_key} c={c} />)}
+              {builtinConfigs.map((c) => <BuiltinCard key={c.agent_key} c={c} />)}
             </div>
           )}
-          {/* 마켓플레이스 자산 카탈로그(로컬+원격) 통합 — 설치 시 시스템/Addon 에이전트로 편입 */}
+          {/* 마켓플레이스 자산 카탈로그(로컬+원격) — 설치 시 내장 탭/Addon 에이전트로 편입 */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
             <MarketplacePage />
           </div>

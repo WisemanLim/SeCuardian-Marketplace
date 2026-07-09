@@ -23,38 +23,27 @@
 
 ```
 addon-agents/
-├── _templates/              개발용 템플릿 (완성본 zip 포함)
-│   ├── Board/               App Agent — 게시판 + 댓글
-│   │   ├── Board-app.py
-│   │   ├── Board-front.tsx
-│   │   ├── Board-sql.sql
-│   │   └── Board-meta.json
-│   ├── RagAgent/            RAG Agent — 문서 임베딩 + 벡터 검색 Q&A
-│   │   ├── RagAgent-app.py
-│   │   ├── RagAgent-sql.sql
-│   │   └── RagAgent-meta.json
-│   ├── ServiceAgent/        Service Agent — 백엔드 비즈니스 로직
-│   │   ├── ServiceAgent-app.py
-│   │   └── ServiceAgent-meta.json
-│   ├── ToolProxyAgent/      Tool Proxy Agent — 외부 API → MCP 어댑터
-│   │   ├── ToolProxyAgent-app.py
-│   │   └── ToolProxyAgent-meta.json
-│   ├── ShellAgent/          Shell Agent — 서버 상태 점검 CLI/셸 터미널 (읽기 전용)
-│   │   ├── ShellAgent-app.py
-│   │   ├── ShellAgent-front.tsx
-│   │   └── ShellAgent-meta.json
-│   ├── Board.zip            ↗ 등록 가능한 완성 패키지
-│   ├── RagAgent.zip
-│   ├── ServiceAgent.zip
-│   ├── ToolProxyAgent.zip
-│   └── ShellAgent.zip
+├── Makefile                 스캐폴드 개발 도우미 (init/test/publish → marketplace-assets/addon)
 └── deployed/                업로드 후 자동 생성 (내장 에이전트 제외: 직접 편집 금지)
     └── {agent_key}/
         ├── {AgentName}-app.py
         ├── {AgentName}-front.tsx   (선택)
         ├── {AgentName}-sql.sql     (선택)
         └── {AgentName}-meta.json
+
+marketplace-assets/            ← 모든 자산 소스 일원화 (§7.6.1-7)
+├── security/    (13)          vasca-cve · cilium-netpol · … · ai-eval-gate
+├── builtin/     (5)           marketplace · workflow · rag · playground · guardrails
+├── addon/       (5)           Board · RagAgent · ServiceAgent · ShellAgent · ToolProxyAgent  ← 스캐폴드 템플릿
+└── utilities/   (6)           UserManager · server-shell · ai-traffic-monitor · caddy-proxy · grafana-dashboard · truffle-scan
+    각 {key}/ 소스 디렉터리 + {key}.zip 업로드 패키지
 ```
+
+> **§7.6.1-7 (2026-07-09)**: `addon-agents/{zip,_templates}` 를 폐지하고 모든 자산 소스를
+> **`marketplace-assets/<카테고리>/`** 로 일원화했다. 스캐폴드 템플릿은 `marketplace-assets/addon/`
+> — 템플릿 목록/다운로드/스캐폴더 API 는 이 경로만 조회한다. `addon-agents/` 에는 런타임 산출물
+> `deployed/`(bind mount)와 개발용 `Makefile` 만 남는다.
+> `marketplace-assets/` 는 `.dockerignore` 미제외로 컨테이너 이미지에 포함된다.
 
 > **내장 에이전트** (`deployed/board/`)는 git에 포함되어 있으며 앱 시작 시 자동 로드됩니다.
 
@@ -74,17 +63,16 @@ addon-agents/
 > `-app.py` 또는 `-front.tsx` 중 최소 하나 필요합니다.  
 > zip 내부는 서브디렉터리 없이 파일만 포함해야 합니다.
 
-### emb_ prefix — 내장 유래 에이전트 명명 규약
+### 명명 규약 (§7.6.1-6 — 구 emb_ prefix 폐지)
 
-- **`emb_` prefix** = 플랫폼 내장(embedded) 에이전트의 ADDON 판 표식 (예: `emb_vasca-cve`, `emb_cilium-netpol`).
-  순수 ADDON(내장 tbl_agent_config 목록에 없는 에이전트, 예: `caddy-proxy`·`grafana-dashboard`·`truffle-scan`)
-  은 prefix 없이 명명하여 서로 구별합니다.
-- **내장 에이전트 자체의 key 와 에이전트 관리 '내장 에이전트' 탭 표출 이름에는 emb_ 를 붙이지 않습니다** —
-  emb_ 는 ADDON 패키징(zip·addon key)에만 적용됩니다.
-- 내장 에이전트를 ADDON 화하거나 추가 구현할 때는 **반드시 `emb_` prefix** 를 사용하고
-  `addon-agents/zip/emb_{key}/` 에 소스, `addon-agents/zip/emb_{key}.zip` 으로 패키징합니다.
-- meta.json 의 `key`(또는 `agent_key`) 필드도 `emb_` prefix 를 포함해야 하며,
-  `base_agent` 필드에 원본 내장 라우터 출처를 기록합니다.
+- 모든 패키지는 **prefix 없는 tbl_agent_config key 그대로** 명명합니다
+  (예: `rag`, `guardrails`, `vasca-cve`). 구 `emb_` prefix 규약(내장 유래 ADDON 판 표식)은
+  2026-07-09 §7.6.1-6 으로 폐지되었습니다.
+- prefix 없는 zip 업로드는 **config 키 선재 시 `is_builtin=1`** 로 내장 판에 등록되어
+  ADDON 탭과 중복되지 않습니다.
+- 내장 에이전트를 ADDON 화할 때는 `marketplace-assets/<카테고리>/{key}/` 에 소스,
+  `marketplace-assets/<카테고리>/{key}.zip` 으로 패키징하고(카테고리: builtin/utilities 등), meta.json 의 `key`(또는 `agent_key`) 필드는
+  config key 와 동일하게, `base_agent` 필드에 원본 내장 라우터 출처를 기록합니다.
 - ⚠️ addon `-app.py` 에서 `from __future__ import annotations` 는 사용 금지 —
   동적 로더(`spec_from_file_location`)가 모듈을 `sys.modules` 에 등록하지 않아
   pydantic 이 지연 어노테이션(request body 모델)을 해석하지 못해 500 오류가 발생합니다.
@@ -96,7 +84,7 @@ addon-agents/
 - `mx-auto`(가운데 정렬) 금지, `max-w-4xl/5xl` 등 개별 폭 지정 금지 — `.page` 로 표준화.
 - 예: `<div className="page space-y-4"> … </div>` (그리드면 `page grid grid-cols-3 gap-4`).
 - **예외**: 채팅·터미널 등 **전체높이 인터랙티브 레이아웃**(`flex flex-col h-full`)은 `.page` 미적용
-  (AI 어시스턴트·ShellAgent·emb_server-shell 등). 그 외 콘텐츠·폼 화면은 모두 `.page` 준용.
+  (AI 어시스턴트·ShellAgent·server-shell 등). 그 외 콘텐츠·폼 화면은 모두 `.page` 준용.
 
 ---
 
@@ -116,9 +104,9 @@ make clean   AGENT=Survey   # 생성 파일 삭제
 
 | 타겟 | 설명 |
 |------|------|
-| `make init AGENT=<name>` | Board 템플릿 복사 + `Board` → `<name>` 치환 → `_templates/<name>/` 생성 |
+| `make init AGENT=<name>` | Board 템플릿 복사 + `Board` → `<name>` 치환 → `marketplace-assets/addon/<name>/` 생성 |
 | `make test AGENT=<name>` | 파일 존재·Python 문법·router export·SQL 구조·React export 검증 |
-| `make publish AGENT=<name>` | `_templates/<name>.zip` 생성 (업로드 준비) |
+| `make publish AGENT=<name>` | `marketplace-assets/addon/<name>.zip` 생성 (업로드 준비) |
 | `make clean AGENT=<name>` | 생성된 디렉터리 및 zip 삭제 |
 
 ---
@@ -278,13 +266,13 @@ Orchestrator의 capability-based routing과 거버넌스 게이트에서 사용�
 ```bash
 # Makefile 사용 (권장)
 make publish AGENT=MyFeature
-# → _templates/MyFeature.zip 생성
+# → marketplace-assets/addon/MyFeature.zip 생성
 
 # 수동
-zip -j _templates/MyFeature.zip \
-    _templates/MyFeature/MyFeature-app.py \
-    _templates/MyFeature/MyFeature-front.tsx \
-    _templates/MyFeature/MyFeature-sql.sql
+zip -j marketplace-assets/addon/MyFeature.zip \
+    marketplace-assets/addon/MyFeature/MyFeature-app.py \
+    marketplace-assets/addon/MyFeature/MyFeature-front.tsx \
+    marketplace-assets/addon/MyFeature/MyFeature-sql.sql
 ```
 
 ### 업로드 절차
@@ -361,34 +349,18 @@ addon-agents/deployed/{agent_key}/ 에 파일 저장
 |-------|------|------|
 | **Board** | 게시판 (글쓰기·수정·삭제, 댓글 작성·삭제, 페이지네이션) | `/addon/board` |
 
-### 내장 에이전트 ADDON 판 (`zip/emb_*`) + 순수 ADDON
+### 자산 카탈로그 (`marketplace-assets/<카테고리>/`, §7.6.1-7 — 무 prefix)
 
-플랫폼 내장 에이전트(tbl_agent_config 시드)의 ADDON 패키징은 `emb_` prefix, 내장 목록에 없는
-순수 ADDON 은 prefix 없이 관리합니다. `addon-agents/zip/{key}.zip` 을 에이전트 관리에서
-업로드하면 `/api/addon/{key}` 로 배포됩니다.
+모든 ADDON 패키징은 **config key 그대로**(구 `emb_` prefix 폐지) 관리합니다.
+`marketplace-assets/<카테고리>/{key}.zip` 을 에이전트 관리에서 업로드하면 `/api/addon/{key}` 로 배포됩니다
+(내장 config 키 선재 시 `is_builtin=1`).
 
-**내장 유래 (`emb_`) 13종:**
-
-| # | ADDON key | 원본 내장 | 비고 |
-|---|-----------|----------|------|
-| 1 | `emb_agentic-soc` | agentic-soc | Agentic SOC 오케스트레이션 |
-| 2 | `emb_ai-eval-gate` | ai-eval-gate (router_ai_eval) | **신규 포팅** — PyRIT/SkillSpector 게이트 |
-| 3 | `emb_ai-redteam` | ai-redteam | ⚠️ isolated |
-| 4 | `emb_behavior-noti` | behavior-noti | C++ 행위 알림 |
-| 5 | `emb_cilium-netpol` | cilium-netpol | eBPF 네트워크 정책 |
-| 6 | `emb_isms-p-evidence` | isms-p-evidence (router_isms) | **신규 포팅** — ISMS-P 증거 수집 |
-| 7 | `emb_neosync-dlp` | neosync-dlp | DLP 파이프라인 |
-| 8 | `emb_otel-collector` | otel-collector | OTel 관측성 |
-| 9 | `emb_shuffle-soar` | shuffle-soar | SOAR 워크플로 |
-| 10 | `emb_teleport-pam` | teleport-pam | PAM 감사 |
-| 11 | `emb_teler-ids` | teler-ids | HTTP IDS |
-| 12 | `emb_vasca-cve` | vasca-cve (router_vasca) | **신규 포팅** — CVE 스캔 |
-| 13 | `emb_velociraptor-dfir` | velociraptor-dfir | DFIR 수집 |
-
-**순수 ADDON (prefix 없음) 4종:** `caddy-proxy`(리버스 프록시 모니터) · `grafana-dashboard`(대시보드 RAG + sql) · `truffle-scan`(시크릿 스캔 수신) · `ai-traffic-monitor`(브라우저 AI 도우미 트래픽 사용량 모니터 — vnstat/nethogs/tcpdump/tshark 래핑)
+- **`builtin/`** (5): SeCMP 내장 — `marketplace` · `workflow` · `rag` · `playground` · `guardrails`(룰셋 데이터 동봉)
+- **`utilities/`** (6): `UserManager` · `server-shell` · `caddy-proxy`(리버스 프록시 모니터) · `grafana-dashboard`(대시보드 RAG + sql) · `truffle-scan`(시크릿 스캔 수신) · `ai-traffic-monitor`(브라우저 AI 트래픽 모니터)
+- **`addon/`** (6): 스캐폴드 템플릿 — `Board` · `RagAgent` · `ServiceAgent` · `ShellAgent` · `ToolProxyAgent`
+- **`security/`** (13): `vasca-cve` · `cilium-netpol` · `teler-ids` · `shuffle-soar` · `neosync-dlp` · `otel-collector` · `teleport-pam` · `velociraptor-dfir` · `ai-redteam` · `isms-p-evidence` · `behavior-noti` · `agentic-soc` · `ai-eval-gate` — `make seed-security` 로 자산 카탈로그(category=security)에 등록해 설치 방식으로 제공(§7.6.1).
 
 > `general`(Orchestrator)·`chat`(AI 어시스턴트) 은 required 코어로 ADDON 화 대상에서 제외.
-> 신규 포팅 3종은 내장판(settings 기반)과 달리 **환경변수 기반 설정**이며 인메모리 저장소는 내장판과 독립입니다.
 
 ---
 

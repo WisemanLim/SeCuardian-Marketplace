@@ -502,6 +502,64 @@ TENANT_DEFAULT_ID=default                  # off 모드일 때 사용할 고정 
 - 신규: **카탈로그**(자산 메타·버전·카테고리·거버넌스·필요 env·리뷰), **설치 트랜잭션**(upload 파이프라인 래핑 + 롤백), **버전관리**(meta.version + min_platform_version, 1차 단일 활성), **원격 레지스트리**(§7.3). 자산 유형: `agent` / `workflow` / `rag-pipeline` / `tool-proxy connector`.
 - 설치 = 기존 hot-deploy 파이프라인(SQL→`load_router()`→config upsert→OpenAPI 캐시버스트) — 로컬/원격 공통.
 
+### 7.6.1 에이전트 통합 관리 — 탭 통합 + 보안 에이전트 자산 카탈로그 이관 (F-MP 확장, impl/36 · 물리 test/impl/34) — 사용자 요구(2026-07-09)
+
+**목표**: 모든 에이전트를 SeCuardian-Marketplace 에서 일원 관리한다(SeCuardian PRD §20 연동).
+
+1. **탭 통합**: 에이전트 관리 허브의 `내장 에이전트`/`시스템 에이전트` 2개 탭(impl/20, v0.16)을
+   **`내장 에이전트` 단일 탭으로 통합** — `tbl_agent_config` 전체(사용자 Addon 제외)를 한 그리드로
+   표시하고, 자산 카탈로그(로컬+원격)와 `자산 등록` 버튼을 통합 탭으로 이동.
+   `Addon 에이전트` 탭·기능은 무변경 유지. `BUILTIN_KEYS` 분류 셋·`system` 탭 제거.
+2. **보안 에이전트 자산 카탈로그 이관**: 종전 '시스템 에이전트'로 표출되던 SeCuardian 내장
+   보안 13종(vasca-cve·cilium-netpol·teler-ids·shuffle-soar·neosync-dlp·otel-collector·
+   teleport-pam·velociraptor-dfir·ai-redteam·isms-p-evidence·behavior-noti·agentic-soc·
+   ai-eval-gate — Orchestrator `general`·AI 어시스턴트 `chat` 제외)을
+   **marketplace_assets(kind=agent, category=security) 자산으로 등록**해 카탈로그 설치 방식으로 제공.
+   - emb_ 패키지 13종은 `addon-agents/zip`·`_templates` 에서 제거하고
+     **`marketplace-assets/security/`** 로 이동(소스 디렉터리+zip) — zip 블롭은 설치 시 hot-deploy 에 사용.
+   - `scripts/seed.py`(=`make seed`)에서 보안 13종 `tbl_agent_config` 시드를 제거(기반 시드만),
+     **`scripts/seed_security.py`(=`make seed-security`)** 가 카탈로그 등록(자산 메타 ko/en +
+     `marketplace_asset_blobs` zip 블롭 + sha256 checksum)을 멱등 수행.
+   - 설치(`POST /api/marketplace/install/{key}`) 시 기존 계약 그대로 `tbl_agent_config` upsert
+     (`nav_group='marketplace'`) + zip 블롭 hot-deploy — 통합 '내장 에이전트' 탭에 편입.
+3. **zip 스캐폴드 등록 UI**: `자산 등록` 모달에서 카탈로그 메타 등록과 함께 **addon ZIP
+   (스캐폴드 형식: `{key}-app.py`+`{key}-meta.json`[+front/sql]) 첨부 업로드**를 지원 —
+   기존 `POST /api/marketplace/catalog/{asset_key}/zip`(impl/14) 재사용, 백엔드 무변경.
+4. **템플릿 정리(SeCuardian §20.1 동일 적용)**: `_templates/` 는 Board 만 잔류, 나머지 5종
+   (RagAgent·ServiceAgent·ShellAgent·ToolProxyAgent·UserManager)은 `addon-agents/zip/` 으로 이동.
+   템플릿 목록/다운로드/스캐폴더 API 는 `_templates/`→`zip/` fallback 으로 기능 무변경.
+5. **중복 제거 결과(2026-07-09 전수 비교)**: SeCuardian ↔ SeCMP `addon-agents/zip` 공유 18종 동일,
+   `_templates` 는 SeCMP 측이 최신(`.page` 리팩터) — **최신 버전 관리 주체 = SeCuardian-Marketplace**.
+6. **오류 수정(2026-07-09, impl/37 · 물리 test/impl/35) — emb_ 규약 폐지 + SeCuardian zip 최종 정리**
+   (SeCuardian PRD §20.4 연동):
+   - 모든 패키지에서 `emb_` prefix 제거 — 디렉터리·zip·내부 파일명·meta `key`
+     (`addon-agents/zip/`: marketplace·workflow·rag·playground·guardrails·server-shell,
+     `marketplace-assets/security/`: 보안 13종). `scripts/seed_security.py` 블롭 경로 동기
+     (`{key}.zip`).
+   - prefix 없는 zip 업로드/hot-deploy 는 config 키 선재 시 `is_builtin=1` 등록(기존 호환 경로) —
+     내장 탭과 ADDON 탭 간 중복 없음.
+   - SeCuardian `addon-agents/zip/` 은 보안 내장 13종만 잔류 — 템플릿 5종·server-shell·
+     순수 ADDON 4종은 SeCMP 이전(동일본 확인) 후 SeCuardian 에서 삭제.
+7. **자산 디렉터리 재구성(2026-07-09, impl/38 · 물리 test/impl/36) — `addon-agents/zip` 폐지 + 카테고리별 이관**
+   (사용자 요구): SeCMP 의 모든 자산 소스를 **`marketplace-assets/<카테고리>/`** 로 일원화한다.
+   `addon-agents/zip/` 은 폐지하고, `addon-agents/` 에는 런타임 산출물 `deployed/` 만 남긴다.
+   - **`marketplace-assets/security/`** (13, 유지): vasca-cve·cilium-netpol·teler-ids·shuffle-soar·
+     neosync-dlp·otel-collector·teleport-pam·velociraptor-dfir·ai-redteam·isms-p-evidence·
+     behavior-noti·agentic-soc·ai-eval-gate. zip/ 에 잔존하는 security 는 여기로 이관하되
+     **이미 존재하면 zip/ 사본을 삭제**(중복 제거).
+   - **`marketplace-assets/builtin/`** (5, 신규): SeCMP 내장 에이전트 ADDON 판 —
+     marketplace·workflow·rag·playground·guardrails.
+   - **`marketplace-assets/addon/`** (5, 신규): addon 관리 zip 업로드/스캐폴더 **템플릿 경로**
+     대상 — Board·RagAgent·ServiceAgent·ShellAgent·ToolProxyAgent (`_TYPE_TEMPLATE` 매핑 대상)
+     + `_templates/Board` 이관. `addon-agents/_templates/` 도 폐지.
+   - **`marketplace-assets/utilities/`** (6, 신규): 그 외 유틸리티/순수 ADDON —
+     UserManager·server-shell·ai-traffic-monitor·caddy-proxy·grafana-dashboard·truffle-scan.
+   - **코드 영향**: `router_addon_agent.py` 의 템플릿 조회 기준 경로를
+     `addon-agents/{_templates,zip}` → **`marketplace-assets/addon`** 로 전환
+     (`_TYPE_TEMPLATE` 값 dir 그대로, 목록/다운로드/스캐폴더 기능 무변경). `_ZIP_CATALOG`/
+     `_ZIP_TEMPLATE_NAMES` fallback 제거. `deployed/`(bind mount)·seed_security(security 경로)는 무변경.
+   - **이미지 포함**: `marketplace-assets/` 는 `.dockerignore` 미제외(`COPY . .`) → 컨테이너에 포함.
+
 ### 7.7 Playground (F-PG)
 
 - 프롬프트/모델/에이전트/RAG 컬렉션 조합 대화형 실험, A/B 비교(응답·비용·지연·인용), eval 실행. 승격 경로: Playground → Workflow 노드 / Marketplace 게시.
@@ -902,6 +960,9 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 | 2026-07-09 | v0.28 | **impl/32(물리 `test/impl/30`) — F-WF 풀스크린 워크플로우 빌더**(사용자 요구, §7.2.8). impl/27 편집형 캔버스가 생성 패널 내 320px 보조 위젯에 그쳐 "현재 구현 코드로는 사용할 수 없다"는 사용자 피드백 접수 — `.docs/Perplexity-Workflow/`·No-code/Low-code·Marketplace 리서치의 **팔레트→캔버스 drag&drop→인스펙터** 3분할 빌더 패턴(Flowise/Dify/n8n 공통)을 준용해 재구현. **코드 복제 없이 UX 패턴만 참조**(React Flow MIT 자체 구현, 상용/추가조건 라이선스 구성요소 제외). (1) 프론트 신규 `/workflow/builder(/:id)` + `WorkflowBuilderPage` — 좌측 팔레트(8노드+§7.2.3 컴포넌트, HTML5 드래그+클릭 삽입), 중앙 풀높이 캔버스(타입별 커스텀 노드), 우측 인스펙터(타입별 구조화 폼+JSON 폴백+엣지 `when` 편집 — §7.2.5 유보 해소). (2) 백엔드 `PATCH /workflows/{id}` 부분 편집 확장(name/description/definition_json, definition 변경 시 version+1, `{"enabled"}` 단독 하위호환 — §7.2.7 범위 확장). KWCAG 2.2 는 기존 a11y 폼 병행+인스펙터 표준 폼으로 유지. 시험 test/impl/30. **후속 결함 수정(같은 날)**: 캔버스 노드 미표시 버그 — React Flow v12 는 노드 측정값(`measured`)이 컨트롤드 상태에 반영돼야 `visibility:hidden` 을 해제하는데, 매 렌더 rfNodes 를 도메인 상태에서 재생성해 measured 가 소실(impl/18 부터 잠재, 정적 검증만 수행돼 미발견). 빌더는 RF 상태를 단일 진실로 전환, `WorkflowCanvas` 는 measured 보존 merge-sync 로 수정 — headless Chromium E2E(팔레트 삽입→저장→재로드→폼 동기화)로 실측 검증(test/impl/30 §D). |
 | 2026-07-09 | v0.27 | **impl/31(물리 `test/impl/29`) — F-RAG pgvector 실측 벤치마크**(사용자 요구·승인, §7.5.1). 사용자가 "순차적으로 진행" 지정한 후속 3항목의 마지막(webhook 보안 강화→enabled 토글→**pgvector 실측**). 도커 이미지 pull+실 컨테이너 기동이 필요해 별도 승인 후 진행. **발견**: `docker-compose.yml` postgres 서비스가 plain `postgres:17-alpine` 이미지라 `vector` 확장이 없었고, impl/15 `ensure_pg_schema()` 가 예외를 삼키고 조용히 local 폴백하는 설계라 지금까지 드러나지 않았던 잠재 결함 — **`pgvector/pgvector:pg17` 로 영구 교체**(임시 우회 아님). `docker compose up -d postgres` → `CREATE EXTENSION vector`(0.8.4) 확인 → `ENV=dev VECTOR_BACKEND=pgvector` 로 앱 부팅해 `vector_backend.resolve()="pgvector"` 실경로 최초 활성화 → 식별자 질의 세트(N=40, impl/4 방법론)로 실 `/api/rag/*` HTTP 경로 실측: **Recall@10=1.000**(목표 ≥0.89 초과 달성), **p95=20.8ms**(목표 ≤250ms, 약 12배 여유). 인프라 검증(이번 목표)과 임베딩 품질(파라프레이즈 재평가, 별도 로드맵)을 분리 보고 — PRD §5 KPI 표에 실측치 반영(더 이상 전량 `가정:` 아님). 벤치마크 후 `docker compose stop postgres` 로 정리(볼륨 보존). 시험 test/impl/29, 기존 test/impl/4·15(sqlite 경로) 회귀 무영향. |
 | 2026-07-09 | v0.26 | **impl/30(물리 `test/impl/28`) — F-WF `enabled` 토글 PATCH 엔드포인트**(사용자 요구, §7.2.7). 사용자가 "순차적으로 진행" 지정한 후속 3항목의 2번째. `PATCH /api/workflows/{id}`(admin/supervisor, `{"enabled": bool}`) 신설 — impl/24 시험이 DB 직접조작으로 우회했던 기존 갭 해소, impl/28(Dify DSL Import, 항상 `enabled=false` 생성) 을 검토 후 활성화하는 실사용 흐름 지원. 1차 범위는 `enabled` 토글만(이름/정의 편집은 범위 밖). 프론트 `WorkflowPage.tsx` 에 활성화/비활성화 토글 버튼 추가. 시험 test/impl/28, 기존 test/impl/2·23·24·26·27 회귀 무영향. |
+| 2026-07-09 | v0.28 | **§7.6.1-7 자산 디렉터리 재구성 — `addon-agents/zip` 폐지(impl/38 · 물리 `test/impl/36`)**(사용자 요구). 모든 자산 소스를 `marketplace-assets/<카테고리>/` 로 일원화: security(13, 기존)·builtin(5: marketplace·workflow·rag·playground·guardrails)·addon(5: 스캐폴드 템플릿 Board·RagAgent·ServiceAgent·ShellAgent·ToolProxyAgent)·utilities(6: UserManager·server-shell·ai-traffic-monitor·caddy-proxy·grafana-dashboard·truffle-scan). `addon-agents/{zip,_templates}` 폐지(deployed/ 만 잔존). `router_addon_agent.py` 템플릿 경로 → `marketplace-assets/addon`(`_ZIP_CATALOG`/`_ZIP_TEMPLATE_NAMES` fallback 제거, 목록/다운로드/스캐폴더 무변경). marketplace-assets 는 `.dockerignore` 미제외로 이미지 포함 | addon-agents/*, marketplace-assets/*, router_addon_agent.py, README(.en), addon-agents/README(.en), test/impl/36 |
+| 2026-07-09 | v0.27 | **§7.6.1-6 오류 수정 — emb_ 규약 폐지(impl/37 · 물리 `test/impl/35`)**(사용자 요구). ① 전 패키지 `emb_` prefix 제거(emb_rag→rag 등) — `addon-agents/zip/` 6종 + `marketplace-assets/security/` 13종 rename(디렉터리·zip·내부 파일명·meta key), `seed_security.py` 블롭 경로 `{key}.zip` 동기 ② prefix 없는 업로드는 config 키 선재 시 is_builtin=1 등록(기존 호환 경로) ③ SeCuardian `addon-agents/zip/` 은 보안 13종(무prefix)만 잔류 — 템플릿 5종·server-shell·순수 4종은 SeCMP 이전 확인 후 삭제(SeCuardian PRD §20.4) |
+| 2026-07-09 | v0.26 | **§7.6.1 신규 요구 등재 — 에이전트 통합 관리(impl/36 · 물리 `test/impl/34`)**(사용자 요구). ① 내장/시스템 탭 → `내장 에이전트` 단일 탭 통합(자산 카탈로그·자산 등록 버튼 편입, Addon 탭 무변경) ② 보안 내장 13종을 `marketplace_assets`(category=security) 자산 카탈로그로 이관 — emb_ 패키지는 `addon-agents/zip` → `marketplace-assets/security/` 이동, `make seed-security`(`scripts/seed_security.py`) 신설, `make seed` 는 기반 시드만 ③ 자산 등록 모달에 addon ZIP(스캐폴드 형식) 첨부 업로드 UI(기존 `/catalog/{key}/zip` 재사용) ④ `_templates` Board 제외 5종 → `zip/` 이동(fallback 으로 기능 유지) ⑤ 전수 비교: 관리 주체 = SeCuardian-Marketplace 확정(SeCuardian PRD §20 연동) |
 | 2026-07-09 | v0.25 | **impl/29(물리 `test/impl/27`) — F-WF webhook 보안 강화**(사용자 요구, §7.2.4.1). impl/25~28 순차 4항목 완료 후 사용자가 "순차적으로 진행"으로 지정한 §9.5 잔여 3항목의 1번째. 시크릿 저장을 **bcrypt(단방향, impl/26) → Fernet 대칭암호**(`cryptography`, `python-jose[cryptography]` 통해 이미 설치되어 신규 의존성 없음)로 전환 — 로테이션·HMAC 검증에 평문 복원이 필요했기 때문(키는 `JWT_SECRET_KEY` 파생, 신규 env 불요). (1) `POST /workflows/{id}/trigger/webhook/rotate`(admin/supervisor) 신설 — 재발급, 구 시크릿 즉시 무효. (2) `X-Webhook-Signature: sha256=<hmac>` 헤더 지원(GitHub 컨벤션) — 기존 `X-Webhook-Secret` 과 **둘 중 하나만 유효하면 통과**(하위호환). (3) 워크플로우별 인메모리 고정윈도우 rate limit(기본 분당 30회, `settings.workflow_webhook_rate_limit_per_min`) — 초과 시 429, 단일 프로세스 한정임을 리스크로 명시. impl/26 발급 workflow 는 재발급(rotate) 1회 필요(하위 마이그레이션 없음, 로컬/개발 단계라 실사용 영향 없음). 시험 test/impl/27, 기존 test/impl/2·23·24·26 회귀 무영향. |
 | 2026-07-09 | v0.24 | **impl/28(물리 `test/impl/26`) — F-WF Dify DSL Import 어댑터 모드 A**(사용자 요구, §7.2.6). 지난 impl/25~27 순차 진행의 3번째(webhook→편집형 캔버스→Dify DSL Import)이자 마지막 지정 항목. §7.2.2 에 이미 문서화된 노드 매핑표(2026-07-08 Dify 공식문서 실측 근거)를 구현: `POST /api/workflows/import/dify-dsl` 신설, `app/services/dify_dsl_adapter.py`(PyYAML 파싱, 기존 의존성 재사용·신규 설치 없음)가 `start/llm/if-else/knowledge-retrieval/http-request/tool/answer/end` 를 SeCMP 8노드로 매핑, **`code`·미인식 타입은 크래시 대신 `transform` 플레이스홀더 + `warnings[]`** 로 명시(§3 code 노드 유보 원칙 유지). Dify 원본 노드 id 보존으로 엣지 정합성 자동 유지, `sourceHandle` true/false → SeCMP `when`. **가져온 워크플로우는 항상 `enabled=false` 로 생성**(사람 검토 강제). 데이터 모델: `workflows.dify_dsl_source`/`dify_dsl_version` 컬럼 추가(sqlite/pg `01_init.sql` + `app/db.py` 컬럼 마이그레이션 양쪽 반영, 기존 로컬 DB 무중단 확장). 시험 test/impl/26(합성 Dify DSL 픽스처로 매핑 전종류 검증), 기존 test/impl/2·23·24 회귀 무영향. |
 | 2026-07-09 | v0.23 | **impl/27(물리 `test/impl/25`) — F-WF 편집형 캔버스**(사용자 요구, §7.2.5). 지난 impl/25·26 완료 후 접수된 유보 항목을 사용자가 지정한 순서(webhook→편집형 캔버스→Dify DSL Import→기타)의 2번째. `WorkflowCanvas.tsx` 를 읽기전용 시각화에서 편집형으로 승격 — React Flow `onNodesChange`/`onEdgesChange`/`onConnect` 로 노드 드래그 이동·핸들 연결·Backspace/Delete 삭제 지원. 좌표는 `definition_json.nodes[].position`(신규 선택적 필드, 스키마 없는 JSON 컬럼이라 백엔드 무변경)에 저장, 좌표 없는 노드는 기존 BFS 자동배치로 폴백. **KWCAG 2.2**: 캔버스 자체는 접근성 대상 아님 — 기존 `DefinitionEditor`(a11y 폼, impl/3)가 캔버스와 동일한 `nodes`/`edges` 상위 상태를 공유하는 대체편집기로 계속 병행되어 키보드 전용 사용자도 전체 기능 사용 가능. 시험 test/impl/25(tsc 0오류 + 좌표 왕복 로직 단위검증), 기존 test/impl/2·23·24 회귀 무영향. |

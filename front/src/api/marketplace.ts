@@ -50,6 +50,19 @@ export async function registerAsset(body: {
   return data;
 }
 
+// §7.6.1: 자산 등록 시 addon ZIP(스캐폴드 형식) 첨부 — 설치 시 hot-deploy 에 사용
+export async function uploadAssetZip(assetKey: string, file: File, version?: string): Promise<{
+  asset_key: string; version: string; checksum: string; size: number;
+}> {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await client.post(`/marketplace/catalog/${assetKey}/zip`, form, {
+    params: version ? { version } : undefined,
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+}
+
 export async function installAsset(assetKey: string, version?: string): Promise<MarketplaceInstall> {
   const { data } = await client.post<MarketplaceInstall>(
     `/marketplace/install/${assetKey}`,

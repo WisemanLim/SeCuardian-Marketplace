@@ -1,0 +1,65 @@
+{
+  "key": "teler-ids",
+  "name": "Teler HTTP IDS",
+  "type": "service",
+  "epic": "E11",
+  "layer": "L4",
+  "layer_name": "Application",
+  "description": "teler HTTP 침입 탐지(IDS) 알림을 웹훅으로 수신하고 조회·통계를 제공하는 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "description_en": "teler HTTP Intrusion Detection System alert receiver. Accepts webhook POSTs from teler, stores alerts in an in-memory deque, and exposes query/stats endpoints. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
+  "version": "1.0.0",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/alerts",
+      "auth": false,
+      "description": "Receive teler webhook alert"
+    },
+    {
+      "method": "GET",
+      "path": "/alerts",
+      "auth": true,
+      "description": "List alerts with optional category/severity filter"
+    },
+    {
+      "method": "DELETE",
+      "path": "/alerts",
+      "auth": true,
+      "role": "admin",
+      "description": "Clear all alerts"
+    },
+    {
+      "method": "GET",
+      "path": "/status",
+      "auth": true,
+      "description": "Webhook status and alert counts"
+    },
+    {
+      "method": "GET",
+      "path": "/stats",
+      "auth": true,
+      "description": "Category and severity breakdown"
+    },
+    {
+      "method": "GET",
+      "path": "/config",
+      "auth": true,
+      "role": "admin",
+      "description": "Active env-var configuration"
+    }
+  ],
+  "env_vars": [
+    {
+      "key": "TELER_WEBHOOK_ENABLED",
+      "default": "true",
+      "description": "Enable/disable webhook receiver"
+    },
+    {
+      "key": "TELER_ALERTS_MAX",
+      "default": "500",
+      "description": "Maximum alerts kept in memory (deque maxlen)"
+    }
+  ],
+  "dependencies": [],
+  "db_tables": false
+}

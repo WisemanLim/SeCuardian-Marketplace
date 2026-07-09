@@ -13,9 +13,11 @@
 
 AGENT       ?= MyAgent
 AGENT_LC     = $(shell echo '$(AGENT)' | tr '[:upper:]' '[:lower:]')
-TMPL_SRC    := _templates/Board
-TMPL_DIR    := _templates/$(AGENT)
-ZIP_OUT     := _templates/$(AGENT).zip
+# §7.6.1-7: 스캐폴드 템플릿은 marketplace-assets/addon/ 로 이관 (구 _templates 폐지)
+TMPL_BASE   := ../marketplace-assets/addon
+TMPL_SRC    := $(TMPL_BASE)/Board
+TMPL_DIR    := $(TMPL_BASE)/$(AGENT)
+ZIP_OUT     := $(TMPL_BASE)/$(AGENT).zip
 PY          := $(shell test -f ../.venv/bin/python && echo ../.venv/bin/python || echo python3)
 
 .DEFAULT_GOAL := help

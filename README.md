@@ -30,7 +30,9 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
-> **UI 구성(impl/20)**: 별도 `에이전트 관리` 메뉴 없이 **마켓플레이스 메뉴가 통합 에이전트 허브**다. 상단탭 3분류 — **내장 에이전트**(Orchestrator·AI 어시스턴트·마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일 7종 한정) / **시스템 에이전트**(보안 도메인 등 그 외) / **Addon 에이전트**(사용자 업로드). 내장 5종(마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일)은 **REQUIRED(비활성 불가)**. `자산 등록`은 시스템 에이전트 탭(Addon 탭 `새 Agent 만들기`와 동일 위치), 자산 카탈로그(로컬·원격)는 그 하단에 편입.
+> **UI 구성(impl/20 → impl/36·물리 `test/impl/34`, §7.6.1 탭 통합)**: 별도 `에이전트 관리` 메뉴 없이 **마켓플레이스 메뉴가 통합 에이전트 허브**다. 상단탭 2분류 — **내장 에이전트**(`tbl_agent_config` 전체: Orchestrator·AI 어시스턴트·마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일 + 카탈로그 설치 에이전트) / **Addon 에이전트**(사용자 업로드). 내장 5종(마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일)은 **REQUIRED(비활성 불가)**. `자산 등록`·자산 카탈로그(로컬·원격)는 내장 에이전트 탭에 편입(Addon 탭 `새 Agent 만들기`와 동일 위치). 자산 등록 모달에서 **addon ZIP(스캐폴드 형식) 첨부** 시 설치에서 hot-deploy 된다.
+>
+> **보안 에이전트 자산 카탈로그 이관(impl/36, §7.6.1)**: 종전 '시스템 에이전트' 탭의 SeCuardian 보안 내장 13종(vasca-cve·cilium-netpol·teler-ids·shuffle-soar·neosync-dlp·otel-collector·teleport-pam·velociraptor-dfir·ai-redteam·isms-p-evidence·behavior-noti·agentic-soc·ai-eval-gate)은 **자산 카탈로그(marketplace_assets, category=security)** 로 이관 — `make seed-security` 로 등록(zip 블롭 포함)하고 카탈로그에서 설치한다. 패키지 13종은 **`marketplace-assets/security/`** 에서 관리(§7.6.1-6 `emb_` 폐지, §7.6.1-7 `addon-agents/zip` 폐지). `make seed` 는 기반 시드(설정·계정)만 수행.
 >
 > **가드레일 도메인 필터(impl/20 §7.8.7)**: wise-Guardrails 규칙 **24개 도메인 전체를 에이전트 내부 데이터(`app/data/guardrails/`)로 관리**한다. `global`(PII/신용정보)은 무조건 필수, 업종 도메인(금융·의료·제조·공공행정 등)은 classifier 규칙에 **regex 를 생성**해 결정적 판정에 사용하며, 도메인 카탈로그의 **`필터적용` 토글**로 테스트 시 적용 여부를 반영(다도메인 동시 판정). 데이터 재빌드: `make guardrails-data` (`scripts/build_guardrails_data.py`).
 >
@@ -48,13 +50,13 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 >
 > **pgvector 실측 벤치마크(impl/31·물리 `test/impl/29`, §7.5.1)**: `docker-compose.yml` postgres 이미지를 **`pgvector/pgvector:pg17` 로 영구 교체**(구 `postgres:17-alpine` 은 `vector` 확장이 없어 조용히 local 폴백하던 잠재 결함 수정). 실 컨테이너에서 `CREATE EXTENSION vector` 확인 후 `VECTOR_BACKEND=pgvector` 실경로로 식별자 질의 세트(N=40) 실측 — **Recall@10=1.000, p95=20.8ms**(PRD §5 목표 0.89/250ms 대비 초과 달성). 파라프레이즈형 dense 단독 성능은 임베딩 모델 교체(로드맵) 후 별도 재평가 필요.
 >
-> **완전판정 2단 구조(impl/23 §7.8.7)**: (1) **regex**(결정적) — 규칙별 `mode` 로 **실판정(원본 regex)+휴리스틱(생성 regex) 공존**(카탈로그에 `실판정 N · 휴리스틱 M` 분리 표시). (2) **LLM classifier**(옵션 `GUARDRAILS_CLASSIFIER_ENABLED=true`, 기본 off·비결정적) — regex 후 규칙 메뉴를 LLM 에 제시해 패러프레이즈/문맥 위반까지 판정, 미구성·장애 시 regex 로 degrade. 생성 regex 과탐은 **2개 키워드 공기(AND)+교차도메인 DF 필터**로 완화(단일 흔한 키워드 오탐 제거). 도메인 카탈로그에 **전체 선택/해제 토글**(`필터적용 N/M 도메인` 우측). emb_guardrails ADDON 패키지에 룰셋 데이터 동봉.
+> **완전판정 2단 구조(impl/23 §7.8.7)**: (1) **regex**(결정적) — 규칙별 `mode` 로 **실판정(원본 regex)+휴리스틱(생성 regex) 공존**(카탈로그에 `실판정 N · 휴리스틱 M` 분리 표시). (2) **LLM classifier**(옵션 `GUARDRAILS_CLASSIFIER_ENABLED=true`, 기본 off·비결정적) — regex 후 규칙 메뉴를 LLM 에 제시해 패러프레이즈/문맥 위반까지 판정, 미구성·장애 시 regex 로 degrade. 생성 regex 과탐은 **2개 키워드 공기(AND)+교차도메인 DF 필터**로 완화(단일 흔한 키워드 오탐 제거). 도메인 카탈로그에 **전체 선택/해제 토글**(`필터적용 N/M 도메인` 우측). guardrails ADDON 패키지에 룰셋 데이터 동봉.
 >
 > **화면 정렬 표준(impl/24)**: 모든 에이전트 화면 루트를 **`.page` 클래스**(`front/src/index.css` = `w-full max-w-6xl p-4 sm:p-6`)로 **좌측정렬·반응형·최대폭 제한** 통일(`mx-auto` 금지). 신규 에이전트(내장·Addon) 개발 기준. **예외**: 전체높이 인터랙티브 레이아웃(AI 어시스턴트 등 채팅·터미널).
 >
 > **내장 에이전트 MCP 개방(impl/20)**: REQUIRED 내장 5종의 MCP 설정 잠금을 해제 — 7종 내장 에이전트 모두 MCP 서버로 노출 가능.
 >
-> **emb_ 내장 패키지(impl/20 §7.8.8)**: 내장 5종의 ADDON 패키지 `addon-agents/zip/emb_{marketplace,workflow,rag,playground,guardrails}` 를 생성(기존 13종 보안 에이전트와 동일 규약).
+> **자산 디렉터리(impl/38 §7.6.1-7)**: 모든 자산 소스를 `marketplace-assets/<카테고리>/` 로 일원화 — security(13)·builtin(5: marketplace·workflow·rag·playground·guardrails)·addon(5: 스캐폴드 템플릿)·utilities(6: UserManager·server-shell·순수 ADDON 4). `addon-agents/{zip,_templates}` 폐지(deployed/ 만 잔존), 템플릿 조회 경로 = `marketplace-assets/addon`.
 >
 > **에이전트 표시명 다국어(impl/35·물리 `test/impl/33`, §7.11.2-4 — SeCuardian impl/56 복제 싱크)**: `tbl_agent_config.agent_names` JSON(`{"ko":..,"en":..}`) 신설 — 내장 7종 시드에 en 표시명 병기(마켓플레이스→Marketplace, 워크플로우→Workflow 등)로 en UI 에서 한국어 표시명이 남던 부분 해소. 기동 시 `{"ko": agent_name}` 멱등 백필, meta.json `display_name` dict 형 허용(업로드 시 정규화·동기). 에이전트 카드·좌측 메뉴·헤더 타이틀·가드레일 에이전트 셀렉트에 descriptions 와 동일 fallback 체인 적용.
 >
@@ -85,7 +87,7 @@ sql/{sqlite,pg}/         01_init.sql(멱등 DDL: 코어 + marketplace/workflow/r
                          02_seed.sql(에이전트/설정/도메인카탈로그 시드)
 front/src/
   pages/                 chat·users·settings·profile·addon·setup +
-                         marketplace(=agents 통합 허브: 내장/시스템/Addon 3탭+자산카탈로그)·
+                         marketplace(=agents 통합 허브: 내장/Addon 2탭+자산카탈로그, §7.6.1)·
                          workflow·rag·playground·guardrails (내장 에이전트 5종)
   api/                   백엔드 계약별 axios 클라이언트(1:1 대응)
 addon-agents/            Addon ZIP 자산 (deployed/ 는 런타임 bind-mount)
@@ -154,8 +156,9 @@ make staging-all / make prod-all    # 각 .env.<env> 사용
 ### DB 초기화
 ```bash
 make db-reset       # 스키마 재생성 (FORCE=1 확인 생략)
-make seed           # 기본 설정 + 테스트 계정
-make db-fresh       # reset + seed
+make seed           # 기반 시드만 — 기본 설정 + 테스트 계정
+make seed-security  # 보안 에이전트 13종 자산 카탈로그 등록 (§7.6.1 — 필요 시 명시 실행)
+make db-fresh       # reset + seed(기반) — 보안 에이전트는 make seed-security 별도
 ```
 
 ---

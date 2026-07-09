@@ -25,7 +25,9 @@ logger = logging.getLogger("uvicorn.error")
 router = APIRouter(prefix="/api/addon-agents", tags=["addon-agents"])
 
 _DEPLOYED = Path("addon-agents/deployed")
-_TEMPLATES = Path("addon-agents/_templates")
+# §7.6.1-7: 스캐폴드 템플릿(Board·RagAgent·ServiceAgent·ShellAgent·ToolProxyAgent)은
+# marketplace-assets/addon/ 로 일원화(구 addon-agents/{_templates,zip} 폐지)
+_TEMPLATES = Path("marketplace-assets/addon")
 _FRONT_DEPLOYED = Path("front/src/pages/addon/deployed")
 _MAX_SIZE = 10 * 1024 * 1024  # 10 MB
 
@@ -182,14 +184,24 @@ def _parse_meta_json(dest: Path, zip_stem: str) -> dict:
         return _norm_descriptions({"agent_type": "app", "capabilities": []})
 
 
+def _template_dirs() -> list[Path]:
+    """스캐폴드 템플릿 디렉터리 목록 — marketplace-assets/addon/ (§7.6.1-7)."""
+    if not _TEMPLATES.exists():
+        return []
+    dirs = [d for d in _TEMPLATES.iterdir() if d.is_dir() and not d.name.startswith(".")]
+    return sorted(dirs, key=lambda d: d.name)
+
+
+def _find_template_dir(name: str) -> Path | None:
+    """템플릿 디렉터리 조회 — marketplace-assets/addon/ (§7.6.1-7)."""
+    d = _TEMPLATES / name
+    return d if d.is_dir() else None
+
+
 @router.get("/templates/list")
 async def list_templates(user: dict = Depends(get_current_user)):
-    if not _TEMPLATES.exists():
-        return {"templates": []}
     templates = []
-    for d in sorted(_TEMPLATES.iterdir()):
-        if not d.is_dir():
-            continue
+    for d in _template_dirs():
         # meta.json이 있으면 유형 정보 읽기
         meta_files = list(d.glob("*-meta.json"))
         agent_type = "app"
@@ -212,7 +224,7 @@ async def list_templates(user: dict = Depends(get_current_user)):
             "description": description,
             "description_en": description_en,
             "descriptions": descriptions,
-            "has_zip": (_TEMPLATES / f"{d.name}.zip").exists(),
+            "has_zip": (d.parent / f"{d.name}.zip").exists(),
         })
     return {"templates": templates}
 
@@ -252,9 +264,9 @@ async def download_template(name: str, user: dict = Depends(get_current_user)):
     if ".." in name or "/" in name or "\\" in name:
         raise HTTPException(status_code=400, detail="Invalid template name")
     zip_path = _TEMPLATES / f"{name}.zip"
-    if not zip_path.exists():
-        raise HTTPException(status_code=404, detail="Template zip not found")
-    return FileResponse(str(zip_path), media_type="application/zip", filename=f"{name}.zip")
+    if zip_path.exists():
+        return FileResponse(str(zip_path), media_type="application/zip", filename=f"{name}.zip")
+    raise HTTPException(status_code=404, detail="Template zip not found")
 
 
 @router.get("/guide")
@@ -546,8 +558,8 @@ async def scaffold_addon(
 
     # 기반 템플릿 디렉터리 결정
     tmpl_dir_name = _TYPE_TEMPLATE.get(body.agent_type, "ServiceAgent")
-    tmpl_dir = _TEMPLATES / tmpl_dir_name
-    if not tmpl_dir.exists():
+    tmpl_dir = _find_template_dir(tmpl_dir_name)
+    if tmpl_dir is None:
         raise HTTPException(status_code=404, detail=f"템플릿 미존재: {tmpl_dir_name}")
 
     # ZIP을 메모리에서 생성 (템플릿 파일 복사 + 이름 치환)

@@ -1,0 +1,28 @@
+{
+  "key": "guardrails",
+  "name": "가드레일 (내장 ADDON판)",
+  "type": "service",
+  "description": "PII·신용정보 등 도메인별 콘텐츠 안전 판정을 제공하는 가드레일 내장 에이전트 ADDON 판 (router_guardrails 패키징). global(필수) 및 금융·의료·제조·공공행정 등 24개 도메인 규칙셋을 동봉 데이터(data/guardrails/)로 관리하며, 실판정(원본 regex)+휴리스틱(생성 regex)이 공존한다(§7.8.7). LLM classifier 는 옵션. 결정 로그는 인메모리 deque 로 보관합니다.",
+  "description_en": "Guardrails built-in agent ADDON packaging (router_guardrails). Bundles 24 domain rulesets (data/guardrails/) — global (required) plus finance/healthcare/manufacturing/public-admin, with real (original regex) + heuristic (generated regex) detection coexisting (§7.8.7). Optional LLM classifier. Decision log kept in an in-memory deque.",
+  "version": "1.0.0",
+  "endpoints": [
+    {"method": "GET", "path": "/status", "auth": true, "description": "Guardrails agent status (domains, decision count)"},
+    {"method": "GET", "path": "/domains", "auth": true, "description": "List guardrails domain catalog"},
+    {"method": "POST", "path": "/test", "auth": true, "description": "Instantly evaluate text against a domain (global: real PII detection)"},
+    {"method": "GET", "path": "/decisions", "auth": true, "description": "List decision log (filter by agent_key)"},
+    {"method": "GET", "path": "/decisions/{decision_id}", "auth": true, "description": "Explain a single decision"},
+    {"method": "PUT", "path": "/agents/{agent_key}/config", "auth": true, "description": "Set per-agent guardrail domain config"},
+    {"method": "GET", "path": "/agents/{agent_key}/config", "auth": true, "description": "Get per-agent guardrail config"}
+  ],
+  "env_vars": [
+    {"name": "GUARDRAILS_ENABLED", "default": "true", "description": "Enable guardrails operations"},
+    {"name": "GUARDRAILS_MAX_DECISIONS", "default": "500", "description": "Max in-memory decision log entries"}
+  ],
+  "dependencies": [],
+  "db_tables": [],
+  "base_agent": {
+    "agent_key": "guardrails",
+    "source": "app/routers/router_guardrails.py",
+    "platform": "SeCuardian-Marketplace"
+  }
+}

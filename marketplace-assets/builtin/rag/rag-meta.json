@@ -1,0 +1,30 @@
+{
+  "key": "rag",
+  "name": "RAG (내장 ADDON판)",
+  "type": "rag",
+  "description": "컬렉션 생성·조회, 문서 수집(ingest), 하이브리드 검색 기능을 제공하는 RAG 파이프라인 내장 에이전트 ADDON 판 (router_rag 패키징). 임베딩 엔진 없이 인메모리 키워드 검색으로 동작하며, AI 어시스턴트를 통해 컬렉션 및 문서 현황을 확인할 수 있습니다.",
+  "description_en": "RAG pipeline built-in agent ADDON packaging (router_rag). Provides collection CRUD, document ingestion, and hybrid search. Runs on in-memory keyword search without an embedding engine — use via AI Assistant to inspect collections and documents.",
+  "version": "1.0.0",
+  "endpoints": [
+    {"method": "GET", "path": "/status", "auth": true, "description": "RAG agent status and store stats"},
+    {"method": "GET", "path": "/collections", "auth": true, "description": "List RAG collections with document counts"},
+    {"method": "POST", "path": "/collections", "auth": true, "description": "Create a new collection (general/sensitive)"},
+    {"method": "GET", "path": "/collections/{collection_id}", "auth": true, "description": "Get collection detail"},
+    {"method": "POST", "path": "/collections/{collection_id}/documents", "auth": true, "description": "Ingest a document into a collection"},
+    {"method": "GET", "path": "/collections/{collection_id}/documents", "auth": true, "description": "List documents in a collection"},
+    {"method": "POST", "path": "/collections/{collection_id}/search", "auth": true, "description": "Keyword search within a collection (ADDON: no embeddings)"}
+  ],
+  "env_vars": [
+    {"name": "RAG_ENABLED", "default": "true", "description": "Enable RAG operations"},
+    {"name": "RAG_MAX_COLLECTIONS", "default": "50", "description": "Max in-memory collections"},
+    {"name": "RAG_MAX_DOCS_PER_COLLECTION", "default": "500", "description": "Max documents per collection"},
+    {"name": "RAG_DEFAULT_TOP_K", "default": "5", "description": "Default top-k for search"}
+  ],
+  "dependencies": [],
+  "db_tables": [],
+  "base_agent": {
+    "agent_key": "rag",
+    "source": "app/routers/router_rag.py",
+    "platform": "SeCuardian-Marketplace"
+  }
+}

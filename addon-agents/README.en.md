@@ -23,33 +23,27 @@ The Scaffolding Wizard calls `/api/addon-agents/scaffold` to generate the ZIP se
 
 ```
 addon-agents/
-├── _templates/              Developer templates (includes ready-to-use zip)
-│   ├── Board/               App Agent — bulletin board + comments
-│   │   ├── Board-app.py
-│   │   ├── Board-front.tsx
-│   │   ├── Board-sql.sql
-│   │   └── Board-meta.json
-│   ├── RagAgent/            RAG Agent — document embedding + vector search Q&A
-│   │   ├── RagAgent-app.py
-│   │   ├── RagAgent-sql.sql
-│   │   └── RagAgent-meta.json
-│   ├── ServiceAgent/        Service Agent — backend business logic
-│   │   ├── ServiceAgent-app.py
-│   │   └── ServiceAgent-meta.json
-│   ├── ToolProxyAgent/      Tool Proxy Agent — external API → MCP adapter
-│   │   ├── ToolProxyAgent-app.py
-│   │   └── ToolProxyAgent-meta.json
-│   ├── Board.zip            ↗ Ready-to-upload packages
-│   ├── RagAgent.zip
-│   ├── ServiceAgent.zip
-│   └── ToolProxyAgent.zip
+├── Makefile                 Scaffold dev helper (init/test/publish → marketplace-assets/addon)
 └── deployed/                Auto-created after upload (builtin agents excluded — do not edit manually)
     └── {agent_key}/
         ├── {AgentName}-app.py
         ├── {AgentName}-front.tsx   (optional)
         ├── {AgentName}-sql.sql     (optional)
         └── {AgentName}-meta.json
+
+marketplace-assets/            ← single home for all asset sources (§7.6.1-7)
+├── security/    (13)          vasca-cve · cilium-netpol · … · ai-eval-gate
+├── builtin/     (5)           marketplace · workflow · rag · playground · guardrails
+├── addon/       (5)           Board · RagAgent · ServiceAgent · ShellAgent · ToolProxyAgent  ← scaffold templates
+└── utilities/   (6)           UserManager · server-shell · ai-traffic-monitor · caddy-proxy · grafana-dashboard · truffle-scan
+    each: {key}/ source dir + {key}.zip upload package
 ```
+
+> **§7.6.1-7 (2026-07-09)**: `addon-agents/{zip,_templates}` are abolished; all asset sources are
+> unified under **`marketplace-assets/<category>/`**. Scaffold templates live in
+> `marketplace-assets/addon/` — the template list/download/scaffold APIs read only this path.
+> `addon-agents/` retains only the runtime output `deployed/` (bind mount) and the dev `Makefile`.
+> `marketplace-assets/` is not excluded by `.dockerignore`, so it ships in the container image.
 
 > **Builtin agents** (`deployed/board/`) are tracked in git and loaded automatically on app start.
 
@@ -69,14 +63,16 @@ addon-agents/
 > At least one of `-app.py` or `-front.tsx` is required.  
 > The zip must contain files at the root level — no subdirectories.
 
-### emb_ prefix — naming convention for embedded-origin agents
+### Naming convention (§7.6.1-6 — old emb_ prefix abolished)
 
-- **`emb_` prefix** marks the ADDON packaging of a platform built-in (embedded) agent
-  (e.g. `emb_vasca-cve`, `emb_cilium-netpol`). Pure user-authored ADDONs are named without the prefix.
-- When converting or newly porting a built-in agent to an ADDON, always use the `emb_` prefix,
-  keep the source in `addon-agents/zip/emb_{key}/`, and package it as `addon-agents/zip/emb_{key}.zip`.
-- The meta.json `key` (or `agent_key`) field must also carry the `emb_` prefix,
-  and a `base_agent` field should record the original built-in router provenance.
+- Every package is named after its **plain tbl_agent_config key** (e.g. `rag`, `guardrails`,
+  `vasca-cve`). The old `emb_` prefix convention (marker for built-in-origin ADDON packagings)
+  was abolished on 2026-07-09 (§7.6.1-6).
+- Uploading a prefix-less zip whose key already exists in config registers it as
+  **`is_builtin=1`**, so it never duplicates into the Addon tab.
+- When porting a built-in agent to an ADDON, keep the source in `marketplace-assets/<category>/{key}/`,
+  package it as `marketplace-assets/<category>/{key}.zip` (category: builtin/utilities/etc.), keep the meta.json `key` (or `agent_key`) equal
+  to the config key, and record the original router provenance in a `base_agent` field.
 - ⚠️ Never use `from __future__ import annotations` in an addon `-app.py` —
   the dynamic loader (`spec_from_file_location`) does not register the module in `sys.modules`,
   so pydantic cannot resolve postponed annotations on request-body models (500 error).
@@ -87,7 +83,7 @@ addon-agents/
   (defined in `front/src/index.css` = `w-full max-w-6xl p-4 sm:p-6`): **left-aligned, responsive, width-capped**, unified across all screens.
 - No `mx-auto` (centering), no per-page `max-w-4xl/5xl` — standardize via `.page`.
 - e.g. `<div className="page space-y-4"> … </div>` (grids: `page grid grid-cols-3 gap-4`).
-- **Exception**: full-height interactive layouts (`flex flex-col h-full`, e.g. chat/terminal — AI Assistant, ShellAgent, emb_server-shell) do NOT use `.page`. All other content/form screens follow `.page`.
+- **Exception**: full-height interactive layouts (`flex flex-col h-full`, e.g. chat/terminal — AI Assistant, ShellAgent, server-shell) do NOT use `.page`. All other content/form screens follow `.page`.
 
 ---
 
@@ -107,9 +103,9 @@ make clean   AGENT=Survey   # remove generated files
 
 | Target | Description |
 |--------|-------------|
-| `make init AGENT=<name>` | Copy Board template + replace `Board` → `<name>` into `_templates/<name>/` |
+| `make init AGENT=<name>` | Copy Board template + replace `Board` → `<name>` into `marketplace-assets/addon/<name>/` |
 | `make test AGENT=<name>` | Validate: files, Python syntax, router export, SQL structure, React export |
-| `make publish AGENT=<name>` | Create `_templates/<name>.zip` (ready to upload) |
+| `make publish AGENT=<name>` | Create `marketplace-assets/addon/<name>.zip` (ready to upload) |
 | `make clean AGENT=<name>` | Delete generated directory and zip |
 
 ---
@@ -268,13 +264,13 @@ Used by the Orchestrator for capability-based routing and governance gates.
 ```bash
 # Makefile (recommended)
 make publish AGENT=MyFeature
-# → _templates/MyFeature.zip
+# → marketplace-assets/addon/MyFeature.zip
 
 # Manual
-zip -j _templates/MyFeature.zip \
-    _templates/MyFeature/MyFeature-app.py \
-    _templates/MyFeature/MyFeature-front.tsx \
-    _templates/MyFeature/MyFeature-sql.sql
+zip -j marketplace-assets/addon/MyFeature.zip \
+    marketplace-assets/addon/MyFeature/MyFeature-app.py \
+    marketplace-assets/addon/MyFeature/MyFeature-front.tsx \
+    marketplace-assets/addon/MyFeature/MyFeature-sql.sql
 ```
 
 ### Upload steps
@@ -351,25 +347,18 @@ On app restart: addon_agent_loader._load_all_from_disk()
 |-------|-------------|------|
 | **Board** | Bulletin board (create/edit/delete posts, write/delete comments, pagination) | `/addon/board` |
 
-### ADDON packaging of built-in agents (`zip/emb_*`) + pure ADDONs
+### Asset catalog (`marketplace-assets/<category>/`, §7.6.1-7 — plain keys)
 
-ADDON packagings of built-in agents (seeded in tbl_agent_config) carry the `emb_` prefix;
-pure ADDONs (not in the built-in list) are named without it.
-Upload `addon-agents/zip/{key}.zip` via Agent Management to deploy at `/api/addon/{key}`.
+All ADDON packagings are named after their **plain config keys** (old `emb_` prefix abolished).
+Upload `marketplace-assets/<category>/{key}.zip` via Agent Management to deploy at
+`/api/addon/{key}` (registered as `is_builtin=1` when the config key already exists).
 
-**Built-in-origin (`emb_`), 13:**
-`emb_agentic-soc` · `emb_ai-eval-gate`(new port) · `emb_ai-redteam` · `emb_behavior-noti` ·
-`emb_cilium-netpol` · `emb_isms-p-evidence`(new port) · `emb_neosync-dlp` · `emb_otel-collector` ·
-`emb_shuffle-soar` · `emb_teleport-pam` · `emb_teler-ids` · `emb_vasca-cve`(new port) ·
-`emb_velociraptor-dfir`
-
-**Pure ADDONs (no prefix), 4:** `caddy-proxy` (reverse-proxy monitor) · `grafana-dashboard` (dashboard RAG + sql) · `truffle-scan` (secret-scan receiver) · `ai-traffic-monitor` (browser AI-assistant traffic-usage monitor — wraps vnstat/nethogs/tcpdump/tshark; ITManually Batch 13)
+- **`builtin/`** (5): SeCMP built-ins — `marketplace` · `workflow` · `rag` · `playground` · `guardrails` (bundles ruleset data)
+- **`utilities/`** (6): `UserManager` · `server-shell` · `caddy-proxy` (reverse-proxy monitor) · `grafana-dashboard` (dashboard RAG + sql) · `truffle-scan` (secret-scan receiver) · `ai-traffic-monitor` (browser AI traffic monitor)
+- **`addon/`** (6): scaffold templates — `Board` · `RagAgent` · `ServiceAgent` · `ShellAgent` · `ToolProxyAgent`
+- **`security/`** (13): `vasca-cve` · `cilium-netpol` · `teler-ids` · `shuffle-soar` · `neosync-dlp` · `otel-collector` · `teleport-pam` · `velociraptor-dfir` · `ai-redteam` · `isms-p-evidence` · `behavior-noti` · `agentic-soc` · `ai-eval-gate` — registered in the asset catalog (category=security) by `make seed-security` and provided via marketplace install (§7.6.1).
 
 > `general` (Orchestrator) and `chat` (AI Assistant) are required core agents and excluded from conversion.
-> Built-in agents themselves keep their original keys and built-in-tab display names without emb_ —
-> the prefix applies only to ADDON packagings (zip / addon key).
-> The three new ports use environment-variable configuration (unlike the settings-based built-ins) and
-> keep independent in-memory stores from their built-in counterparts.
 
 ---
 

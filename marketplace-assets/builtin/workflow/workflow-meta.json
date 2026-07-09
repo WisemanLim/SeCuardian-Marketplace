@@ -1,0 +1,29 @@
+{
+  "key": "workflow",
+  "name": "워크플로우 (내장 ADDON판)",
+  "type": "service",
+  "description": "DAG 워크플로우 CRUD + 실행·HITL 승인·취소 기능을 제공하는 워크플로우 내장 에이전트 ADDON 판 (router_workflow 패키징). 인메모리 저장소로 동작하며 실 DAG 엔진 없이 워크플로우 정의 및 실행 이력을 관리합니다.",
+  "description_en": "Workflow built-in agent ADDON packaging (router_workflow). Provides DAG workflow CRUD, run execution, HITL approval, and cancellation. Runs on in-memory store without a real DAG engine — manages workflow definitions and run history.",
+  "version": "1.0.0",
+  "endpoints": [
+    {"method": "GET", "path": "/status", "auth": true, "description": "Workflow agent status and run stats"},
+    {"method": "GET", "path": "/workflows", "auth": true, "description": "List all workflows"},
+    {"method": "POST", "path": "/workflows", "auth": true, "description": "Create a new workflow (node/edge validation)"},
+    {"method": "GET", "path": "/workflows/{workflow_id}", "auth": true, "description": "Get workflow detail"},
+    {"method": "POST", "path": "/workflows/{workflow_id}/run", "auth": true, "description": "Execute a workflow (in-memory: completes immediately)"},
+    {"method": "GET", "path": "/workflow-runs/{run_id}", "auth": true, "description": "Get run detail"},
+    {"method": "POST", "path": "/workflow-runs/{run_id}/cancel", "auth": true, "description": "Cancel a non-terminal run"},
+    {"method": "GET", "path": "/runs", "auth": true, "description": "List run history (filter by workflow_id)"}
+  ],
+  "env_vars": [
+    {"name": "WORKFLOW_ENABLED", "default": "true", "description": "Enable workflow operations"},
+    {"name": "WORKFLOW_MAX_RUNS", "default": "200", "description": "Max in-memory run history"}
+  ],
+  "dependencies": [],
+  "db_tables": [],
+  "base_agent": {
+    "agent_key": "workflow",
+    "source": "app/routers/router_workflow.py",
+    "platform": "SeCuardian-Marketplace"
+  }
+}
