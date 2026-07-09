@@ -51,6 +51,8 @@ class Settings(BaseSettings):
     vllm_model: str = ""
     # R19-4: 히스토리 토큰 예산 (추정 토큰 초과 시 head/tail 축약) — 0 이하 = 무압축
     llm_context_budget: int = 8000
+    # AI 어시스턴트 tool-call 최대 루프 횟수 (API 오류 자가수정 재시도 상한)
+    llm_tool_max_rounds: int = 6
 
     # CORS — str 타입 유지: pydantic-settings가 list[str]에 json.loads를 시도해 crash하는 것 방지
     # 파싱은 main.py의 _parse_cors_origins()에서 수행 (JSON array OR 쉼표 구분 모두 지원)

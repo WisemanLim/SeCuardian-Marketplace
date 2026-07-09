@@ -18,6 +18,7 @@ const EDITABLE_KEYS = [
   "vllm_model",
   "llm_routes",
   "llm_context_budget",
+  "llm_tool_max_rounds",
 ];
 
 export default function SettingsPage() {

@@ -750,6 +750,8 @@ _SETTING_ENV_MAP = {
     "vllm_model": "VLLM_MODEL",
     # R19-4: 토큰 압축 예산
     "llm_context_budget": "LLM_CONTEXT_BUDGET",
+    # tool-call 최대 루프 횟수
+    "llm_tool_max_rounds": "LLM_TOOL_MAX_ROUNDS",
 }
 
 
@@ -781,6 +783,7 @@ async def _db_llm_settings() -> dict[str, str]:
         "vllm_base_url": "http://localhost:8100",
         "vllm_model": "",
         "llm_context_budget": "8000",
+        "llm_tool_max_rounds": "6",
     }
     _settings_vals = {
         "ollama_model": _settings.ollama_model,
@@ -793,6 +796,7 @@ async def _db_llm_settings() -> dict[str, str]:
         "vllm_base_url": _settings.vllm_base_url,
         "vllm_model": _settings.vllm_model,
         "llm_context_budget": str(_settings.llm_context_budget),
+        "llm_tool_max_rounds": str(_settings.llm_tool_max_rounds),
     }
 
     # 1단계: DB 값 로드
@@ -802,7 +806,7 @@ async def _db_llm_settings() -> dict[str, str]:
             "SELECT key, value FROM tbl_settings WHERE key IN "
             "('ollama_base_url','ollama_model','orchestrator_model','domain_agent_model',"
             "'local_llm_provider','llamacpp_base_url','llamacpp_model',"
-            "'vllm_base_url','vllm_model','llm_context_budget')"
+            "'vllm_base_url','vllm_model','llm_context_budget','llm_tool_max_rounds')"
         )
         result = {r["key"]: r["value"] for r in rows if r.get("value")}
     except Exception:
@@ -918,6 +922,14 @@ class Orchestrator:
             return int(db.get("llm_context_budget") or settings.llm_context_budget)
         except (TypeError, ValueError):
             return settings.llm_context_budget
+
+    @staticmethod
+    def _max_rounds(db: dict[str, str]) -> int:
+        """tool-call 최대 루프 횟수 (llm_tool_max_rounds) — 최소 1 보장."""
+        try:
+            return max(1, int(db.get("llm_tool_max_rounds") or settings.llm_tool_max_rounds))
+        except (TypeError, ValueError):
+            return max(1, settings.llm_tool_max_rounds)
 
     async def _meter(
         self, provider: str, model: str, task: str, usage: dict | None, started: float
@@ -1048,7 +1060,7 @@ class Orchestrator:
         _meter_usage: dict = {}
         _started = _time.monotonic()
 
-        for _ in range(6):  # max 6 tool-call rounds
+        for _ in range(self._max_rounds(db)):  # max tool-call rounds (llm_tool_max_rounds)
             resp = await self._client.messages.create(
                 model=orch_model,
                 max_tokens=2048,
@@ -1203,7 +1215,8 @@ class Orchestrator:
         _started = _time.monotonic()
         try:
             return await self._ollama_tool_rounds(
-                messages, ollama_sys, _provider, _model, _base_url, _usage, token, _re
+                messages, ollama_sys, _provider, _model, _base_url, _usage, token, _re,
+                max_rounds=self._max_rounds(db),
             )
         finally:
             await self._meter(_provider, _model, "tools", _usage, _started)
@@ -1218,9 +1231,11 @@ class Orchestrator:
         _usage: dict,
         token: str | None,
         _re: Any,
+        max_rounds: int = 6,
     ) -> str:
         last_error: str = ""
-        for rnd in range(6):
+        last_fail_sig: tuple | None = None
+        for rnd in range(max_rounds):
             text = await llm_providers.chat(
                 messages, ollama_sys, provider=_provider, model=_model,
                 base_url=_base_url, usage_out=_usage,
@@ -1289,6 +1304,15 @@ class Orchestrator:
                         _format_api_error(status_code, err_data)
                         + f"\n(요청: {call.get('method', 'GET')} {call.get('path', '')})"
                     )
+                    # 동일 요청이 동일 오류로 반복 = 자가수정 실패 — 남은 라운드 낭비 방지 즉시 중단
+                    fail_sig = (call.get("method"), call.get("path"), status_code)
+                    if fail_sig == last_fail_sig:
+                        logger.warning(
+                            "[orchestrator] ollama 동일 API 오류 반복 (%s %s → %s) — 루프 조기 종료",
+                            *fail_sig,
+                        )
+                        return last_error
+                    last_fail_sig = fail_sig
                     # 모델에는 원시 오류를 전달해 자가수정 유도 (사용자에게는 미노출)
                     messages.append({"role": "assistant", "content": text})
                     messages.append({"role": "user", "content": f"API 오류: {result[:300]}\n위 요청을 수정하여 다시 시도해 주세요. 오류 내용을 사용자에게 그대로 보여주지 마세요."})
@@ -1300,7 +1324,7 @@ class Orchestrator:
                 # 여기로 진입 — 원문을 그대로 노출하면 내부 프롬프트가 유출된다
                 return _safe_ollama_text(text, last_error)
 
-        # 6라운드 소진 — API 오류 반복 (예: 존재하지 않는 경로 반복 호출)
+        # max_rounds 소진 — API 오류 반복 (예: 존재하지 않는 경로 반복 호출)
         return last_error or (
             "❌ 요청하신 작업에 맞는 API를 찾지 못했습니다. "
             "요청을 다르게 표현해 주시거나, 지원되는 기능인지 확인해 주세요."

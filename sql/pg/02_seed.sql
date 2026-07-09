@@ -78,6 +78,7 @@ INSERT INTO tbl_settings (key, value, description) VALUES
   ('vllm_model',          '',                          'vLLM 모델명'),
   ('llm_routes',          '',                          'R19-2 작업별 LLM 라우팅 (JSON: task→provider/model)'),
   ('llm_context_budget',  '8000',                      'R19-4 히스토리 토큰 예산 (초과 시 압축, 0=무압축)'),
+  ('llm_tool_max_rounds', '6',                         'AI 어시스턴트 tool-call 최대 루프 횟수 (API 오류 자가수정 재시도 상한)'),
   ('fallback_enabled',    'true',                      'LLM Fallback 활성화'),
   ('setup_completed',     'false',                     'Setup Wizard 완료'),
   ('system_custom_instructions', '',                  '시스템 전체 맞춤지침 (모든 사용자에게 적용)'),

@@ -802,6 +802,17 @@ SeCuardian 구현(test/impl/55)을 **코드 복제**로 싱크 (§3 준용 계�
      JSON 을 함께 기록(자산 ko 설명 + name/name_en → agent_names).
    - **정리**: `db.py` 중복 `backfill_descriptions` 정의 제거(완전판 1개 유지).
    - addon 경로(`_norm_descriptions` + upload `descriptions` 기록)는 이미 임의 언어 확장형 — 무변경.
+6. **AI 어시스턴트 tool-call 루프 설정화 + 동일 오류 조기 종료 (impl/40 · 물리 test/impl/38, 2026-07-09)**:
+   AI 어시스턴트가 API 오류 시 내부 자가수정 루프(하드코딩 6라운드)를 도는데, 존재하지 않는
+   메서드 반복 호출(예: `PUT /api/agent-config/ai-assistant` → 405 × 6회) 시 LLM 호출이 낭비됨.
+   - **`llm_tool_max_rounds`**(기본 6, 최소 1 클램프): tool-call 최대 루프 횟수를 시스템에서 관리.
+     우선순위는 기존 LLM 설정과 동일 — `os.environ`(compose 주입) > **`.env.*` 파일**(pydantic
+     `LLM_TOOL_MAX_ROUNDS`) > `tbl_settings`(시스템 설정 UI) > `config.py` 기본값.
+     Anthropic tool-call 루프·Ollama `_ollama_tool_rounds` 양쪽 적용. seed(sqlite/pg) +
+     SettingsPage `EDITABLE_KEYS` + `.env.example`·`.env.{local,dev,staging,prod}` 키 등재.
+   - **동일 오류 조기 종료**: Ollama 루프에서 직전 실패와 `(method, path, status)` 시그니처가
+     동일하면 자가수정 실패로 판단, 남은 라운드를 소진하지 않고 즉시 사용자 친화 오류 반환
+     (재시도 1회는 허용 — 모델의 PUT→POST 등 자가수정 기회 보존).
 
 ### 7.11.3 내장 에이전트 화면 i18n 전면 적용 + 중복 타이틀 제거 (impl/34 · 물리 test/impl/32) — 사용자 요구(2026-07-09)
 
@@ -969,6 +980,7 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-09 | v0.33 | **impl/40(물리 `test/impl/38`) — AI 어시스턴트 tool-call 루프 설정화 + `.env.*` 지원**(§7.11.2-6, 사용자 요구: "오류 loop 횟수를 시스템에서 관리 + `.env.*` 로 설정"). ① `llm_tool_max_rounds` 설정 신설(기본 6, 최소 1) — `config.py` 필드 + `_db_llm_settings` 플럼빙(`LLM_TOOL_MAX_ROUNDS` env 맵·DB 키·pydantic 기본값) + seed(sqlite/pg) + SettingsPage `EDITABLE_KEYS`, Anthropic/Ollama tool-call 루프 양쪽 적용 ② `.env.example` 활성 키 + `.env.{local,dev,staging,prod}` 키 등재(pydantic env_file 경로로 설정 가능) ③ 효율 개선 — Ollama 루프 동일 `(method, path, status)` 오류 반복 시 조기 종료(405 × 6회 → 2회, 재시도 1회 허용). 시험 test/impl/38 | app/core/config.py, app/agents/orchestrator.py, sql/{sqlite,pg}/02_seed.sql, front/src/pages/settings/SettingsPage.tsx, .env.example, .env.{local,dev,staging,prod}, test/impl/38 |
 | 2026-07-09 | v0.32 | **impl/39(물리 `test/impl/37`) — 다국어 설명 authoring 소스 전환 + jp 확장**(§7.11.2-5, 사용자 오류 보고: "확장 구조 개선됐다 했으나 미적용 — descriptions 를 split 컬럼 아닌 `{"ko","en","jp"}` JSON 으로, 언어셋 없으면 선호언어 표출"). impl/33 은 구조·프론트 fallback·선호언어 UI 를 갖췄으나 **authoring 소스가 여전히 split 컬럼**이라 타 언어 추가 경로가 없었음. 정정: ① `02_seed.sql`(sqlite/pg) 내장 7종 `descriptions`·`agent_names` **JSON 직접 저자(ko/en/jp)**, split `description`/`description_en` authoring 제거(레거시 컬럼은 읽기 폴백용 스키마만 유지) ② orchestrator `_active_agents_block` — `descriptions`(ko→en→첫 언어)에서 프롬프트 설명 읽기 ③ 마이페이지 `PREFERRED_LANGS` 에 `jp` 추가(`locale.jp` 라벨) — UI 언어 키 없을 때 선호언어로 표출 ④ `router_marketplace` install upsert 에 `descriptions` JSON 기록 ⑤ `db.py` 중복 `backfill_descriptions` 제거. addon 경로는 이미 확장형 무변경. 시험 test/impl/37(격리 sqlite: 시드 jp·API·pickDescription jp fallback·orchestrator block·dedupe) | sql/{sqlite,pg}/02_seed.sql, app/db.py, app/agents/orchestrator.py, app/routers/router_marketplace.py, front(store/locale.ts·profile/ProfilePage.tsx·locales), test/impl/37 |
 | 2026-07-09 | v0.31 | **impl/35(물리 `test/impl/33`) — 에이전트 표시명 다국어 agent_names 싱크**(§7.11.2-4, 사용자 요구 "agent_name 도 descriptions 방식으로 확장"). SeCuardian impl/56 복제: `tbl_agent_config.agent_names` JSON 컬럼(init+멱등 ALTER+`{"ko": agent_name}` 백필), **내장 7종 시드 en 표시명**(마켓플레이스→Marketplace 등 — en UI 에서 한국어 표시명 노출 해소), meta.json `display_name` dict 형 정규화·배포 동기·addon 목록 노출, `_templates` 6종 dict 화 재패키징. 프론트: AgentsPage `nameOf`(10개소)·AppLayout nav/헤더(names dict 상태 보존, locale 전환 즉시 반영)·GuardrailsPage 에이전트 셀렉트. 시험 test/impl/33 4/4 PASS(격리 sqlite 기동·시드·API + import/tsc) |
 | 2026-07-09 | v0.30 | **impl/34(물리 `test/impl/32`) — 내장 에이전트 화면 i18n 전면 적용 + 중복 타이틀 제거**(§7.11.3, 사용자 결함 보고: English 전환 시 미적용 + 본문 타이틀 2중 표시). ① Workflow(목록·풀스크린 빌더·캔버스)·RAG·Playground·Guardrails·Marketplace·Dashboard 8파일의 하드코딩 한국어 137개를 `t()` 키로 치환 — `locales/{ko,en}.json` 에 wf/wfb/rag/pg/mp/dash/grd 섹션 신설(키 패리티 검증 0건 차이). WorkflowBuilderPage `NODE_META` label/desc 를 locale 키로 분리, GuardrailsPage `statusBadge` 키 반환화 ② 본문 h1 5화면 제거 → `pageDesc` 만 표시(SeCuardian R18 '본문 중복 타이틀 제거' 표준 준용, AppLayout 헤더가 타이틀 단독 표시) ③ AgentsPage `nav_group` 칩(DB 한국어 값) locale 매핑(`기본 Agent`→Basic Agent 등) — **SeCuardian 에도 동기 반영** ④ Dashboard 에이전트 설명 `pickDescription`(R18-7 fallback) 적용, `nav.aiAssistant` ko 오타 수정. 시험 test/impl/32 6/6 PASS(tsc·build·패리티·잔존 0건) |
