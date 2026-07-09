@@ -1,4 +1,6 @@
 """Agent 설정 관리 라우터 (F8) — 활성화 토글·모델·프롬프트 변경."""
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
@@ -8,27 +10,58 @@ from app.db import execute_write, fetch_all, fetch_one, _PH
 router = APIRouter(prefix="/api/agent-config", tags=["agent-config"])
 
 
+def _parse_lang_dict(raw) -> dict:
+    """JSON 문자열 → {lang: str} dict (유효 문자열 값만)."""
+    if not raw:
+        return {}
+    try:
+        parsed = json.loads(raw)
+        if isinstance(parsed, dict):
+            return {k: v for k, v in parsed.items() if isinstance(v, str) and v.strip()}
+    except (ValueError, TypeError):
+        pass
+    return {}
+
+
+def _expand_descriptions(row: dict) -> dict:
+    """R18-7: descriptions/agent_names JSON 문자열 → dict 변환(레거시 컬럼 폴백)."""
+    d = _parse_lang_dict(row.get("descriptions"))
+    if not d:
+        if (row.get("description") or "").strip():
+            d["ko"] = row["description"]
+        if (row.get("description_en") or "").strip():
+            d["en"] = row["description_en"]
+    row["descriptions"] = d
+    names = _parse_lang_dict(row.get("agent_names"))
+    if not names and (row.get("agent_name") or "").strip():
+        names["ko"] = row["agent_name"]
+    row["agent_names"] = names
+    return row
+
+
 @router.get("/")
 async def list_agents(user: dict = Depends(get_current_user)):
     rows = await fetch_all(
         "SELECT agent_key, agent_name, is_enabled, is_required, model, system_prompt, "
-        "description, description_en, disabled_reason, disabled_reason_en, nav_group, sort_order, updated_at "
+        "description, description_en, descriptions, agent_names, disabled_reason, disabled_reason_en, "
+        "nav_group, sort_order, updated_at "
         "FROM tbl_agent_config ORDER BY sort_order, agent_key"
     )
-    return {"agents": rows}
+    return {"agents": [_expand_descriptions(r) for r in rows]}
 
 
 @router.get("/{agent_key}")
 async def get_agent(agent_key: str, user: dict = Depends(get_current_user)):
     row = await fetch_one(
         f"SELECT agent_key, agent_name, is_enabled, is_required, model, system_prompt, "
-        f"description, description_en, disabled_reason, disabled_reason_en, nav_group, sort_order, updated_at "
+        f"description, description_en, descriptions, agent_names, disabled_reason, disabled_reason_en, "
+        f"nav_group, sort_order, updated_at "
         f"FROM tbl_agent_config WHERE agent_key = {_PH}",
         (agent_key,),
     )
     if not row:
         raise HTTPException(status_code=404, detail="Agent not found")
-    return row
+    return _expand_descriptions(row)
 
 
 class AgentConfigPatch(BaseModel):

@@ -706,6 +706,45 @@ POST /api/setup/complete       # tbl_settings.setup_completed = true
   - RAG(응답 합성)·Playground(실험) 는 동일 `generate`/Assistant 를 후속 사용(로드맵).
 - **오프라인/CI**: Claude·Ollama 모두 불가 시 degrade — 결정적 동작(시험 안전).
 
+### 7.11.2 에이전트 설명 다국어 확장 + Local LLM 다양화 (SeCuardian R18-7·R19 준용, impl/33 · 물리 test/impl/31) — 사용자 요구(2026-07-09)
+
+SeCuardian 구현(test/impl/55)을 **코드 복제**로 싱크 (§3 준용 계약 연장):
+
+1. **다국어 설명 구조(R18-7)**: `tbl_agent_config.descriptions`(JSON `{"ko":..,"en":..}`, 타 언어
+   키 추가만으로 확장) + 기동 시 레거시(`description`/`description_en`) 멱등 백필.
+   meta.json `description` dict 형/레거시 형 모두 허용(업로드 시 정규화).
+   `tbl_users.preferred_lang` + 마이페이지 선호언어 UI — 표시 fallback:
+   `UI언어 → 선호언어 → ko → 첫 언어`(`pickDescription`). 로그인 시 UI locale 동기화.
+2. **Local LLM 다양화(R19)**: `llm_providers`(ollama/llamacpp/vllm 공통 `chat`, OpenAI 호환) ·
+   `llm_router`(작업별 라우팅 `llm_routes`: classify/tools/synthesize/domain/chat) ·
+   `llm_metering`(`tbl_llm_usage` 원장 + `GET /api/llm/usage` 집계) ·
+   `token_compress`(`llm_context_budget` 초과 시 head/tail 축약) ·
+   `router_llm`(`/api/llm/providers·models·routes·usage`) — orchestrator/base_agent 전 경로 통합.
+   compose profile `llamacpp`/`vllm`(기본 미기동 — 기존 Ollama 동작 무변경).
+3. **비고**: SeCMP 자체 `services/llm.py`(공유 generate) 는 무변경 — 차후 `llm_providers` 경유
+   통합은 로드맵.
+4. **에이전트 표시명 다국어 (impl/35 · 물리 test/impl/33, 2026-07-09 추가)**:
+   `tbl_agent_config.agent_names` JSON(`{"ko":..,"en":..}`) — SeCuardian impl/56 복제 싱크.
+   내장 7종 시드에 en 표시명 병기(Marketplace/Workflow/RAG/Playground/Guardrails/AI Assistant/
+   Orchestrator), 기동 시 `{"ko": agent_name}` 멱등 백필, meta.json `display_name` dict 형 허용.
+   표시: AgentsPage 카드·AppLayout nav/헤더·Guardrails 에이전트 셀렉트 — descriptions 와 동일
+   fallback 체인. `agent_name` 컬럼은 내부 참조용 유지.
+
+### 7.11.3 내장 에이전트 화면 i18n 전면 적용 + 중복 타이틀 제거 (impl/34 · 물리 test/impl/32) — 사용자 요구(2026-07-09)
+
+UI 언어 English 전환 시 내장 에이전트 화면들이 한국어로 남는 결함 + 본문 타이틀 중복 결함 수정.
+
+1. **i18n 미적용 해소**: Workflow(목록·풀스크린 빌더·캔버스)·RAG·Playground·Guardrails·
+   Marketplace·Dashboard 화면의 하드코딩 한국어 문자열 전부를 `useLocale` `t()` 키로 치환 —
+   `locales/{ko,en}.json` 에 화면별 섹션(`workflow.*`/`rag.*`/`playground.*`/`guardrails.*`/
+   `marketplace.*`/`dashboard.*`) 추가. ko/en 키 패리티 유지.
+2. **에이전트 카드 라벨**: 마켓플레이스 허브 카드의 `nav_group`(DB 한국어 값: `기본 Agent`·
+   `내장 에이전트` 등) 을 locale 매핑으로 표시(en: Basic Agent·Built-in Agent, 미등록 값은
+   원문 유지). 에이전트 표시명(`agent_name`)은 DB 데이터로 유지(범위 밖).
+3. **중복 타이틀 제거**: 상단 헤더(AppLayout)가 메뉴 타이틀을 표시하므로, 본문 h1
+   (Workflow/RAG/Playground/Guardrails/Dashboard) 을 제거하고 **페이지 설명(`*.pageDesc`)만
+   표시** — SeCuardian R18 '본문 중복 타이틀 제거' 표준 준용.
+
 ### 7.12 운영 명령(F-OPS) — Makefile 환경별 ops + DB 초기화 (SeCuardian 준용)
 
 | 범주 | 타겟 | 설명 |
@@ -799,6 +838,7 @@ POST /api/setup/complete       # tbl_settings.setup_completed = true
 | AI Assistant | ✅ | Orchestrator tool-calling 경로 |
 | Agent 관리(4테이블) | ✅ | `tbl_agent_config`·`tbl_addon_agents`·`tbl_addon_agent_capabilities`·`tbl_agent_registry` 잔존 |
 | **Addon Agent 핫디플로이** | ✅ **복원(impl/1)** | 사용자 결정(A): `router_addon_agent.py`·`app/addon_agent_loader.py`·`addon-agents/` 원본 복원, `main.py` `addon_init`/`addon_guard` 재배선, `router_mcp`/`router_agent_config` addon 연동 원복. Marketplace/Playground/Workflow 가 차후 소비 |
+| **다국어 설명 + Local LLM 다양화** | ✅ **싱크(impl/33)** | SeCuardian R18-7·R19(test/impl/55) 코드 복제 — `descriptions` JSON·`preferred_lang`·`llm_providers/router/metering/token_compress`·`router_llm`·compose profile llamacpp/vllm (§7.11.2) |
 
 ### 9.3 ⚠ 설계 전제 변경 (Deviation) — **해결됨(2026-07-08): 옵션 A 채택·완료**
 
@@ -856,6 +896,9 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-09 | v0.31 | **impl/35(물리 `test/impl/33`) — 에이전트 표시명 다국어 agent_names 싱크**(§7.11.2-4, 사용자 요구 "agent_name 도 descriptions 방식으로 확장"). SeCuardian impl/56 복제: `tbl_agent_config.agent_names` JSON 컬럼(init+멱등 ALTER+`{"ko": agent_name}` 백필), **내장 7종 시드 en 표시명**(마켓플레이스→Marketplace 등 — en UI 에서 한국어 표시명 노출 해소), meta.json `display_name` dict 형 정규화·배포 동기·addon 목록 노출, `_templates` 6종 dict 화 재패키징. 프론트: AgentsPage `nameOf`(10개소)·AppLayout nav/헤더(names dict 상태 보존, locale 전환 즉시 반영)·GuardrailsPage 에이전트 셀렉트. 시험 test/impl/33 4/4 PASS(격리 sqlite 기동·시드·API + import/tsc) |
+| 2026-07-09 | v0.30 | **impl/34(물리 `test/impl/32`) — 내장 에이전트 화면 i18n 전면 적용 + 중복 타이틀 제거**(§7.11.3, 사용자 결함 보고: English 전환 시 미적용 + 본문 타이틀 2중 표시). ① Workflow(목록·풀스크린 빌더·캔버스)·RAG·Playground·Guardrails·Marketplace·Dashboard 8파일의 하드코딩 한국어 137개를 `t()` 키로 치환 — `locales/{ko,en}.json` 에 wf/wfb/rag/pg/mp/dash/grd 섹션 신설(키 패리티 검증 0건 차이). WorkflowBuilderPage `NODE_META` label/desc 를 locale 키로 분리, GuardrailsPage `statusBadge` 키 반환화 ② 본문 h1 5화면 제거 → `pageDesc` 만 표시(SeCuardian R18 '본문 중복 타이틀 제거' 표준 준용, AppLayout 헤더가 타이틀 단독 표시) ③ AgentsPage `nav_group` 칩(DB 한국어 값) locale 매핑(`기본 Agent`→Basic Agent 등) — **SeCuardian 에도 동기 반영** ④ Dashboard 에이전트 설명 `pickDescription`(R18-7 fallback) 적용, `nav.aiAssistant` ko 오타 수정. 시험 test/impl/32 6/6 PASS(tsc·build·패리티·잔존 0건) |
+| 2026-07-09 | v0.29 | **impl/33(물리 `test/impl/31`) — SeCuardian R18-7·R19 복제 싱크**(§7.11.2, 사용자 요구 "SeCuardian 구현 후 Marketplace 에 코드 복제 싱크"). ① **다국어 설명 확장 구조**: `tbl_agent_config.descriptions` JSON(init+멱등 ALTER+기동 백필), meta.json dict 형 정규화(레거시 호환), `tbl_users.preferred_lang`+`GET/PATCH /auth/me`+마이페이지 선호언어 UI, `pickDescription` fallback 체인(UI→선호→ko→첫 언어), 로그인 locale 동기화, `_templates` 6종 dict 형 재패키징 ② **Local LLM 다양화**: `llm_providers`(ollama/llamacpp/vllm)·`llm_router`(작업별 라우팅)·`llm_metering`(`tbl_llm_usage`+집계)·`token_compress`·`router_llm`(4 엔드포인트), orchestrator/base_agent 통합, compose profile llamacpp/vllm, 설정 seed 7종, SettingsPage 사용량 요약, ChatPage 동적 모델 목록. 싱크 방법: 동일 13종+신규 6종 복사, 분기 11종 patch, main.py 3개소 수동 병합(SeCMP 고유 guardrails 배선 보존). 시험 test/impl/31 6/6 PASS(격리 sqlite 기동·API 검증 + import/ruff/tsc/compose 정적 검증) |
 | 2026-07-09 | v0.28 | **impl/32(물리 `test/impl/30`) — F-WF 풀스크린 워크플로우 빌더**(사용자 요구, §7.2.8). impl/27 편집형 캔버스가 생성 패널 내 320px 보조 위젯에 그쳐 "현재 구현 코드로는 사용할 수 없다"는 사용자 피드백 접수 — `.docs/Perplexity-Workflow/`·No-code/Low-code·Marketplace 리서치의 **팔레트→캔버스 drag&drop→인스펙터** 3분할 빌더 패턴(Flowise/Dify/n8n 공통)을 준용해 재구현. **코드 복제 없이 UX 패턴만 참조**(React Flow MIT 자체 구현, 상용/추가조건 라이선스 구성요소 제외). (1) 프론트 신규 `/workflow/builder(/:id)` + `WorkflowBuilderPage` — 좌측 팔레트(8노드+§7.2.3 컴포넌트, HTML5 드래그+클릭 삽입), 중앙 풀높이 캔버스(타입별 커스텀 노드), 우측 인스펙터(타입별 구조화 폼+JSON 폴백+엣지 `when` 편집 — §7.2.5 유보 해소). (2) 백엔드 `PATCH /workflows/{id}` 부분 편집 확장(name/description/definition_json, definition 변경 시 version+1, `{"enabled"}` 단독 하위호환 — §7.2.7 범위 확장). KWCAG 2.2 는 기존 a11y 폼 병행+인스펙터 표준 폼으로 유지. 시험 test/impl/30. **후속 결함 수정(같은 날)**: 캔버스 노드 미표시 버그 — React Flow v12 는 노드 측정값(`measured`)이 컨트롤드 상태에 반영돼야 `visibility:hidden` 을 해제하는데, 매 렌더 rfNodes 를 도메인 상태에서 재생성해 measured 가 소실(impl/18 부터 잠재, 정적 검증만 수행돼 미발견). 빌더는 RF 상태를 단일 진실로 전환, `WorkflowCanvas` 는 measured 보존 merge-sync 로 수정 — headless Chromium E2E(팔레트 삽입→저장→재로드→폼 동기화)로 실측 검증(test/impl/30 §D). |
 | 2026-07-09 | v0.27 | **impl/31(물리 `test/impl/29`) — F-RAG pgvector 실측 벤치마크**(사용자 요구·승인, §7.5.1). 사용자가 "순차적으로 진행" 지정한 후속 3항목의 마지막(webhook 보안 강화→enabled 토글→**pgvector 실측**). 도커 이미지 pull+실 컨테이너 기동이 필요해 별도 승인 후 진행. **발견**: `docker-compose.yml` postgres 서비스가 plain `postgres:17-alpine` 이미지라 `vector` 확장이 없었고, impl/15 `ensure_pg_schema()` 가 예외를 삼키고 조용히 local 폴백하는 설계라 지금까지 드러나지 않았던 잠재 결함 — **`pgvector/pgvector:pg17` 로 영구 교체**(임시 우회 아님). `docker compose up -d postgres` → `CREATE EXTENSION vector`(0.8.4) 확인 → `ENV=dev VECTOR_BACKEND=pgvector` 로 앱 부팅해 `vector_backend.resolve()="pgvector"` 실경로 최초 활성화 → 식별자 질의 세트(N=40, impl/4 방법론)로 실 `/api/rag/*` HTTP 경로 실측: **Recall@10=1.000**(목표 ≥0.89 초과 달성), **p95=20.8ms**(목표 ≤250ms, 약 12배 여유). 인프라 검증(이번 목표)과 임베딩 품질(파라프레이즈 재평가, 별도 로드맵)을 분리 보고 — PRD §5 KPI 표에 실측치 반영(더 이상 전량 `가정:` 아님). 벤치마크 후 `docker compose stop postgres` 로 정리(볼륨 보존). 시험 test/impl/29, 기존 test/impl/4·15(sqlite 경로) 회귀 무영향. |
 | 2026-07-09 | v0.26 | **impl/30(물리 `test/impl/28`) — F-WF `enabled` 토글 PATCH 엔드포인트**(사용자 요구, §7.2.7). 사용자가 "순차적으로 진행" 지정한 후속 3항목의 2번째. `PATCH /api/workflows/{id}`(admin/supervisor, `{"enabled": bool}`) 신설 — impl/24 시험이 DB 직접조작으로 우회했던 기존 갭 해소, impl/28(Dify DSL Import, 항상 `enabled=false` 생성) 을 검토 후 활성화하는 실사용 흐름 지원. 1차 범위는 `enabled` 토글만(이름/정의 편집은 범위 밖). 프론트 `WorkflowPage.tsx` 에 활성화/비활성화 토글 버튼 추가. 시험 test/impl/28, 기존 test/impl/2·23·24·26·27 회귀 무영향. |

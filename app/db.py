@@ -185,11 +185,14 @@ def _apply_pg_column_migrations() -> None:
         "ALTER TABLE tbl_agent_config ADD COLUMN IF NOT EXISTS is_required INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE tbl_agent_config ADD COLUMN IF NOT EXISTS description TEXT",
         "ALTER TABLE tbl_agent_config ADD COLUMN IF NOT EXISTS description_en TEXT",
+        "ALTER TABLE tbl_agent_config ADD COLUMN IF NOT EXISTS descriptions TEXT",
+        "ALTER TABLE tbl_agent_config ADD COLUMN IF NOT EXISTS agent_names TEXT",
         "ALTER TABLE tbl_agent_config ADD COLUMN IF NOT EXISTS disabled_reason TEXT",
         "ALTER TABLE tbl_agent_config ADD COLUMN IF NOT EXISTS disabled_reason_en TEXT",
         "ALTER TABLE tbl_users ADD COLUMN IF NOT EXISTS totp_secret TEXT",
         "ALTER TABLE tbl_users ADD COLUMN IF NOT EXISTS totp_enabled INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE tbl_users ADD COLUMN IF NOT EXISTS custom_instructions TEXT",
+        "ALTER TABLE tbl_users ADD COLUMN IF NOT EXISTS preferred_lang VARCHAR(10)",
         "ALTER TABLE tbl_addon_agents ADD COLUMN IF NOT EXISTS has_app INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE tbl_addon_agents ADD COLUMN IF NOT EXISTS agent_type TEXT NOT NULL DEFAULT 'app'",
         "ALTER TABLE tbl_addon_agents ADD COLUMN IF NOT EXISTS meta_json TEXT",
@@ -247,6 +250,8 @@ async def apply_column_migrations() -> None:
             ("is_required", "INTEGER NOT NULL DEFAULT 0"),
             ("description", "TEXT"),
             ("description_en", "TEXT"),
+            ("descriptions", "TEXT"),
+            ("agent_names", "TEXT"),
             ("disabled_reason", "TEXT"),
             ("disabled_reason_en", "TEXT"),
         ] if cols else []):
@@ -264,6 +269,7 @@ async def apply_column_migrations() -> None:
             ("totp_secret", "TEXT"),
             ("totp_enabled", "INTEGER NOT NULL DEFAULT 0"),
             ("custom_instructions", "TEXT"),
+            ("preferred_lang", "VARCHAR(10)"),
         ] if user_cols else []):
             col_name = col.split()[0]
             if col_name not in user_cols:
@@ -348,6 +354,73 @@ async def apply_column_migrations() -> None:
                 await conn.execute(f"ALTER TABLE workflows ADD COLUMN {col} {typedef}")
                 logger.info("[db] added column workflows.%s", col)
         await conn.commit()
+
+
+async def backfill_descriptions() -> None:
+    """R18-7: 레거시 description/description_en → descriptions JSON 멱등 백필.
+
+    descriptions 가 비어 있는 행만 대상. 레거시 컬럼은 하위호환용으로 유지한다.
+    """
+    import json as _json
+
+    rows = await fetch_all(
+        "SELECT agent_key, description, description_en, descriptions FROM tbl_agent_config"
+    )
+    filled = 0
+    for r in rows:
+        if (r.get("descriptions") or "").strip():
+            continue
+        d: dict[str, str] = {}
+        if (r.get("description") or "").strip():
+            d["ko"] = r["description"].strip()
+        if (r.get("description_en") or "").strip():
+            d["en"] = r["description_en"].strip()
+        if not d:
+            continue
+        await execute_write(
+            f"UPDATE tbl_agent_config SET descriptions = {_PH} WHERE agent_key = {_PH}",
+            (_json.dumps(d, ensure_ascii=False), r["agent_key"]),
+        )
+        filled += 1
+    if filled:
+        logger.info("[db] descriptions backfilled: %d agents", filled)
+
+
+async def backfill_descriptions() -> None:
+    """R18-7: 레거시 컬럼 → 다국어 JSON 멱등 백필.
+
+    - descriptions: description(ko)/description_en(en) 에서 병합
+    - agent_names: agent_name 에서 {"ko": ...} 생성 (en 은 시드/업로드 meta 로 보강)
+    비어 있는 행만 대상. 레거시 컬럼은 하위호환용으로 유지한다.
+    """
+    import json as _json
+
+    rows = await fetch_all(
+        "SELECT agent_key, agent_name, description, description_en, descriptions, agent_names "
+        "FROM tbl_agent_config"
+    )
+    filled = names_filled = 0
+    for r in rows:
+        if not (r.get("descriptions") or "").strip():
+            d: dict[str, str] = {}
+            if (r.get("description") or "").strip():
+                d["ko"] = r["description"].strip()
+            if (r.get("description_en") or "").strip():
+                d["en"] = r["description_en"].strip()
+            if d:
+                await execute_write(
+                    f"UPDATE tbl_agent_config SET descriptions = {_PH} WHERE agent_key = {_PH}",
+                    (_json.dumps(d, ensure_ascii=False), r["agent_key"]),
+                )
+                filled += 1
+        if not (r.get("agent_names") or "").strip() and (r.get("agent_name") or "").strip():
+            await execute_write(
+                f"UPDATE tbl_agent_config SET agent_names = {_PH} WHERE agent_key = {_PH}",
+                (_json.dumps({"ko": r["agent_name"].strip()}, ensure_ascii=False), r["agent_key"]),
+            )
+            names_filled += 1
+    if filled or names_filled:
+        logger.info("[db] backfilled: descriptions %d, agent_names %d", filled, names_filled)
 
 
 async def seed_default_admin() -> None:

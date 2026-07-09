@@ -125,18 +125,61 @@ def _safe_extract(zf: zipfile.ZipFile, dest: Path) -> None:
     zf.extractall(dest)
 
 
+def _norm_descriptions(meta: dict) -> dict:
+    """R18-7: meta 의 description 을 다국어 dict 로 정규화.
+
+    허용 형식 — ① dict 형: description={"ko": "...", "en": "..."} (확장형, 타 언어 키 허용)
+               ② 레거시: description(문자열=ko) + description_en(문자열=en)
+    정규화 후 meta 에는 세 키가 모두 존재: description(ko 문자열, 하위호환),
+    description_en(en 문자열, 하위호환), descriptions(dict).
+    """
+    desc = meta.get("description")
+    d: dict[str, str] = {}
+    if isinstance(desc, dict):
+        d = {k: v for k, v in desc.items() if isinstance(v, str) and v.strip()}
+    elif isinstance(desc, str) and desc.strip():
+        d["ko"] = desc.strip()
+    en = meta.get("description_en")
+    if isinstance(en, str) and en.strip():
+        d.setdefault("en", en.strip())
+    # dict 형이 넘어온 경우에도 legacy 키 병행 유지
+    existing = meta.get("descriptions")
+    if isinstance(existing, dict):
+        for k, v in existing.items():
+            if isinstance(v, str) and v.strip():
+                d.setdefault(k, v.strip())
+    meta["descriptions"] = d
+    meta["description"] = d.get("ko", "")
+    meta["description_en"] = d.get("en", "")
+    # R18-7 확장: display_name 도 dict 형(다국어) 허용 → agent_names 정규화
+    disp = meta.get("display_name")
+    names: dict[str, str] = {}
+    if isinstance(disp, dict):
+        names = {k: v for k, v in disp.items() if isinstance(v, str) and v.strip()}
+    elif isinstance(disp, str) and disp.strip():
+        names["ko"] = disp.strip()
+    existing_names = meta.get("agent_names")
+    if isinstance(existing_names, dict):
+        for k, v in existing_names.items():
+            if isinstance(v, str) and v.strip():
+                names.setdefault(k, v.strip())
+    meta["agent_names"] = names
+    meta["display_name"] = names.get("ko", "") or (disp if isinstance(disp, str) else "")
+    return meta
+
+
 def _parse_meta_json(dest: Path, zip_stem: str) -> dict:
     """ZIP 내 {AgentName}-meta.json 파싱. 없으면 기본값(type=app) 반환."""
     meta_file = dest / f"{zip_stem}-meta.json"
     if not meta_file.exists():
-        return {"agent_type": "app", "capabilities": []}
+        return _norm_descriptions({"agent_type": "app", "capabilities": []})
     try:
         data = json.loads(meta_file.read_text(encoding="utf-8"))
         if data.get("agent_type") not in _VALID_TYPES:
             data["agent_type"] = "app"
-        return data
+        return _norm_descriptions(data)
     except Exception:
-        return {"agent_type": "app", "capabilities": []}
+        return _norm_descriptions({"agent_type": "app", "capabilities": []})
 
 
 @router.get("/templates/list")
@@ -152,12 +195,14 @@ async def list_templates(user: dict = Depends(get_current_user)):
         agent_type = "app"
         description = ""
         description_en = ""
+        descriptions: dict = {}
         if meta_files:
             try:
-                meta = json.loads(meta_files[0].read_text(encoding="utf-8"))
+                meta = _norm_descriptions(json.loads(meta_files[0].read_text(encoding="utf-8")))
                 agent_type = meta.get("agent_type", "app")
                 description = meta.get("description", "")
                 description_en = meta.get("description_en", "")
+                descriptions = meta.get("descriptions", {})
             except Exception:
                 pass
         templates.append({
@@ -166,6 +211,7 @@ async def list_templates(user: dict = Depends(get_current_user)):
             "agent_type": agent_type,
             "description": description,
             "description_en": description_en,
+            "descriptions": descriptions,
             "has_zip": (_TEMPLATES / f"{d.name}.zip").exists(),
         })
     return {"templates": templates}
@@ -229,12 +275,16 @@ async def list_addons(user: dict = Depends(get_current_user)):
     )
     for row in rows:
         try:
-            meta = json.loads(row.get("meta_json") or "{}")
+            meta = _norm_descriptions(json.loads(row.get("meta_json") or "{}"))
             row["description"] = meta.get("description", "")
             row["description_en"] = meta.get("description_en", "")
+            row["descriptions"] = meta.get("descriptions", {})
+            row["agent_names"] = meta.get("agent_names", {})
         except Exception:
             row["description"] = ""
             row["description_en"] = ""
+            row["descriptions"] = {}
+            row["agent_names"] = {}
         row.pop("meta_json", None)
     return {"addons": rows}
 
@@ -682,7 +732,10 @@ def _standalone_seed_sql(row: dict, stem: str, has_app: bool) -> str:
     router_path = f"addon-agents/deployed/{key}/{stem}-app.py" if has_app else ""
     description = ""
     try:
-        description = _sql_quote(json.loads(row.get("meta_json") or "{}").get("description", ""))
+        # dict 형(description={"ko":..}) meta 도 안전 처리 — 정규화 후 ko 문자열 사용
+        description = _sql_quote(
+            _norm_descriptions(json.loads(row.get("meta_json") or "{}")).get("description", "")
+        )
     except Exception:
         pass
     return (
@@ -1030,13 +1083,14 @@ async def upload_addon(
              sql_path_val, agent_type, meta_json_val, is_builtin, user["sub"]),
         )
 
-    # Agent 설정 등록 (이미 있으면 스킵) — 설명은 meta_json 기준으로 항상 최신화 (ko + en)
+    # Agent 설정 등록 (이미 있으면 스킵) — 설명은 meta_json 기준으로 항상 최신화 (다국어 dict + 레거시)
     description = meta.get("description", "")
     description_en = meta.get("description_en", "")
+    descriptions_json = json.dumps(meta.get("descriptions") or {}, ensure_ascii=False)
     await execute_write(
-        f"INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, description, description_en) "
-        f"VALUES ({_PH},{_PH},1,{_PH},{_PH}) ON CONFLICT(agent_key) DO NOTHING",
-        (agent_key, agent_name, description, description_en),
+        f"INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, description, description_en, descriptions) "
+        f"VALUES ({_PH},{_PH},1,{_PH},{_PH},{_PH}) ON CONFLICT(agent_key) DO NOTHING",
+        (agent_key, agent_name, description, description_en, descriptions_json),
     )
     if description:
         await execute_write(
@@ -1047,6 +1101,17 @@ async def upload_addon(
         await execute_write(
             f"UPDATE tbl_agent_config SET description_en = {_PH} WHERE agent_key = {_PH}",
             (description_en, agent_key),
+        )
+    if meta.get("descriptions"):
+        await execute_write(
+            f"UPDATE tbl_agent_config SET descriptions = {_PH} WHERE agent_key = {_PH}",
+            (descriptions_json, agent_key),
+        )
+    # R18-7 확장: meta display_name(다국어) → agent_names 동기
+    if meta.get("agent_names"):
+        await execute_write(
+            f"UPDATE tbl_agent_config SET agent_names = {_PH} WHERE agent_key = {_PH}",
+            (json.dumps(meta["agent_names"], ensure_ascii=False), agent_key),
         )
 
     # Capability 인덱스 등록 (F23) — meta_json의 capabilities 배열 저장

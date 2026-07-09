@@ -5,6 +5,7 @@ import {
 } from "../../api/guardrails";
 import { AgentConfig, listAgentConfigs } from "../../api/agentConfig";
 import { getAuth } from "../../store/auth";
+import { pickDescription } from "../../store/locale";
 import { useLocale } from "../../hooks/useLocale";
 
 const DECISION_COLOR: Record<string, string> = {
@@ -13,10 +14,11 @@ const DECISION_COLOR: Record<string, string> = {
 };
 
 // 상태 배지 — functional(원본 regex 실판정) / heuristic(생성 regex·예시 휴리스틱) / catalog_only(규칙 없음)
-function statusBadge(status: string): { cls: string; label: string } {
-  if (status === "functional") return { cls: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400", label: "실판정" };
-  if (status === "heuristic") return { cls: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", label: "휴리스틱" };
-  return { cls: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400", label: "규칙 없음" };
+// i18n: 라벨은 키로 반환하고 사용처에서 t() 적용 (impl/34 §7.11.3)
+function statusBadge(status: string): { cls: string; labelKey: string } {
+  if (status === "functional") return { cls: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400", labelKey: "grd.badgeReal" };
+  if (status === "heuristic") return { cls: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", labelKey: "grd.badgeHeuristic" };
+  return { cls: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400", labelKey: "grd.badgeNone" };
 }
 
 export default function GuardrailsPage() {
@@ -67,7 +69,7 @@ export default function GuardrailsPage() {
     } catch (e) {
       setDomains((prev) => prev.map((x) => x.domain_key === d.domain_key ? { ...x, filter_enabled: enabled ? 0 : 1 } : x));
       const msg = (e as { response?: { status?: number; data?: { detail?: string } } })?.response;
-      setError(msg?.data?.detail || (msg?.status === 404 ? "필터 API 미탑재 — 백엔드 재시작 필요" : "필터 적용 실패"));
+      setError(msg?.data?.detail || (msg?.status === 404 ? t("grd.filterApiMissing") : t("grd.filterFailed")));
     }
   }
 
@@ -82,7 +84,7 @@ export default function GuardrailsPage() {
     } catch (e) {
       reloadDomains();
       const msg = (e as { response?: { status?: number; data?: { detail?: string } } })?.response;
-      setError(msg?.data?.detail || (msg?.status === 404 ? "필터 API 미탑재 — 백엔드 재시작 필요" : "일괄 필터 적용 실패"));
+      setError(msg?.data?.detail || (msg?.status === 404 ? t("grd.filterApiMissing") : t("grd.bulkFilterFailed")));
     }
   }
 
@@ -100,27 +102,24 @@ export default function GuardrailsPage() {
 
   return (
     <div className="page space-y-6">
-      <div>
-        <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("nav.guardrails") ?? "가드레일"}</h1>
-        <p className="text-xs text-gray-500 mt-0.5">
-          도메인 규칙셋을 요청/응답에 강제하는 거버넌스. <code className="font-mono">global</code>(PII/신용정보)은 무조건 필수,
-          업종 도메인은 <b>필터적용</b> 토글로 테스트 적용 여부를 반영합니다.
-        </p>
-      </div>
+      {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 (R18 표준) */}
+      <p className="text-xs text-gray-500">
+        {t("grd.desc1")}<code className="font-mono">global</code>{t("grd.desc2")}<b>{t("grd.filterApply")}</b>{t("grd.desc3")}
+      </p>
 
       <section>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">도메인 카탈로그</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("grd.domainCatalog")}</h3>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-gray-400">필터적용 {activeCount} / {domains.length} 도메인</span>
+            <span className="text-[11px] text-gray-400">{t("grd.filterApplied")} {activeCount} / {domains.length} {t("grd.domainsUnit")}</span>
             {isAdmin && (() => {
               const targets = domains.filter((d) => !d.is_required);
               const allOn = targets.length > 0 && targets.every((d) => d.filter_enabled);
               return (
-                <label className="inline-flex items-center gap-1 cursor-pointer" title="전체 필터적용/해제">
+                <label className="inline-flex items-center gap-1 cursor-pointer" title={t("grd.allToggleTitle")}>
                   <input type="checkbox" checked={allOn}
                     onChange={(e) => toggleAllFilters(e.target.checked)} />
-                  <span className="text-[10px] text-gray-500">전체</span>
+                  <span className="text-[10px] text-gray-500">{t("grd.all")}</span>
                 </label>
               );
             })()}
@@ -138,21 +137,21 @@ export default function GuardrailsPage() {
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-medium text-gray-700 dark:text-gray-200 truncate" title={d.domain_key}>{d.display_name}</p>
                   {d.is_required ? (
-                    <span className="shrink-0 border-2 border-red-500 text-red-500 text-[9px] font-black px-1 rounded-sm uppercase leading-none">필수</span>
+                    <span className="shrink-0 border-2 border-red-500 text-red-500 text-[9px] font-black px-1 rounded-sm uppercase leading-none">{t("grd.requiredBadge")}</span>
                   ) : isAdmin ? (
-                    <label className="shrink-0 inline-flex items-center gap-1 cursor-pointer" title="필터적용">
+                    <label className="shrink-0 inline-flex items-center gap-1 cursor-pointer" title={t("grd.applyTitle")}>
                       <input type="checkbox" checked={!!d.filter_enabled}
                         onChange={(e) => toggleFilter(d, e.target.checked)} />
-                      <span className="text-[10px] text-gray-500">적용</span>
+                      <span className="text-[10px] text-gray-500">{t("grd.apply")}</span>
                     </label>
                   ) : (
                     <span className={`shrink-0 inline-block w-2 h-2 rounded-full ${d.filter_enabled ? "bg-blue-500" : "bg-gray-300 dark:bg-gray-600"}`} />
                   )}
                 </div>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] ${b.cls}`}>{b.label}</span>
+                  <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] ${b.cls}`}>{t(b.labelKey)}</span>
                   <span className="text-[10px] text-gray-400">
-                    실판정 {d.real_rule_count ?? 0} · 휴리스틱 {d.heuristic_rule_count ?? 0} / {d.rule_count}
+                    {t("grd.realShort")} {d.real_rule_count ?? 0} · {t("grd.heurShort")} {d.heuristic_rule_count ?? 0} / {d.rule_count}
                   </span>
                 </div>
               </div>
@@ -162,20 +161,20 @@ export default function GuardrailsPage() {
       </section>
 
       <section className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">테스트 (필수 + 필터적용 도메인 동시 판정)</h3>
-        <textarea placeholder="PII/신용정보·업종 위반 문구 등을 입력해 판정을 시험하세요."
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("grd.testTitle")}</h3>
+        <textarea placeholder={t("grd.testPh")}
           rows={3} value={testInput} onChange={(e) => setTestInput(e.target.value)}
           className="w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
         <button disabled={busy} onClick={handleTest}
           className="mt-2 text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
-          판정 시험
+          {t("grd.testBtn")}
         </button>
         {result && (
           <div className="mt-3 p-2 rounded bg-gray-50 dark:bg-gray-800 text-xs space-y-1">
             <p>
-              결정: <span className={`font-semibold ${DECISION_COLOR[result.decision] ?? ""}`}>{result.decision}</span>
+              {t("grd.decision")} <span className={`font-semibold ${DECISION_COLOR[result.decision] ?? ""}`}>{result.decision}</span>
               {" · "}riskScore: {result.riskScore}
-              {" · "}평가 도메인: {result.evaluatedDomains.join(", ")}
+              {" · "}{t("grd.evalDomains")} {result.evaluatedDomains.join(", ")}
               {result.source && <span className="ml-1 text-gray-400">[{result.source}]</span>}
             </p>
             {result.perDomain?.length > 0 && (
@@ -183,24 +182,24 @@ export default function GuardrailsPage() {
                 {result.perDomain.map((pd) => (
                   <p key={pd.domain} className="text-gray-500">
                     · {pd.domain}: <span className={DECISION_COLOR[pd.decision] ?? ""}>{pd.decision}</span>
-                    {pd.matchedCount > 0 && ` (${pd.matchedCount}건: ${pd.matchedRules.slice(0, 4).join(", ")}${pd.matchedRules.length > 4 ? "…" : ""})`}
+                    {pd.matchedCount > 0 && ` (${pd.matchedCount}${t("grd.matchedUnit")}: ${pd.matchedRules.slice(0, 4).join(", ")}${pd.matchedRules.length > 4 ? "…" : ""})`}
                   </p>
                 ))}
               </div>
             )}
             {result.decision !== "allow" && (
-              <p className="mt-1 text-gray-500">마스킹 결과: {result.redactedText}</p>
+              <p className="mt-1 text-gray-500">{t("grd.maskResult")} {result.redactedText}</p>
             )}
           </div>
         )}
       </section>
 
       <section>
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">에이전트별 도메인 토글(게이트 강제)</h3>
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("grd.agentToggleTitle")}</h3>
         <select value={selectedAgent} onChange={(e) => loadAgentConfig(e.target.value)}
           className="text-sm px-2 py-1.5 mb-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
-          <option value="">에이전트 선택</option>
-          {agents.map((a) => <option key={a.agent_key} value={a.agent_key}>{a.agent_name}</option>)}
+          <option value="">{t("grd.selectAgent")}</option>
+          {agents.map((a) => <option key={a.agent_key} value={a.agent_key}>{pickDescription(a.agent_names, a.agent_name, null) || a.agent_name}</option>)}
         </select>
         {selectedAgent && (
           <div className="space-y-1.5">
@@ -209,7 +208,7 @@ export default function GuardrailsPage() {
                 <input type="checkbox" checked={isEnabled(d.domain_key)}
                   onChange={(e) => toggleDomain(d.domain_key, e.target.checked)} />
                 {d.display_name}
-                <span className="text-[10px] text-gray-400">({statusBadge(d.status).label})</span>
+                <span className="text-[10px] text-gray-400">({t(statusBadge(d.status).labelKey)})</span>
               </label>
             ))}
           </div>

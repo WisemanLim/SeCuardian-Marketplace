@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { streamChat } from "../../api/agent";
 import { listAddonAgents, type AddonAgent } from "../../api/addonAgents";
+import { pickDescription } from "../../store/locale";
 import { useLocale } from "../../hooks/useLocale";
 
 interface Message {
@@ -14,7 +15,7 @@ interface Message {
 
 export default function GenericAddonPage() {
   const { agentKey } = useParams<{ agentKey: string }>();
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
   const [agent, setAgent] = useState<AddonAgent | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -81,7 +82,7 @@ export default function GenericAddonPage() {
     }
   }
 
-  const agentName = agent?.agent_name ?? agentKey ?? "";
+  const agentName = (agent ? pickDescription(agent.agent_names, agent.agent_name, null) || agent.agent_name : agentKey) ?? "";
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-950">
@@ -91,7 +92,7 @@ export default function GenericAddonPage() {
           <span className="text-base shrink-0">🤖</span>
           <div className="min-w-0">
             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-              {(locale === "en" ? agent?.description_en || agent?.description : agent?.description) || t("chat.addonQaNotice")}
+              {pickDescription(agent?.descriptions, agent?.description, agent?.description_en) || t("chat.addonQaNotice")}
             </p>
             {agent?.api_prefix && (
               <p className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">{agent.api_prefix}</p>

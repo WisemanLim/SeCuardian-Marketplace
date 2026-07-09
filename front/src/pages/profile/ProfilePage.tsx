@@ -3,6 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import client from "../../api/client";
 import { getAuth, setAuth } from "../../store/auth";
 import { getTotpQr, enableTotp, disableTotp } from "../../api/auth";
+import { setPreferredLang } from "../../store/locale";
 import { useLocale } from "../../hooks/useLocale";
 
 interface Profile {
@@ -12,8 +13,15 @@ interface Profile {
   role: string;
   totp_enabled: boolean;
   custom_instructions: string | null;
+  preferred_lang: string | null;
   created_at: string;
 }
+
+// R18-7: 선호언어 선택지 — 타 언어 지원 시 여기에 추가
+const PREFERRED_LANGS: { value: string; labelKey: string }[] = [
+  { value: "ko", labelKey: "locale.ko" },
+  { value: "en", labelKey: "locale.en" },
+];
 
 export default function ProfilePage() {
   const { t } = useLocale();
@@ -32,6 +40,9 @@ export default function ProfilePage() {
   const [userInstr, setUserInstr] = useState("");
   const [userInstrSaved, setUserInstrSaved] = useState(false);
   const [userInstrSaving, setUserInstrSaving] = useState(false);
+  const [prefLang, setPrefLang] = useState("ko");
+  const [prefLangSaved, setPrefLangSaved] = useState(false);
+  const [prefLangSaving, setPrefLangSaving] = useState(false);
 
   const [totpOtpauth, setTotpOtpauth] = useState("");
   const [totpEnabled, setTotpEnabled] = useState(false);
@@ -49,6 +60,7 @@ export default function ProfilePage() {
         setForm({ username: data.username ?? "", email: data.email ?? "" });
         setTotpEnabled(data.totp_enabled);
         setUserInstr(data.custom_instructions ?? "");
+        setPrefLang(data.preferred_lang ?? "ko");
       })
       .catch(() => setError(t("profile.updateFailed")))
       .finally(() => setLoading(false));
@@ -98,6 +110,18 @@ export default function ProfilePage() {
       setTimeout(() => setUserInstrSaved(false), 2000);
     } catch { /* ignore */ } finally {
       setUserInstrSaving(false);
+    }
+  }
+
+  async function handleSavePrefLang() {
+    setPrefLangSaving(true);
+    try {
+      await client.patch("/auth/me", { preferred_lang: prefLang });
+      setPreferredLang(prefLang); // 로컬 fallback 체인에 즉시 반영
+      setPrefLangSaved(true);
+      setTimeout(() => setPrefLangSaved(false), 2000);
+    } catch { /* ignore */ } finally {
+      setPrefLangSaving(false);
     }
   }
 
@@ -349,6 +373,32 @@ export default function ProfilePage() {
             </form>
           </div>
         )}
+      </div>
+
+      {/* Preferred language (R18-7) */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-3">
+        <div>
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200">🌐 {t("profile.preferredLang")}</h2>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{t("profile.preferredLangDesc")}</p>
+        </div>
+        <div className="flex gap-2 items-center">
+          <select
+            value={prefLang}
+            onChange={(e) => setPrefLang(e.target.value)}
+            className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {PREFERRED_LANGS.map(({ value, labelKey }) => (
+              <option key={value} value={value}>{t(labelKey)}</option>
+            ))}
+          </select>
+          <button
+            onClick={handleSavePrefLang}
+            disabled={prefLangSaving}
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors"
+          >
+            {prefLangSaved ? t("common.saved") : prefLangSaving ? t("common.saving") : t("common.save")}
+          </button>
+        </div>
       </div>
 
       {/* Custom instructions */}

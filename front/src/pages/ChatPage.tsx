@@ -13,6 +13,7 @@ import {
   sendFeedback,
 } from "../api/chatHistory";
 import { clearAuth } from "../store/auth";
+import { listLlmModels } from "../api/llm";
 import { useLocale } from "../hooks/useLocale";
 import { type ChatMessage, newSessionId } from "../store/sessions";
 import {
@@ -29,12 +30,11 @@ interface Message extends ChatMessage {
   pendingPair?: boolean;                   // 전역 스트림 store 반영 중인 교환 (서버 sync)
 }
 
-const MODEL_OPTIONS = [
-  { value: "ollama", label: "🏠 Ollama (Local)" },
+// R19: 서버 /api/llm/models 로 동적 조회 — 실패 시 아래 기본 옵션 사용
+const FALLBACK_MODEL_OPTIONS = [
+  { value: "ollama", label: "🏠 Local LLM" },
   { value: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
   { value: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5" },
-  { value: "gpt-4o", label: "GPT-4o" },
-  { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash" },
 ];
 
 const FEEDBACK_OPTIONS: { value: FeedbackRating; icon: string }[] = [
@@ -80,6 +80,21 @@ export default function ChatPage() {
   const [activeId, setActiveId] = useState<string>(() => newSessionId());
   const [messages, setMessages] = useState<Message[]>([]);
   const [model, setModel] = useState<string>("ollama");
+  const [modelOptions, setModelOptions] = useState(FALLBACK_MODEL_OPTIONS);
+
+  // R19: 사용 가능 모델 동적 조회 (로컬 provider 라벨 반영)
+  useEffect(() => {
+    listLlmModels()
+      .then((d) => {
+        if (d.models?.length) {
+          setModelOptions(d.models.map((m) => ({
+            value: m.value,
+            label: m.provider !== "anthropic" ? `🏠 ${m.label}` : m.label,
+          })));
+        }
+      })
+      .catch(() => {});
+  }, []);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [showSessions, setShowSessions] = useState(true);
@@ -319,7 +334,7 @@ export default function ChatPage() {
             onChange={(e) => setModel(e.target.value)}
             className="text-xs border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {MODEL_OPTIONS.map((opt) => (
+            {modelOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -356,7 +371,7 @@ export default function ChatPage() {
                 {t("chat.noMessages")}
               </p>
               <p className="text-gray-300 dark:text-gray-600 text-xs">
-                {t("chat.currentModel")}: {MODEL_OPTIONS.find((o) => o.value === model)?.label}
+                {t("chat.currentModel")}: {modelOptions.find((o) => o.value === model)?.label}
               </p>
             </div>
           )}

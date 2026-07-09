@@ -9,6 +9,7 @@ import {
 import { getUiConfig } from "../../api/settings";
 import { registerAsset, ASSET_KINDS } from "../../api/marketplace";
 import { getAuth } from "../../store/auth";
+import { pickDescription } from "../../store/locale";
 import { useLocale } from "../../hooks/useLocale";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import MarketplacePage from "../marketplace/MarketplacePage";
@@ -199,10 +200,22 @@ export default function AgentsPage() {
   const { t, locale } = useLocale();
   const user = getAuth();
 
-  // '언어' 선택에 따른 설명 — en 이면 description_en 우선, 없으면 ko 폴백
+  // '언어' 선택에 따른 설명 — en 이면 description_en 우선, 없으면 ko 폴백 (disabled_reason 용)
   const pickDesc = (ko?: string | null, en?: string | null) =>
     locale === "en" ? (en || ko || "") : (ko || "");
+  // R18-7: 다국어 dict(descriptions) 우선 + 선호언어 fallback — locale 변경 시 재렌더로 갱신
+  const descOf = (o: { descriptions?: Record<string, string> | null; description?: string | null; description_en?: string | null }) =>
+    pickDescription(o.descriptions, o.description, o.description_en);
+  // R18-7 확장: 에이전트 표시명 다국어 — 동일 fallback 체인
+  const nameOf = (o: { agent_names?: Record<string, string> | null; agent_name: string }) =>
+    pickDescription(o.agent_names, o.agent_name, null) || o.agent_name;
   const isAdmin = user?.role === "supervisor" || user?.role === "admin";
+  // i18n(§7.11.3): DB 한국어 nav_group 값을 locale 라벨로 매핑(미등록 값은 원문 유지)
+  const navGroupLabel = (g?: string | null) => {
+    if (!g) return t("common.default");
+    const m: Record<string, string> = { "기본 Agent": t("agent.groupBasic"), "내장 에이전트": t("agent.groupBuiltin") };
+    return m[g] ?? g;
+  };
 
   const [tab, setTab] = useState<Tab>("builtin");
   const [configs, setConfigs] = useState<AgentConfig[]>([]);
@@ -537,16 +550,16 @@ export default function AgentsPage() {
               title={c.is_enabled ? t("common.active") : t("common.inactive")}
             />
           )}
-          <McpCorner agentKey={c.agent_key} agentName={c.agent_name} eligible={mcpEligible} />
-          {canExport && <ExportIcons agentKey={c.agent_key} agentName={c.agent_name} />}
+          <McpCorner agentKey={c.agent_key} agentName={nameOf(c)} eligible={mcpEligible} />
+          {canExport && <ExportIcons agentKey={c.agent_key} agentName={nameOf(c)} />}
         </div>
 
         <div className={`flex items-center gap-3 ${canExport ? "pr-32" : "pr-28"}`}>
-          <AgentAvatar agentKey={c.agent_key} name={c.agent_name} />
+          <AgentAvatar agentKey={c.agent_key} name={nameOf(c)} />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{c.agent_name}</p>
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{nameOf(c)}</p>
             <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
-              {c.agent_key} · {c.nav_group ?? t("common.default")}
+              {c.agent_key} · {navGroupLabel(c.nav_group)}
             </p>
           </div>
         </div>
@@ -554,11 +567,11 @@ export default function AgentsPage() {
         <p
           className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 min-h-8"
           title={[
-            pickDesc(c.description, c.description_en),
+            descOf(c),
             c.disabled_reason ? `⚠️ ${pickDesc(c.disabled_reason, c.disabled_reason_en)}` : "",
           ].filter(Boolean).join("\n")}
         >
-          {pickDesc(c.description, c.description_en) || "—"}
+          {descOf(c) || "—"}
         </p>
         {c.disabled_reason && (
           <p className="text-[11px] text-amber-500 line-clamp-1" title={pickDesc(c.disabled_reason, c.disabled_reason_en)}>
@@ -588,12 +601,12 @@ export default function AgentsPage() {
               title={a.is_active ? t("common.active") : t("common.inactive")}
             />
           )}
-          <McpCorner agentKey={a.agent_key} agentName={a.agent_name} eligible={!!a.is_active} />
-          {isAdmin && <ExportIcons agentKey={a.agent_key} agentName={a.agent_name} />}
+          <McpCorner agentKey={a.agent_key} agentName={nameOf(a)} eligible={!!a.is_active} />
+          {isAdmin && <ExportIcons agentKey={a.agent_key} agentName={nameOf(a)} />}
           {isAdmin && (
             <button
               type="button"
-              onClick={() => setConfirmTarget({ type: "agent", key: a.agent_key, name: a.agent_name })}
+              onClick={() => setConfirmTarget({ type: "agent", key: a.agent_key, name: nameOf(a) })}
               className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/40 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-700 transition-colors"
               title={t("common.delete")}
             >
@@ -603,15 +616,15 @@ export default function AgentsPage() {
         </div>
 
         <div className={`flex items-center gap-3 ${isAdmin ? "pr-40" : "pr-28"}`}>
-          <AgentAvatar agentKey={a.agent_key} name={a.agent_name} />
+          <AgentAvatar agentKey={a.agent_key} name={nameOf(a)} />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{a.agent_name}</p>
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{nameOf(a)}</p>
             <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">{a.api_prefix}</p>
           </div>
         </div>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 min-h-8" title={pickDesc(a.description, a.description_en)}>
-          {pickDesc(a.description, a.description_en) || "—"}
+        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 min-h-8" title={descOf(a)}>
+          {descOf(a) || "—"}
         </p>
 
         {loadingKey === a.agent_key && (

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { getHealth, HealthStatus } from "../../api/health";
 import { listAgentConfigs, AgentConfig } from "../../api/agentConfig";
 import { getSummary, getActivity, DashboardSummary, ActivityItem } from "../../api/dashboard";
+import { pickDescription } from "../../store/locale";
 import { useLocale } from "../../hooks/useLocale";
 
 const POLL_MS = 10000;
@@ -52,43 +53,39 @@ export default function DashboardPage() {
   const enabledCount = agents.filter((a) => a.is_enabled).length;
   const requiredCount = agents.filter((a) => a.is_required).length;
   const byGroup = agents.reduce<Record<string, number>>((acc, a) => {
-    const g = a.nav_group || "기타";
+    const g = a.nav_group || t("dash.etc");
     acc[g] = (acc[g] || 0) + 1;
     return acc;
   }, {});
 
   return (
     <div className="page space-y-6">
-      <div>
-        <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-          {t("nav.dashboard") ?? "대시보드"}
-        </h1>
-        <p className="text-xs text-gray-500 mt-0.5">플랫폼 상태와 등록된 에이전트 현황.</p>
-      </div>
+      {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 (R18 표준) */}
+      <p className="text-xs text-gray-500">{t("dash.pageDesc")}</p>
 
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard
-          label="서버 상태"
-          value={healthError ? "연결 안 됨" : health?.status ?? "확인 중…"}
+          label={t("dash.serverStatus")}
+          value={healthError ? t("dash.disconnected") : health?.status ?? t("dash.checking")}
           tone={healthError ? "bad" : health?.status === "ok" ? "good" : "default"}
         />
-        <StatCard label="환경" value={health?.env ?? "-"} />
-        <StatCard label="에이전트 (전체/활성)" value={`${agents.length} / ${enabledCount}`} />
-        <StatCard label="필수 에이전트" value={requiredCount} />
+        <StatCard label={t("dash.env")} value={health?.env ?? "-"} />
+        <StatCard label={t("dash.agentsTotal")} value={`${agents.length} / ${enabledCount}`} />
+        <StatCard label={t("dash.requiredAgents")} value={requiredCount} />
       </section>
 
       {summary && (
         <section>
           <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            내장 에이전트 활동 <span className="text-xs font-normal text-gray-400">(10초마다 갱신)</span>
+            {t("dash.builtinActivity")} <span className="text-xs font-normal text-gray-400">{t("dash.refreshEvery")}</span>
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <StatCard label="마켓 자산 / 설치" value={`${summary.marketplace.assets} / ${summary.marketplace.installed}`} />
-            <StatCard label="워크플로우 실행 (대기)" value={`${summary.workflow.runs} (${summary.workflow.waiting_hitl})`}
+            <StatCard label={t("dash.statMarket")} value={`${summary.marketplace.assets} / ${summary.marketplace.installed}`} />
+            <StatCard label={t("dash.statWfRuns")} value={`${summary.workflow.runs} (${summary.workflow.waiting_hitl})`}
               tone={summary.workflow.waiting_hitl > 0 ? "bad" : "default"} />
-            <StatCard label="RAG 컬렉션 / PG 실행" value={`${summary.rag.collections} / ${summary.playground.runs}`} />
-            <StatCard label="PG 토큰 누적" value={summary.playground.tokens} />
-            <StatCard label="가드레일 판정 (차단)" value={`${summary.guardrails.decisions} (${summary.guardrails.blocked})`}
+            <StatCard label={t("dash.statRagPg")} value={`${summary.rag.collections} / ${summary.playground.runs}`} />
+            <StatCard label={t("dash.statPgTokens")} value={summary.playground.tokens} />
+            <StatCard label={t("dash.statGuard")} value={`${summary.guardrails.decisions} (${summary.guardrails.blocked})`}
               tone={summary.guardrails.blocked > 0 ? "bad" : "good"} />
           </div>
         </section>
@@ -96,7 +93,7 @@ export default function DashboardPage() {
 
       {activity.length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">최근 활동</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("dash.recentActivity")}</h3>
           <ul className="space-y-1">
             {activity.map((a, i) => (
               <li key={i} className="flex items-center gap-2 text-xs">
@@ -113,7 +110,7 @@ export default function DashboardPage() {
       )}
 
       <section>
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">내장 에이전트</h3>
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("dash.builtinAgents")}</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {BUILTIN_AGENTS.map((b) => {
             const cfg = agents.find((a) => a.agent_key === b.key);
@@ -127,11 +124,11 @@ export default function DashboardPage() {
                   <span className="text-sm font-medium text-gray-800 dark:text-gray-100">{t(b.labelKey)}</span>
                   {cfg && (
                     <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.is_enabled ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"}`}
-                      title={cfg.is_enabled ? "활성" : "비활성"} />
+                      title={cfg.is_enabled ? t("common.active") : t("common.inactive")} />
                   )}
                 </div>
-                {cfg?.description && (
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{cfg.description}</p>
+                {cfg && pickDescription(cfg.descriptions, cfg.description, cfg.description_en) && (
+                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{pickDescription(cfg.descriptions, cfg.description, cfg.description_en)}</p>
                 )}
               </button>
             );
@@ -141,7 +138,7 @@ export default function DashboardPage() {
 
       {Object.keys(byGroup).length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">그룹별 에이전트 수</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("dash.byGroup")}</h3>
           <table className="w-full text-xs">
             <tbody>
               {Object.entries(byGroup).map(([group, count]) => (

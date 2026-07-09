@@ -26,6 +26,7 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 | Playground (F-PG: 프롬프트/모델/RAG 실험·A/B) — 백엔드+프론트 | 🟡 |
 | Guardrails (F-GRD: 실판정+휴리스틱 공존·**도메인 규칙 24종 내재화·필터적용 토글·다도메인·LLM classifier(옵션) 완전판정**·Orchestrator 게이트) — 백엔드+프론트 | 🟡 |
 | 환경 분리/키(F-ENV), 웹 포털(F-WEB), 거버넌스(F-GOV) | 🟡 부분 |
+| 다국어 설명 확장 구조 + Local LLM 다양화 (SeCuardian R18-7·R19 복제 싱크, §7.11.2) | ✅ 싱크 |
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
@@ -54,6 +55,12 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 > **내장 에이전트 MCP 개방(impl/20)**: REQUIRED 내장 5종의 MCP 설정 잠금을 해제 — 7종 내장 에이전트 모두 MCP 서버로 노출 가능.
 >
 > **emb_ 내장 패키지(impl/20 §7.8.8)**: 내장 5종의 ADDON 패키지 `addon-agents/zip/emb_{marketplace,workflow,rag,playground,guardrails}` 를 생성(기존 13종 보안 에이전트와 동일 규약).
+>
+> **에이전트 표시명 다국어(impl/35·물리 `test/impl/33`, §7.11.2-4 — SeCuardian impl/56 복제 싱크)**: `tbl_agent_config.agent_names` JSON(`{"ko":..,"en":..}`) 신설 — 내장 7종 시드에 en 표시명 병기(마켓플레이스→Marketplace, 워크플로우→Workflow 등)로 en UI 에서 한국어 표시명이 남던 부분 해소. 기동 시 `{"ko": agent_name}` 멱등 백필, meta.json `display_name` dict 형 허용(업로드 시 정규화·동기). 에이전트 카드·좌측 메뉴·헤더 타이틀·가드레일 에이전트 셀렉트에 descriptions 와 동일 fallback 체인 적용.
+>
+> **내장 에이전트 화면 i18n 전면 적용 + 중복 타이틀 제거(impl/34·물리 `test/impl/32`, §7.11.3)**: UI 언어 English 전환 시 Workflow(목록·풀스크린 빌더·캔버스)·RAG·Playground·Guardrails·Marketplace·Dashboard 화면이 한국어로 남던 결함 수정 — 하드코딩 문자열 137개를 `t()` locale 키(`locales/{ko,en}.json` wf/wfb/rag/pg/mp/dash/grd 섹션)로 치환, ko/en 키 패리티 유지. 본문 h1(5화면)은 상단 헤더(AppLayout) 타이틀과 중복이라 제거하고 **페이지 설명만 표시**(SeCuardian R18 표준 준용). 에이전트 카드의 `nav_group` 칩(DB 한국어 값)도 locale 매핑(en: Basic Agent·Built-in Agent).
+>
+> **다국어 설명 + Local LLM 다양화(impl/33·물리 `test/impl/31`, §7.11.2 — SeCuardian R18-7·R19 복제 싱크)**: ① 에이전트 설명을 `tbl_agent_config.descriptions` JSON(`{"ko":..,"en":..}`, 타 언어 키 추가만으로 확장)으로 관리 — 기동 시 레거시(`description`/`description_en`) 멱등 백필, meta.json 은 dict 형/레거시 형 모두 허용(업로드 시 정규화). 마이페이지 **선호언어**(`tbl_users.preferred_lang`) 신설 — 표시 fallback `UI언어 → 선호언어 → ko → 첫 언어`, 로그인 시 UI locale 동기화. ② 로컬 LLM 을 **Ollama·llama.cpp·vLLM** 3개 백엔드로 추상화(`app/services/llm_providers.py`, `LOCAL_LLM_PROVIDER` 로 선택, compose profile `llamacpp`/`vllm`) + **작업별 LLM Route**(`llm_routes`: classify/tools/synthesize/domain/chat) + **호출 단위 Metering**(`tbl_llm_usage` 원장, `GET /api/llm/usage` 집계, 시스템 설정 사용량 요약) + **Token 압축**(`LLM_CONTEXT_BUDGET` 초과 시 오래된 히스토리 head/tail 축약). AI 어시스턴트 모델 목록은 `GET /api/llm/models` 동적 조회.
 
 ---
 

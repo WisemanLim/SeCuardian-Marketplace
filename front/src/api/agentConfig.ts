@@ -9,6 +9,8 @@ export interface AgentConfig {
   system_prompt: string | null;
   description: string | null;
   description_en: string | null;
+  descriptions?: Record<string, string> | null;
+  agent_names?: Record<string, string> | null;
   disabled_reason: string | null;
   disabled_reason_en: string | null;
   nav_group: string | null;

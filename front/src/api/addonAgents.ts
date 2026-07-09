@@ -12,6 +12,8 @@ export interface AddonAgent {
   is_active: boolean;
   description?: string;
   description_en?: string;
+  descriptions?: Record<string, string> | null;
+  agent_names?: Record<string, string> | null;
   uploaded_by: string | null;
   uploaded_at: string;
 }

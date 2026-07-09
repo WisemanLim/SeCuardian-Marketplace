@@ -42,6 +42,7 @@ class ProfileUpdate(BaseModel):
     email: str | None = None
     password: str | None = None
     custom_instructions: str | None = None
+    preferred_lang: str | None = None  # R18-7: 선호언어 (ko/en, 확장 가능)
 
 
 class TotpCodeRequest(BaseModel):
@@ -96,7 +97,7 @@ async def me(creds: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
     payload = verify_token(creds.credentials)
     user_id = payload.get("sub")
     row = await fetch_one(
-        f"SELECT user_id, username, email, role, totp_enabled, custom_instructions, created_at "
+        f"SELECT user_id, username, email, role, totp_enabled, custom_instructions, preferred_lang, created_at "
         f"FROM tbl_users WHERE user_id = {_PH}",
         (user_id,),
     )
@@ -128,6 +129,12 @@ async def update_me(
     if body.custom_instructions is not None:
         sets.append(f"custom_instructions = {_PH}")
         vals.append(body.custom_instructions)
+    if body.preferred_lang is not None:
+        lang = body.preferred_lang.strip().lower()
+        if lang and not lang.replace("-", "").isalpha():
+            raise HTTPException(status_code=400, detail="preferred_lang 형식이 올바르지 않습니다")
+        sets.append(f"preferred_lang = {_PH}")
+        vals.append(lang or None)
 
     if not sets:
         return {"message": "변경 없음"}

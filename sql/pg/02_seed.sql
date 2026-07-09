@@ -61,6 +61,15 @@ VALUES ('manufacturing-food', '제조업(식품)', 'catalog_only', 0) ON CONFLIC
 INSERT INTO guardrails_domain_catalog (domain_key, display_name, status, rule_count)
 VALUES ('public-administration', '공공행정', 'catalog_only', 0) ON CONFLICT (domain_key) DO NOTHING;
 
+-- R18-7 확장: 에이전트 표시명 다국어 (agent_names JSON — 매 기동 seed 재적용으로 반영)
+UPDATE tbl_agent_config SET agent_names = '{"ko": "Orchestrator", "en": "Orchestrator"}' WHERE agent_key = 'general';
+UPDATE tbl_agent_config SET agent_names = '{"ko": "AI 어시스턴트", "en": "AI Assistant"}' WHERE agent_key = 'chat';
+UPDATE tbl_agent_config SET agent_names = '{"ko": "마켓플레이스", "en": "Marketplace"}' WHERE agent_key = 'marketplace';
+UPDATE tbl_agent_config SET agent_names = '{"ko": "워크플로우", "en": "Workflow"}' WHERE agent_key = 'workflow';
+UPDATE tbl_agent_config SET agent_names = '{"ko": "RAG", "en": "RAG"}' WHERE agent_key = 'rag';
+UPDATE tbl_agent_config SET agent_names = '{"ko": "플레이그라운드", "en": "Playground"}' WHERE agent_key = 'playground';
+UPDATE tbl_agent_config SET agent_names = '{"ko": "가드레일", "en": "Guardrails"}' WHERE agent_key = 'guardrails';
+
 DELETE FROM tbl_agent_config WHERE agent_key IN ('example', 'board');
 DELETE FROM tbl_addon_agents WHERE agent_key = 'board';
 
@@ -69,6 +78,13 @@ INSERT INTO tbl_settings (key, value, description) VALUES
   ('domain_agent_model',  'claude-haiku-4-5-20251001','Domain Agent LLM 모델'),
   ('ollama_base_url',     'http://localhost:11434',    'Ollama 서버 주소'),
   ('ollama_model',        'mistral',                  'Ollama 기본 모델'),
+  ('local_llm_provider',  'ollama',                    'R19-1 기본 로컬 LLM provider (ollama|llamacpp|vllm)'),
+  ('llamacpp_base_url',   'http://localhost:8180',     'llama.cpp server 주소 (OpenAI 호환)'),
+  ('llamacpp_model',      '',                          'llama.cpp 모델명 (단일 모델 서빙 시 생략 가능)'),
+  ('vllm_base_url',       'http://localhost:8100',     'vLLM OpenAI 호환 서버 주소'),
+  ('vllm_model',          '',                          'vLLM 모델명'),
+  ('llm_routes',          '',                          'R19-2 작업별 LLM 라우팅 (JSON: task→provider/model)'),
+  ('llm_context_budget',  '8000',                      'R19-4 히스토리 토큰 예산 (초과 시 압축, 0=무압축)'),
   ('fallback_enabled',    'true',                      'LLM Fallback 활성화'),
   ('setup_completed',     'false',                     'Setup Wizard 완료'),
   ('system_custom_instructions', '',                  '시스템 전체 맞춤지침 (모든 사용자에게 적용)'),

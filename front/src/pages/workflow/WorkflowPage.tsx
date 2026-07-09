@@ -28,6 +28,7 @@ function DefinitionEditor({
   edges: WorkflowEdge[];
   onChange: (nodes: WorkflowNode[], edges: WorkflowEdge[]) => void;
 }) {
+  const { t } = useLocale();
   function addNode() {
     const id = newNodeId(nodes);
     onChange([...nodes, { id, type: "transform", config: {} }], edges);
@@ -68,10 +69,10 @@ function DefinitionEditor({
     <div className="space-y-4">
       <section aria-labelledby="nodes-heading">
         <div className="flex items-center justify-between mb-2">
-          <h3 id="nodes-heading" className="text-sm font-semibold text-gray-700 dark:text-gray-300">노드</h3>
+          <h3 id="nodes-heading" className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("wf.nodes")}</h3>
           <button type="button" onClick={addNode}
             className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">
-            + 노드 추가
+            {t("wf.addNode")}
           </button>
         </div>
         <div className="space-y-2">
@@ -81,16 +82,16 @@ function DefinitionEditor({
                 <label className="text-xs text-gray-500">
                   ID
                   <input
-                    aria-label={`노드 ${idx + 1} ID`}
+                    aria-label={`${t("wf.nodeAria")} ${idx + 1} ID`}
                     value={n.id}
                     onChange={(e) => updateNode(idx, { id: e.target.value })}
                     className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800"
                   />
                 </label>
                 <label className="text-xs text-gray-500">
-                  타입
+                  {t("wf.typeLabel")}
                   <select
-                    aria-label={`노드 ${idx + 1} 타입`}
+                    aria-label={`${t("wf.nodeAria")} ${idx + 1} ${t("wf.typeLabel")}`}
                     value={n.type}
                     onChange={(e) => updateNode(idx, { type: e.target.value as WorkflowNode["type"] })}
                     className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800"
@@ -101,7 +102,7 @@ function DefinitionEditor({
                 <label className="text-xs text-gray-500 col-span-2">
                   config (JSON)
                   <textarea
-                    aria-label={`노드 ${idx + 1} 설정 JSON`}
+                    aria-label={`${t("wf.nodeAria")} ${idx + 1} ${t("wf.configJsonAria")}`}
                     defaultValue={JSON.stringify(n.config ?? {}, null, 0)}
                     onChange={(e) => updateNodeConfig(idx, e.target.value)}
                     rows={2}
@@ -109,20 +110,20 @@ function DefinitionEditor({
                   />
                 </label>
               </div>
-              <button type="button" onClick={() => removeNode(idx)} aria-label={`노드 ${idx + 1} 삭제`}
-                className="text-xs px-2 py-1 rounded text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">삭제</button>
+              <button type="button" onClick={() => removeNode(idx)} aria-label={`${t("wf.nodeAria")} ${idx + 1} ${t("wf.deleteAria")}`}
+                className="text-xs px-2 py-1 rounded text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">{t("common.delete")}</button>
             </div>
           ))}
-          {nodes.length === 0 && <p className="text-xs text-gray-400">노드가 없습니다. "+ 노드 추가"로 시작하세요.</p>}
+          {nodes.length === 0 && <p className="text-xs text-gray-400">{t("wf.noNodes")}</p>}
         </div>
       </section>
 
       <section aria-labelledby="edges-heading">
         <div className="flex items-center justify-between mb-2">
-          <h3 id="edges-heading" className="text-sm font-semibold text-gray-700 dark:text-gray-300">엣지</h3>
+          <h3 id="edges-heading" className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("wf.edges")}</h3>
           <button type="button" onClick={addEdge} disabled={nodes.length < 2}
             className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
-            + 엣지 추가
+            {t("wf.addEdge")}
           </button>
         </div>
         <div className="space-y-2">
@@ -130,7 +131,7 @@ function DefinitionEditor({
             <div key={idx} className="flex items-center gap-2 p-2 rounded border border-gray-200 dark:border-gray-700">
               <label className="text-xs text-gray-500 flex-1">
                 source
-                <select aria-label={`엣지 ${idx + 1} source`} value={e.source}
+                <select aria-label={`${t("wf.edgeAria")} ${idx + 1} source`} value={e.source}
                   onChange={(ev) => updateEdge(idx, { source: ev.target.value })}
                   className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
                   {nodes.map((n) => <option key={n.id} value={n.id}>{n.id}</option>)}
@@ -138,24 +139,24 @@ function DefinitionEditor({
               </label>
               <label className="text-xs text-gray-500 flex-1">
                 target
-                <select aria-label={`엣지 ${idx + 1} target`} value={e.target}
+                <select aria-label={`${t("wf.edgeAria")} ${idx + 1} target`} value={e.target}
                   onChange={(ev) => updateEdge(idx, { target: ev.target.value })}
                   className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
                   {nodes.map((n) => <option key={n.id} value={n.id}>{n.id}</option>)}
                 </select>
               </label>
               <label className="text-xs text-gray-500 flex-1">
-                when (조건 분기, 선택)
-                <input aria-label={`엣지 ${idx + 1} when`} value={e.when ?? ""}
+                {t("wf.whenLabel")}
+                <input aria-label={`${t("wf.edgeAria")} ${idx + 1} when`} value={e.when ?? ""}
                   placeholder="true | false"
                   onChange={(ev) => updateEdge(idx, { when: ev.target.value || undefined })}
                   className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
               </label>
-              <button type="button" onClick={() => removeEdge(idx)} aria-label={`엣지 ${idx + 1} 삭제`}
-                className="text-xs px-2 py-1 rounded text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">삭제</button>
+              <button type="button" onClick={() => removeEdge(idx)} aria-label={`${t("wf.edgeAria")} ${idx + 1} ${t("wf.deleteAria")}`}
+                className="text-xs px-2 py-1 rounded text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">{t("common.delete")}</button>
             </div>
           ))}
-          {edges.length === 0 && <p className="text-xs text-gray-400">엣지가 없습니다.</p>}
+          {edges.length === 0 && <p className="text-xs text-gray-400">{t("wf.noEdges")}</p>}
         </div>
       </section>
     </div>
@@ -166,6 +167,7 @@ function DefinitionEditor({
  *  매핑 불가 노드는 transform 플레이스홀더로 대체되고 warnings 로 보고된다. 가져온 워크플로우는
  *  항상 비활성(enabled=false) 상태로 생성되어 사람 검토를 거친 뒤 활성화해야 한다. */
 function DifyImportPanel({ onImported }: Readonly<{ onImported: () => void }>) {
+  const { t } = useLocale();
   const [open, setOpen] = useState(false);
   const [dsl, setDsl] = useState("");
   const [busy, setBusy] = useState(false);
@@ -174,7 +176,7 @@ function DifyImportPanel({ onImported }: Readonly<{ onImported: () => void }>) {
 
   async function handleImport() {
     setError(""); setResult(null);
-    if (!dsl.trim()) { setError("Dify DSL(YAML)을 붙여넣으세요."); return; }
+    if (!dsl.trim()) { setError(t("wf.difyPasteRequired")); return; }
     setBusy(true);
     try {
       const wf = await importDifyDsl(dsl);
@@ -183,7 +185,7 @@ function DifyImportPanel({ onImported }: Readonly<{ onImported: () => void }>) {
       onImported();
     } catch (e) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg || "가져오기 실패");
+      setError(msg || t("wf.difyImportFailed"));
     } finally {
       setBusy(false);
     }
@@ -193,14 +195,11 @@ function DifyImportPanel({ onImported }: Readonly<{ onImported: () => void }>) {
     <div className="mb-4">
       <button type="button" onClick={() => setOpen((v) => !v)}
         className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
-        {open ? "Dify DSL 가져오기 닫기" : "Dify DSL 가져오기(impl/28 §7.2.6)"}
+        {open ? t("wf.difyClose") : t("wf.difyOpen")}
       </button>
       {open && (
         <div className="mt-2 p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-          <p className="text-xs text-gray-500 mb-2">
-            Dify Studio 에서 export 한 DSL YAML을 붙여넣으세요. 매핑 불가 노드는 자동으로 대체되고
-            경고로 표시됩니다. 가져온 워크플로우는 <strong>항상 비활성</strong>으로 생성되니 검토 후 활성화하세요.
-          </p>
+          <p className="text-xs text-gray-500 mb-2">{t("wf.difyDesc")}</p>
           <textarea aria-label="Dify DSL YAML" value={dsl} onChange={(e) => setDsl(e.target.value)}
             rows={6} placeholder="app:\n  name: my-flow\nworkflow:\n  graph:\n    nodes: [...]\n    edges: [...]"
             className="w-full text-xs font-mono px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
@@ -208,7 +207,7 @@ function DifyImportPanel({ onImported }: Readonly<{ onImported: () => void }>) {
           {result && (
             <div role="status" className="mt-2 p-2 rounded border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
               <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">
-                "{result.name}" 가져옴(비활성) — {result.warnings.length}건 경고
+                "{result.name}" {t("wf.difyImported")} — {result.warnings.length}{t("wf.difyWarnUnit")}
               </p>
               {result.warnings.length > 0 && (
                 <ul className="text-xs text-gray-600 dark:text-gray-400 mt-1 list-disc pl-4 space-y-0.5">
@@ -219,7 +218,7 @@ function DifyImportPanel({ onImported }: Readonly<{ onImported: () => void }>) {
           )}
           <button disabled={busy} onClick={handleImport}
             className="mt-2 text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
-            가져오기
+            {t("wf.difyImport")}
           </button>
         </div>
       )}
@@ -227,11 +226,12 @@ function DifyImportPanel({ onImported }: Readonly<{ onImported: () => void }>) {
   );
 }
 
-const CATEGORY_LABEL: Record<string, string> = { builtin: "내장", system: "시스템", addon: "Addon" };
+const CATEGORY_KEY: Record<string, string> = { builtin: "wf.catBuiltin", system: "wf.catSystem", addon: "wf.catAddon" };
 
 /** impl/23(PRD §7.2.3) — 내장/시스템/Addon 에이전트의 API를 "{에이전트명}-{기능}" 컴포넌트로 노출.
  *  클릭 시 사전설정된 agent 노드(agent_key/method/path)를 삽입해 실제 API 호출을 워크플로우에 조합. */
 function ComponentPalette({ onInsert }: Readonly<{ onInsert: (c: WorkflowComponent) => void }>) {
+  const { t } = useLocale();
   const [components, setComponents] = useState<WorkflowComponent[]>([]);
   const [open, setOpen] = useState(false);
 
@@ -246,13 +246,13 @@ function ComponentPalette({ onInsert }: Readonly<{ onInsert: (c: WorkflowCompone
     <div className="mb-3">
       <button type="button" onClick={() => setOpen((v) => !v)}
         className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
-        {open ? "컴포넌트 팔레트 닫기" : "+ 컴포넌트에서 노드 추가"}
+        {open ? t("wf.paletteClose") : t("wf.paletteOpen")}
       </button>
       {open && (
         <div className="mt-2 max-h-64 overflow-y-auto rounded border border-gray-200 dark:border-gray-700 p-2 space-y-3">
           {(["builtin", "system", "addon"] as const).map((cat) => groups[cat].length > 0 && (
             <div key={cat}>
-              <p className="text-[11px] font-semibold text-gray-400 mb-1">{CATEGORY_LABEL[cat]} 에이전트</p>
+              <p className="text-[11px] font-semibold text-gray-400 mb-1">{t(CATEGORY_KEY[cat])}{t("wf.catAgentsSuffix")}</p>
               <div className="flex flex-wrap gap-1">
                 {groups[cat].map((c) => (
                   <button key={`${c.agent_key}-${c.method}-${c.path}`} type="button"
@@ -264,7 +264,7 @@ function ComponentPalette({ onInsert }: Readonly<{ onInsert: (c: WorkflowCompone
               </div>
             </div>
           ))}
-          {components.length === 0 && <p className="text-xs text-gray-400">사용 가능한 컴포넌트가 없습니다.</p>}
+          {components.length === 0 && <p className="text-xs text-gray-400">{t("wf.noComponents")}</p>}
         </div>
       )}
     </div>
@@ -272,6 +272,7 @@ function ComponentPalette({ onInsert }: Readonly<{ onInsert: (c: WorkflowCompone
 }
 
 function RunPanel({ run, onRefresh }: { run: WorkflowRun; onRefresh: () => void }) {
+  const { t } = useLocale();
   const [nodes, setNodes] = useState<WorkflowNodeRun[]>([]);
   const [busy, setBusy] = useState(false);
 
@@ -303,27 +304,27 @@ function RunPanel({ run, onRefresh }: { run: WorkflowRun; onRefresh: () => void 
       <div className="flex items-center justify-between">
         <p className="text-sm">
           Run #{run.id} — <span className={`font-semibold ${RUN_STATUS_COLOR[run.status] ?? ""}`}>{run.status}</span>
-          {run.waiting_node_id && <span className="text-xs text-gray-400 ml-2">대기 노드: {run.waiting_node_id}</span>}
+          {run.waiting_node_id && <span className="text-xs text-gray-400 ml-2">{t("wf.waitingNode")} {run.waiting_node_id}</span>}
         </p>
         <div className="flex gap-2">
           {run.status === "waiting_hitl" && (
             <>
               <button disabled={busy} onClick={() => decide(true)}
-                className="text-xs px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-40">승인</button>
+                className="text-xs px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-40">{t("wf.approve")}</button>
               <button disabled={busy} onClick={() => decide(false)}
-                className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-40">거부</button>
+                className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-40">{t("wf.reject")}</button>
             </>
           )}
           {["pending", "running", "waiting_hitl"].includes(run.status) && (
             <button disabled={busy} onClick={doCancel}
-              className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40">취소</button>
+              className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40">{t("common.cancel")}</button>
           )}
         </div>
       </div>
       {run.error && <p className="text-xs text-red-500 mt-1">{run.error}</p>}
       <table className="w-full text-xs mt-2">
         <thead className="text-gray-400">
-          <tr><th className="text-left font-normal py-1">노드</th><th className="text-left font-normal">타입</th><th className="text-left font-normal">상태</th><th className="text-left font-normal">시도</th></tr>
+          <tr><th className="text-left font-normal py-1">{t("wf.thNode")}</th><th className="text-left font-normal">{t("wf.thType")}</th><th className="text-left font-normal">{t("wf.thStatus")}</th><th className="text-left font-normal">{t("wf.thAttempts")}</th></tr>
         </thead>
         <tbody>
           {nodes.map((n) => (
@@ -366,7 +367,7 @@ export default function WorkflowPage() {
 
   async function handleCreate() {
     setError("");
-    if (!name.trim()) { setError("이름을 입력하세요."); return; }
+    if (!name.trim()) { setError(t("wf.nameRequired")); return; }
     setBusy(true);
     try {
       const wf = await createWorkflow({ name, definition_json: { nodes, edges }, trigger_type: triggerType });
@@ -376,7 +377,7 @@ export default function WorkflowPage() {
       load();
     } catch (e) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg || "생성 실패");
+      setError(msg || t("wf.createFailed"));
     } finally {
       setBusy(false);
     }
@@ -410,20 +411,18 @@ export default function WorkflowPage() {
   return (
     <div className="page">
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("nav.workflow") ?? "워크플로우"}</h1>
-          <p className="text-xs text-gray-500 mt-0.5">에이전트·LLM·조건·HITL 노드를 DAG로 조합해 자동화합니다.</p>
-        </div>
+        {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 (R18 표준) */}
+        <p className="text-xs text-gray-500">{t("wf.pageDesc")}</p>
         <div className="flex items-center gap-2">
           {/* impl/32(§7.2.8) — Flowise/Dify 준용 풀스크린 빌더(팔레트 drag&drop) */}
           <button onClick={() => navigate("/workflow/builder")}
             className="text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">
-            + 새 워크플로우(빌더)
+            {t("wf.newBuilder")}
           </button>
           <button onClick={() => setShowCreate((v) => !v)}
-            title="키보드 전용 폼 편집기(KWCAG 2.2 대체 편집기)"
+            title={t("wf.formEditorTitle")}
             className="text-sm px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
-            {showCreate ? "닫기" : "+ 새 워크플로우(폼)"}
+            {showCreate ? t("common.close") : t("wf.newForm")}
           </button>
         </div>
       </div>
@@ -433,7 +432,7 @@ export default function WorkflowPage() {
       {webhookBanner && (
         <div role="alert" className="mb-4 p-3 rounded border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
           <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">
-            webhook 시크릿 — 지금만 표시됩니다. 안전한 곳에 보관하세요(재조회 불가).
+            {t("wf.webhookBannerTitle")}
           </p>
           <p className="text-xs mt-1 font-mono break-all text-gray-700 dark:text-gray-300">
             POST /api/workflows/{webhookBanner.workflowId}/trigger/webhook
@@ -443,7 +442,7 @@ export default function WorkflowPage() {
           </p>
           <button type="button" onClick={() => setWebhookBanner(null)}
             className="mt-2 text-xs px-2 py-1 rounded border border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/40">
-            확인함, 닫기
+            {t("wf.ackClose")}
           </button>
         </div>
       )}
@@ -451,33 +450,30 @@ export default function WorkflowPage() {
       {showCreate && (
         <div className="mb-6 p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
           <label className="block text-xs text-gray-500 mb-2">
-            이름
+            {t("wf.name")}
             <input value={name} onChange={(e) => setName(e.target.value)}
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
           </label>
           <label className="block text-xs text-gray-500 mb-2">
-            트리거
+            {t("wf.trigger")}
             <select value={triggerType} onChange={(e) => setTriggerType(e.target.value as "manual" | "webhook")}
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
-              <option value="manual">수동(manual)</option>
-              <option value="webhook">webhook 수신(impl/26 §7.2.4)</option>
+              <option value="manual">{t("wf.manualOption")}</option>
+              <option value="webhook">{t("wf.webhookOption")}</option>
             </select>
           </label>
           <ComponentPalette onInsert={insertComponentNode} />
           <DefinitionEditor nodes={nodes} edges={edges} onChange={(n, e) => { setNodes(n); setEdges(e); }} />
           {nodes.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs font-semibold text-gray-500 mb-1">
-                DAG 편집 캔버스(React Flow) — 드래그로 이동·연결, 선택 후 Delete 로 삭제.
-                키보드 사용자는 위 폼 편집기를 이용하세요(impl/27 §7.2.5).
-              </p>
+              <p className="text-xs font-semibold text-gray-500 mb-1">{t("wf.canvasHint")}</p>
               <WorkflowCanvas nodes={nodes} edges={edges} onChange={(n, e) => { setNodes(n); setEdges(e); }} />
             </div>
           )}
           {error && <p role="alert" className="text-xs text-red-500 mt-2">{error}</p>}
           <button disabled={busy} onClick={handleCreate}
             className="mt-3 text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
-            저장
+            {t("common.save")}
           </button>
         </div>
       )}
@@ -489,13 +485,13 @@ export default function WorkflowPage() {
               <div>
                 <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{wf.name}</p>
                 <p className="text-xs text-gray-400">
-                  {wf.definition_json.nodes.length}노드 · {wf.definition_json.edges.length}엣지 · v{wf.version}
-                  {!wf.enabled && <span className="ml-1 text-amber-500">(비활성)</span>}
+                  {wf.definition_json.nodes.length}{t("wf.nodesUnit")} · {wf.definition_json.edges.length}{t("wf.edgesUnit")} · v{wf.version}
+                  {!wf.enabled && <span className="ml-1 text-amber-500">{t("wf.disabledBadge")}</span>}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <input
-                  aria-label={`${wf.name} 실행 입력 JSON`}
+                  aria-label={`${wf.name} ${t("wf.runInputAria")}`}
                   placeholder='{"key":"value"}'
                   value={runInput[wf.id] ?? ""}
                   onChange={(e) => setRunInput((m) => ({ ...m, [wf.id]: e.target.value }))}
@@ -503,22 +499,22 @@ export default function WorkflowPage() {
                 />
                 <button onClick={() => handleRun(wf)} disabled={!wf.enabled}
                   className="text-xs px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-40">
-                  실행
+                  {t("wf.run")}
                 </button>
                 <button onClick={() => navigate(`/workflow/builder/${wf.id}`)}
-                  title="풀스크린 빌더에서 정의 편집(impl/32 §7.2.8)"
+                  title={t("wf.builderEditTitle")}
                   className="text-xs px-2 py-1 rounded border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30">
-                  빌더 편집
+                  {t("wf.builderEdit")}
                 </button>
                 <button onClick={() => handleToggleEnabled(wf)}
-                  title="impl/30(§7.2.7) — 활성/비활성 토글"
+                  title={t("wf.toggleTitle")}
                   className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
-                  {wf.enabled ? "비활성화" : "활성화"}
+                  {wf.enabled ? t("common.disable") : t("common.enable")}
                 </button>
                 {wf.trigger_type === "webhook" && (
-                  <button onClick={() => handleRotateSecret(wf)} title="webhook 시크릿 재발급(impl/29 §7.2.4.1) — 구 시크릿 즉시 무효"
+                  <button onClick={() => handleRotateSecret(wf)} title={t("wf.rotateSecretTitle")}
                     className="text-xs px-2 py-1 rounded border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30">
-                    시크릿 재발급
+                    {t("wf.rotateSecret")}
                   </button>
                 )}
               </div>
@@ -529,7 +525,7 @@ export default function WorkflowPage() {
           </div>
         ))}
         {workflows.length === 0 && !showCreate && (
-          <p className="text-sm text-gray-400">등록된 워크플로우가 없습니다.</p>
+          <p className="text-sm text-gray-400">{t("wf.noWorkflows")}</p>
         )}
       </div>
     </div>

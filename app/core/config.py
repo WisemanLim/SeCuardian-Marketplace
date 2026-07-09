@@ -43,6 +43,15 @@ class Settings(BaseSettings):
     ollama_warmup_enabled: bool = True
     ollama_warmup_interval: int = 240   # 초. 주기 재예열(ollama 독립 재구동 대응). 0 이하면 1회만
 
+    # R19-1: 로컬 LLM 다중 백엔드 — 기본 provider 선택 (ollama|llamacpp|vllm)
+    local_llm_provider: str = "ollama"
+    llamacpp_base_url: str = "http://localhost:8180"   # llama.cpp server (OpenAI 호환)
+    llamacpp_model: str = ""                            # 서버가 단일 모델 서빙 시 생략 가능
+    vllm_base_url: str = "http://localhost:8100"        # vLLM OpenAI 호환 서버
+    vllm_model: str = ""
+    # R19-4: 히스토리 토큰 예산 (추정 토큰 초과 시 head/tail 축약) — 0 이하 = 무압축
+    llm_context_budget: int = 8000
+
     # CORS — str 타입 유지: pydantic-settings가 list[str]에 json.loads를 시도해 crash하는 것 방지
     # 파싱은 main.py의 _parse_cors_origins()에서 수행 (JSON array OR 쉼표 구분 모두 지원)
     cors_origins: str = "http://localhost:4100"

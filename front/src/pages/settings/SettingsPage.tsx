@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getSettings, updateSetting, testLlm, Setting } from "../../api/settings";
+import { getLlmUsage, LlmUsageRow } from "../../api/llm";
 import { getAuth } from "../../store/auth";
 import { useLocale } from "../../hooks/useLocale";
 
@@ -9,6 +10,14 @@ const EDITABLE_KEYS = [
   "ollama_base_url",
   "ollama_model",
   "fallback_enabled",
+  // R19: Local LLM 다중 백엔드 + 라우팅 + 토큰 예산
+  "local_llm_provider",
+  "llamacpp_base_url",
+  "llamacpp_model",
+  "vllm_base_url",
+  "vllm_model",
+  "llm_routes",
+  "llm_context_budget",
 ];
 
 export default function SettingsPage() {
@@ -27,6 +36,7 @@ export default function SettingsPage() {
   const [userCommonInstr, setUserCommonInstr] = useState("");
   const [userCommonInstrSaved, setUserCommonInstrSaved] = useState(false);
   const [userCommonInstrSaving, setUserCommonInstrSaving] = useState(false);
+  const [llmUsage, setLlmUsage] = useState<LlmUsageRow[]>([]);
   // '사용자 맞춤지침 (개인화)' 는 마이페이지 '맞춤지침' 과 중복 — 시스템 설정에서 제거 (R18-5)
 
   useEffect(() => {
@@ -37,6 +47,11 @@ export default function SettingsPage() {
       const ucRow = data.find((s) => s.key === "user_custom_instructions");
       if (ucRow) setUserCommonInstr(ucRow.value ?? "");
     }).catch(console.error);
+    // R19-3: LLM 사용량 요약 (admin 전용 API — 실패 무시)
+    if (isAdmin) {
+      getLlmUsage("model", 30).then((d) => setLlmUsage(d.rows ?? [])).catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleSaveSysInstr() {
@@ -172,6 +187,40 @@ export default function SettingsPage() {
           );
         })}
       </div>
+
+      {/* LLM usage summary (R19-3, Admin+) */}
+      {isAdmin && llmUsage.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-3">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200">📊 {t("settings.llmUsage")}</h2>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{t("settings.llmUsageDesc")}</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-left text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700">
+                  <th className="py-1.5 pr-3 font-medium">{t("settings.llmUsageModel")}</th>
+                  <th className="py-1.5 pr-3 font-medium text-right">{t("settings.llmUsageCalls")}</th>
+                  <th className="py-1.5 pr-3 font-medium text-right">{t("settings.llmUsageTokensIn")}</th>
+                  <th className="py-1.5 pr-3 font-medium text-right">{t("settings.llmUsageTokensOut")}</th>
+                  <th className="py-1.5 font-medium text-right">{t("settings.llmUsageLatency")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {llmUsage.map((r) => (
+                  <tr key={r.grp} className="border-b border-gray-50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300">
+                    <td className="py-1.5 pr-3 font-mono">{r.grp || "—"}</td>
+                    <td className="py-1.5 pr-3 text-right">{r.calls.toLocaleString()}</td>
+                    <td className="py-1.5 pr-3 text-right">{(r.tokens_in ?? 0).toLocaleString()}</td>
+                    <td className="py-1.5 pr-3 text-right">{(r.tokens_out ?? 0).toLocaleString()}</td>
+                    <td className="py-1.5 text-right">{r.avg_latency_ms}ms</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* System custom instructions (Admin+) */}
       {isAdmin && (

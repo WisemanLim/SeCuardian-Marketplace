@@ -16,7 +16,8 @@ import httpx
 
 from app.core.config import settings
 from app.rules.keyword_matcher import format_response, format_response_async, match_rule_async
-from app.services.llm_fallback import call_ollama
+from app.services import llm_metering, llm_providers, llm_router
+from app.services.token_compress import compress_history
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -728,6 +729,14 @@ _SETTING_ENV_MAP = {
     "domain_agent_model": "DOMAIN_AGENT_MODEL",
     "ollama_base_url": "OLLAMA_BASE_URL",
     "ollama_model": "OLLAMA_MODEL",
+    # R19-1: 로컬 LLM 다중 백엔드
+    "local_llm_provider": "LOCAL_LLM_PROVIDER",
+    "llamacpp_base_url": "LLAMACPP_BASE_URL",
+    "llamacpp_model": "LLAMACPP_MODEL",
+    "vllm_base_url": "VLLM_BASE_URL",
+    "vllm_model": "VLLM_MODEL",
+    # R19-4: 토큰 압축 예산
+    "llm_context_budget": "LLM_CONTEXT_BUDGET",
 }
 
 
@@ -752,12 +761,25 @@ async def _db_llm_settings() -> dict[str, str]:
         "ollama_base_url": "http://localhost:11434",
         "orchestrator_model": "claude-sonnet-4-6",
         "domain_agent_model": "claude-haiku-4-5-20251001",
+        # R19: 로컬 LLM 다중 백엔드 + 토큰 예산
+        "local_llm_provider": "ollama",
+        "llamacpp_base_url": "http://localhost:8180",
+        "llamacpp_model": "",
+        "vllm_base_url": "http://localhost:8100",
+        "vllm_model": "",
+        "llm_context_budget": "8000",
     }
     _settings_vals = {
         "ollama_model": _settings.ollama_model,
         "ollama_base_url": _settings.ollama_base_url,
         "orchestrator_model": _settings.orchestrator_model,
         "domain_agent_model": _settings.domain_agent_model,
+        "local_llm_provider": _settings.local_llm_provider,
+        "llamacpp_base_url": _settings.llamacpp_base_url,
+        "llamacpp_model": _settings.llamacpp_model,
+        "vllm_base_url": _settings.vllm_base_url,
+        "vllm_model": _settings.vllm_model,
+        "llm_context_budget": str(_settings.llm_context_budget),
     }
 
     # 1단계: DB 값 로드
@@ -765,7 +787,9 @@ async def _db_llm_settings() -> dict[str, str]:
         from app.db import fetch_all
         rows = await fetch_all(
             "SELECT key, value FROM tbl_settings WHERE key IN "
-            "('ollama_base_url','ollama_model','orchestrator_model','domain_agent_model')"
+            "('ollama_base_url','ollama_model','orchestrator_model','domain_agent_model',"
+            "'local_llm_provider','llamacpp_base_url','llamacpp_model',"
+            "'vllm_base_url','vllm_model','llm_context_budget')"
         )
         result = {r["key"]: r["value"] for r in rows if r.get("value")}
     except Exception:
@@ -867,24 +891,98 @@ class Orchestrator:
         self._client: anthropic.AsyncAnthropic | None = (
             anthropic.AsyncAnthropic(api_key=self._key) if self._key else None
         )
+        # R19-3: 미터링 컨텍스트 (run/stream 진입 시 설정)
+        self._meter_ctx: dict[str, str | None] = {}
 
     def _use_ollama(self, model: str | None) -> bool:
-        """Ollama 경로 사용 여부: 명시적 ollama 선택 OR Anthropic key 없음."""
+        """로컬 LLM 경로 사용 여부: 명시적 ollama(=local) 선택 OR Anthropic key 없음."""
         return model == "ollama" or not self._key
+
+    @staticmethod
+    def _budget(db: dict[str, str]) -> int:
+        """R19-4: 히스토리 토큰 예산 (llm_context_budget)."""
+        try:
+            return int(db.get("llm_context_budget") or settings.llm_context_budget)
+        except (TypeError, ValueError):
+            return settings.llm_context_budget
+
+    async def _meter(
+        self, provider: str, model: str, task: str, usage: dict | None, started: float
+    ) -> None:
+        """R19-3: LLM 호출 1건 기록 (best-effort)."""
+        import time as _time
+        await llm_metering.record(
+            provider=provider,
+            model=model,
+            task=task,
+            usage=usage,
+            latency_ms=int((_time.monotonic() - started) * 1000),
+            user_id=self._meter_ctx.get("user_id"),
+            agent_key=self._meter_ctx.get("agent_key"),
+        )
+
+    async def _local_chat(
+        self,
+        task: str,
+        messages: list[dict],
+        system: str,
+        usage_out: dict | None = None,
+        db: dict[str, str] | None = None,
+    ) -> str:
+        """R19-1/2: 로컬 LLM 호출 — llm_routes[task] 우선, 미지정 시 기본 provider."""
+        import time as _time
+        db = db if db is not None else await _db_llm_settings()
+        route = await llm_router.resolve(task, db)
+        if route and route["provider"] != "anthropic":
+            provider, model, base_url = route["provider"], route["model"], route["base_url"]
+        else:
+            provider, model, base_url = llm_providers.resolve_local(db)
+        usage: dict = usage_out if usage_out is not None else {}
+        started = _time.monotonic()
+        try:
+            return await llm_providers.chat(
+                messages, system, provider=provider, model=model,
+                base_url=base_url, usage_out=usage,
+            )
+        finally:
+            await self._meter(provider, model, task, usage, started)
 
     async def _classify_intent(self, user_message: str) -> list[str]:
         if not self._client:
             return ["general"]
+        import time as _time
         try:
             db = await _db_llm_settings()
-            orch_model = db.get("orchestrator_model") or settings.orchestrator_model
+            # R19-2: classify 라우트가 로컬 provider 를 지정하면 로컬 LLM 으로 분류
+            route = await llm_router.resolve("classify", db)
+            if route and route["provider"] != "anthropic":
+                text = await self._local_chat(
+                    "classify",
+                    [{"role": "user", "content": user_message}],
+                    _CLASSIFY_SYSTEM,
+                    db=db,
+                )
+                intents: list[str] = json.loads(text.strip())
+                disabled = await _disabled_agents()
+                valid = [
+                    i for i in intents
+                    if i in _VALID_INTENTS and (i == "general" or i not in disabled)
+                ]
+                return valid or ["general"]
+            orch_model = (route or {}).get("model") or db.get("orchestrator_model") or settings.orchestrator_model
+            _usage: dict = {}
+            _started = _time.monotonic()
             resp = await self._client.messages.create(
                 model=orch_model,
                 max_tokens=30,
                 system=_CLASSIFY_SYSTEM,
                 messages=[{"role": "user", "content": user_message}],
             )
-            intents: list[str] = json.loads(resp.content[0].text.strip())
+            if getattr(resp, "usage", None):
+                _usage = {"input_tokens": resp.usage.input_tokens or 0,
+                          "output_tokens": resp.usage.output_tokens or 0}
+            await self._meter("anthropic", orch_model, "classify", _usage, _started)
+            intents = json.loads(resp.content[0].text.strip())
             disabled = await _disabled_agents()
             valid = [
                 i for i in intents
@@ -918,9 +1016,24 @@ class Orchestrator:
     ) -> str:
         if not self._client:
             raise RuntimeError("Anthropic client not configured")
+        import time as _time
         db = await _db_llm_settings()
-        orch_model = db.get("orchestrator_model") or settings.orchestrator_model
-        messages = list(history) + [{"role": "user", "content": user_message}]
+        # R19-2: tools 라우트의 anthropic model 오버라이드 (로컬 provider 지정 시 로컬 경로)
+        route = await llm_router.resolve("tools", db)
+        if route and route["provider"] != "anthropic":
+            history_c, was_compressed = compress_history(list(history), self._budget(db))
+            if was_compressed and usage_out is not None:
+                usage_out["compressed"] = True
+            messages = history_c + [{"role": "user", "content": user_message}]
+            return await self._local_chat("tools", messages, system_prompt, usage_out=usage_out, db=db)
+        orch_model = (route or {}).get("model") or db.get("orchestrator_model") or settings.orchestrator_model
+        # R19-4: 히스토리 토큰 예산 초과 시 압축
+        history_c, was_compressed = compress_history(list(history), self._budget(db))
+        if was_compressed and usage_out is not None:
+            usage_out["compressed"] = True
+        messages = history_c + [{"role": "user", "content": user_message}]
+        _meter_usage: dict = {}
+        _started = _time.monotonic()
 
         for _ in range(6):  # max 6 tool-call rounds
             resp = await self._client.messages.create(
@@ -930,10 +1043,14 @@ class Orchestrator:
                 messages=messages,
                 tools=[_TOOL_CALL_API],
             )
+            if getattr(resp, "usage", None):
+                _meter_usage["input_tokens"] = _meter_usage.get("input_tokens", 0) + (resp.usage.input_tokens or 0)
+                _meter_usage["output_tokens"] = _meter_usage.get("output_tokens", 0) + (resp.usage.output_tokens or 0)
             if usage_out is not None and getattr(resp, "usage", None):
                 usage_out["input_tokens"] = usage_out.get("input_tokens", 0) + (resp.usage.input_tokens or 0)
                 usage_out["output_tokens"] = usage_out.get("output_tokens", 0) + (resp.usage.output_tokens or 0)
             if resp.stop_reason != "tool_use":
+                await self._meter("anthropic", orch_model, "tools", _meter_usage, _started)
                 return "".join(
                     b.text for b in resp.content if hasattr(b, "text")
                 )
@@ -957,20 +1074,17 @@ class Orchestrator:
                     })
             messages.append({"role": "user", "content": tool_results})
 
+        await self._meter("anthropic", orch_model, "tools", _meter_usage, _started)
         return "처리 중 오류가 발생했습니다. 다시 시도해 주세요."
 
     async def _ollama_general(self, user_message: str, history: list[dict], system_prompt: str,
                               usage_out: dict | None = None) -> str:
         db = await _db_llm_settings()
-        messages = list(history) + [{"role": "user", "content": user_message}]
-        _uk = {"usage_out": usage_out} if usage_out is not None else {}
-        return await call_ollama(
-            messages,
-            system_prompt,
-            model=db.get("ollama_model"),
-            base_url=db.get("ollama_base_url"),
-            **_uk,
-        )
+        history_c, was_compressed = compress_history(list(history), self._budget(db))
+        if was_compressed and usage_out is not None:
+            usage_out["compressed"] = True
+        messages = history_c + [{"role": "user", "content": user_message}]
+        return await self._local_chat("chat", messages, system_prompt, usage_out=usage_out, db=db)
 
     async def _ollama_with_tools(
         self,
@@ -980,12 +1094,20 @@ class Orchestrator:
         token: str | None = None,
         usage_out: dict | None = None,
     ) -> str:
-        """Ollama용 prompt-based tool calling: <api_call>JSON</api_call> 태그 파싱."""
+        """로컬 LLM용 prompt-based tool calling: <api_call>JSON</api_call> 태그 파싱.
+
+        R19-1/2: Ollama 외 llama.cpp/vLLM 도 동일 태그 방식 사용 — llm_routes['tools']
+        가 로컬 provider 를 지정하면 해당 백엔드, 아니면 기본 local provider.
+        """
         import re as _re
+        import time as _time
 
         db = await _db_llm_settings()
-        _model = db.get("ollama_model")
-        _base_url = db.get("ollama_base_url")
+        _route = await llm_router.resolve("tools", db)
+        if _route and _route["provider"] != "anthropic":
+            _provider, _model, _base_url = _route["provider"], _route["model"], _route["base_url"]
+        else:
+            _provider, _model, _base_url = llm_providers.resolve_local(db)
 
         # Extract only the addon API specs section for Ollama (short & focused)
         addon_spec = await _addon_api_specs()
@@ -1058,12 +1180,38 @@ class Orchestrator:
                 f"Use ONLY API paths under {target[1]} for this request.\n"
             )
 
-        messages: list[dict] = list(history) + [{"role": "user", "content": user_message}]
+        # R19-4: 히스토리 토큰 예산 초과 시 압축
+        _history_c, _was_compressed = compress_history(list(history), self._budget(db))
+        if _was_compressed and usage_out is not None:
+            usage_out["compressed"] = True
+        messages: list[dict] = _history_c + [{"role": "user", "content": user_message}]
 
+        _usage: dict = usage_out if usage_out is not None else {}
+        _started = _time.monotonic()
+        try:
+            return await self._ollama_tool_rounds(
+                messages, ollama_sys, _provider, _model, _base_url, _usage, token, _re
+            )
+        finally:
+            await self._meter(_provider, _model, "tools", _usage, _started)
+
+    async def _ollama_tool_rounds(
+        self,
+        messages: list[dict],
+        ollama_sys: str,
+        _provider: str,
+        _model: str,
+        _base_url: str,
+        _usage: dict,
+        token: str | None,
+        _re: Any,
+    ) -> str:
         last_error: str = ""
-        _uk = {"usage_out": usage_out} if usage_out is not None else {}
         for rnd in range(6):
-            text = await call_ollama(messages, ollama_sys, model=_model, base_url=_base_url, **_uk)
+            text = await llm_providers.chat(
+                messages, ollama_sys, provider=_provider, model=_model,
+                base_url=_base_url, usage_out=_usage,
+            )
             # 일부 모델이 마크다운 이스케이프(<api\_call>)로 응답 — 태그 파싱 전 정규화
             text = text.replace("\\_", "_")
             logger.warning("[orchestrator] ollama round %d response: %.120s", rnd, text)
@@ -1148,18 +1296,33 @@ class Orchestrator:
     async def _synthesize(self, results: dict[str, str], user_message: str) -> str:
         if not self._client:
             return "\n\n".join(f"[{_AGENT_LABELS.get(k, k)}]\n{v}" for k, v in results.items())
+        import time as _time
         db = await _db_llm_settings()
-        orch_model = db.get("orchestrator_model") or settings.orchestrator_model
         combined = "\n\n".join(
             f"[{_AGENT_LABELS.get(k, k)}]\n{v}" for k, v in results.items()
         )
+        _synth_system = "Synthesize multiple agent responses into a clear, unified final answer for the user."
+        _synth_user = f"Original question: {user_message}\n\n{combined}"
         try:
+            # R19-2: synthesize 라우트가 로컬 provider 를 지정하면 로컬 LLM 으로 합성
+            route = await llm_router.resolve("synthesize", db)
+            if route and route["provider"] != "anthropic":
+                return await self._local_chat(
+                    "synthesize", [{"role": "user", "content": _synth_user}], _synth_system, db=db,
+                )
+            orch_model = (route or {}).get("model") or db.get("orchestrator_model") or settings.orchestrator_model
+            _usage: dict = {}
+            _started = _time.monotonic()
             resp = await self._client.messages.create(
                 model=orch_model,
                 max_tokens=2048,
-                system="Synthesize multiple agent responses into a clear, unified final answer for the user.",
-                messages=[{"role": "user", "content": f"Original question: {user_message}\n\n{combined}"}],
+                system=_synth_system,
+                messages=[{"role": "user", "content": _synth_user}],
             )
+            if getattr(resp, "usage", None):
+                _usage = {"input_tokens": resp.usage.input_tokens or 0,
+                          "output_tokens": resp.usage.output_tokens or 0}
+            await self._meter("anthropic", orch_model, "synthesize", _usage, _started)
             return resp.content[0].text
         except Exception:
             return combined
@@ -1170,6 +1333,7 @@ class Orchestrator:
         agent_key: str | None = None,
     ) -> str:
         logger.warning("[orchestrator] run() called, msg=%.40s", user_message)
+        self._meter_ctx = {"user_id": user_id, "agent_key": agent_key}  # R19-3
         rule = await match_rule_async(user_message)
         if rule:
             action = rule.get("action", {})
@@ -1218,6 +1382,7 @@ class Orchestrator:
         agent_key: str | None = None,
     ) -> AsyncGenerator[str, None]:
         logger.warning("[orchestrator] stream() called, msg=%.40s", user_message)
+        self._meter_ctx = {"user_id": user_id, "agent_key": agent_key}  # R19-3
         try:
             rule = await match_rule_async(user_message)
             if rule:
@@ -1260,13 +1425,14 @@ class Orchestrator:
 
             # ── Ollama 경로 (명시적 선택 또는 Anthropic key 없음) ──────────
             if self._use_ollama(model):
+                _local_db = await _db_llm_settings()
+                _lp, _lm, _ = llm_providers.resolve_local(_local_db)
                 yield f"event: intent\ndata: {json.dumps({'intents': ['general']})}\n\n"
-                yield f"event: agent_start\ndata: {json.dumps({'agent': 'general', 'label': '일반 응답 (Ollama)'})}\n\n"
+                yield f"event: agent_start\ndata: {json.dumps({'agent': 'general', 'label': f'일반 응답 ({_lp})'})}\n\n"
                 usage: dict = {}
                 text = await self._ollama_with_tools(user_message, history, sys_prompt, token=token, usage_out=usage)
                 yield f"event: delta\ndata: {json.dumps({'text': text})}\n\n"
-                _ollama_db = await _db_llm_settings()
-                yield f"event: done\ndata: {json.dumps({'usage': usage, 'model': _ollama_db.get('ollama_model') or settings.ollama_model})}\n\n"
+                yield f"event: done\ndata: {json.dumps({'usage': usage, 'model': _lm or settings.ollama_model})}\n\n"
                 return
 
             # ── Claude 경로 ────────────────────────────────────────────────
@@ -1312,9 +1478,10 @@ class Orchestrator:
                     try:
                         text = await self._claude_with_tools(user_message, history, sys_prompt, token=token, usage_out=usage)
                     except Exception as exc:
-                        logger.warning("[orchestrator] Claude 실패, Ollama 폴백: %s", exc)
+                        logger.warning("[orchestrator] Claude 실패, 로컬 LLM 폴백: %s", exc)
                         text = await self._ollama_with_tools(user_message, history, sys_prompt, token=token, usage_out=usage)
-                        used_model = _db.get("ollama_model") or settings.ollama_model
+                        _, used_model, _ = llm_providers.resolve_local(_db)
+                        used_model = used_model or settings.ollama_model
 
                     # F25-2: reviewer gate (옵트인)
                     if reviewer_gate:

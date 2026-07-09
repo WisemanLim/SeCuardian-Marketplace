@@ -12,7 +12,8 @@ from typing import Any
 import anthropic
 
 from app.core.config import settings
-from app.services.llm_fallback import call_ollama
+from app.services import llm_metering, llm_providers
+from app.services.token_compress import compress_history
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -46,9 +47,15 @@ class BaseAgent(ABC):
         if domain_ctx:
             system += f"\n\n[현재 상태]\n{domain_ctx}"
 
-        messages = list(history) + [{"role": "user", "content": user_message}]
+        import time as _time
+
+        # R19-4: 히스토리 토큰 예산 초과 시 압축
+        history_c, _ = compress_history(list(history), settings.llm_context_budget)
+        messages = history_c + [{"role": "user", "content": user_message}]
         tools = self.get_tools()
         executors = self.get_tool_executors()
+        _usage: dict = {}
+        _started = _time.monotonic()
 
         while True:
             try:
@@ -59,13 +66,33 @@ class BaseAgent(ABC):
                     tools=tools,
                     messages=messages,
                 )
+                if getattr(resp, "usage", None):
+                    _usage["input_tokens"] = _usage.get("input_tokens", 0) + (resp.usage.input_tokens or 0)
+                    _usage["output_tokens"] = _usage.get("output_tokens", 0) + (resp.usage.output_tokens or 0)
             except anthropic.APIError as exc:
-                logger.warning("[%s] Claude API 오류, Ollama fallback: %s", self.agent_key, exc)
-                text = await call_ollama(messages, system)
+                logger.warning("[%s] Claude API 오류, 로컬 LLM fallback: %s", self.agent_key, exc)
+                # R19-1/3: 기본 로컬 provider 로 폴백 + 미터링
+                provider, model, base_url = llm_providers.resolve_local()
+                fb_usage: dict = {}
+                fb_started = _time.monotonic()
+                text = await llm_providers.chat(
+                    messages, system, provider=provider, model=model,
+                    base_url=base_url, usage_out=fb_usage,
+                )
+                await llm_metering.record(
+                    provider=provider, model=model, task="domain", usage=fb_usage,
+                    latency_ms=int((_time.monotonic() - fb_started) * 1000),
+                    agent_key=self.agent_key,
+                )
                 yield {"type": "delta", "text": text}
                 return
 
             if resp.stop_reason == "end_turn":
+                await llm_metering.record(
+                    provider="anthropic", model=settings.domain_agent_model, task="domain",
+                    usage=_usage, latency_ms=int((_time.monotonic() - _started) * 1000),
+                    agent_key=self.agent_key,
+                )
                 for block in resp.content:
                     if hasattr(block, "text"):
                         yield {"type": "delta", "text": block.text}

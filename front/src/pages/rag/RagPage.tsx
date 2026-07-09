@@ -31,7 +31,7 @@ export default function RagPage() {
 
   async function handleCreate() {
     setError("");
-    if (!form.name.trim()) { setError("이름을 입력하세요."); return; }
+    if (!form.name.trim()) { setError(t("rag.nameRequired")); return; }
     try {
       const c = await createCollection(form);
       setShowCreate(false);
@@ -40,7 +40,7 @@ export default function RagPage() {
       selectCollection(c);
     } catch (e) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg || "생성 실패");
+      setError(msg || t("rag.createFailed"));
     }
   }
 
@@ -70,18 +70,18 @@ export default function RagPage() {
   return (
     <div className="page grid grid-cols-3 gap-4">
       <div className="col-span-1">
+        {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 (R18 표준) */}
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("nav.rag") ?? "RAG"}</h1>
+          <p className="text-xs text-gray-500">{t("rag.pageDesc")}</p>
           <button onClick={() => setShowCreate((v) => !v)}
-            className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">
-            {showCreate ? "닫기" : "+ 컬렉션"}
+            className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 shrink-0">
+            {showCreate ? t("common.close") : t("rag.addCollection")}
           </button>
         </div>
-        <p className="text-xs text-gray-500 mb-3">문서 수집→임베딩→하이브리드(BM25+dense+RRF) 검색.</p>
 
         {showCreate && (
           <div className="mb-3 p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 space-y-2">
-            <input placeholder="이름" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            <input placeholder={t("rag.namePh")} value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               className="w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
             <select value={form.sensitivity} onChange={(e) => setForm((f) => ({ ...f, sensitivity: e.target.value as "general" | "sensitive" }))}
               className="w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
@@ -89,7 +89,7 @@ export default function RagPage() {
               <option value="sensitive">sensitive</option>
             </select>
             {error && <p role="alert" className="text-xs text-red-500">{error}</p>}
-            <button onClick={handleCreate} className="w-full text-sm px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">저장</button>
+            <button onClick={handleCreate} className="w-full text-sm px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700">{t("common.save")}</button>
           </div>
         )}
 
@@ -108,27 +108,27 @@ export default function RagPage() {
               </span>
             </button>
           ))}
-          {collections.length === 0 && <p className="text-xs text-gray-400">컬렉션이 없습니다.</p>}
+          {collections.length === 0 && <p className="text-xs text-gray-400">{t("rag.noCollections")}</p>}
         </div>
       </div>
 
       <div className="col-span-2">
         {!selected ? (
-          <p className="text-sm text-gray-400 mt-8">좌측에서 컬렉션을 선택하세요.</p>
+          <p className="text-sm text-gray-400 mt-8">{t("rag.selectPrompt")}</p>
         ) : (
           <div className="space-y-4">
             <section className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">문서 수집 — {selected.name}</h3>
-              <input placeholder="제목(선택)" value={docText.title}
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("rag.ingestTitle")}{selected.name}</h3>
+              <input placeholder={t("rag.titleOptionalPh")} value={docText.title}
                 onChange={(e) => setDocText((d) => ({ ...d, title: e.target.value }))}
                 className="w-full text-sm px-2 py-1.5 mb-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
-              <textarea placeholder="본문 텍스트" rows={4} value={docText.text}
+              <textarea placeholder={t("rag.bodyPh")} rows={4} value={docText.text}
                 onChange={(e) => setDocText((d) => ({ ...d, text: e.target.value }))}
                 className="w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
               <button disabled={busy} onClick={handleIngest}
-                className="mt-2 text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">수집</button>
+                className="mt-2 text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">{t("rag.ingest")}</button>
               <table className="w-full text-xs mt-3">
-                <thead className="text-gray-400"><tr><th className="text-left font-normal py-1">제목</th><th className="text-left font-normal">청크</th></tr></thead>
+                <thead className="text-gray-400"><tr><th className="text-left font-normal py-1">{t("rag.thTitle")}</th><th className="text-left font-normal">{t("rag.thChunks")}</th></tr></thead>
                 <tbody>
                   {documents.map((d) => (
                     <tr key={d.id} className="border-t border-gray-200 dark:border-gray-800">
@@ -140,13 +140,13 @@ export default function RagPage() {
             </section>
 
             <section className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">하이브리드 검색</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t("rag.hybridSearch")}</h3>
               <div className="flex gap-2">
-                <input placeholder="검색어" value={query} onChange={(e) => setQuery(e.target.value)}
+                <input placeholder={t("rag.queryPh")} value={query} onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   className="flex-1 text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
                 <button disabled={busy} onClick={handleSearch}
-                  className="text-xs px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">검색</button>
+                  className="text-xs px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">{t("rag.search")}</button>
               </div>
               <div className="mt-2 space-y-2">
                 {hits.map((h) => (
@@ -157,7 +157,7 @@ export default function RagPage() {
                     </p>
                   </div>
                 ))}
-                {hits.length === 0 && <p className="text-xs text-gray-400">검색 결과가 없습니다.</p>}
+                {hits.length === 0 && <p className="text-xs text-gray-400">{t("rag.noResults")}</p>}
               </div>
             </section>
           </div>

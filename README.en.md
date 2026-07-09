@@ -27,6 +27,7 @@ bases (RAG).
 | Playground (F-PG: prompt/model/RAG experimentation · A/B) — backend+frontend | 🟡 |
 | Guardrails (F-GRD: real+heuristic coexist · **24 domain rulesets vendored · filter toggle · multi-domain · LLM classifier (optional) full judgment** · Orchestrator gate) — backend+frontend | 🟡 |
 | Env separation/keys (F-ENV), Web portal (F-WEB), Governance (F-GOV) | 🟡 Partial |
+| Extensible multilingual descriptions + Local LLM diversification (SeCuardian R18-7·R19 clone sync, §7.11.2) | ✅ Synced |
 
 > All 5 built-in agents have working backend+frontend (tests PASS). 🟡 = extension items remain (remote registry, React Flow canvas, pgvector, MCP proxy, etc). Details: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
@@ -55,6 +56,12 @@ bases (RAG).
 > **Built-in MCP unlock (impl/20)**: the MCP lock on the REQUIRED built-in 5 is removed — all 7 built-in agents can be exposed as MCP servers.
 >
 > **emb_ built-in packages (impl/20 §7.8.8)**: ADDON packages `addon-agents/zip/emb_{marketplace,workflow,rag,playground,guardrails}` are created (same convention as the 13 security agents).
+>
+> **Multilingual agent display names (impl/35 · physical `test/impl/33`, §7.11.2-4 — cloned from SeCuardian impl/56)**: new `tbl_agent_config.agent_names` JSON (`{"ko":..,"en":..}`) — the 7 built-in agents are seeded with English display names (마켓플레이스→Marketplace, 워크플로우→Workflow, …), fixing Korean names remaining in the English UI. Idempotent `{"ko": agent_name}` backfill at startup; meta.json `display_name` accepts the dict form (normalized & synced on upload). Applied with the same fallback chain as descriptions to agent cards, left nav, header title, and the Guardrails agent selector.
+>
+> **Full i18n for built-in agent screens + duplicate title removal (impl/34 · physical `test/impl/32`, §7.11.3)**: fixed screens (Workflow list/full-screen builder/canvas, RAG, Playground, Guardrails, Marketplace, Dashboard) remaining in Korean when the UI language is English — 137 hardcoded strings replaced with `t()` locale keys (`locales/{ko,en}.json` wf/wfb/rag/pg/mp/dash/grd sections), ko/en key parity enforced. Content h1 titles (5 screens) duplicated the AppLayout header title and were removed — **only the page description remains** (SeCuardian R18 standard). The `nav_group` chip on agent cards (Korean DB values) is also locale-mapped (en: Basic Agent · Built-in Agent).
+>
+> **Multilingual descriptions + Local LLM diversification (impl/33 · physical `test/impl/31`, §7.11.2 — cloned from SeCuardian R18-7·R19)**: ① Agent descriptions are managed as `tbl_agent_config.descriptions` JSON (`{"ko":..,"en":..}`, extensible to more languages by adding keys) — legacy `description`/`description_en` is idempotently backfilled at startup; meta.json accepts both dict and legacy forms (normalized on upload). New **preferred language** in My Page (`tbl_users.preferred_lang`) — display fallback `UI lang → preferred → ko → first available`, synced to the UI locale at login. ② Local LLM abstracted into **Ollama · llama.cpp · vLLM** backends (`app/services/llm_providers.py`, selected via `LOCAL_LLM_PROVIDER`, compose profiles `llamacpp`/`vllm`) + **per-task LLM routing** (`llm_routes`: classify/tools/synthesize/domain/chat) + **per-call metering** (`tbl_llm_usage` ledger, `GET /api/llm/usage` aggregation, usage summary in System Settings) + **token compression** (head/tail truncation of older history above `LLM_CONTEXT_BUDGET`). The AI Assistant model list is fetched dynamically from `GET /api/llm/models`.
 
 ---
 

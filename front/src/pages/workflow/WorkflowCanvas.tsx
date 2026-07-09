@@ -5,6 +5,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { WorkflowNode, WorkflowEdge } from "../../api/workflow";
+import { useLocale } from "../../hooks/useLocale";
 
 const NODE_COLOR: Record<string, string> = {
   trigger: "#16a34a", agent: "#2563eb", llm: "#7c3aed", condition: "#d97706",
@@ -31,6 +32,7 @@ interface Props {
  *  KWCAG 2.2: 캔버스는 마우스 중심이라 접근성 대상이 아니며, a11y 폼 편집기(WorkflowPage
  *  DefinitionEditor)가 동일 nodes/edges 상태를 공유하는 대체편집기로 계속 병행된다. */
 export default function WorkflowCanvas({ nodes, edges, onChange }: Readonly<Props>) {
+  const { t } = useLocale();
   const editable = !!onChange;
   const [rfNodes, setRfNodes] = useState<Node[]>([]);
   const [rfEdges, setRfEdges] = useState<Edge[]>([]);
@@ -116,7 +118,7 @@ export default function WorkflowCanvas({ nodes, edges, onChange }: Readonly<Prop
 
   return (
     <div style={{ height: 320 }} className="rounded border border-gray-200 dark:border-gray-700"
-      aria-label={editable ? "워크플로우 DAG 편집 캔버스(마우스 드래그 전용 — 키보드 사용자는 위 폼 편집기 이용)" : "워크플로우 DAG 시각화"}>
+      aria-label={editable ? t("wf.canvasEditAria") : t("wf.canvasViewAria")}>
       <ReactFlow
         nodes={rfNodes} edges={rfEdges} fitView proOptions={{ hideAttribution: true }}
         nodesDraggable={editable} nodesConnectable={editable} elementsSelectable={editable}

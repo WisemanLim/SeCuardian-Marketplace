@@ -52,6 +52,34 @@ services:
       retries: 10
       start_period: 20s
 
+  # ── R19-1: 로컬 LLM 대체 백엔드 (선택 기동) ────────────────────────────────
+  # llama.cpp server — OpenAI 호환. GGUF 모델을 ./models 에 두고 profile 로 기동:
+  #   LLAMACPP_MODEL_FILE=/models/<file>.gguf docker compose --profile llamacpp up -d llamacpp
+  llamacpp:
+    profiles: ["llamacpp"]
+    image: ghcr.io/ggml-org/llama.cpp:server
+    ports: ["${LLAMACPP_PORT:-8180}:8080"]
+    volumes:
+      - ./models:/models
+    command: ["-m", "${LLAMACPP_MODEL_FILE:-/models/model.gguf}", "--host", "0.0.0.0", "--port", "8080"]
+
+  # vLLM — OpenAI 호환. Linux + NVIDIA GPU 권장:
+  #   VLLM_MODEL=<hf-model-id> docker compose --profile vllm up -d vllm
+  vllm:
+    profiles: ["vllm"]
+    image: vllm/vllm-openai:latest
+    ports: ["${VLLM_PORT:-8100}:8000"]
+    volumes:
+      - vllm-cache:/root/.cache/huggingface
+    command: ["--model", "${VLLM_MODEL:-Qwen/Qwen2.5-3B-Instruct}"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${VLLM_GPU_COUNT:-all}
+              capabilities: [gpu]
+
   # ── 앱 서비스 (profiles:[app] → make up 에서 제외, make build/dev 로 기동) ─
   api:
     profiles: ["app"]
@@ -110,3 +138,4 @@ services:
 volumes:
   pgdata:
   ollama-data:
+  vllm-cache:

@@ -10,6 +10,7 @@ import {
   Workflow, WorkflowNode, WorkflowEdge, WorkflowComponent,
   getWorkflow, createWorkflow, updateWorkflow, listComponents,
 } from "../../api/workflow";
+import { useLocale } from "../../hooks/useLocale";
 
 /** impl/32(PRD §7.2.8) — Flowise/Dify 준용 풀스크린 워크플로우 빌더.
  *  팔레트(좌) → 캔버스 drag & drop(중앙) → 인스펙터(우) 3분할. React Flow(MIT) 자체 구현 —
@@ -28,46 +29,48 @@ type NodeType = WorkflowNode["type"];
 type BuilderData = { nodeType: NodeType; config: Record<string, unknown> };
 type RfNode = Node<BuilderData, "secmp">;
 
-const NODE_META: Record<NodeType, { label: string; desc: string; color: string; defaultConfig: Record<string, unknown> }> = {
-  trigger: { label: "트리거", desc: "워크플로우 시작점(입력 수신)", color: "#16a34a", defaultConfig: {} },
-  agent: { label: "에이전트", desc: "내장/시스템/Addon 에이전트 API 호출", color: "#2563eb", defaultConfig: { agent_key: "" } },
-  llm: { label: "LLM", desc: "프롬프트로 LLM 호출(Ollama 폴백)", color: "#7c3aed", defaultConfig: { prompt: "" } },
-  condition: { label: "조건", desc: "분기 판단(true/false 엣지)", color: "#d97706", defaultConfig: { left: "", op: "truthy", right: "" } },
-  hitl: { label: "HITL 승인", desc: "사람 승인 대기(승인/거부)", color: "#dc2626", defaultConfig: {} },
-  transform: { label: "변환", desc: "컨텍스트 템플릿으로 출력 구성", color: "#0891b2", defaultConfig: { output: {} } },
-  notify: { label: "알림", desc: "메시지 기록(종료 노드로 사용)", color: "#4b5563", defaultConfig: { message: "" } },
-  http: { label: "HTTP", desc: "외부 URL 직접 호출", color: "#059669", defaultConfig: { method: "GET", url: "" } },
+// i18n(impl/34 §7.11.3): label/desc 는 locale 키(wfb.node.{type}.label/desc)로 조회
+const NODE_META: Record<NodeType, { color: string; defaultConfig: Record<string, unknown> }> = {
+  trigger: { color: "#16a34a", defaultConfig: {} },
+  agent: { color: "#2563eb", defaultConfig: { agent_key: "" } },
+  llm: { color: "#7c3aed", defaultConfig: { prompt: "" } },
+  condition: { color: "#d97706", defaultConfig: { left: "", op: "truthy", right: "" } },
+  hitl: { color: "#dc2626", defaultConfig: {} },
+  transform: { color: "#0891b2", defaultConfig: { output: {} } },
+  notify: { color: "#4b5563", defaultConfig: { message: "" } },
+  http: { color: "#059669", defaultConfig: { method: "GET", url: "" } },
 };
 const NODE_TYPE_KEYS = Object.keys(NODE_META) as NodeType[];
 const CONDITION_OPS = ["truthy", "==", "!=", ">", "<", "contains"] as const;
 const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;
 const DND_MIME = "application/secmp-workflow-node";
-const CATEGORY_LABEL: Record<string, string> = { builtin: "내장", system: "시스템", addon: "Addon" };
+const CATEGORY_KEY: Record<string, string> = { builtin: "wf.catBuiltin", system: "wf.catSystem", addon: "wf.catAddon" };
 
 interface DragPayload {
   type: NodeType;
   config?: Record<string, unknown>;
 }
 
-function summarize(type: NodeType, config: Record<string, unknown>): string {
+function summarize(type: NodeType, config: Record<string, unknown>, t: (k: string) => string): string {
   const c = config ?? {};
   switch (type) {
     case "agent": {
       const key = String(c.agent_key ?? "");
-      return c.path ? `${key} · ${String(c.method ?? "GET")} ${String(c.path)}` : key || "에이전트 미지정";
+      return c.path ? `${key} · ${String(c.method ?? "GET")} ${String(c.path)}` : key || t("wfb.sumAgentUnset");
     }
-    case "llm": return String(c.prompt ?? "").slice(0, 60) || "프롬프트 미지정";
+    case "llm": return String(c.prompt ?? "").slice(0, 60) || t("wfb.sumPromptUnset");
     case "condition": return `${String(c.left ?? "")} ${String(c.op ?? "truthy")} ${String(c.right ?? "")}`.trim();
     case "http": return `${String(c.method ?? "GET")} ${String(c.url ?? "")}`.trim();
     case "notify": return String(c.message ?? "").slice(0, 60);
-    case "transform": return "출력 템플릿";
-    case "hitl": return "승인 대기";
-    default: return "시작";
+    case "transform": return t("wfb.sumTransform");
+    case "hitl": return t("wfb.sumHitl");
+    default: return t("wfb.sumStart");
   }
 }
 
 /** 캔버스 커스텀 노드 — 타입별 색상 헤더 + config 요약(Flowise 노드 카드 패턴 준용). */
 function BuilderNode({ id, data, selected }: NodeProps<RfNode>) {
+  const { t } = useLocale();
   const meta = NODE_META[data.nodeType];
   return (
     <div className={`rounded-md bg-white dark:bg-gray-800 shadow-sm text-left w-[190px] border ${selected ? "border-blue-500 ring-2 ring-blue-300 dark:ring-blue-700" : "border-gray-200 dark:border-gray-600"}`}>
@@ -76,12 +79,12 @@ function BuilderNode({ id, data, selected }: NodeProps<RfNode>) {
       )}
       <div className="px-2 py-1 rounded-t-md text-[11px] font-semibold text-white flex items-center justify-between"
         style={{ background: meta.color }}>
-        <span>{meta.label}</span>
+        <span>{t(`wfb.node.${data.nodeType}.label`)}</span>
         <span className="opacity-80 font-normal">{data.nodeType}</span>
       </div>
       <div className="px-2 py-1.5">
         <p className="text-[11px] font-medium text-gray-800 dark:text-gray-100 truncate">{id}</p>
-        <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{summarize(data.nodeType, data.config)}</p>
+        <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{summarize(data.nodeType, data.config, t)}</p>
       </div>
       <Handle type="source" position={Position.Right} style={{ background: meta.color, width: 9, height: 9 }} />
     </div>
@@ -155,6 +158,7 @@ function toDomain(rfNodes: RfNode[], rfEdges: Edge[]): { nodes: WorkflowNode[]; 
 
 /** 좌측 팔레트 — 노드 타입 + 컴포넌트(§7.2.3). HTML5 드래그 + 클릭 삽입(키보드 폴백) 병행. */
 function Palette({ onInsert }: Readonly<{ onInsert: (p: DragPayload) => void }>) {
+  const { t } = useLocale();
   const [components, setComponents] = useState<WorkflowComponent[]>([]);
   const [query, setQuery] = useState("");
 
@@ -175,34 +179,34 @@ function Palette({ onInsert }: Readonly<{ onInsert: (p: DragPayload) => void }>)
   }
 
   return (
-    <aside aria-label="노드 팔레트" className="w-60 shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-white dark:bg-gray-900">
+    <aside aria-label={t("wfb.paletteAria")} className="w-60 shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-white dark:bg-gray-900">
       <div className="p-3">
-        <h2 className="text-xs font-semibold text-gray-500 mb-2">노드</h2>
-        <p className="text-[10px] text-gray-400 mb-2">캔버스로 드래그하거나 클릭해 추가</p>
+        <h2 className="text-xs font-semibold text-gray-500 mb-2">{t("wfb.paletteNodes")}</h2>
+        <p className="text-[10px] text-gray-400 mb-2">{t("wfb.paletteHint")}</p>
         <div className="space-y-1">
-          {NODE_TYPE_KEYS.map((t) => (
-            <button key={t} type="button" draggable
-              onDragStart={(e) => startDrag(e, { type: t })}
-              onClick={() => onInsert({ type: t })}
+          {NODE_TYPE_KEYS.map((nt) => (
+            <button key={nt} type="button" draggable
+              onDragStart={(e) => startDrag(e, { type: nt })}
+              onClick={() => onInsert({ type: nt })}
               className="w-full text-left p-2 rounded border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 cursor-grab active:cursor-grabbing bg-white dark:bg-gray-800">
               <span className="flex items-center gap-2">
-                <span aria-hidden className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: NODE_META[t].color }} />
-                <span className="text-xs font-medium text-gray-800 dark:text-gray-100">{NODE_META[t].label}</span>
-                <span className="text-[10px] text-gray-400">{t}</span>
+                <span aria-hidden className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: NODE_META[nt].color }} />
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-100">{t(`wfb.node.${nt}.label`)}</span>
+                <span className="text-[10px] text-gray-400">{nt}</span>
               </span>
-              <span className="block text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 pl-4">{NODE_META[t].desc}</span>
+              <span className="block text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 pl-4">{t(`wfb.node.${nt}.desc`)}</span>
             </button>
           ))}
         </div>
       </div>
       <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-        <h2 className="text-xs font-semibold text-gray-500 mb-2">컴포넌트(에이전트 API)</h2>
-        <input aria-label="컴포넌트 검색" value={query} onChange={(e) => setQuery(e.target.value)}
-          placeholder="검색…"
+        <h2 className="text-xs font-semibold text-gray-500 mb-2">{t("wfb.paletteComponents")}</h2>
+        <input aria-label={t("wfb.searchAria")} value={query} onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("wfb.searchPh")}
           className="w-full text-xs px-2 py-1 mb-2 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
         {(["builtin", "system", "addon"] as const).map((cat) => groups[cat].length > 0 && (
           <div key={cat} className="mb-2">
-            <p className="text-[10px] font-semibold text-gray-400 mb-1">{CATEGORY_LABEL[cat]} 에이전트</p>
+            <p className="text-[10px] font-semibold text-gray-400 mb-1">{t(CATEGORY_KEY[cat])}{t("wf.catAgentsSuffix")}</p>
             <div className="space-y-1">
               {groups[cat].map((c) => {
                 const payload: DragPayload = {
@@ -222,7 +226,7 @@ function Palette({ onInsert }: Readonly<{ onInsert: (p: DragPayload) => void }>)
             </div>
           </div>
         ))}
-        {components.length === 0 && <p className="text-[11px] text-gray-400">사용 가능한 컴포넌트가 없습니다.</p>}
+        {components.length === 0 && <p className="text-[11px] text-gray-400">{t("wf.noComponents")}</p>}
       </div>
     </aside>
   );
@@ -240,13 +244,14 @@ function Inspector({
   onEdgeChange: (id: string, when: string | undefined) => void;
   onEdgeRemove: (id: string) => void;
 }>) {
+  const { t } = useLocale();
   const [idDraft, setIdDraft] = useState(node?.id ?? "");
   useEffect(() => { setIdDraft(node?.id ?? ""); }, [node?.id]);
 
   if (!node && !edge) {
     return (
-      <aside aria-label="속성 편집" className="w-72 shrink-0 border-l border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900">
-        <p className="text-xs text-gray-400">노드/엣지를 선택하면 속성을 편집할 수 있습니다.</p>
+      <aside aria-label={t("wfb.inspectorAria")} className="w-72 shrink-0 border-l border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900">
+        <p className="text-xs text-gray-400">{t("wfb.inspectorEmpty")}</p>
       </aside>
     );
   }
@@ -254,18 +259,18 @@ function Inspector({
   if (edge) {
     const when = (edge.data as { when?: string } | undefined)?.when ?? "";
     return (
-      <aside aria-label="엣지 속성 편집" className="w-72 shrink-0 border-l border-gray-200 dark:border-gray-700 p-3 overflow-y-auto bg-white dark:bg-gray-900 space-y-3">
-        <h2 className="text-xs font-semibold text-gray-500">엣지</h2>
+      <aside aria-label={t("wfb.edgeAria")} className="w-72 shrink-0 border-l border-gray-200 dark:border-gray-700 p-3 overflow-y-auto bg-white dark:bg-gray-900 space-y-3">
+        <h2 className="text-xs font-semibold text-gray-500">{t("wfb.edge")}</h2>
         <p className="text-xs font-mono text-gray-600 dark:text-gray-300">{edge.source} → {edge.target}</p>
         <label className="block text-xs text-gray-500">
-          when (조건 분기 — condition 노드의 true/false)
-          <input aria-label="엣지 when" value={when} placeholder="true | false | 비움(무조건)"
+          {t("wfb.edgeWhenLabel")}
+          <input aria-label="edge when" value={when} placeholder={t("wfb.edgeWhenPh")}
             onChange={(e) => onEdgeChange(edge.id, e.target.value || undefined)}
             className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
         </label>
         <button type="button" onClick={() => onEdgeRemove(edge.id)}
           className="text-xs px-2 py-1 rounded text-red-500 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20">
-          엣지 삭제
+          {t("wfb.edgeDelete")}
         </button>
       </aside>
     );
@@ -289,36 +294,36 @@ function Inspector({
   );
 
   return (
-    <aside aria-label="노드 속성 편집" className="w-72 shrink-0 border-l border-gray-200 dark:border-gray-700 p-3 overflow-y-auto bg-white dark:bg-gray-900 space-y-3">
+    <aside aria-label={t("wfb.nodeAria")} className="w-72 shrink-0 border-l border-gray-200 dark:border-gray-700 p-3 overflow-y-auto bg-white dark:bg-gray-900 space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-xs font-semibold text-gray-500">노드 속성</h2>
+        <h2 className="text-xs font-semibold text-gray-500">{t("wfb.nodeProps")}</h2>
         <span className="text-[10px] px-1.5 py-0.5 rounded text-white" style={{ background: NODE_META[n.data.nodeType].color }}>
-          {NODE_META[n.data.nodeType].label}
+          {t(`wfb.node.${n.data.nodeType}.label`)}
         </span>
       </div>
       <label className="block text-xs text-gray-500">
-        ID (Enter 로 적용, 엣지 자동 갱신)
-        <input aria-label="노드 ID" value={idDraft}
+        {t("wfb.idLabel")}
+        <input aria-label={t("wfb.nodeIdAria")} value={idDraft}
           onChange={(e) => setIdDraft(e.target.value)}
           onBlur={applyId}
           onKeyDown={(e) => { if (e.key === "Enter") applyId(); }}
           className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
       </label>
       <label className="block text-xs text-gray-500">
-        타입
-        <select aria-label="노드 타입" value={n.data.nodeType}
+        {t("wfb.typeLabel")}
+        <select aria-label={t("wfb.nodeTypeAria")} value={n.data.nodeType}
           onChange={(e) => {
-            const t = e.target.value as NodeType;
-            onNodeChange(n.id, { nodeType: t, config: { ...NODE_META[t].defaultConfig } });
+            const nt = e.target.value as NodeType;
+            onNodeChange(n.id, { nodeType: nt, config: { ...NODE_META[nt].defaultConfig } });
           }}
           className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
-          {NODE_TYPE_KEYS.map((t) => <option key={t} value={t}>{NODE_META[t].label} ({t})</option>)}
+          {NODE_TYPE_KEYS.map((nt) => <option key={nt} value={nt}>{t(`wfb.node.${nt}.label`)} ({nt})</option>)}
         </select>
       </label>
 
       {n.data.nodeType === "agent" && (
         <>
-          {textInput("agent_key", "agent_key", "예: rag")}
+          {textInput("agent_key", "agent_key", t("wfb.agentKeyPh"))}
           <label className="block text-xs text-gray-500">
             method
             <select aria-label={`${n.id} method`} value={String(cfg.method ?? "GET")}
@@ -327,19 +332,19 @@ function Inspector({
               {HTTP_METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
             </select>
           </label>
-          {textInput("path (비우면 스텁 호출)", "path", "/api/rag/search")}
-          <p className="text-[10px] text-gray-400">팔레트의 컴포넌트를 드래그/클릭하면 자동 설정됩니다.</p>
+          {textInput(t("wfb.pathLabel"), "path", "/api/rag/search")}
+          <p className="text-[10px] text-gray-400">{t("wfb.agentComponentHint")}</p>
         </>
       )}
       {n.data.nodeType === "llm" && (
         <>
           <label className="block text-xs text-gray-500">
-            prompt ({"{{trigger1.input.key}}"} 템플릿 지원)
+            prompt ({"{{trigger1.input.key}}"} {t("wfb.promptTemplateHint")})
             <textarea aria-label={`${n.id} prompt`} value={String(cfg.prompt ?? "")} rows={4}
               onChange={(e) => setCfg({ prompt: e.target.value })}
               className="mt-0.5 w-full text-xs font-mono px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
           </label>
-          {textInput("system (선택)", "system")}
+          {textInput(t("wfb.systemLabel"), "system")}
         </>
       )}
       {n.data.nodeType === "condition" && (
@@ -354,7 +359,7 @@ function Inspector({
             </select>
           </label>
           {textInput("right", "right")}
-          <p className="text-[10px] text-gray-400">나가는 엣지의 when 을 true/false 로 지정해 분기합니다.</p>
+          <p className="text-[10px] text-gray-400">{t("wfb.conditionHint")}</p>
         </>
       )}
       {n.data.nodeType === "http" && (
@@ -371,13 +376,13 @@ function Inspector({
         </>
       )}
       {n.data.nodeType === "notify" && textInput("message", "message", "{{llm1.text}}")}
-      {n.data.nodeType === "hitl" && <p className="text-[11px] text-gray-400">실행이 이 노드에서 승인 대기(waiting_hitl) 상태가 됩니다.</p>}
-      {n.data.nodeType === "trigger" && <p className="text-[11px] text-gray-400">워크플로우 입력이 {"{{"}트리거ID.input{"}}"} 으로 노출됩니다.</p>}
-      {n.data.nodeType === "transform" && <p className="text-[11px] text-gray-400">아래 JSON 의 output 객체가 컨텍스트 템플릿으로 해석됩니다.</p>}
+      {n.data.nodeType === "hitl" && <p className="text-[11px] text-gray-400">{t("wfb.hitlHint")}</p>}
+      {n.data.nodeType === "trigger" && <p className="text-[11px] text-gray-400">{t("wfb.triggerHint1")}{"{{"}triggerID.input{"}}"}{t("wfb.triggerHint2")}</p>}
+      {n.data.nodeType === "transform" && <p className="text-[11px] text-gray-400">{t("wfb.transformHint")}</p>}
 
       <details>
-        <summary className="text-[11px] text-gray-400 cursor-pointer">고급 — config JSON 직접 편집</summary>
-        <textarea key={`${n.id}-json`} aria-label={`${n.id} 설정 JSON`}
+        <summary className="text-[11px] text-gray-400 cursor-pointer">{t("wfb.advancedJson")}</summary>
+        <textarea key={`${n.id}-json`} aria-label={`${n.id} config JSON`}
           defaultValue={JSON.stringify(cfg, null, 1)} rows={5}
           onChange={(e) => {
             try { onNodeChange(n.id, { config: JSON.parse(e.target.value || "{}") }); } catch { /* invalid → 대기 */ }
@@ -387,13 +392,14 @@ function Inspector({
 
       <button type="button" onClick={() => onNodeRemove(n.id)}
         className="text-xs px-2 py-1 rounded text-red-500 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20">
-        노드 삭제
+        {t("wfb.nodeDelete")}
       </button>
     </aside>
   );
 }
 
 function BuilderInner() {
+  const { t } = useLocale();
   const { id } = useParams();
   const navigate = useNavigate();
   const { screenToFlowPosition } = useReactFlow();
@@ -425,7 +431,7 @@ function BuilderInner() {
         setRfEdges(toRfEdges(wf.definition_json.edges ?? []));
         setLoadedVersion(wf.version);
       })
-      .catch(() => setError("워크플로우를 불러오지 못했습니다."));
+      .catch(() => setError(t("wfb.loadFailed")));
   }, [editId]);
 
   const handleNodesChange = useCallback((changes: NodeChange<RfNode>[]) => {
@@ -524,7 +530,7 @@ function BuilderInner() {
   // ---------- 저장 ----------
   async function handleSave() {
     setError("");
-    if (!name.trim()) { setError("이름을 입력하세요."); return; }
+    if (!name.trim()) { setError(t("wf.nameRequired")); return; }
     setBusy(true);
     try {
       const definition_json = toDomain(rfNodes, rfEdges);
@@ -540,7 +546,7 @@ function BuilderInner() {
       setSavedAt(new Date().toLocaleTimeString());
     } catch (e) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg || "저장 실패");
+      setError(msg || t("wfb.saveFailed"));
     } finally {
       setBusy(false);
     }
@@ -552,35 +558,35 @@ function BuilderInner() {
       <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <button type="button" onClick={() => navigate("/workflow")}
           className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
-          ← 목록
+          {t("wfb.backToList")}
         </button>
-        <input aria-label="워크플로우 이름" value={name} onChange={(e) => setName(e.target.value)}
-          placeholder="워크플로우 이름"
+        <input aria-label={t("wfb.nameAria")} value={name} onChange={(e) => setName(e.target.value)}
+          placeholder={t("wfb.namePh")}
           className="text-sm font-medium px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800 w-56" />
-        <input aria-label="설명" value={description} onChange={(e) => setDescription(e.target.value)}
-          placeholder="설명(선택)"
+        <input aria-label={t("wfb.descAria")} value={description} onChange={(e) => setDescription(e.target.value)}
+          placeholder={t("wfb.descPh")}
           className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800 flex-1 min-w-0" />
-        <select aria-label="트리거 타입" value={triggerType} disabled={editId !== null}
+        <select aria-label={t("wfb.triggerTypeAria")} value={triggerType} disabled={editId !== null}
           onChange={(e) => setTriggerType(e.target.value as "manual" | "webhook")}
-          title={editId !== null ? "트리거 타입은 생성 시에만 지정" : undefined}
+          title={editId !== null ? t("wfb.triggerTypeLockTitle") : undefined}
           className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800 disabled:opacity-50">
           <option value="manual">manual</option>
           <option value="webhook">webhook</option>
         </select>
         {loadedVersion !== null && <span className="text-[11px] text-gray-400">v{loadedVersion}</span>}
-        {savedAt && <span role="status" className="text-[11px] text-green-600">저장됨 {savedAt}</span>}
+        {savedAt && <span role="status" className="text-[11px] text-green-600">{t("wfb.savedAt")} {savedAt}</span>}
         {error && <span role="alert" className="text-[11px] text-red-500">{error}</span>}
         <button type="button" disabled={busy} onClick={handleSave}
           className="ml-auto text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
-          저장
+          {t("common.save")}
         </button>
       </div>
 
       {webhookSecret && (
         <div role="alert" className="px-3 py-2 border-b border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 text-xs">
-          <span className="font-semibold text-amber-700 dark:text-amber-300">webhook 시크릿(지금만 표시, 재조회 불가): </span>
+          <span className="font-semibold text-amber-700 dark:text-amber-300">{t("wfb.webhookSecretLabel")}</span>
           <span className="font-mono break-all">{webhookSecret.secret}</span>
-          <button type="button" onClick={() => setWebhookSecret(null)} className="ml-2 underline">확인함, 닫기</button>
+          <button type="button" onClick={() => setWebhookSecret(null)} className="ml-2 underline">{t("wf.ackClose")}</button>
         </div>
       )}
 
@@ -588,7 +594,7 @@ function BuilderInner() {
       <div className="flex flex-1 min-h-0">
         <Palette onInsert={(p) => insertNode(p)} />
         <div className="flex-1 min-w-0" onDrop={onDrop} onDragOver={onDragOver}
-          aria-label="워크플로우 캔버스(마우스 드래그 전용 — 키보드 사용자는 팔레트 클릭 삽입과 우측 속성 폼, 또는 워크플로우 목록의 폼 편집기 이용)">
+          aria-label={t("wfb.canvasAria")}>
           <ReactFlow
             nodes={rfNodes} edges={rfEdges} nodeTypes={nodeTypes} fitView
             proOptions={{ hideAttribution: true }}

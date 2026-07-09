@@ -30,7 +30,7 @@ export default function MarketplacePage() {
       load();
     } catch (e) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg || "원격 설치 실패");
+      setError(msg || t("mp.remoteInstallFailed"));
     } finally {
       setBusy(null);
     }
@@ -60,7 +60,7 @@ export default function MarketplacePage() {
     <div>
       <div className="mb-3">
         <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("agent.assetCatalog")}</h2>
-        <p className="text-xs text-gray-500 mt-0.5">에이전트·워크플로우·RAG 파이프라인을 탐색·설치·버전관리합니다. (등록은 상단 ‘{t("agent.registerAsset")}’)</p>
+        <p className="text-xs text-gray-500 mt-0.5">{t("mp.catalogDesc")} ({t("mp.registerHint")} ‘{t("agent.registerAsset")}’)</p>
       </div>
 
       {error && <p role="alert" className="mb-3 text-xs text-red-500">{error}</p>}
@@ -76,7 +76,7 @@ export default function MarketplacePage() {
               <span className={`text-[10px] px-1.5 py-0.5 rounded shrink-0 ${
                 a.installed ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                             : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
-                {a.installed ? `설치됨 (${a.active_version})` : "미설치"}
+                {a.installed ? `${t("mp.installed")} (${a.active_version})` : t("mp.notInstalled")}
               </span>
             </div>
             {a.description && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{a.description}</p>}
@@ -84,26 +84,26 @@ export default function MarketplacePage() {
               {a.installed ? (
                 <button disabled={busy === a.asset_key} onClick={() => handleUninstall(a)}
                   className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-40">
-                  해제
+                  {t("mp.uninstall")}
                 </button>
               ) : (
                 <button disabled={busy === a.asset_key} onClick={() => handleInstall(a)}
                   className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
-                  설치
+                  {t("mp.install")}
                 </button>
               )}
             </div>
           </div>
         ))}
         {assets.length === 0 && (
-          <p className="text-sm text-gray-400 col-span-2">등록된 자산이 없습니다.</p>
+          <p className="text-sm text-gray-400 col-span-2">{t("mp.noAssets")}</p>
         )}
       </div>
 
       {remoteEnabled && (
         <section className="mt-8">
           <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            원격 레지스트리 <span className="text-xs font-normal text-gray-400">(다운로드→체크섬 검증→로컬 편입)</span>
+            {t("mp.remoteTitle")} <span className="text-xs font-normal text-gray-400">{t("mp.remoteSub")}</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {remoteAssets.map((a) => {
@@ -113,18 +113,18 @@ export default function MarketplacePage() {
                   <div className="flex items-start justify-between">
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{a.name}</p>
-                      <p className="text-xs text-gray-400">{a.asset_key} · {a.kind} · v{a.version} · 원격</p>
+                      <p className="text-xs text-gray-400">{a.asset_key} · {a.kind} · v{a.version} · {t("mp.remoteTag")}</p>
                     </div>
                   </div>
                   {a.description && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{a.description}</p>}
                   <button disabled={busy === `remote:${a.asset_key}` || localHas} onClick={() => handleRemoteInstall(a)}
                     className="mt-2 text-xs px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40">
-                    {localHas ? "로컬에 편입됨" : "다운로드·편입"}
+                    {localHas ? t("mp.importedLocal") : t("mp.downloadImport")}
                   </button>
                 </div>
               );
             })}
-            {remoteAssets.length === 0 && <p className="text-sm text-gray-400 col-span-2">원격 자산이 없습니다.</p>}
+            {remoteAssets.length === 0 && <p className="text-sm text-gray-400 col-span-2">{t("mp.noRemote")}</p>}
           </div>
         </section>
       )}

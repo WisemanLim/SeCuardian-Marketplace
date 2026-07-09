@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS tbl_users (
     role         VARCHAR(20)  NOT NULL DEFAULT 'user',
     status       VARCHAR(20)  NOT NULL DEFAULT 'active',
     custom_instructions TEXT,
+    preferred_lang VARCHAR(10),
     totp_secret  TEXT,
     totp_enabled INTEGER      NOT NULL DEFAULT 0,
     created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -25,6 +26,8 @@ CREATE TABLE IF NOT EXISTS tbl_agent_config (
     system_prompt TEXT,
     description  TEXT,
     description_en TEXT,
+    descriptions TEXT,
+    agent_names  TEXT,
     disabled_reason TEXT,
     disabled_reason_en TEXT,
     nav_group    VARCHAR(50),
@@ -57,6 +60,22 @@ CREATE TABLE IF NOT EXISTS tbl_settings (
     description  VARCHAR(200),
     updated_at   TIMESTAMP
 );
+
+-- LLM 호출 사용량 원장 (R19-3 Metering)
+CREATE TABLE IF NOT EXISTS tbl_llm_usage (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id      VARCHAR(50),
+    agent_key    VARCHAR(50),
+    provider     VARCHAR(20)  NOT NULL,
+    model        VARCHAR(100) NOT NULL,
+    task         VARCHAR(20)  NOT NULL,
+    tokens_in    INTEGER      NOT NULL DEFAULT 0,
+    tokens_out   INTEGER      NOT NULL DEFAULT 0,
+    latency_ms   INTEGER      NOT NULL DEFAULT 0,
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_created ON tbl_llm_usage(created_at);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_model ON tbl_llm_usage(model);
 
 -- Agent Registry — 외부 Standalone Agent (F12 + F23)
 CREATE TABLE IF NOT EXISTS tbl_agent_registry (

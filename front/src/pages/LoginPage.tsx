@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { login } from "../api/auth";
+import client from "../api/client";
 import { setAuth } from "../store/auth";
+import { setLocale, setPreferredLang, type Locale } from "../store/locale";
 import { useLocale } from "../hooks/useLocale";
 
 export default function LoginPage() {
@@ -26,6 +28,16 @@ export default function LoginPage() {
         username: data.username,
         totpEnabled: data.totp_enabled,
       });
+      // R18-7: 선호언어 동기화 — 서버 preferred_lang 을 UI locale 초기값으로 반영
+      try {
+        const { data: me } = await client.get<{ preferred_lang?: string | null }>("/auth/me");
+        if (me.preferred_lang) {
+          setPreferredLang(me.preferred_lang);
+          if (me.preferred_lang === "ko" || me.preferred_lang === "en") {
+            setLocale(me.preferred_lang as Locale);
+          }
+        }
+      } catch { /* best-effort */ }
       navigate("/chat", { replace: true });
     } catch (err: unknown) {
       const detail = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail;

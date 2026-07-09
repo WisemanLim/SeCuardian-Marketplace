@@ -4,7 +4,7 @@ import { logout } from "../../api/auth";
 import { listAddonAgents } from "../../api/addonAgents";
 import { getAuth } from "../../store/auth";
 import { getTheme, setTheme, type Theme } from "../../store/theme";
-import { getLocale, setLocale as persistLocale, type Locale } from "../../store/locale";
+import { pickDescription, getLocale, setLocale as persistLocale, type Locale } from "../../store/locale";
 import { useLocale } from "../../hooks/useLocale";
 import geniansCi from "../../assets/genians-ci.png";
 
@@ -12,6 +12,7 @@ interface ActiveAgent {
   key: string;
   name: string;
   type: "builtin" | "addon";
+  names?: Record<string, string>;
 }
 
 /* ── SVG icons ─────────────────────────────────────── */
@@ -144,7 +145,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     listAddonAgents().catch(() => []).then((addons) => {
       const addon: ActiveAgent[] = addons
         .filter((a) => a.is_active && a.has_front)
-        .map((a) => ({ key: a.agent_key, name: a.agent_name, type: "addon" }));
+        .map((a) => ({ key: a.agent_key, name: pickDescription(a.agent_names, a.agent_name, null) || a.agent_name, names: a.agent_names ?? undefined, type: "addon" }));
       setActiveAgents(addon);
     });
   }
@@ -174,7 +175,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   else if (path.startsWith("/guardrails")) headerTitle = t("nav.guardrails");
   else if (path.startsWith("/addon/")) {
     const key = path.split("/")[2];
-    headerTitle = activeAgents.find((a) => a.key === key)?.name ?? "SeCuardian Marketplace";
+    headerTitle = (() => { const ag = activeAgents.find((a) => a.key === key); return ag ? (pickDescription(ag.names, ag.name, null) || ag.name) : "SeCuardian Marketplace"; })();
   }
 
   const themeLabel  = t(`theme.${theme}`);
@@ -322,11 +323,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <NavLink
                   key={agent.key}
                   to={`/addon/${agent.key}`}
-                  title={collapsed ? agent.name : undefined}
+                  title={collapsed ? (pickDescription(agent.names, agent.name, null) || agent.name) : undefined}
                   className={({ isActive }) => navCls(isActive, true, collapsed)}
                 >
                   <span className="shrink-0"><IcBot /></span>
-                  {!collapsed && <span className="truncate">{agent.name}</span>}
+                  {!collapsed && <span className="truncate">{pickDescription(agent.names, agent.name, null) || agent.name}</span>}
                 </NavLink>
               ))}
               <div className={`my-1.5 mx-1 border-t ${sidebar.border}`} />

@@ -31,6 +31,7 @@ from app.routers import (
     router_chat_history,  # 사용자별 대화이력 + 만족도 피드백 (R18-2, R18-3)
     router_suggestions,   # 관리자 건의전달 (R18-4)
     router_addon_agent,   # Addon Agent 핫디플로이 (ZIP 업로드·무중단 마운트)
+    router_llm,          # LLM provider·라우팅·미터링 (R19)
     router_settings,
     router_setup,
     router_agent_config,
@@ -52,11 +53,12 @@ from app.routers import (
 async def lifespan(app: FastAPI):
     # startup: 컬럼 마이그레이션(기존 DB ALTER) → DB 마이그레이션(init+seed) → 기본 관리자 시드 → Addon 로더
     # 컬럼 ALTER 를 먼저 실행해야 02_seed.sql 이 신규 컬럼(description 등)을 참조해도 기존 DB에서 실패하지 않는다.
-    from app.db import apply_column_migrations, run_migrations, seed_default_admin
+    from app.db import apply_column_migrations, backfill_descriptions, run_migrations, seed_default_admin
     from app.addon_agent_loader import init as addon_init
 
     await apply_column_migrations()
     await run_migrations()
+    await backfill_descriptions()  # R18-7: 레거시 description/_en → descriptions JSON 멱등 백필
     await seed_default_admin()
     await addon_init(app)
     from app.agents import guardrails_gate
@@ -116,6 +118,7 @@ app.include_router(router_agent.router)
 app.include_router(router_chat_history.router)  # 대화이력·피드백 (R18-2, R18-3)
 app.include_router(router_suggestions.router)   # 관리자 건의 (R18-4)
 app.include_router(router_addon_agent.router)   # Addon Agent 핫디플로이
+app.include_router(router_llm.router)           # LLM provider·라우팅·미터링 (R19)
 app.include_router(router_settings.router)
 app.include_router(router_setup.router)
 app.include_router(router_agent_config.router)
