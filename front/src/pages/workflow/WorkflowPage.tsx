@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import {
-  Workflow, WorkflowNode, WorkflowEdge, WorkflowRun, WorkflowNodeRun,
+  Workflow, WorkflowNode, WorkflowEdge, WorkflowRun, WorkflowNodeRun, WorkflowComponent,
   NODE_TYPES, listWorkflows, createWorkflow, runWorkflow, getRun, getRunNodes,
-  approveHitl, cancelRun,
+  approveHitl, cancelRun, listComponents, importDifyDsl,
 } from "../../api/workflow";
 import { useLocale } from "../../hooks/useLocale";
 import WorkflowCanvas from "./WorkflowCanvas";
@@ -161,6 +161,115 @@ function DefinitionEditor({
   );
 }
 
+/** impl/28(PRD §7.2.6) — Dify DSL(YAML) 붙여넣기 → SeCMP 워크플로우로 가져오기(모드 A).
+ *  매핑 불가 노드는 transform 플레이스홀더로 대체되고 warnings 로 보고된다. 가져온 워크플로우는
+ *  항상 비활성(enabled=false) 상태로 생성되어 사람 검토를 거친 뒤 활성화해야 한다. */
+function DifyImportPanel({ onImported }: Readonly<{ onImported: () => void }>) {
+  const [open, setOpen] = useState(false);
+  const [dsl, setDsl] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<{ name: string; warnings: string[] } | null>(null);
+
+  async function handleImport() {
+    setError(""); setResult(null);
+    if (!dsl.trim()) { setError("Dify DSL(YAML)을 붙여넣으세요."); return; }
+    setBusy(true);
+    try {
+      const wf = await importDifyDsl(dsl);
+      setResult({ name: wf.name, warnings: wf.warnings });
+      setDsl("");
+      onImported();
+    } catch (e) {
+      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(msg || "가져오기 실패");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mb-4">
+      <button type="button" onClick={() => setOpen((v) => !v)}
+        className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
+        {open ? "Dify DSL 가져오기 닫기" : "Dify DSL 가져오기(impl/28 §7.2.6)"}
+      </button>
+      {open && (
+        <div className="mt-2 p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+          <p className="text-xs text-gray-500 mb-2">
+            Dify Studio 에서 export 한 DSL YAML을 붙여넣으세요. 매핑 불가 노드는 자동으로 대체되고
+            경고로 표시됩니다. 가져온 워크플로우는 <strong>항상 비활성</strong>으로 생성되니 검토 후 활성화하세요.
+          </p>
+          <textarea aria-label="Dify DSL YAML" value={dsl} onChange={(e) => setDsl(e.target.value)}
+            rows={6} placeholder="app:\n  name: my-flow\nworkflow:\n  graph:\n    nodes: [...]\n    edges: [...]"
+            className="w-full text-xs font-mono px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
+          {error && <p role="alert" className="text-xs text-red-500 mt-1">{error}</p>}
+          {result && (
+            <div role="status" className="mt-2 p-2 rounded border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
+              <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">
+                "{result.name}" 가져옴(비활성) — {result.warnings.length}건 경고
+              </p>
+              {result.warnings.length > 0 && (
+                <ul className="text-xs text-gray-600 dark:text-gray-400 mt-1 list-disc pl-4 space-y-0.5">
+                  {result.warnings.map((w) => <li key={w}>{w}</li>)}
+                </ul>
+              )}
+            </div>
+          )}
+          <button disabled={busy} onClick={handleImport}
+            className="mt-2 text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
+            가져오기
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const CATEGORY_LABEL: Record<string, string> = { builtin: "내장", system: "시스템", addon: "Addon" };
+
+/** impl/23(PRD §7.2.3) — 내장/시스템/Addon 에이전트의 API를 "{에이전트명}-{기능}" 컴포넌트로 노출.
+ *  클릭 시 사전설정된 agent 노드(agent_key/method/path)를 삽입해 실제 API 호출을 워크플로우에 조합. */
+function ComponentPalette({ onInsert }: Readonly<{ onInsert: (c: WorkflowComponent) => void }>) {
+  const [components, setComponents] = useState<WorkflowComponent[]>([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    listComponents().then(setComponents).catch(() => {});
+  }, []);
+
+  const groups: Record<string, WorkflowComponent[]> = { builtin: [], system: [], addon: [] };
+  for (const c of components) groups[c.category]?.push(c);
+
+  return (
+    <div className="mb-3">
+      <button type="button" onClick={() => setOpen((v) => !v)}
+        className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800">
+        {open ? "컴포넌트 팔레트 닫기" : "+ 컴포넌트에서 노드 추가"}
+      </button>
+      {open && (
+        <div className="mt-2 max-h-64 overflow-y-auto rounded border border-gray-200 dark:border-gray-700 p-2 space-y-3">
+          {(["builtin", "system", "addon"] as const).map((cat) => groups[cat].length > 0 && (
+            <div key={cat}>
+              <p className="text-[11px] font-semibold text-gray-400 mb-1">{CATEGORY_LABEL[cat]} 에이전트</p>
+              <div className="flex flex-wrap gap-1">
+                {groups[cat].map((c) => (
+                  <button key={`${c.agent_key}-${c.method}-${c.path}`} type="button"
+                    onClick={() => onInsert(c)} title={`${c.method} ${c.path}`}
+                    className="text-[11px] px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50">
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          {components.length === 0 && <p className="text-xs text-gray-400">사용 가능한 컴포넌트가 없습니다.</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RunPanel({ run, onRefresh }: { run: WorkflowRun; onRefresh: () => void }) {
   const [nodes, setNodes] = useState<WorkflowNodeRun[]>([]);
   const [busy, setBusy] = useState(false);
@@ -233,26 +342,35 @@ export default function WorkflowPage() {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState("");
+  const [triggerType, setTriggerType] = useState<"manual" | "webhook">("manual");
   const [nodes, setNodes] = useState<WorkflowNode[]>([{ id: "trigger1", type: "trigger" }]);
   const [edges, setEdges] = useState<WorkflowEdge[]>([]);
   const [runInput, setRunInput] = useState<Record<number, string>>({});
   const [activeRuns, setActiveRuns] = useState<Record<number, WorkflowRun>>({});
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  /** impl/26(§7.2.4) — webhook 생성 시 1회만 노출되는 시크릿(재조회 불가). */
+  const [webhookBanner, setWebhookBanner] = useState<{ workflowId: number; secret: string } | null>(null);
 
   function load() {
     listWorkflows().then(setWorkflows).catch(() => {});
   }
   useEffect(load, []);
 
+  function insertComponentNode(c: WorkflowComponent) {
+    const id = newNodeId(nodes);
+    setNodes([...nodes, { id, type: "agent", config: { agent_key: c.agent_key, method: c.method, path: c.path } }]);
+  }
+
   async function handleCreate() {
     setError("");
     if (!name.trim()) { setError("이름을 입력하세요."); return; }
     setBusy(true);
     try {
-      await createWorkflow({ name, definition_json: { nodes, edges } });
+      const wf = await createWorkflow({ name, definition_json: { nodes, edges }, trigger_type: triggerType });
       setShowCreate(false);
-      setName(""); setNodes([{ id: "trigger1", type: "trigger" }]); setEdges([]);
+      setName(""); setTriggerType("manual"); setNodes([{ id: "trigger1", type: "trigger" }]); setEdges([]);
+      if (wf.webhook_secret) setWebhookBanner({ workflowId: wf.id, secret: wf.webhook_secret });
       load();
     } catch (e) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
@@ -290,6 +408,26 @@ export default function WorkflowPage() {
         </button>
       </div>
 
+      <DifyImportPanel onImported={load} />
+
+      {webhookBanner && (
+        <div role="alert" className="mb-4 p-3 rounded border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
+          <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">
+            webhook 시크릿 — 지금만 표시됩니다. 안전한 곳에 보관하세요(재조회 불가).
+          </p>
+          <p className="text-xs mt-1 font-mono break-all text-gray-700 dark:text-gray-300">
+            POST /api/workflows/{webhookBanner.workflowId}/trigger/webhook
+          </p>
+          <p className="text-xs mt-1 font-mono break-all text-gray-700 dark:text-gray-300">
+            X-Webhook-Secret: {webhookBanner.secret}
+          </p>
+          <button type="button" onClick={() => setWebhookBanner(null)}
+            className="mt-2 text-xs px-2 py-1 rounded border border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/40">
+            확인함, 닫기
+          </button>
+        </div>
+      )}
+
       {showCreate && (
         <div className="mb-6 p-4 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
           <label className="block text-xs text-gray-500 mb-2">
@@ -297,11 +435,23 @@ export default function WorkflowPage() {
             <input value={name} onChange={(e) => setName(e.target.value)}
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
           </label>
+          <label className="block text-xs text-gray-500 mb-2">
+            트리거
+            <select value={triggerType} onChange={(e) => setTriggerType(e.target.value as "manual" | "webhook")}
+              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
+              <option value="manual">수동(manual)</option>
+              <option value="webhook">webhook 수신(impl/26 §7.2.4)</option>
+            </select>
+          </label>
+          <ComponentPalette onInsert={insertComponentNode} />
           <DefinitionEditor nodes={nodes} edges={edges} onChange={(n, e) => { setNodes(n); setEdges(e); }} />
           {nodes.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs font-semibold text-gray-500 mb-1">DAG 미리보기 (React Flow)</p>
-              <WorkflowCanvas nodes={nodes} edges={edges} />
+              <p className="text-xs font-semibold text-gray-500 mb-1">
+                DAG 편집 캔버스(React Flow) — 드래그로 이동·연결, 선택 후 Delete 로 삭제.
+                키보드 사용자는 위 폼 편집기를 이용하세요(impl/27 §7.2.5).
+              </p>
+              <WorkflowCanvas nodes={nodes} edges={edges} onChange={(n, e) => { setNodes(n); setEdges(e); }} />
             </div>
           )}
           {error && <p role="alert" className="text-xs text-red-500 mt-2">{error}</p>}

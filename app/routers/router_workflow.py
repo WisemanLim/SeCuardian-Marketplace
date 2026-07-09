@@ -1,22 +1,44 @@
-"""router_workflow (F-WF) — /api/workflows, /api/workflow-runs.
+"""router_workflow (F-WF) — /api/workflows, /api/workflow-runs, /api/workflow/components.
 
 DAG 워크플로우 CRUD + 실행(run)·재개(HITL)·취소·SSE 스트림. SeCuardian Path A 준용.
 raw-SQL 아키텍처. tenant 는 JWT 미포함이라 TENANT_DEFAULT_ID 사용. 등록/승인/취소는 admin/supervisor.
 
+impl/23(PRD §7.2.3): /workflow/components — 내장/시스템/Addon 에이전트의 OpenAPI 엔드포인트를
+"{에이전트명}-{기능}" 컴포넌트로 실시간 노출(Orchestrator의 기존 OpenAPI 동적 탐지 재사용, 신규
+테이블 없음). run/hitl 요청의 Bearer 토큰을 actor_token 으로 워크플로우 엔진에 전달해, agent 노드의
+실 API 호출이 실행 요청자 권한 이상으로 동작하지 않도록 한다(actor-scoped, 권한 상승 없음).
+
+impl/26(PRD §7.2.4): /workflows/{id}/trigger/webhook — JWT 없이 X-Webhook-Secret(bcrypt 검증)로
+워크플로우를 트리거하는 무인증 수신 엔드포인트. 워크플로우 생성자의 현재 역할을 조회해 스코프된
+임시 actor 토큰을 발급, agent/http 노드가 그 권한 이상으로 동작하지 않게 한다(§7.2.3 원칙 계승).
+
+impl/28(PRD §7.2.6): /workflows/import/dify-dsl — Dify DSL Import 어댑터 모드 A. YAML 텍스트를
+`app.services.dify_dsl_adapter` 로 SeCMP definition_json 으로 변환해 워크플로우를 생성한다.
+매핑 불가 노드는 크래시 대신 transform 플레이스홀더로 대체하고 warnings 로 보고, 가져온
+워크플로우는 항상 enabled=false 로 생성해 사람 검토를 강제한다.
+
 참조: SeCuardian-Marketplace-v0 router_workflow 를 async raw-SQL 로 이식.
 """
 import json
+import secrets
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from app.core.config import settings
 from app.core.deps import get_current_user, require_role
+from app.core.security import create_access_token, hash_password, verify_password
 from app.db import _PH, execute_insert, execute_write, fetch_all, fetch_one
+from app.services.dify_dsl_adapter import DifyDslError, import_dify_dsl
 from app.services.workflow_engine import NODE_TYPES, NodeError, execute_run, resume_hitl
 
 router = APIRouter(prefix="/api", tags=["workflow"])
+_bearer = HTTPBearer()
+
+# 내장 에이전트 7종(impl/20 BUILTIN_KEYS 와 동일 기준) — 그 외 tbl_agent_config 행은 'system'.
+_BUILTIN_KEYS = {"general", "chat", "marketplace", "workflow", "rag", "playground", "guardrails"}
 
 
 def _tenant() -> str:
@@ -59,8 +81,10 @@ def _validate_definition(defn: dict) -> None:
 
 
 def _wf_out(row: dict) -> dict:
+    trigger_config = json.loads(row.get("trigger_config_json") or "{}")
+    trigger_config.pop("webhook_secret_hash", None)  # impl/26 — 해시도 응답에 노출하지 않음
     return {**row, "definition_json": json.loads(row.get("definition_json") or "{}"),
-            "trigger_config_json": json.loads(row.get("trigger_config_json") or "{}"),
+            "trigger_config_json": trigger_config,
             "enabled": bool(row.get("enabled"))}
 
 
@@ -82,6 +106,56 @@ async def _get_run(run_id: int, tid: str) -> dict:
     return run
 
 
+def _endpoints_to_components(agent_key: str, agent_name: str, category: str, prefix: str) -> list[dict]:
+    """impl/23 — prefix 하위 OpenAPI 엔드포인트를 워크플로우 컴포넌트로 변환.
+
+    Orchestrator._openapi_paths() 를 재사용(신규 스캐너 없음) — 에이전트가 뜨면 즉시 컴포넌트로 노출.
+    """
+    from app.agents.orchestrator import _openapi_paths
+
+    out: list[dict] = []
+    for path, methods in sorted(_openapi_paths().items()):
+        if not (path == prefix or path.startswith(prefix + "/")):
+            continue
+        for method, spec in methods.items():
+            if method.upper() not in ("GET", "POST", "PUT", "PATCH", "DELETE"):
+                continue
+            summary = (spec.get("summary") or spec.get("description") or "").strip().split("\n")[0]
+            capability = summary or f"{method.upper()} {path.rsplit('/', 1)[-1] or path}"
+            out.append({
+                "agent_key": agent_key,
+                "agent_name": agent_name,
+                "category": category,
+                "method": method.upper(),
+                "path": path,
+                "capability_key": capability,
+                "label": f"{agent_name}-{capability}",
+            })
+    return out
+
+
+@router.get("/workflow/components")
+async def list_components(user: dict = Depends(get_current_user)):
+    """impl/23(PRD §7.2.3) — 내장/시스템/Addon 에이전트별 API를 컴포넌트 목록으로 노출."""
+    from app.agents.orchestrator import _probe_prefix
+
+    components: list[dict] = []
+    for r in await fetch_all(
+        "SELECT agent_key, agent_name FROM tbl_agent_config WHERE is_enabled = 1 ORDER BY sort_order"
+    ):
+        key = r["agent_key"]
+        prefix = _probe_prefix(key)
+        if not prefix or prefix.startswith("/api/addon/"):
+            continue
+        category = "builtin" if key in _BUILTIN_KEYS else "system"
+        components.extend(_endpoints_to_components(key, r["agent_name"], category, prefix))
+    for r in await fetch_all(
+        "SELECT agent_key, agent_name, api_prefix FROM tbl_addon_agents WHERE is_active = 1"
+    ):
+        components.extend(_endpoints_to_components(r["agent_key"], r["agent_name"], "addon", r["api_prefix"]))
+    return {"components": components}
+
+
 # ---------- Workflow CRUD ----------
 @router.get("/workflows")
 async def list_workflows(user: dict = Depends(get_current_user)):
@@ -97,16 +171,25 @@ async def create_workflow(
 ):
     _validate_definition(body.definition_json)
     tid = _tenant()
+    trigger_config = dict(body.trigger_config_json)
+    webhook_secret: str | None = None
+    if body.trigger_type == "webhook":
+        # impl/26(§7.2.4) — 평문은 이 응답에만 1회 노출, DB 에는 해시만 저장.
+        webhook_secret = secrets.token_urlsafe(32)
+        trigger_config["webhook_secret_hash"] = hash_password(webhook_secret)
     wid = await execute_insert(
         f"INSERT INTO workflows "
         f"(tenant_id, name, description, definition_json, trigger_type, trigger_config_json, enabled, created_by) "
         f"VALUES ({','.join([_PH] * 8)})",
         (tid, body.name, body.description,
          json.dumps(body.definition_json, ensure_ascii=False), body.trigger_type,
-         json.dumps(body.trigger_config_json, ensure_ascii=False),
+         json.dumps(trigger_config, ensure_ascii=False),
          1 if body.enabled else 0, user.get("username") or user.get("sub") or ""),
     )
-    return _wf_out(await _get_wf(wid, tid))
+    out = _wf_out(await _get_wf(wid, tid))
+    if webhook_secret:
+        out["webhook_secret"] = webhook_secret
+    return out
 
 
 @router.get("/workflows/{workflow_id}")
@@ -114,10 +197,41 @@ async def get_workflow(workflow_id: int, user: dict = Depends(get_current_user))
     return _wf_out(await _get_wf(workflow_id, _tenant()))
 
 
+class DifyDslImportRequest(BaseModel):
+    dsl: str = Field(min_length=1)
+
+
+@router.post("/workflows/import/dify-dsl", status_code=201)
+async def import_dify_workflow(
+    body: DifyDslImportRequest, user: dict = Depends(require_role("admin", "supervisor"))
+):
+    """impl/28(§7.2.6) — Dify DSL(YAML) → SeCMP 워크플로우. 항상 enabled=false 로 생성(사람 검토 강제)."""
+    try:
+        parsed = import_dify_dsl(body.dsl)
+    except DifyDslError as exc:
+        raise HTTPException(422, f"DSL parse error: {exc}") from exc
+    _validate_definition(parsed["definition_json"])
+    tid = _tenant()
+    wid = await execute_insert(
+        f"INSERT INTO workflows "
+        f"(tenant_id, name, description, definition_json, trigger_type, trigger_config_json, "
+        f"enabled, created_by, dify_dsl_source, dify_dsl_version) "
+        f"VALUES ({','.join([_PH] * 10)})",
+        (tid, parsed["name"], parsed["description"],
+         json.dumps(parsed["definition_json"], ensure_ascii=False), "manual", "{}",
+         0, user.get("username") or user.get("sub") or "", body.dsl, parsed["dify_version"]),
+    )
+    out = _wf_out(await _get_wf(wid, tid))
+    out["warnings"] = parsed["warnings"]
+    return out
+
+
 # ---------- Run ----------
 @router.post("/workflows/{workflow_id}/run", status_code=201)
 async def run_workflow(
-    workflow_id: int, body: RunCreate, user: dict = Depends(get_current_user)
+    workflow_id: int, body: RunCreate,
+    user: dict = Depends(get_current_user),
+    creds: HTTPAuthorizationCredentials = Depends(_bearer),
 ):
     tid = _tenant()
     wf = await _get_wf(workflow_id, tid)
@@ -129,10 +243,57 @@ async def run_workflow(
         (tid, workflow_id, body.trigger_source, json.dumps(body.input, ensure_ascii=False)),
     )
     run = await _get_run(run_id, tid)
+    run["_actor_token"] = creds.credentials  # impl/23 — agent/http 노드 실호출용(actor-scoped)
     try:
         await execute_run(run)
     except NodeError:
         pass  # run.status 는 이미 failed 로 기록됨
+    return await _get_run(run_id, tid)
+
+
+async def _actor_token_for_creator(created_by: str) -> str | None:
+    """impl/26(§7.2.4) — webhook 트리거는 로그인 세션이 없으므로, 워크플로우 생성자의 현재
+    역할을 조회해 그 권한으로 스코프된 임시 토큰을 발급한다(DB 미영속, 이 요청 한정).
+    생성자를 찾지 못하면 None — agent/http 노드의 실 API 호출만 인증 실패로 실패한다(권한 상승 없음).
+    """
+    if not created_by:
+        return None
+    row = await fetch_one(
+        f"SELECT user_id, role FROM tbl_users WHERE username = {_PH} OR user_id = {_PH} LIMIT 1",
+        (created_by, created_by),
+    )
+    if not row:
+        return None
+    return create_access_token({"sub": row["user_id"], "role": row["role"], "username": created_by})
+
+
+@router.post("/workflows/{workflow_id}/trigger/webhook", status_code=201)
+async def trigger_webhook(
+    workflow_id: int, body: dict | None = None,
+    x_webhook_secret: str | None = Header(default=None),
+):
+    """impl/26(§7.2.4) — 무인증 외부 수신 엔드포인트. X-Webhook-Secret 을 저장된 해시와 비교."""
+    tid = _tenant()
+    wf = await _get_wf(workflow_id, tid)
+    if wf.get("trigger_type") != "webhook":
+        raise HTTPException(404, "workflow is not webhook-triggered")
+    if not wf.get("enabled"):
+        raise HTTPException(409, "workflow disabled")
+    trigger_config = json.loads(wf.get("trigger_config_json") or "{}")
+    secret_hash = trigger_config.get("webhook_secret_hash")
+    if not secret_hash or not x_webhook_secret or not verify_password(x_webhook_secret, secret_hash):
+        raise HTTPException(401, "invalid or missing X-Webhook-Secret")
+    run_id = await execute_insert(
+        f"INSERT INTO workflow_runs (tenant_id, workflow_id, status, trigger_source, input_json) "
+        f"VALUES ({_PH}, {_PH}, 'pending', 'webhook', {_PH})",
+        (tid, workflow_id, json.dumps(body or {}, ensure_ascii=False)),
+    )
+    run = await _get_run(run_id, tid)
+    run["_actor_token"] = await _actor_token_for_creator(wf.get("created_by") or "")
+    try:
+        await execute_run(run)
+    except NodeError:
+        pass
     return await _get_run(run_id, tid)
 
 
@@ -152,12 +313,15 @@ async def get_run_nodes(run_id: int, user: dict = Depends(get_current_user)):
 
 @router.post("/workflow-runs/{run_id}/hitl")
 async def approve_hitl(
-    run_id: int, decision: HitlDecision, user: dict = Depends(require_role("admin", "supervisor"))
+    run_id: int, decision: HitlDecision,
+    user: dict = Depends(require_role("admin", "supervisor")),
+    creds: HTTPAuthorizationCredentials = Depends(_bearer),
 ):
     tid = _tenant()
     run = await _get_run(run_id, tid)
     if run["status"] != "waiting_hitl":
         raise HTTPException(409, f"run not awaiting hitl (status={run['status']})")
+    run["_actor_token"] = creds.credentials  # impl/23 — 재개 후 agent/http 노드 실호출용
     try:
         await resume_hitl(run, run.get("waiting_node_id") or "", decision.approved, decision.payload)
     except NodeError:

@@ -207,6 +207,9 @@ def _apply_pg_column_migrations() -> None:
         "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS heuristic_rule_count INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS is_required INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS filter_enabled INTEGER NOT NULL DEFAULT 0",
+        # F-WF §7.2.6: Dify DSL Import 어댑터(impl/28)
+        "ALTER TABLE workflows ADD COLUMN IF NOT EXISTS dify_dsl_source TEXT",
+        "ALTER TABLE workflows ADD COLUMN IF NOT EXISTS dify_dsl_version VARCHAR(32)",
         # F23: tbl_addon_agent_capabilities (new table)
         """CREATE TABLE IF NOT EXISTS tbl_addon_agent_capabilities (
             id SERIAL PRIMARY KEY, agent_key VARCHAR(50) NOT NULL,
@@ -331,6 +334,19 @@ async def apply_column_migrations() -> None:
             if col not in grd_cols:
                 await conn.execute(f"ALTER TABLE guardrails_domain_catalog ADD COLUMN {col} {typedef}")
                 logger.info("[db] added column guardrails_domain_catalog.%s", col)
+        await conn.commit()
+
+    # workflows — Dify DSL Import 확장 컬럼 (F-WF §7.2.6, impl/28)
+    async with aiosqlite.connect(_db_path()) as conn:
+        async with conn.execute("PRAGMA table_info(workflows)") as cur:
+            wf_cols = {row[1] async for row in cur}
+        for col, typedef in ([
+            ("dify_dsl_source", "TEXT"),
+            ("dify_dsl_version", "VARCHAR(32)"),
+        ] if wf_cols else []):
+            if col not in wf_cols:
+                await conn.execute(f"ALTER TABLE workflows ADD COLUMN {col} {typedef}")
+                logger.info("[db] added column workflows.%s", col)
         await conn.commit()
 
 

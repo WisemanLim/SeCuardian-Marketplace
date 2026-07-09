@@ -2,8 +2,10 @@ import client from "./client";
 
 export interface WorkflowNode {
   id: string;
-  type: "trigger" | "agent" | "llm" | "condition" | "hitl" | "transform" | "notify";
+  type: "trigger" | "agent" | "llm" | "condition" | "hitl" | "transform" | "notify" | "http";
   config?: Record<string, unknown>;
+  /** impl/27(§7.2.5) — 편집형 캔버스 드래그 좌표. 스키마 없는 JSON 컬럼이라 백엔드 변경 불필요. */
+  position?: { x: number; y: number };
 }
 export interface WorkflowEdge {
   source: string;
@@ -28,6 +30,8 @@ export interface Workflow {
   created_by: string;
   created_at: string;
   updated_at: string;
+  /** impl/26(§7.2.4) — trigger_type="webhook" 생성 응답에만 1회 노출되는 평문 시크릿. */
+  webhook_secret?: string;
 }
 
 export interface WorkflowRun {
@@ -112,4 +116,30 @@ export async function cancelRun(runId: number): Promise<WorkflowRun> {
   return data;
 }
 
-export const NODE_TYPES = ["trigger", "agent", "llm", "condition", "hitl", "transform", "notify"] as const;
+export const NODE_TYPES = ["trigger", "agent", "llm", "condition", "hitl", "transform", "notify", "http"] as const;
+
+/** impl/23(PRD §7.2.3) — 내장/시스템/Addon 에이전트의 API 1건 = 컴포넌트 1건. */
+export interface WorkflowComponent {
+  agent_key: string;
+  agent_name: string;
+  category: "builtin" | "system" | "addon";
+  method: string;
+  path: string;
+  capability_key: string;
+  label: string;
+}
+
+export async function listComponents(): Promise<WorkflowComponent[]> {
+  const { data } = await client.get<{ components: WorkflowComponent[] }>("/workflow/components");
+  return data.components ?? [];
+}
+
+/** impl/28(§7.2.6) — Dify DSL Import 결과(항상 enabled=false, warnings 는 매핑 불가/최선노력 항목). */
+export interface DifyImportResult extends Workflow {
+  warnings: string[];
+}
+
+export async function importDifyDsl(dsl: string): Promise<DifyImportResult> {
+  const { data } = await client.post<DifyImportResult>("/workflows/import/dify-dsl", { dsl });
+  return data;
+}

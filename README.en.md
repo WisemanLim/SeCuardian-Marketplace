@@ -22,7 +22,7 @@ bases (RAG).
 | Addon hot-deploy (ZIP upload · live mount) | ✅ Restored |
 | Dashboard (`/dashboard` — server status + agent summary + quick links) | ✅ Done |
 | Marketplace (F-MP: catalog · install · single active version, **unified agent-management hub**) — backend+frontend | 🟡 |
-| Workflow (F-WF: DAG engine · 7 nodes · retry · HITL · SSE) — backend+a11y form frontend | 🟡 |
+| Workflow (F-WF: DAG engine · 8 nodes[+http] · retry · HITL · SSE · **component palette · webhook trigger · editable canvas · Dify DSL Import**) — backend+a11y form frontend | 🟡 |
 | RAG (F-RAG: chunking · BM25+dense · RRF hybrid search) — backend+frontend | 🟡 |
 | Playground (F-PG: prompt/model/RAG experimentation · A/B) — backend+frontend | 🟡 |
 | Guardrails (F-GRD: real+heuristic coexist · **24 domain rulesets vendored · filter toggle · multi-domain · LLM classifier (optional) full judgment** · Orchestrator gate) — backend+frontend | 🟡 |
@@ -33,6 +33,14 @@ bases (RAG).
 > **UI layout (impl/20)**: there is no separate `Agent Management` menu — the **Marketplace menu is the unified agent hub**. Three top tabs: **Built-in Agents** (limited to Orchestrator, AI Assistant, Marketplace, Workflow, RAG, Playground, Guardrails), **System Agents** (security domains, etc.), **Addon Agents** (user-uploaded). The 5 built-ins (Marketplace/Workflow/RAG/Playground/Guardrails) are **REQUIRED (cannot be disabled)**. `Register Asset` sits on the System Agents tab (same position as `New Agent` on the Addon tab); the asset catalog (local + remote) is embedded below it.
 >
 > **Guardrails domain filters (impl/20 §7.8.7)**: all **24 wise-Guardrails domain rulesets are vendored as agent-internal data (`app/data/guardrails/`)**. `global` (PII/financial) is always required; industry domains (finance/healthcare/manufacturing/public-admin, …) get **generated regex** for their classifier rules, and each non-required domain has a **`Filter` toggle** in the catalog to include/exclude it at test time (multi-domain evaluation). Rebuild data: `make guardrails-data` (`scripts/build_guardrails_data.py`).
+>
+> **Workflow component palette (impl/25 · physical `test/impl/23`, §7.2.3)**: `GET /api/workflow/components` scans built-in (7), system, and addon agents' OpenAPI endpoints and exposes each as a `{agent name}-{capability}` component in real time (no new table — reuses Orchestrator's existing dynamic endpoint discovery). Clicking a palette item on the Workflow screen inserts a preconfigured `agent` node (agent_key/method/path); on run, it actually calls that API, forwarding the actor's own Bearer token (a workflow cannot act beyond the requester's own permissions). A new `http` node (8th type) supports calling arbitrary external URLs directly. When `config.path` is omitted the `agent` node keeps its v1 stub behavior (backward compatible).
+>
+> **Webhook ingress trigger (impl/26 · physical `test/impl/24`, §7.2.4)**: creating a `trigger_type="webhook"` workflow makes the server generate a secret and **expose it only once, in the create response** (only a bcrypt hash is stored in the DB). External systems call `POST /api/workflows/{id}/trigger/webhook` with an `X-Webhook-Secret` header — **no JWT required**. The server looks up the workflow **creator's current role** and mints a scoped, ephemeral token so `agent`/`http` nodes run with that identity (inherits the actor-scoped principle from §7.2.3 — if the creator can't be found, the run proceeds without a token and only that node fails safely). Secret rotation, HMAC payload signing, and rate limiting are deferred.
+>
+> **Editable (drag) canvas (impl/27 · physical `test/impl/25`, §7.2.5)**: `WorkflowCanvas` (React Flow) is promoted from read-only visualization to editable — **drag nodes to move, drag handles to connect, select + Backspace/Delete to remove**. Coordinates are stored in `definition_json.nodes[].position` (a schema-less JSON column, so **no backend change**); nodes without a position fall back to the existing BFS auto-layout. **KWCAG 2.2**: the canvas itself is mouse-centric and not an accessibility target — the existing a11y form editor (`DefinitionEditor`) keeps running in parallel, sharing the exact same nodes/edges state as the canvas, so keyboard-only users can still complete every operation (add/remove nodes & edges, insert components).
+>
+> **Dify DSL Import adapter (impl/28 · physical `test/impl/26`, §7.2.6, mode A)**: `POST /api/workflows/import/dify-dsl` converts a Dify Studio export YAML into a SeCMP `definition_json` per the §7.2.2 mapping table (`start→trigger` · `llm→llm` · `if-else→condition` · `knowledge-retrieval→agent(rag)` · `http-request→http` · `tool→agent` · `answer/end→notify`). **Lenient parsing** — `code` and unrecognized node types are replaced with a `transform` placeholder instead of crashing, reported in `warnings[]`; dangling edges are skipped the same way. Imported workflows are **always created with `enabled=false`** (forces human review). The original YAML and DSL version are kept in `dify_dsl_source`/`dify_dsl_version` (round-trip ready). Execution still runs on SeCMP's own engine (mode B delegate execution and mode C remain roadmap).
 >
 > **Two-tier full judgment (impl/23 §7.8.7)**: (1) **regex** (deterministic) — each rule tagged with a `mode`, so **real (original regex) + heuristic (generated regex) coexist** (catalog shows `real N · heuristic M`). (2) **LLM classifier** (optional `GUARDRAILS_CLASSIFIER_ENABLED=true`, default off / non-deterministic) — after regex, presents the rule menu to the LLM to judge paraphrase/contextual violations; degrades to regex when unconfigured/unavailable. Generated-regex over-matching is mitigated by **2-keyword co-occurrence (AND) + cross-domain DF filter** (removes single common-keyword false positives). The catalog has a **select-all / deselect-all toggle** (right of `Filter N/M domains`). The emb_guardrails ADDON bundles the ruleset data.
 >
@@ -213,6 +221,44 @@ curl -X POST http://localhost:8100/api/workflows/1/run -H "Authorization: Bearer
 curl -X POST http://localhost:8100/api/workflow-runs/1/hitl -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' -d '{"approved":true}'
 
+# Component palette (impl/25 §7.2.3) — list built-in/system/addon agent APIs as components
+curl http://localhost:8100/api/workflow/components -H "Authorization: Bearer $TOKEN"
+# → {"components":[{"agent_key":"marketplace","agent_name":"Marketplace","category":"builtin",
+#                    "method":"GET","path":"/api/marketplace/catalog","capability_key":"list catalog",
+#                    "label":"Marketplace-list catalog"}, ...]}
+# agent node actually invokes the component (executes when config.path is set) — actor token forwarded, v1 stub if omitted
+curl -X POST http://localhost:8100/api/workflows -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{
+    "name":"catalog-check","definition_json":{
+      "nodes":[{"id":"t","type":"trigger"},
+               {"id":"a","type":"agent","config":{"agent_key":"marketplace","method":"GET","path":"/api/marketplace/catalog"}}],
+      "edges":[{"source":"t","target":"a"}]}}'
+curl -X POST http://localhost:8100/api/workflows/2/run -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"input":{}}'
+# → {"status":"completed","output_json":"{...\"a\":{\"agent_key\":\"marketplace\",\"invoked\":true,\"status\":200,\"body\":{...}}}"}
+# http node (§7.2.3) — direct external URL call (admin-trust boundary, SSRF tracked in §6)
+curl -X POST http://localhost:8100/api/workflows -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{
+    "name":"notify-hook","definition_json":{
+      "nodes":[{"id":"t","type":"trigger"},
+               {"id":"h","type":"http","config":{"url":"https://example.com/hook","method":"POST","body":{"msg":"$t.input.msg"}}}],
+      "edges":[{"source":"t","target":"h"}]}}'
+
+# Webhook ingress trigger (impl/26 §7.2.4) — creating trigger_type="webhook" exposes the secret once
+curl -X POST http://localhost:8100/api/workflows -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"name":"wh-demo","trigger_type":"webhook","definition_json":{"nodes":[{"id":"t","type":"trigger"}],"edges":[]}}'
+# → {"id":3,...,"trigger_type":"webhook","webhook_secret":"<plaintext, only in this response>"}
+# external systems trigger with just the secret — no JWT needed
+curl -X POST http://localhost:8100/api/workflows/3/trigger/webhook -H "X-Webhook-Secret: <secret above>" \
+  -H 'Content-Type: application/json' -d '{"event":"deploy-finished"}'
+# → {"id":5,"status":"completed","trigger_source":"webhook",...}  (agent/http nodes run as the creator)
+
+# Dify DSL Import (impl/28 §7.2.6, mode A) — paste YAML → SeCMP workflow (always created disabled)
+curl -X POST http://localhost:8100/api/workflows/import/dify-dsl -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"dsl":"app:\n  name: demo\nworkflow:\n  graph:\n    nodes:\n      - id: n1\n        data: {type: start}\n    edges: []\n"}'
+# → {"id":4,"name":"demo","enabled":false,"dify_dsl_version":"unknown",
+#    "definition_json":{"nodes":[{"id":"n1","type":"trigger"}],"edges":[]},"warnings":[]}
+
 # ── RAG (F-RAG) — collection·ingest·hybrid search ──
 curl -X POST http://localhost:8100/api/rag/collections -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' -d '{"name":"docs","sensitivity":"general"}'
@@ -275,10 +321,13 @@ python test/impl/15/test_pgvector_adapter.py   # F-RAG pgvector adapter (6 asser
 python test/impl/16/test_gpg_mtls.py           # F-MP GPG signature + mTLS (10 asserts, needs gpg binary)
 python test/impl/17/test_dashboard_summary.py  # Dashboard realtime widgets (10 asserts)
 python test/impl/19/test_playground_tokens.py  # F-PG token usage tracking (6 asserts)
+python test/impl/23/test_workflow_components.py  # F-WF component palette+real invoke+http node (18 asserts)
+python test/impl/24/test_workflow_webhook.py     # F-WF webhook ingress trigger (15 asserts)
+python test/impl/26/test_dify_dsl_import.py      # F-WF Dify DSL Import adapter mode A (30 asserts)
 make lint                                   # ruff
 cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # frontend type-check + build
 ```
-Per-iteration scenario·result: `test/impl/<Nth>/{scenario,result}.md`. impl/3 (F-WF Designer + F-MP frontend), impl/8 (dashboard), impl/12 (nav 'Users' moved to bottom) touch no backend code, so they're static verification (tsc/build) only.
+Per-iteration scenario·result: `test/impl/<Nth>/{scenario,result}.md`. impl/3 (F-WF Designer + F-MP frontend), impl/8 (dashboard), impl/12 (nav 'Users' moved to bottom), impl/25 (F-WF editable canvas, logical impl/27) touch no backend code, so they're static verification (tsc/build) only. impl/26 (F-WF Dify DSL Import, logical impl/28) has full backend+frontend tests across every mapped node type.
 
 ---
 
@@ -298,12 +347,20 @@ Per-iteration scenario·result: `test/impl/<Nth>/{scenario,result}.md`. impl/3 (
 ## 10. Next Steps (PRD backlog)
 
 The 6 §9.5 backlog items (F-WF canvas · F-RAG pgvector · F-GRD MCP · local real-ZIP · dashboard widgets · GPG/mTLS)
-are **all done in impl/13~18**. What remains is external-infra validation & roadmap:
+are **all done in impl/13~18**. **impl/25 (physical `test/impl/23`) — F-WF component palette + agent-node real
+invocation + http node — done** (§7.2.3). **impl/26 (physical `test/impl/24`) — F-WF webhook ingress trigger —
+done** (§7.2.4). **impl/27 (physical `test/impl/25`) — F-WF editable canvas — done** (§7.2.5).
+**impl/28 (physical `test/impl/26`) — F-WF Dify DSL Import mode A — done** (§7.2.6).
+All 4 user-specified sequential items (webhook → editable canvas → Dify DSL Import → other) are
+complete. What remains is external-infra validation & roadmap:
 
 - **Real-infra validation**: pgvector benchmark (Recall@10≥0.89 · p95≤250ms, PostgreSQL+extension), mTLS handshake (private CA), real wise-Guardrails MCP integration (code & fallback done).
 - **Embedding model swap**: local hashing → sentence-transformers/OpenAI (pin embedding_version).
-- **Editable workflow canvas**: currently read-only visualization (form editor is primary). An editable canvas must ship with a KWCAG alternative editor.
-- **Multi-tenancy namespace/physical, Qdrant, Dify DSL Import** — roadmap (P5).
+- **Multi-tenancy namespace/physical, Qdrant** — roadmap (P5).
+- **Code node**: needs a sandbox security review first (§3 Out of Scope).
+- **Webhook secret rotation · HMAC payload signing · rate limiting** — deferred in impl/26 (§7.2.4).
+- **Canvas edge `when` inline editing, node resize/grouping/undo-redo** — deferred in impl/27 (§7.2.5).
+- **Dify mode B (Delegate)/mode C (Round-trip), file upload, real Dify instance validation** — deferred in impl/28 (§7.2.6).
 - **F-PG cost tracking** (once Claude is wired), eval execution.
 - **Ops docs**: GPG key rotation, mTLS cert issuance procedures.
 

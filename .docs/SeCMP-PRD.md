@@ -63,7 +63,7 @@
 | # | 기능 | 우선순위 | 설명 |
 |---|---|---|---|
 | **F-MP** | **Marketplace 내장 에이전트** | P0 | 에이전트/워크플로우/RAG 파이프라인의 카탈로그·상세·설치·버전·심사. 로컬 업로드 + **원격 레지스트리(사내/SaaS)** 접속 지원(§7.3) |
-| **F-WF** | **Workflow 내장 에이전트** | P0 | DAG 워크플로우 엔진 + Designer(React Flow). 7노드(trigger/agent/llm/condition/hitl/transform/notify), 실행 상태머신, SSE, retry. **자체 DAG 기본 + Dify DSL/API 호환 어댑터**(§7.2) |
+| **F-WF** | **Workflow 내장 에이전트** | P0 | DAG 워크플로우 엔진 + Designer(React Flow). 8노드(trigger/agent/llm/condition/hitl/transform/notify/**http**), 실행 상태머신, SSE, retry. **자체 DAG 기본 + Dify DSL/API 호환 어댑터**(§7.2). **impl/25(물리 test/impl/23): 컴포넌트 팔레트**(§7.2.3) — 내장/시스템/Addon 에이전트의 개별 API를 "{에이전트명}-{기능}" 컴포넌트로 노출, `agent` 노드가 실제 API를 호출(기존 스텁 대체, 하위호환 유지) |
 | **F-RAG** | **RAG/지식베이스 내장 에이전트** | P0 | 문서 수집→임베딩→벡터DB→하이브리드 검색(BM25+dense+RRF)→리랭크. pgvector 기본, Qdrant 확장 |
 | **F-PG** | **Playground 내장 에이전트** | P1 | 프롬프트/에이전트/RAG/워크플로우 대화형 실험·비교·평가(eval) 표면 |
 | **F-GRD** | **Guardrails 내장 에이전트** | P0 | wise-Guardrails(MCP Server, `/mcp/tools/validate_input\|validate_output`) 연동 거버넌스 에이전트. **`global`(PII/신용정보) 은 무조건 필수 판정**. **impl/21: 업종 도메인(금융·의료·제조·공공행정 등 24종) 규칙셋 전체를 에이전트 내부 데이터(`app/data/guardrails/`)로 관리**하고, classifier 규칙에는 **regex 를 생성**해 결정적 부분판정 + examplesPositive 휴리스틱으로 적용. 도메인 카탈로그에서 **필수(global) 외 도메인은 `필터적용` 토글**로 테스트 시 적용 유무를 반영(다도메인 동시 판정). 전체 ML classifier(패러프레이즈)까지의 판정은 여전히 로드맵. 에이전트별 도메인 활성화는 **SeCMP 자체 DB에서 소유·강제**(업스트림 미강제) |
@@ -175,6 +175,9 @@
 | **Guardrails 도메인 선택이 클라이언트 자기신고 + 미인증** — `api_keys.allowed_domains` 컬럼 존재하나 코드 어디서도 참조 안 됨(grep 확인) | 손상된/악성 에이전트가 자신에게 할당되지 않은 도메인으로 위장 요청 가능 | **SeCMP가 도메인 스코프를 자체 DB(`agent_guardrail_config`)에서 소유**하고, Guardrails 호출 시 사용자 입력이 아닌 이 설정값으로 `domain` 필드를 채움(§7.8.4). 강한 격리가 필요하면 업스트림 `ApiKeyGuard` 확장이 필요함을 리스크로 기록 |
 | **Guardrails 감사로그 보존기간 미구현**(Audit Service에 TTL/retention 코드 없음, DB 장애 시 메모리 링버퍼 1000건 캡으로 유실) | 장기 감사 추적성 부족, 규제(§7.9 PIPA) 요구와 불일치 가능 | SeCMP 자체 감사로그(F-GOV)에 `decisionId`+요약을 **이중 기록**해 Audit Service 장애/유실에도 자체 추적성 확보 |
 | **Guardrails API 키가 단일 공유 정적 키**(`MCP_HTTP_AUTH=required` 시에도 테넌트별 키/스코프/만료 없음) | 키 유출 시 전체 테넌트 영향 | SeCMP↔Guardrails 간 키는 시크릿 매니저 보관 + 정기 로테이션 운영절차로 완화(코드 레벨 해결 아님, 운영 통제) |
+| **워크플로우 `http` 노드(SSRF)**(impl/25, §7.2.3) — 임의 외부 URL 을 워크플로우 정의로 호출 | 내부망 스캔·메타데이터 엔드포인트 접근 등 SSRF 벡터 | 1차는 admin/supervisor 만 워크플로우 생성 가능(RBAC 기존 유지)한 admin-trust 경계로 완화. URL allow-list·사설대역 차단은 로드맵(P5 하드닝) |
+| **워크플로우 `agent` 노드 실호출 전환**(impl/25) — 스텁에서 실제 내부 API 호출로 전환 | 워크플로우가 실행자 권한을 넘어서는 API를 호출할 가능성 | actor(실행 요청자) Bearer 토큰을 그대로 전달(actor-scoped) — 워크플로우는 호출자 본인 권한 이상으로 동작 불가. 서비스 계정·권한 상승 경로 없음 |
+| **webhook 수신 트리거**(impl/26, §7.2.4) — 미인증 외부 엔드포인트가 워크플로우 실행을 유발 | 시크릿 유출/무차별대입 시 임의 트리거 남용, DoS | bcrypt 해시 저장(평문 미보관)·생성 1회 노출. rate limiting·HMAC 페이로드 서명·시크릿 로테이션은 1차 유보(로드맵) — 운영 시 리버스프록시 레벨 rate limit 권장 |
 
 ### 의존성 (내부/외부)
 - 내부: SeCuardian 코어(F1~F25) — **무변경 준용**. `agent-registry`, HITL 게이트, keyword rules, standalone export 재사용. wise-Guardrails(진행 중) — Guardrails Agent 규칙 소스.
@@ -279,6 +282,65 @@ ALTER TABLE workflows ADD COLUMN dify_dsl_version TEXT NULL;  -- 임포트 시�
 **도입 순서 제안**: (1) 모드 A(Import)부터 — 리스크 최저, 설계 자산 재사용 가치가 큼. (2) 사용 패턴을 보고 모드 B(Delegate)는 "Dify에 이미 존재하는 대형 플로우"를 재구현 없이 재사용하려는 조직에 한해 옵션 제공. (3) 모드 C는 로드맵 후반(P6+)에서 수요 확인 후 재검토.
 
 **전제 조건**: 실제 도입 전 (a) 대상 조직이 사용할 Dify 버전 고정 및 DSL 스키마 재검증, (b) Dify 라이선스(코어 OSS + 상용 옵션) 조건 확인, (c) 온프렘/폐쇄망 환경에서 Dify 자체도 self-host 필요(외부 SaaS Dify 사용 시 데이터 경계 정책 위반 가능 — §7.6 참조).
+
+### 7.2.3 컴포넌트 팔레트 + 실 실행(F-WF 확장, impl/25 · 물리 test/impl/23) — 사용자 요구(2026-07-09)
+
+> **요구 배경**: "내장/시스템/Addon 에이전트가 제공하는 세부 기능(API)을 워크플로우 컴포넌트로 그대로 사용 가능해야 한다 — 예: A에이전트에 조회 API가 있으면 `A에이전트-조회` 컴포넌트로 제공." No-code/Low-code 플랫폼(Flowise/n8n/Dify) 의 "커넥터/노드 라이브러리" 패턴을 준용.
+
+- **결정**: 별도 컴포넌트 레지스트리 테이블을 신설하지 않고, Orchestrator 가 이미 보유한 **OpenAPI 기반 동적 엔드포인트 탐지**(`_probe_prefix`·`_openapi_paths`, `app/agents/orchestrator.py`)를 재사용해 `GET /api/workflow/components` 에서 실시간 컴포넌트 목록을 생성한다(추가 테이블/동기화 불필요 — 에이전트가 뜨면 즉시 컴포넌트로 노출).
+- **분류**: `tbl_agent_config` 의 7개 필수 키(§F-WEB impl/20 `BUILTIN_KEYS`) = `builtin`, 그 외 `tbl_agent_config` 행 = `system`, `tbl_addon_agents` = `addon`. 각 엔드포인트(METHOD+path)를 `{agent_name}-{OpenAPI summary}` 라벨의 컴포넌트 1건으로 매핑.
+- **agent 노드 실행 갱신**: 기존 `agent` 노드는 `agent_key` 존재/활성 여부만 확인하는 **스텁**이었다(§9.1 기존 갭). `config.path` 가 지정되면(컴포넌트 선택 시 자동 채움) Orchestrator 의 `_exec_api_call`(in-proc ASGITransport 자기호출, add-only 재사용)로 **실제 API를 호출**하고 `{status, body}` 를 노드 출력에 담는다. `config.path` 가 없으면(v1 하위호환) 기존 스텁 동작 그대로 유지 — **기존 시험(test/impl/2, 21/21) 회귀 없음**.
+- **인증**: 워크플로우 실행 호출자(run/hitl-approve 요청의 Bearer 토큰)를 그대로 내부 API 호출에 전달(actor-scoped, 별도 서비스 계정 없음) — 워크플로우가 실행자의 권한 이상으로 동작할 수 없음(권한 상승 방지).
+- **신규 `http` 노드**: Dify DSL 매핑표(§7.2.2)의 `http-request` 대응. 외부 URL(agent-registry 밖)을 직접 호출 — admin-trust 경계 내 기능(§6 리스크에 SSRF 항목 추가).
+- **1차 구현 범위**: 컴포넌트 팔레트 조회 + agent 노드 실호출 + http 노드. **1차 유보**(다음 반복 대상, 사용자 요구 접수·PRD 기록만 완료):
+  - **편집형(드래그) 캔버스**: 현재 React Flow 캔버스는 읽기전용 시각화, a11y 폼이 1차 편집 수단(§9.5). 드래그 편집 승격 시 KWCAG 2.2 대체편집기 병행 필요 — 별도 반복.
+  - **Dify DSL Import 어댑터(모드 A)**: §7.2.2 기 설계, 로드맵 P5(§8.2) 그대로 유지.
+  - **webhook 수신 트리거·code 노드**: PRD §3 "하지 않을 것"에 code 노드는 보안 리스크로 명시 유보. webhook 인입(외부 HTTP → 워크플로우 트리거)은 `trigger_type` 필드가 이미 값만 보유(§7.2.1 데이터모델)하고 실제 수신 엔드포인트는 미구현 — 별도 반복(→ §7.2.4 impl/26 로 착수).
+
+### 7.2.4 webhook 수신 트리거(F-WF 확장, impl/26 · 물리 test/impl/24) — 사용자 요구(2026-07-09, 순차 진행 1번째)
+
+- **결정**: `workflows.trigger_config_json`(기존 컬럼, 신규 테이블/컬럼 없음)에 `webhook_secret_hash`(bcrypt, `app.core.security.hash_password` 재사용)를 저장. `trigger_type="webhook"` 워크플로우 생성 시 서버가 `secrets.token_urlsafe(32)` 로 평문 시크릿을 생성해 **생성 응답에만 1회 노출**(이후 재조회 불가 — API 키 발급 UX 준용), DB 에는 해시만 저장.
+- **수신 엔드포인트**: `POST /api/workflows/{workflow_id}/trigger/webhook` — **JWT 불필요**(외부 시스템 호출 전제). 헤더 `X-Webhook-Secret` 을 저장된 해시와 `verify_password` 로 검증, 불일치/미지정 시 401. `trigger_type != "webhook"` 이거나 `enabled=false` 면 404/409.
+- **actor 신원(§7.2.3 원칙 계승)**: webhook 은 로그인 세션이 없으므로, 워크플로우 **생성자(`created_by`)의 현재 역할**을 `tbl_users` 에서 조회해 그 역할로 스코프된 임시 토큰을 발급해 `agent`/`http` 노드 실행에 전달한다(런타임 한정, DB 미영속). 생성자를 찾지 못하면 토큰 없이 실행 — 이 경우 `agent` 노드의 실제 API 호출은 인증 실패로 해당 노드만 실패(권한 상승 없음, §7.2.3 리스크 완화와 동일 원칙).
+- **미포함(1차 유보)**: 시크릿 로테이션 엔드포인트(재발급은 워크플로우 재생성으로 대체), payload 서명 검증(HMAC), rate limiting — 로드맵.
+- **리스크**: 수신 엔드포인트가 미인증 네트워크 노출 표면 — §6 리스크 테이블에 항목 추가(시크릿 무차별대입/유출 시 트리거 남용).
+
+### 7.2.5 편집형(드래그) 워크플로우 캔버스(F-WF 확장, impl/27 · 물리 test/impl/25) — 사용자 요구(2026-07-09, 순차 진행 2번째)
+
+- **결정**: `WorkflowCanvas`(React Flow, impl/18 부터 존재)를 **읽기전용 시각화 → 편집형**으로 승격. 노드 드래그 이동, 핸들 드래그로 엣지 연결(`onConnect`), 노드/엣지 선택 후 삭제(Backspace/Delete)를 지원. 노드 좌표는 `definition_json.nodes[].position`(신규 **선택적** 필드)에 저장 — `definition_json` 은 스키마 없는 JSON 컬럼이라 **백엔드 변경 없음**(`_validate_definition` 은 `id`/`type`/edge 참조만 검사, 추가 키는 통과).
+- **KWCAG 2.2 준수 방식**: 캔버스 자체를 키보드 접근 가능하게 만들지 않는다(React Flow 드래그는 마우스 중심). 대신 **기존 a11y 폼 편집기(`DefinitionEditor`, impl/3)를 캔버스와 동일한 상위 상태(`nodes`/`edges`)를 공유하는 대체 편집기로 계속 병행**한다 — 두 편집기 중 어느 쪽으로 편집해도 동일한 워크플로우 정의에 즉시 반영되며, 키보드 전용 사용자는 폼만으로 전체 기능(노드/엣지 추가·수정·삭제·컴포넌트 삽입)을 완결할 수 있다. §4/§7.11 의 "캔버스 대신 키보드 전용 폼을 1차 제공" 요구를 폼 유지로 충족.
+- **좌표 미지정 노드**: `position` 이 없는 노드(구 워크플로우, 폼으로 신규 추가된 노드)는 기존 BFS 깊이 기반 자동배치로 폴백 — 드래그하면 그 순간부터 좌표가 저장된다.
+- **미포함(1차 유보)**: 조건 분기(`when`)는 캔버스 연결로는 값 미지정 상태로 생성되고, 값 설정은 여전히 폼에서(캔버스 엣지 라벨 직접 편집 UI는 로드맵). 노드 리사이즈·그룹핑·undo/redo 는 로드맵.
+
+### 7.2.6 Dify DSL Import 어댑터 — 모드 A(F-WF 확장, impl/28 · 물리 test/impl/26) — 사용자 요구(2026-07-09, 순차 진행 3번째)
+
+> **가정/전제**: 실제 도입 전 대상 Dify 버전 고정·DSL 스키마 재검증 필요(§7.2.2 전제 조건 그대로 승계).
+> 본 구현은 §7.2.2 에 문서화된 **2026-07-08 실측 노드 매핑표**를 근거로 하되, Dify DSL 자체가
+> 버전마다 필드가 달라질 수 있어 **관용적(lenient) 파싱**을 채택 — 알 수 없는 필드는 무시,
+> 매핑 불가 노드 타입은 크래시 대신 `transform` 플레이스홀더 + `warnings[]` 로 명시한다.
+
+- **결정**: §7.2.2 모드 A(Import, design-time)를 구현. `POST /api/workflows/import/dify-dsl`(admin/supervisor)
+  가 Dify DSL YAML 텍스트를 받아 §7.2.2 노드 매핑표대로 내부 `definition_json`(nodes/edges) 으로 변환 후
+  워크플로우를 생성한다. **실행은 여전히 SeCMP 자체 엔진**(모드 B 위임 실행은 로드맵 유지, §7.2.2 그대로).
+- **노드 매핑**(§7.2.2 표 재사용): `start→trigger` · `llm→llm`(prompt_template/prompt 최선노력 추출) ·
+  `if-else→condition`(comparison_operator 를 SeCMP `op` 서브셋[`truthy/==/!=/>/</contains`]로 매핑,
+  미지원 연산자는 `truthy` 폴백) · `knowledge-retrieval→agent`(agent_key=`rag`, 실 컬렉션 재바인딩은
+  수동, `config.note` 로 표시) · `http-request→http`(§7.2.3 신규 노드 재사용) ·
+  `tool→agent`(agent_key 공란, 컴포넌트 팔레트로 수동 지정 필요 — §7.2.3 재사용) ·
+  `answer`/`end→notify` · **`code`, 미인식 타입 → `transform` 플레이스홀더**(§3 하지 않을 것 유지) +
+  각각 `warnings[]` 항목 기록. **엣지**: `sourceHandle` 이 `true`/`false` 면 SeCMP `when` 으로 이식,
+  그 외는 무조건(unconditional) 엣지로 이식. **id 는 Dify 원본 노드 id 를 그대로 보존**(SeCMP 는 id
+  형식 제약이 없어 재매핑 불필요, edge source/target 정합성이 자동 유지됨).
+- **데이터 모델 확장**(§7.2.2 예고 반영): `workflows` 에 `dify_dsl_source TEXT NULL`(원본 YAML 보관,
+  round-trip 대비) · `dify_dsl_version VARCHAR(32) NULL`(DSL 최상위 `version:` 필드, 없으면 `unknown`)
+  컬럼 추가 — sqlite/pg 양쪽 `01_init.sql`(신규 설치) + `app/db.py` 컬럼 마이그레이션(기존 설치, 멱등)
+  양쪽에 반영.
+- **미포함(1차 유보, §3·§7.2.2 그대로)**: 모드 B(Delegate 실행)·모드 C(Round-trip), `code` 노드 실행,
+  Dify 플러그인 ↔ Addon Agent 자동 1:1 매핑(수동 필요), 파일 업로드(ZIP/멀티파트) — 1차는 YAML **텍스트**
+  입력만(웹 콘솔에서 export 한 YAML 을 붙여넣기).
+- **리스크**: DSL 스키마가 실제 Dify 버전과 달라 매핑이 부정확할 수 있음(§6 리스크 테이블 기존 항목
+  "Dify DSL/API 버전 드리프트"에 이미 반영됨) — 가져오기 결과는 **항상 사람 검토 후 활성화** 권장
+  (`enabled=false` 로 생성, §7.2.6 구현에서 강제).
 
 ### 7.3 Marketplace 원격 레지스트리 (F-MP 확장) — `.env.*` 기반 온프렘/SaaS 접속 가이드
 
@@ -648,7 +710,7 @@ POST /api/setup/complete       # tbl_settings.setup_completed = true
 | **F-ENV** 환경 분리 | 🟡 | `.env.{local,dev,staging,prod}` + `.env.example`(코어 **+ MARKETPLACE_*/TENANT_*/GUARDRAILS_*/VECTOR_BACKEND, impl/1**), `config.py`(동일 필드), `docker-compose*.yml`. 신규 marketplace 테이블 `tenant_id` 선반영 | dev/staging/prod `.env.*` 파일에 신규키 반영 확인, 그 외 신규 테이블 `tenant_id` 지속 적용 |
 | **F-GOV** 거버넌스·보안 | 🟡 | `tbl_audit_log` 존재 | HITL 게이트/`tbl_hitl_approvals` 없음, OWASP 스코어카드·시크릿 매니저·SBOM 미구현 |
 | **F-MP** Marketplace | 🟡 | **impl/1+3+9**: `router_marketplace.py`(catalog·install·uninstall·installs)+`router_marketplace_remote.py`(**원격 레지스트리 E1.5**: ping·catalog[캐시]·detail·install[다운로드→SHA256검증→로컬편입]), 2테이블(tenant_id), 단일 활성 버전+hot-deploy seam, **프론트**(로컬+원격 카탈로그). impl/10 원격 실 hot-deploy. **impl/14: 로컬 자산 실 ZIP 배포**(`marketplace_asset_blobs`+`deploy_zip` 공용). **impl/16: GPG 서명검증+mTLS**. 시험 20/20+14/14+8/8+10/10+10/10 PASS | 실 mTLS 핸드셰이크·GPG 키 로테이션 운영 절차(코드 완료) |
-| **F-WF** Workflow | 🟡 | **impl/2+impl/3**: `workflow_engine.py`(async DAG: topo fire/prune·retry·HITL·템플릿), `router_workflow.py`(CRUD·run·nodes·hitl·cancel·SSE), 3테이블(tenant_id), **프론트**(`pages/workflow/`, a11y 폼 노드/엣지 편집기·실행·HITL 승인/거부·취소). 7노드·시험 21/21 PASS. **impl/18: React Flow 캔버스**(`WorkflowCanvas`, 읽기전용 DAG 시각화, a11y 폼 병존). | 편집형 캔버스·loop/sub-flow/cron 유보, llm 노드는 Ollama 폴백만(Claude 미연동) |
+| **F-WF** Workflow | 🟡 | **impl/2+impl/3**: `workflow_engine.py`(async DAG: topo fire/prune·retry·HITL·템플릿), `router_workflow.py`(CRUD·run·nodes·hitl·cancel·SSE), 3테이블(tenant_id), **프론트**(`pages/workflow/`, a11y 폼 노드/엣지 편집기·실행·HITL 승인/거부·취소). 7노드·시험 21/21 PASS. **impl/18: React Flow 캔버스**(`WorkflowCanvas`, 읽기전용 DAG 시각화, a11y 폼 병존). **impl/25(물리 test/impl/23): 컴포넌트 팔레트**(§7.2.3) — `GET /api/workflow/components`(내장/시스템/Addon 에이전트별 OpenAPI 엔드포인트를 `{에이전트명}-{기능}` 컴포넌트로 노출, DB 신규테이블 없이 동적 탐지), `agent` 노드가 `config.path` 지정 시 `_exec_api_call` 재사용해 **실제 API 호출**(actor 토큰 전달, path 없으면 기존 스텁 하위호환), 신규 `http` 노드(외부 URL 호출). 8노드·시험 test/impl/23 PASS + 기존 21/21 회귀 무영향. **impl/26(물리 test/impl/24): webhook 수신 트리거**(§7.2.4) — `POST /workflows/{id}/trigger/webhook`(무인증, `X-Webhook-Secret` bcrypt 검증), 생성자 역할 기반 임시 actor 토큰. **impl/27(물리 test/impl/25): 편집형 캔버스**(§7.2.5) — 노드 드래그 이동·핸들 연결·삭제, 좌표는 `definition_json.nodes[].position`(백엔드 무변경), a11y 폼과 상태 공유로 KWCAG 2.2 대체편집기 유지. **impl/28(물리 test/impl/26): Dify DSL Import 어댑터**(§7.2.6, 모드 A) — `POST /workflows/import/dify-dsl`, §7.2.2 노드 매핑표 구현, 미매핑 타입은 `transform` 플레이스홀더+`warnings[]`, `dify_dsl_source`/`dify_dsl_version` 컬럼 추가, 가져온 워크플로우는 `enabled=false` 로 생성(사람 검토 강제). | code 노드·loop/sub-flow/cron·모드 B/C 유보(§7.2.3·7.2.4·7.2.5·7.2.6), llm 노드는 Ollama 폴백만(Claude 미연동) |
 | **F-RAG** RAG/지식베이스 | 🟡 | **impl/4**: `embeddings.py`(로컬 해싱 임베더)+`rag_pipeline.py`(청킹·BM25·RRF k=60)+`router_rag.py`(컬렉션·수집·하이브리드검색), 3테이블(tenant_id), **프론트**(`pages/rag/`). 식별자 질의 BM25 최상위 랭크 실증. **impl/15: pgvector 어댑터**(`vector_backend` resolve·pg DDL·`<=>` ANN, sqlite 폴백 유지). 시험 15/15+6/6 PASS | 실 pgvector 벤치마크(Recall@10/p95)는 postgres+확장 환경, Qdrant·임베딩모델 교체 로드맵 |
 | **F-PG** Playground | 🟡 | **impl/5**: `router_playground.py`(공유 LLM 폴백 실호출 + RAG 컨텍스트 주입 + citations + degrade 무중단), `playground_runs` 테이블(tenant_id), **프론트**(`pages/playground/`, A/B 2-variant 동시실행+이력). 시험 13/13 PASS + tsc 0오류 | 비용(cost) 추적 없음(Claude 미연동), eval 실행 로드맵 |
 | **F-GRD** Guardrails | 🟡 | **impl/6+impl/7**: `guardrails_detector.py`(**global 도메인 PII/신용정보 13종 정규식 판정 — 로컬 재구현**, Luhn 카드검증·마스킹), `router_guardrails.py`(도메인 카탈로그·에이전트 토글·test·decision log), **`guardrails_gate.py`(Orchestrator 실시간 게이트 — `_exec_api_call` 모듈 속성 재바인딩으로 orchestrator.py 무변경 유지하며 6개 내부 호출지점 가로챔, 입력/출력 양방향 판정+치환+이중감사)**, 3테이블, 프론트. 13종 전수 실판정 + 게이트 실동작 검증. **impl/11: block/escalate 승격**(고위험 시크릿/신용정보/국가식별번호 1종→block, 2종+→escalate; 게이트 실차단 HTTP 403 [BLOCKED] 검증, 저위험은 redact 하위호환). **impl/13: MCP Server 프록시**(`guardrails_mcp.validate`, MCP 우선·실패시 로컬 폴백, `/test`·게이트 통일). 시험 20/20+15/15+14/14+6/6 PASS | 실 wise-Guardrails MCP 통합시험은 서버 가동 필요(계약·폴백 완료). 25종 업종 판정기는 SeCMP 책임 밖 |
@@ -679,8 +741,8 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 | E1 Marketplace | 🟡 | impl/1+3: 카탈로그·설치 API+프론트, 단일활성버전+hot-deploy seam(시험 20/20+tsc/build). 잔여: 원격(E1.5)·실 ZIP 연결 |
 | E1.5 원격 레지스트리 | ✅ | impl/9+10: `router_marketplace_remote.py`(ping·catalog[캐시]·detail·install)+프론트. **impl/10: 다운로드 ZIP→SHA256→`/api/addon-agents/upload` in-proc 재사용→실 무중단 hot-deploy**(시험 14/14+8/8). 잔여(범위 밖): 로컬자산 ZIP 저장, GPG 서명, mTLS CA 번들 |
 | E2 Workflow 엔진 | 🟡 | impl/2+3: DAG 실행기·상태머신·retry·HITL·SSE+3테이블+a11y 폼 프론트(시험 21/21+tsc/build) |
-| E3 Workflow Designer | 🟡 | a11y 폼 노드/엣지 편집기 완료(impl/3, PRD §7.11 1차 요구사항 충족). React Flow 캔버스는 로드맵 확장 |
-| E3.5 Dify Import(P5) | ⬜ | 이연 |
+| E3 Workflow Designer | 🟡 | a11y 폼 노드/엣지 편집기 완료(impl/3, PRD §7.11 1차 요구사항 충족). **impl/25: 컴포넌트 팔레트**(에이전트별 API를 클릭 삽입), **impl/26: webhook 수신 트리거**(§7.2.4), **impl/27: 편집형 캔버스**(§7.2.5, 폼과 상태 공유) 추가. code 노드는 로드맵 확장(§7.2.3·7.2.4) |
+| E3.5 Dify Import(P5) | 🟡 | **impl/28(물리 test/impl/26): 모드 A 착지**(§7.2.6) — 애초 P5 로드맵이었으나 사용자 요구로 조기 구현. 모드 B(Delegate)/C(Round-trip)는 여전히 로드맵 |
 | E4 RAG | 🟡 | impl/4: 청킹·해싱임베더·BM25·RRF+3테이블+프론트(시험 15/15+tsc). pgvector 확장·eval 로드맵 |
 | E5 Playground | 🟡 | impl/5: LLM 폴백 실행+RAG 컨텍스트 주입+A/B 프론트(시험 13/13+tsc). cost 추적·eval 로드맵 |
 | E6 거버넌스 | 🟡 | `tbl_audit_log` + Guardrails 이중감사(`guardrails_decision_log`, impl/6). HITL 게이트(F-WF 내)는 있으나 별도 `tbl_hitl_approvals`·OWASP 스코어카드 없음 |
@@ -690,14 +752,19 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 ### 9.5 권장 다음 단계
 
 **§9.5 잔여 6항목(F-WF 캔버스·F-RAG pgvector·F-GRD MCP·로컬 실ZIP·대시보드 위젯·GPG/mTLS) impl/13~18 로 전부 착지.**
-남은 것은 외부 인프라 실측·운영 항목뿐:
+**impl/25(물리 test/impl/23) — F-WF 컴포넌트 팔레트(§7.2.3) 착지.**
+**impl/26(물리 test/impl/24) — F-WF webhook 수신 트리거(§7.2.4) 착지.**
+**impl/27(물리 test/impl/25) — F-WF 편집형 캔버스(§7.2.5) 착지.**
+**impl/28(물리 test/impl/26) — F-WF Dify DSL Import 모드 A(§7.2.6) 착지.**
+남은 것은 외부 인프라 실측·운영 항목 + 아래 신규 유보 항목(사용자 순차 지정 4항목 완료 — 이후 항목은 사용자 직접 지정 대기):
 
 1. **실 인프라 실측** — pgvector(§7.5 Recall@10≥0.89·p95≤250ms), mTLS 핸드셰이크, 실 wise-Guardrails MCP Server 통합은
    각 인프라(PostgreSQL+pgvector 확장 / 사설 CA / MCP 서버) 배포 환경에서 검증(코드 경로·폴백은 완료·시험됨).
 2. **임베딩 모델 교체** — 로컬 해싱 임베더 → sentence-transformers/OpenAI(embedding_version 고정, dual-write 마이그레이션).
-3. **편집형 워크플로우 캔버스** — 현재 캔버스는 읽기전용 시각화, 폼 편집기가 1차. 드래그 편집 도입 시 KWCAG 대체편집기 병행.
-4. **멀티테넌시 namespace/physical 구현**(P5), Qdrant 확장, Dify DSL Import(E3.5) — 로드맵.
+3. ~~편집형 워크플로우 캔버스~~ — **완료(impl/27, §7.2.5)**. a11y 폼이 KWCAG 2.2 대체편집기로 계속 병행.
+4. **멀티테넌시 namespace/physical 구현**(P5), Qdrant 확장 — 로드맵. ~~Dify DSL Import(E3.5)~~ — **모드 A 완료(impl/28, §7.2.6)**, 모드 B/C 는 로드맵.
 5. **운영 문서화** — GPG 공개키 배포·로테이션, mTLS 인증서 발급 절차(`docs/marketplace-remote.md`).
+6. **code 노드**(§7.2.3 유보) — 샌드박스 보안 검토 선행 필요(§3 하지 않을 것). ~~webhook 수신 트리거~~ — **완료(impl/26, §7.2.4)**.
 
 > 완료 이력: Orchestrator 게이트(impl/7)·대시보드(impl/8)·block/escalate(impl/11)·MCP 프록시(impl/13)·
 > 로컬 실ZIP(impl/14)·pgvector 어댑터(impl/15)·GPG+mTLS(impl/16)·대시보드 실시간 위젯(impl/17)·React Flow 캔버스(impl/18).
@@ -706,6 +773,10 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-09 | v0.24 | **impl/28(물리 `test/impl/26`) — F-WF Dify DSL Import 어댑터 모드 A**(사용자 요구, §7.2.6). 지난 impl/25~27 순차 진행의 3번째(webhook→편집형 캔버스→Dify DSL Import)이자 마지막 지정 항목. §7.2.2 에 이미 문서화된 노드 매핑표(2026-07-08 Dify 공식문서 실측 근거)를 구현: `POST /api/workflows/import/dify-dsl` 신설, `app/services/dify_dsl_adapter.py`(PyYAML 파싱, 기존 의존성 재사용·신규 설치 없음)가 `start/llm/if-else/knowledge-retrieval/http-request/tool/answer/end` 를 SeCMP 8노드로 매핑, **`code`·미인식 타입은 크래시 대신 `transform` 플레이스홀더 + `warnings[]`** 로 명시(§3 code 노드 유보 원칙 유지). Dify 원본 노드 id 보존으로 엣지 정합성 자동 유지, `sourceHandle` true/false → SeCMP `when`. **가져온 워크플로우는 항상 `enabled=false` 로 생성**(사람 검토 강제). 데이터 모델: `workflows.dify_dsl_source`/`dify_dsl_version` 컬럼 추가(sqlite/pg `01_init.sql` + `app/db.py` 컬럼 마이그레이션 양쪽 반영, 기존 로컬 DB 무중단 확장). 시험 test/impl/26(합성 Dify DSL 픽스처로 매핑 전종류 검증), 기존 test/impl/2·23·24 회귀 무영향. |
+| 2026-07-09 | v0.23 | **impl/27(물리 `test/impl/25`) — F-WF 편집형 캔버스**(사용자 요구, §7.2.5). 지난 impl/25·26 완료 후 접수된 유보 항목을 사용자가 지정한 순서(webhook→편집형 캔버스→Dify DSL Import→기타)의 2번째. `WorkflowCanvas.tsx` 를 읽기전용 시각화에서 편집형으로 승격 — React Flow `onNodesChange`/`onEdgesChange`/`onConnect` 로 노드 드래그 이동·핸들 연결·Backspace/Delete 삭제 지원. 좌표는 `definition_json.nodes[].position`(신규 선택적 필드, 스키마 없는 JSON 컬럼이라 백엔드 무변경)에 저장, 좌표 없는 노드는 기존 BFS 자동배치로 폴백. **KWCAG 2.2**: 캔버스 자체는 접근성 대상 아님 — 기존 `DefinitionEditor`(a11y 폼, impl/3)가 캔버스와 동일한 `nodes`/`edges` 상위 상태를 공유하는 대체편집기로 계속 병행되어 키보드 전용 사용자도 전체 기능 사용 가능. 시험 test/impl/25(tsc 0오류 + 좌표 왕복 로직 단위검증), 기존 test/impl/2·23·24 회귀 무영향. |
+| 2026-07-09 | v0.22 | **impl/26(물리 `test/impl/24`) — F-WF webhook 수신 트리거**(사용자 요구, §7.2.4). 지난 impl/25 완료 후 접수된 유보 4항목(webhook 트리거·편집형 캔버스·Dify DSL Import·기타)을 사용자가 순차 진행하도록 지정한 1번째. `workflows.trigger_config_json`(기존 컬럼, 신규 스키마 없음)에 `webhook_secret_hash`(bcrypt) 저장 — `trigger_type="webhook"` 생성 시 평문 시크릿을 응답에 1회만 노출. `POST /api/workflows/{id}/trigger/webhook`(JWT 불필요, `X-Webhook-Secret` 헤더 검증) 신설 — 워크플로우 생성자의 현재 역할을 `tbl_users` 에서 조회해 임시 actor 토큰을 발급, agent/http 노드 실행에 전달(§7.2.3 actor-scoped 원칙 계승, 권한 상승 없음, 생성자 미발견 시 무토큰 실행). 프론트 `WorkflowPage.tsx` 에 트리거 타입(manual/webhook) 선택 + 생성 시 시크릿·URL 1회 표시 배너 추가. 시크릿 로테이션·HMAC 페이로드 서명·rate limiting 은 1차 유보(§6 리스크 기록). 시험 test/impl/24, 기존 test/impl/2·23 회귀 무영향. |
+| 2026-07-09 | v0.21 | **impl/25(물리 `test/impl/23`) — F-WF 컴포넌트 팔레트 + agent 노드 실호출 + http 노드**(사용자 요구, §7.2.3). `/wise-dev-standard:implement` 세션에서 "워크플로우 생성 시 내장/시스템/Addon 에이전트의 세부 기능이 컴포넌트로 제공되어야 한다(예: A에이전트-조회)" 요구 접수. (1) `GET /api/workflow/components` 신설 — Orchestrator 의 기존 OpenAPI 동적 탐지(`_probe_prefix`/`_openapi_paths`)를 재사용해 내장(7종)/시스템/Addon 에이전트별 API 엔드포인트를 `{에이전트명}-{기능}` 컴포넌트로 실시간 노출(신규 테이블 없음). (2) `workflow_engine.py` `agent` 노드가 `config.path` 지정 시 Orchestrator `_exec_api_call` 재사용으로 **실제 API 호출**(actor Bearer 토큰 전달, 권한 상승 없음) — `path` 미지정 시 기존 스텁 동작 하위호환(test/impl/2 21/21 회귀 무영향). (3) 신규 `http` 노드(8번째 타입) — 외부 URL 직접 호출, admin-trust 경계(§6 SSRF 리스크 기록). (4) 프론트 `WorkflowPage.tsx` 에 컴포넌트 팔레트(내장/시스템/Addon 그룹) 추가 — 클릭 시 사전설정된 `agent` 노드 삽입. 편집형 캔버스·Dify DSL Import·webhook 트리거·code 노드는 동일 요구의 일부로 접수했으나 이번 반복 범위 밖 — PRD §7.2.3·§9.5 에 유보 기록. 시험 test/impl/23. |
 | 2026-07-09 | v0.19 | **impl/24 — 화면 정렬 표준화**(사용자 요구, §7.11). 대시보드·워크플로우·RAG·플레이그라운드·가드레일이 `max-w-4xl/5xl mx-auto`(가운데)로 제각각이던 것을 마켓플레이스식 **좌측정렬·반응형**으로 통일. `front/src/index.css` 에 **`.page` 표준 클래스**(`w-full max-w-6xl p-4 sm:p-6`) 정의 후 전 화면 루트에 적용, `mx-auto` 제거. addon-agents front(emb_server-shell + 템플릿 Board/ShellAgent/UserManager)도 동일 적용, addon 가이드에 표준 명시. **AI 어시스턴트(ChatPage)는 사용자 지시로 현행 유지(제외)**. 프론트 tsc/build 0오류. 시험 test/impl/22. |
 | 2026-07-09 | v0.18 | **impl/23 — F-GRD 완전판정(LLM classifier) + 생성 regex 과탐 완화**(사용자 요구, §7.8.7). (1) `guardrails_classifier_enabled`(기본 off) 시 `/test` 가 regex 후 규칙 메뉴(도메인당 `guardrails_classifier_max_rules`=40, priority순, 기매치 제외)를 LLM(`call_ollama`)에 제시해 패러프레이즈 위반 판정 → `decide_multi_llm`, `source="rules+llm"`, degrade-safe. (2) 컴파일러 `build_guardrails_data.py` 에 **교차도메인 DF 필터 + 단일 키워드 게이트**(DF≤2·len≥3만 단독 허용) 적용해 흔한 키워드 오탐 축소, 규칙에 `description`·`priority`·`mode` 추가·중복 제거. (3) 룰셋 정제 — 규칙별 **실판정(regex)+휴리스틱 공존**, 카탈로그 `regex_rule_count`+`heuristic_rule_count` 분리. (4) 프론트 `필터적용` 토글 **낙관적 업데이트+오류 표면화**(무음 실패 버그 수정). (5) `emb_guardrails` ADDON 에 룰셋 데이터 동봉. 룰스토어 `classifier_candidates()`, 프론트 판정 소스 표기. 시험 test/impl/21. |
 | 2026-07-08 | v0.17 | **impl/21 — F-GRD 도메인별 필터 확장 + impl/22 — 누락 emb_ 내장 패키지 생성**(사용자 추가 요구). **impl/21**(§7.8.7): wise-Guardrails 규칙 데이터 24개 업종 도메인 전체를 `scripts/build_guardrails_data.py` 로 `app/data/guardrails/` 에 컴파일 내재화, classifier 규칙에 **regex 생성**(generated). `guardrails_rules.py` 룰스토어 + `guardrails_detector.decide_multi`(다도메인). `guardrails_domain_catalog.filter_enabled` 컬럼 + `PUT /domains/{key}/filter` 토글(global=필수 잠금), `/test` 다도메인 평가. 프론트 카탈로그 `필터적용` 토글 + 도메인별 결과. **impl/22**(§7.8.8): `emb_{marketplace,workflow,rag,playground,guardrails}` ADDON 패키지 생성(`-app.py`+`-meta.json`+`.zip`, base_agent→네이티브 라우터). |

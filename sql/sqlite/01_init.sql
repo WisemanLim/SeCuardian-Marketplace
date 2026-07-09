@@ -227,6 +227,8 @@ CREATE TABLE IF NOT EXISTS workflows (
     enabled             INTEGER      NOT NULL DEFAULT 1,
     version             INTEGER      NOT NULL DEFAULT 1,
     created_by          VARCHAR(128) DEFAULT '',
+    dify_dsl_source     TEXT         NULL,   -- impl/28(§7.2.6) 원본 Dify DSL YAML(round-trip 대비)
+    dify_dsl_version    VARCHAR(32)  NULL,   -- 임포트 시점 DSL version 필드
     created_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
