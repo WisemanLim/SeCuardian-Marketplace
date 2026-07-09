@@ -1,51 +1,53 @@
 -- secuardian — 기본 시드 데이터 (idempotent, SQLite)
 
-INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('general', 'Orchestrator', 1, 1, '기본 Agent', 0, '사용자 요청의 의도를 분류하고 적합한 에이전트로 라우팅·합성하는 중앙 오케스트레이터입니다.');
+-- §7.11.2-5: descriptions/agent_names 를 JSON 으로 직접 저자(ko/en/jp 확장형).
+-- split description/description_en authoring 폐지 — 레거시 컬럼은 읽기 폴백용 스키마만 유지.
+INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
+VALUES ('general', 'Orchestrator', 1, 1, '기본 Agent', 0);
 UPDATE tbl_agent_config SET agent_name = 'Orchestrator', is_required = 1,
-  description = '사용자 요청의 의도를 분류하고 적합한 에이전트로 라우팅·합성하는 중앙 오케스트레이터입니다.',
-  description_en = 'Central orchestrator that classifies user intent and routes/synthesizes responses across the appropriate agents.' WHERE agent_key = 'general';
+  agent_names = '{"ko": "Orchestrator", "en": "Orchestrator", "jp": "オーケストレーター"}',
+  descriptions = '{"ko": "사용자 요청의 의도를 분류하고 적합한 에이전트로 라우팅·합성하는 중앙 오케스트레이터입니다.", "en": "Central orchestrator that classifies user intent and routes/synthesizes responses across the appropriate agents.", "jp": "ユーザー要求の意図を分類し、適切なエージェントへルーティング・統合する中央オーケストレーターです。"}' WHERE agent_key = 'general';
 
-INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('chat', 'AI 어시스턴트', 1, 1, '기본 Agent', 1, '플랫폼 전반의 질의응답과 데이터 조회·생성·수정·삭제를 수행하는 AI 어시스턴트입니다.');
+INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
+VALUES ('chat', 'AI 어시스턴트', 1, 1, '기본 Agent', 1);
 UPDATE tbl_agent_config SET agent_name = 'AI 어시스턴트', is_required = 1,
-  description = '플랫폼 전반의 질의응답과 데이터 조회·생성·수정·삭제를 수행하는 AI 어시스턴트입니다.',
-  description_en = 'AI assistant that handles platform-wide Q&A and performs data lookup, creation, update, and deletion.' WHERE agent_key = 'chat';
+  agent_names = '{"ko": "AI 어시스턴트", "en": "AI Assistant", "jp": "AIアシスタント"}',
+  descriptions = '{"ko": "플랫폼 전반의 질의응답과 데이터 조회·생성·수정·삭제를 수행하는 AI 어시스턴트입니다.", "en": "AI assistant that handles platform-wide Q&A and performs data lookup, creation, update, and deletion.", "jp": "プラットフォーム全般の質疑応答とデータの照会・作成・更新・削除を行うAIアシスタントです。"}' WHERE agent_key = 'chat';
 
 -- 내장 에이전트: Marketplace (F-MP)
-INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('marketplace', '마켓플레이스', 1, 1, '내장 에이전트', 2, '에이전트·워크플로우·RAG 파이프라인 자산을 탐색·설치·버전관리하는 마켓플레이스입니다.');
+INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
+VALUES ('marketplace', '마켓플레이스', 1, 1, '내장 에이전트', 2);
 UPDATE tbl_agent_config SET agent_name = '마켓플레이스', nav_group = '내장 에이전트', is_required = 1,
-  description = '에이전트·워크플로우·RAG 파이프라인 자산을 탐색·설치·버전관리하는 마켓플레이스입니다.',
-  description_en = 'Marketplace to browse, install, and version agent/workflow/RAG-pipeline assets.' WHERE agent_key = 'marketplace';
+  agent_names = '{"ko": "마켓플레이스", "en": "Marketplace", "jp": "マーケットプレイス"}',
+  descriptions = '{"ko": "에이전트·워크플로우·RAG 파이프라인 자산을 탐색·설치·버전관리하는 마켓플레이스입니다.", "en": "Marketplace to browse, install, and version agent/workflow/RAG-pipeline assets.", "jp": "エージェント・ワークフロー・RAGパイプライン資産を検索・インストール・バージョン管理するマーケットプレイスです。"}' WHERE agent_key = 'marketplace';
 
 -- 내장 에이전트: Workflow (F-WF)
-INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('workflow', '워크플로우', 1, 1, '내장 에이전트', 3, '에이전트·LLM·조건·HITL 노드를 DAG로 조합해 자동화하는 워크플로우 엔진입니다.');
+INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
+VALUES ('workflow', '워크플로우', 1, 1, '내장 에이전트', 3);
 UPDATE tbl_agent_config SET agent_name = '워크플로우', nav_group = '내장 에이전트', is_required = 1,
-  description = '에이전트·LLM·조건·HITL 노드를 DAG로 조합해 자동화하는 워크플로우 엔진입니다.',
-  description_en = 'Workflow engine that composes agent/LLM/condition/HITL nodes into automated DAGs.' WHERE agent_key = 'workflow';
+  agent_names = '{"ko": "워크플로우", "en": "Workflow", "jp": "ワークフロー"}',
+  descriptions = '{"ko": "에이전트·LLM·조건·HITL 노드를 DAG로 조합해 자동화하는 워크플로우 엔진입니다.", "en": "Workflow engine that composes agent/LLM/condition/HITL nodes into automated DAGs.", "jp": "エージェント・LLM・条件・HITLノードをDAGで組み合わせて自動化するワークフローエンジンです。"}' WHERE agent_key = 'workflow';
 
 -- 내장 에이전트: RAG (F-RAG)
-INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('rag', 'RAG', 1, 1, '내장 에이전트', 4, '문서 수집→임베딩→하이브리드(BM25+dense+RRF) 검색을 제공하는 지식베이스 파이프라인입니다.');
+INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
+VALUES ('rag', 'RAG', 1, 1, '내장 에이전트', 4);
 UPDATE tbl_agent_config SET agent_name = 'RAG', nav_group = '내장 에이전트', is_required = 1,
-  description = '문서 수집→임베딩→하이브리드(BM25+dense+RRF) 검색을 제공하는 지식베이스 파이프라인입니다.',
-  description_en = 'Knowledge base pipeline: document ingest → embedding → hybrid (BM25+dense+RRF) search.' WHERE agent_key = 'rag';
+  agent_names = '{"ko": "RAG", "en": "RAG", "jp": "RAG"}',
+  descriptions = '{"ko": "문서 수집→임베딩→하이브리드(BM25+dense+RRF) 검색을 제공하는 지식베이스 파이프라인입니다.", "en": "Knowledge base pipeline: document ingest → embedding → hybrid (BM25+dense+RRF) search.", "jp": "文書取り込み→埋め込み→ハイブリッド(BM25+dense+RRF)検索を提供する知識ベースパイプラインです。"}' WHERE agent_key = 'rag';
 
 -- 내장 에이전트: Playground (F-PG)
-INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('playground', '플레이그라운드', 1, 1, '내장 에이전트', 5, '프롬프트·모델·RAG 컬렉션을 조합해 대화형으로 실험하는 도구입니다.');
+INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
+VALUES ('playground', '플레이그라운드', 1, 1, '내장 에이전트', 5);
 UPDATE tbl_agent_config SET agent_name = '플레이그라운드', nav_group = '내장 에이전트', is_required = 1,
-  description = '프롬프트·모델·RAG 컬렉션을 조합해 대화형으로 실험하는 도구입니다.',
-  description_en = 'Interactive tool to experiment by combining prompt, model, and RAG collections.' WHERE agent_key = 'playground';
+  agent_names = '{"ko": "플레이그라운드", "en": "Playground", "jp": "プレイグラウンド"}',
+  descriptions = '{"ko": "프롬프트·모델·RAG 컬렉션을 조합해 대화형으로 실험하는 도구입니다.", "en": "Interactive tool to experiment by combining prompt, model, and RAG collections.", "jp": "プロンプト・モデル・RAGコレクションを組み合わせて対話的に実験するツールです。"}' WHERE agent_key = 'playground';
 
 -- 내장 에이전트: Guardrails (F-GRD)
-INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order, description)
-VALUES ('guardrails', '가드레일', 1, 1, '내장 에이전트', 6, 'PII/신용정보 등 도메인 규칙셋을 요청/응답에 강제하는 거버넌스 에이전트입니다(1차: global 도메인 실판정).');
+INSERT OR IGNORE INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
+VALUES ('guardrails', '가드레일', 1, 1, '내장 에이전트', 6);
 UPDATE tbl_agent_config SET agent_name = '가드레일', nav_group = '내장 에이전트', is_required = 1,
-  description = 'PII/신용정보 등 도메인 규칙셋을 요청/응답에 강제하는 거버넌스 에이전트입니다(1차: global 도메인 실판정).',
-  description_en = 'Governance agent enforcing domain rule sets (PII/financial) on requests/responses (phase 1: global domain only).' WHERE agent_key = 'guardrails';
+  agent_names = '{"ko": "가드레일", "en": "Guardrails", "jp": "ガードレール"}',
+  descriptions = '{"ko": "PII/신용정보 등 도메인 규칙셋을 요청/응답에 강제하는 거버넌스 에이전트입니다(1차: global 도메인 실판정).", "en": "Governance agent enforcing domain rule sets (PII/financial) on requests/responses (phase 1: global domain only).", "jp": "PII/金融情報などのドメインルールセットを要求/応答に強制するガバナンスエージェントです(第1段階: globalドメインのみ実判定)。"}' WHERE agent_key = 'guardrails';
 
 -- Guardrails 도메인 카탈로그 — global 만 실판정(§7.8.0). 나머지는 PRD 인용 예시 2건만 catalog_only 로 시딩(전체 25종 목록은 wise-Guardrails 소스 미보유로 임의 생성 금지).
 INSERT OR IGNORE INTO guardrails_domain_catalog (domain_key, display_name, status, rule_count)
@@ -55,14 +57,7 @@ VALUES ('manufacturing-food', '제조업(식품)', 'catalog_only', 0);
 INSERT OR IGNORE INTO guardrails_domain_catalog (domain_key, display_name, status, rule_count)
 VALUES ('public-administration', '공공행정', 'catalog_only', 0);
 
--- R18-7 확장: 에이전트 표시명 다국어 (agent_names JSON — 매 기동 seed 재적용으로 반영)
-UPDATE tbl_agent_config SET agent_names = '{"ko": "Orchestrator", "en": "Orchestrator"}' WHERE agent_key = 'general';
-UPDATE tbl_agent_config SET agent_names = '{"ko": "AI 어시스턴트", "en": "AI Assistant"}' WHERE agent_key = 'chat';
-UPDATE tbl_agent_config SET agent_names = '{"ko": "마켓플레이스", "en": "Marketplace"}' WHERE agent_key = 'marketplace';
-UPDATE tbl_agent_config SET agent_names = '{"ko": "워크플로우", "en": "Workflow"}' WHERE agent_key = 'workflow';
-UPDATE tbl_agent_config SET agent_names = '{"ko": "RAG", "en": "RAG"}' WHERE agent_key = 'rag';
-UPDATE tbl_agent_config SET agent_names = '{"ko": "플레이그라운드", "en": "Playground"}' WHERE agent_key = 'playground';
-UPDATE tbl_agent_config SET agent_names = '{"ko": "가드레일", "en": "Guardrails"}' WHERE agent_key = 'guardrails';
+-- (agent_names 는 위 각 에이전트 UPDATE 에서 descriptions 와 함께 JSON 으로 직접 저자 — §7.11.2-5)
 
 DELETE FROM tbl_agent_config WHERE agent_key IN ('example', 'board');
 DELETE FROM tbl_addon_agents WHERE agent_key = 'board';

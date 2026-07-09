@@ -787,6 +787,21 @@ SeCuardian 구현(test/impl/55)을 **코드 복제**로 싱크 (§3 준용 계�
    Orchestrator), 기동 시 `{"ko": agent_name}` 멱등 백필, meta.json `display_name` dict 형 허용.
    표시: AgentsPage 카드·AppLayout nav/헤더·Guardrails 에이전트 셀렉트 — descriptions 와 동일
    fallback 체인. `agent_name` 컬럼은 내부 참조용 유지.
+5. **다국어 authoring 소스 전환 + jp 확장 (impl/39 · 물리 test/impl/37, 2026-07-09 오류 수정)**:
+   impl/33 은 구조·프론트 fallback 을 갖췄으나 **authoring 소스가 여전히 split 컬럼**
+   (`02_seed.sql` 이 `description`/`description_en` 기록, `descriptions` 는 boot backfill 파생)
+   이라 **타 언어를 추가할 경로가 없어 사실상 미적용**이었다. 이를 다음과 같이 정정한다:
+   - **`descriptions`/`agent_names` JSON = authoring 소스**: `02_seed.sql`(sqlite/pg) 이 내장 7종의
+     `descriptions`·`agent_names` 를 **JSON 으로 직접 기록**(ko/en/**jp** 3언어)하고, split
+     `description`/`description_en` authoring 은 제거(레거시 컬럼은 읽기 폴백용으로 스키마만 유지).
+   - **orchestrator `_active_agents_block`**: 프롬프트용 설명을 split `description` 대신
+     `descriptions`(ko→en→첫 언어)에서 읽는다.
+   - **선호언어 확장**: 마이페이지 `PREFERRED_LANGS` 에 `jp` 추가(`locale.jp` 라벨 ko/en). UI 언어에
+     해당 키가 없으면 `pickDescription` 이 선호언어(예: jp)로 표출 — 사용자 요구 명시.
+   - **install 경로**: `router_marketplace` 설치 시 `tbl_agent_config` upsert 에 `descriptions`
+     JSON 을 함께 기록(자산 ko 설명 + name/name_en → agent_names).
+   - **정리**: `db.py` 중복 `backfill_descriptions` 정의 제거(완전판 1개 유지).
+   - addon 경로(`_norm_descriptions` + upload `descriptions` 기록)는 이미 임의 언어 확장형 — 무변경.
 
 ### 7.11.3 내장 에이전트 화면 i18n 전면 적용 + 중복 타이틀 제거 (impl/34 · 물리 test/impl/32) — 사용자 요구(2026-07-09)
 
@@ -954,6 +969,7 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-09 | v0.32 | **impl/39(물리 `test/impl/37`) — 다국어 설명 authoring 소스 전환 + jp 확장**(§7.11.2-5, 사용자 오류 보고: "확장 구조 개선됐다 했으나 미적용 — descriptions 를 split 컬럼 아닌 `{"ko","en","jp"}` JSON 으로, 언어셋 없으면 선호언어 표출"). impl/33 은 구조·프론트 fallback·선호언어 UI 를 갖췄으나 **authoring 소스가 여전히 split 컬럼**이라 타 언어 추가 경로가 없었음. 정정: ① `02_seed.sql`(sqlite/pg) 내장 7종 `descriptions`·`agent_names` **JSON 직접 저자(ko/en/jp)**, split `description`/`description_en` authoring 제거(레거시 컬럼은 읽기 폴백용 스키마만 유지) ② orchestrator `_active_agents_block` — `descriptions`(ko→en→첫 언어)에서 프롬프트 설명 읽기 ③ 마이페이지 `PREFERRED_LANGS` 에 `jp` 추가(`locale.jp` 라벨) — UI 언어 키 없을 때 선호언어로 표출 ④ `router_marketplace` install upsert 에 `descriptions` JSON 기록 ⑤ `db.py` 중복 `backfill_descriptions` 제거. addon 경로는 이미 확장형 무변경. 시험 test/impl/37(격리 sqlite: 시드 jp·API·pickDescription jp fallback·orchestrator block·dedupe) | sql/{sqlite,pg}/02_seed.sql, app/db.py, app/agents/orchestrator.py, app/routers/router_marketplace.py, front(store/locale.ts·profile/ProfilePage.tsx·locales), test/impl/37 |
 | 2026-07-09 | v0.31 | **impl/35(물리 `test/impl/33`) — 에이전트 표시명 다국어 agent_names 싱크**(§7.11.2-4, 사용자 요구 "agent_name 도 descriptions 방식으로 확장"). SeCuardian impl/56 복제: `tbl_agent_config.agent_names` JSON 컬럼(init+멱등 ALTER+`{"ko": agent_name}` 백필), **내장 7종 시드 en 표시명**(마켓플레이스→Marketplace 등 — en UI 에서 한국어 표시명 노출 해소), meta.json `display_name` dict 형 정규화·배포 동기·addon 목록 노출, `_templates` 6종 dict 화 재패키징. 프론트: AgentsPage `nameOf`(10개소)·AppLayout nav/헤더(names dict 상태 보존, locale 전환 즉시 반영)·GuardrailsPage 에이전트 셀렉트. 시험 test/impl/33 4/4 PASS(격리 sqlite 기동·시드·API + import/tsc) |
 | 2026-07-09 | v0.30 | **impl/34(물리 `test/impl/32`) — 내장 에이전트 화면 i18n 전면 적용 + 중복 타이틀 제거**(§7.11.3, 사용자 결함 보고: English 전환 시 미적용 + 본문 타이틀 2중 표시). ① Workflow(목록·풀스크린 빌더·캔버스)·RAG·Playground·Guardrails·Marketplace·Dashboard 8파일의 하드코딩 한국어 137개를 `t()` 키로 치환 — `locales/{ko,en}.json` 에 wf/wfb/rag/pg/mp/dash/grd 섹션 신설(키 패리티 검증 0건 차이). WorkflowBuilderPage `NODE_META` label/desc 를 locale 키로 분리, GuardrailsPage `statusBadge` 키 반환화 ② 본문 h1 5화면 제거 → `pageDesc` 만 표시(SeCuardian R18 '본문 중복 타이틀 제거' 표준 준용, AppLayout 헤더가 타이틀 단독 표시) ③ AgentsPage `nav_group` 칩(DB 한국어 값) locale 매핑(`기본 Agent`→Basic Agent 등) — **SeCuardian 에도 동기 반영** ④ Dashboard 에이전트 설명 `pickDescription`(R18-7 fallback) 적용, `nav.aiAssistant` ko 오타 수정. 시험 test/impl/32 6/6 PASS(tsc·build·패리티·잔존 0건) |
 | 2026-07-09 | v0.29 | **impl/33(물리 `test/impl/31`) — SeCuardian R18-7·R19 복제 싱크**(§7.11.2, 사용자 요구 "SeCuardian 구현 후 Marketplace 에 코드 복제 싱크"). ① **다국어 설명 확장 구조**: `tbl_agent_config.descriptions` JSON(init+멱등 ALTER+기동 백필), meta.json dict 형 정규화(레거시 호환), `tbl_users.preferred_lang`+`GET/PATCH /auth/me`+마이페이지 선호언어 UI, `pickDescription` fallback 체인(UI→선호→ko→첫 언어), 로그인 locale 동기화, `_templates` 6종 dict 형 재패키징 ② **Local LLM 다양화**: `llm_providers`(ollama/llamacpp/vllm)·`llm_router`(작업별 라우팅)·`llm_metering`(`tbl_llm_usage`+집계)·`token_compress`·`router_llm`(4 엔드포인트), orchestrator/base_agent 통합, compose profile llamacpp/vllm, 설정 seed 7종, SettingsPage 사용량 요약, ChatPage 동적 모델 목록. 싱크 방법: 동일 13종+신규 6종 복사, 분기 11종 patch, main.py 3개소 수동 병합(SeCMP 고유 guardrails 배선 보존). 시험 test/impl/31 6/6 PASS(격리 sqlite 기동·API 검증 + import/ruff/tsc/compose 정적 검증) |

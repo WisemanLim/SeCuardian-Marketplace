@@ -25,7 +25,8 @@
   },
   "locale": {
     "ko": "한국어",
-    "en": "English"
+    "en": "English",
+    "jp": "日本語"
   },
   "common": {
     "save": "Save",

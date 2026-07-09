@@ -357,36 +357,6 @@ async def apply_column_migrations() -> None:
 
 
 async def backfill_descriptions() -> None:
-    """R18-7: 레거시 description/description_en → descriptions JSON 멱등 백필.
-
-    descriptions 가 비어 있는 행만 대상. 레거시 컬럼은 하위호환용으로 유지한다.
-    """
-    import json as _json
-
-    rows = await fetch_all(
-        "SELECT agent_key, description, description_en, descriptions FROM tbl_agent_config"
-    )
-    filled = 0
-    for r in rows:
-        if (r.get("descriptions") or "").strip():
-            continue
-        d: dict[str, str] = {}
-        if (r.get("description") or "").strip():
-            d["ko"] = r["description"].strip()
-        if (r.get("description_en") or "").strip():
-            d["en"] = r["description_en"].strip()
-        if not d:
-            continue
-        await execute_write(
-            f"UPDATE tbl_agent_config SET descriptions = {_PH} WHERE agent_key = {_PH}",
-            (_json.dumps(d, ensure_ascii=False), r["agent_key"]),
-        )
-        filled += 1
-    if filled:
-        logger.info("[db] descriptions backfilled: %d agents", filled)
-
-
-async def backfill_descriptions() -> None:
     """R18-7: 레거시 컬럼 → 다국어 JSON 멱등 백필.
 
     - descriptions: description(ko)/description_en(en) 에서 병합

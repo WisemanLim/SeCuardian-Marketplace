@@ -116,11 +116,12 @@ async def main() -> None:
             )
             print(f"[seed-security] asset: {asset_key}")
 
-        # 설치된(설치 이력 있는) 에이전트에는 en 설명을 직접 동기 — marketplace_assets 에는
-        # description_en 컬럼이 없어 카탈로그는 ko 설명만 보유(기존 register_asset 계약과 동일)
+        # §7.11.2-5: 설치된(설치 이력 있는) 에이전트의 descriptions JSON 에 ko/en 을 동기(split 컬럼 대신).
+        # marketplace_assets 에는 en 설명 컬럼이 없어 카탈로그 카드는 ko 만 보유 — 설치본은 여기서 en 보강.
+        import json as _json
         await execute_write(
-            f"UPDATE tbl_agent_config SET description_en = {_PH} WHERE agent_key = {_PH}",
-            (desc_en, asset_key),
+            f"UPDATE tbl_agent_config SET descriptions = {_PH} WHERE agent_key = {_PH}",
+            (_json.dumps({"ko": desc_ko, "en": desc_en}, ensure_ascii=False), asset_key),
         )
 
         if raw:

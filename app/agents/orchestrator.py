@@ -605,19 +605,32 @@ async def _active_agents_block() -> str:
     from app.db import fetch_all
     try:
         agent_rows = await fetch_all(
-            "SELECT agent_key, agent_name, description "
+            "SELECT agent_key, agent_name, agent_names, descriptions, description "
             "FROM tbl_agent_config WHERE is_enabled = 1 ORDER BY sort_order"
         )
     except Exception:
         return ""
     if not agent_rows:
         return ""
+
+    def _pick(raw: str | None, legacy: str | None) -> str:
+        """§7.11.2-5: descriptions/agent_names JSON(ko→en→첫 언어) → 레거시 컬럼 폴백."""
+        if raw and raw.strip():
+            try:
+                j = json.loads(raw)
+                if isinstance(j, dict):
+                    return j.get("ko") or j.get("en") or next((v for v in j.values() if v), "") or (legacy or "")
+            except (ValueError, TypeError):
+                pass
+        return legacy or ""
+
     lines = []
     for r in agent_rows:
-        desc = (r.get("description") or "").strip().replace("\n", " ")
+        name = _pick(r.get("agent_names"), r.get("agent_name")) or r["agent_key"]
+        desc = _pick(r.get("descriptions"), r.get("description")).strip().replace("\n", " ")
         if len(desc) > 120:
             desc = desc[:120] + "…"
-        lines.append(f"- {r['agent_name']} ({r['agent_key']})" + (f": {desc}" if desc else ""))
+        lines.append(f"- {name} ({r['agent_key']})" + (f": {desc}" if desc else ""))
     return "Currently active agents:\n" + "\n".join(lines)
 
 

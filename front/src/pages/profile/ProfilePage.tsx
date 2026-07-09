@@ -21,6 +21,7 @@ interface Profile {
 const PREFERRED_LANGS: { value: string; labelKey: string }[] = [
   { value: "ko", labelKey: "locale.ko" },
   { value: "en", labelKey: "locale.en" },
+  { value: "jp", labelKey: "locale.jp" },
 ];
 
 export default function ProfilePage() {

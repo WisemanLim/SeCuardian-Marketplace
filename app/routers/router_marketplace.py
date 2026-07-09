@@ -153,25 +153,35 @@ async def install(
             (asset_key, tid),
         )
         # 2) hot-deploy seam: agent 유형만 tbl_agent_config upsert → 카탈로그/Orchestrator 노출
+        #    §7.11.2-5: descriptions/agent_names 를 JSON(다국어 확장형)으로 저자.
         cfg_key = None
         if asset["kind"] == "agent":
+            import json as _json
             cfg_key = asset["asset_key"]
+            descriptions = _json.dumps(
+                {"ko": asset["description"]} if asset.get("description") else {},
+                ensure_ascii=False,
+            )
+            _names = {"ko": asset["name"]}
+            if asset.get("name_en"):
+                _names["en"] = asset["name_en"]
+            agent_names = _json.dumps(_names, ensure_ascii=False)
             exists = await fetch_one(
                 f"SELECT agent_key FROM tbl_agent_config WHERE agent_key = {_PH}", (cfg_key,)
             )
             if exists:
                 await execute_write(
                     f"UPDATE tbl_agent_config SET agent_name = {_PH}, description = {_PH}, "
-                    f"description_en = {_PH}, is_enabled = 1, nav_group = 'marketplace', "
+                    f"descriptions = {_PH}, agent_names = {_PH}, is_enabled = 1, nav_group = 'marketplace', "
                     f"updated_at = CURRENT_TIMESTAMP WHERE agent_key = {_PH}",
-                    (asset["name"], asset["description"], asset["name_en"] or asset["name"], cfg_key),
+                    (asset["name"], asset["description"], descriptions, agent_names, cfg_key),
                 )
             else:
                 await execute_write(
                     f"INSERT INTO tbl_agent_config "
-                    f"(agent_key, agent_name, is_enabled, is_required, nav_group, description, description_en) "
-                    f"VALUES ({_PH}, {_PH}, 1, 0, 'marketplace', {_PH}, {_PH})",
-                    (cfg_key, asset["name"], asset["description"], asset["name_en"] or asset["name"]),
+                    f"(agent_key, agent_name, is_enabled, is_required, nav_group, description, descriptions, agent_names) "
+                    f"VALUES ({_PH}, {_PH}, 1, 0, 'marketplace', {_PH}, {_PH}, {_PH})",
+                    (cfg_key, asset["name"], asset["description"], descriptions, agent_names),
                 )
         # 3) install 기록
         iid = await execute_insert(
