@@ -368,6 +368,7 @@ cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # 프론트 타입�
 | Makefile 에 `keycloak-*`/`vault-*`/`harbor-*` 타겟 | 원본 SeCuardian 보안 스택 잔재(SeCMP 범위 밖) | 후속 정리 예정 |
 | Playground `pnpm dev` 크래시루프(`ERR_PNPM_IGNORED_BUILDS`) | pnpm 11 `verifyDepsBeforeRun` 가 esbuild ignored-build 로 사전검사 실패 | `front/pnpm-workspace.yaml` `verifyDepsBeforeRun: false` |
 | Guardrails 카드번호 오탐 | 임의 13~19자리 숫자열이 모두 매치될 수 있음 | Luhn 체크섬 통과분만 인정(구현됨) — 오탐 잔존 시 규칙 정교화 필요 |
+| 워크플로우 캔버스에 노드가 안 보임(`visibility: hidden`) | React Flow v12 는 노드 측정값(`measured`)이 컨트롤드 상태에 반영돼야 표시 — rfNodes 를 매 렌더 재생성하면 measured 소실 | **수정됨(impl/32)** — RF Node[] 를 state 로 보유하고 `applyNodeChanges` 로 dimensions 변경 흡수(`WorkflowBuilderPage`/`WorkflowCanvas`). 동일 패턴 재발 주의 |
 
 ---
 

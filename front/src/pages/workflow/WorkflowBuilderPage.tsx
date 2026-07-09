@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   ReactFlow, ReactFlowProvider, Background, Controls, MiniMap, Handle, Position,
-  applyNodeChanges, useReactFlow, MarkerType,
+  applyNodeChanges, applyEdgeChanges, useReactFlow, MarkerType,
   type Node, type Edge, type NodeChange, type EdgeChange, type Connection, type NodeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -14,10 +14,19 @@ import {
 /** impl/32(PRD §7.2.8) — Flowise/Dify 준용 풀스크린 워크플로우 빌더.
  *  팔레트(좌) → 캔버스 drag & drop(중앙) → 인스펙터(우) 3분할. React Flow(MIT) 자체 구현 —
  *  Flowise/Dify 코드 복제 없음(UX 패턴만 참조, 상용/추가조건 라이선스 구성요소 제외).
+ *
+ *  상태 설계: React Flow v12 는 노드 측정(measured)이 컨트롤드 상태에 반영되기 전까지
+ *  visibility:hidden 을 유지한다 — 매 렌더 도메인 상태에서 rfNodes 를 재생성하면 measured 가
+ *  소실되어 노드가 영구히 보이지 않는다(버그 수정 2026-07-09). 따라서 **RF Node[]/Edge[] 를
+ *  단일 진실 상태로 보유**하고(applyNodeChanges 가 dimensions 변경을 그대로 흡수),
+ *  도메인 모델(WorkflowNode/Edge)로는 저장·로드 시점에만 변환한다.
+ *
  *  KWCAG 2.2: 캔버스는 마우스 중심 — 팔레트 클릭 삽입 + 인스펙터 표준 폼 + 기존
  *  WorkflowPage a11y 폼 편집기 병행으로 키보드 사용자 경로 유지(§7.2.5 원칙 승계). */
 
 type NodeType = WorkflowNode["type"];
+type BuilderData = { nodeType: NodeType; config: Record<string, unknown> };
+type RfNode = Node<BuilderData, "secmp">;
 
 const NODE_META: Record<NodeType, { label: string; desc: string; color: string; defaultConfig: Record<string, unknown> }> = {
   trigger: { label: "트리거", desc: "워크플로우 시작점(입력 수신)", color: "#16a34a", defaultConfig: {} },
@@ -38,23 +47,18 @@ const CATEGORY_LABEL: Record<string, string> = { builtin: "내장", system: "시
 interface DragPayload {
   type: NodeType;
   config?: Record<string, unknown>;
-  labelHint?: string;
 }
 
-function edgeId(e: WorkflowEdge): string {
-  return `${e.source}->${e.target}->${e.when ?? ""}`;
-}
-
-function summarize(n: WorkflowNode): string {
-  const c = (n.config ?? {}) as Record<string, unknown>;
-  switch (n.type) {
+function summarize(type: NodeType, config: Record<string, unknown>): string {
+  const c = config ?? {};
+  switch (type) {
     case "agent": {
       const key = String(c.agent_key ?? "");
-      return c.path ? `${key} · ${c.method ?? "GET"} ${c.path}` : key || "에이전트 미지정";
+      return c.path ? `${key} · ${String(c.method ?? "GET")} ${String(c.path)}` : key || "에이전트 미지정";
     }
     case "llm": return String(c.prompt ?? "").slice(0, 60) || "프롬프트 미지정";
-    case "condition": return `${c.left ?? ""} ${c.op ?? "truthy"} ${c.right ?? ""}`.trim();
-    case "http": return `${c.method ?? "GET"} ${c.url ?? ""}`.trim();
+    case "condition": return `${String(c.left ?? "")} ${String(c.op ?? "truthy")} ${String(c.right ?? "")}`.trim();
+    case "http": return `${String(c.method ?? "GET")} ${String(c.url ?? "")}`.trim();
     case "notify": return String(c.message ?? "").slice(0, 60);
     case "transform": return "출력 템플릿";
     case "hitl": return "승인 대기";
@@ -63,7 +67,7 @@ function summarize(n: WorkflowNode): string {
 }
 
 /** 캔버스 커스텀 노드 — 타입별 색상 헤더 + config 요약(Flowise 노드 카드 패턴 준용). */
-function BuilderNode({ data, selected }: NodeProps<Node<{ nodeId: string; nodeType: NodeType; summary: string }>>) {
+function BuilderNode({ id, data, selected }: NodeProps<RfNode>) {
   const meta = NODE_META[data.nodeType];
   return (
     <div className={`rounded-md bg-white dark:bg-gray-800 shadow-sm text-left w-[190px] border ${selected ? "border-blue-500 ring-2 ring-blue-300 dark:ring-blue-700" : "border-gray-200 dark:border-gray-600"}`}>
@@ -76,8 +80,8 @@ function BuilderNode({ data, selected }: NodeProps<Node<{ nodeId: string; nodeTy
         <span className="opacity-80 font-normal">{data.nodeType}</span>
       </div>
       <div className="px-2 py-1.5">
-        <p className="text-[11px] font-medium text-gray-800 dark:text-gray-100 truncate">{data.nodeId}</p>
-        {data.summary && <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{data.summary}</p>}
+        <p className="text-[11px] font-medium text-gray-800 dark:text-gray-100 truncate">{id}</p>
+        <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{summarize(data.nodeType, data.config)}</p>
       </div>
       <Handle type="source" position={Position.Right} style={{ background: meta.color, width: 9, height: 9 }} />
     </div>
@@ -86,11 +90,67 @@ function BuilderNode({ data, selected }: NodeProps<Node<{ nodeId: string; nodeTy
 
 const nodeTypes = { secmp: BuilderNode };
 
-function newNodeId(nodes: WorkflowNode[], type: NodeType): string {
+function newNodeId(nodes: RfNode[], type: NodeType): string {
   const ids = new Set(nodes.map((n) => n.id));
   let i = 1;
   while (ids.has(`${type}${i}`)) i++;
   return `${type}${i}`;
+}
+
+function edgeStyleProps(): Partial<Edge> {
+  return { animated: true, markerEnd: { type: MarkerType.ArrowClosed } };
+}
+
+/** 도메인(WorkflowNode/Edge) → RF 상태. 좌표 없는 노드는 BFS 깊이 자동배치(§7.2.5 승계). */
+function toRfNodes(nodes: WorkflowNode[], edges: WorkflowEdge[]): RfNode[] {
+  const depth: Record<string, number> = {};
+  nodes.forEach((n) => { depth[n.id] = 0; });
+  for (let i = 0; i < nodes.length; i++) {
+    for (const e of edges) {
+      if (depth[e.source] !== undefined && depth[e.target] !== undefined) {
+        depth[e.target] = Math.max(depth[e.target], depth[e.source] + 1);
+      }
+    }
+  }
+  const perDepth: Record<number, number> = {};
+  return nodes.map((n) => {
+    const d = depth[n.id] ?? 0;
+    const row = perDepth[d] ?? 0;
+    perDepth[d] = row + 1;
+    return {
+      id: n.id,
+      type: "secmp" as const,
+      position: n.position ?? { x: 60 + d * 240, y: 60 + row * 110 },
+      data: { nodeType: n.type, config: (n.config ?? {}) as Record<string, unknown> },
+    };
+  });
+}
+
+function toRfEdges(edges: WorkflowEdge[]): Edge[] {
+  return edges.map((e) => ({
+    id: `${e.source}->${e.target}`,
+    source: e.source,
+    target: e.target,
+    label: e.when,
+    data: { when: e.when },
+    ...edgeStyleProps(),
+  }));
+}
+
+/** RF 상태 → 도메인(저장 페이로드). position 은 definition_json.nodes[].position 으로 영속(§7.2.5). */
+function toDomain(rfNodes: RfNode[], rfEdges: Edge[]): { nodes: WorkflowNode[]; edges: WorkflowEdge[] } {
+  return {
+    nodes: rfNodes.map((n) => ({
+      id: n.id,
+      type: n.data.nodeType,
+      config: n.data.config,
+      position: { x: Math.round(n.position.x), y: Math.round(n.position.y) },
+    })),
+    edges: rfEdges.map((e) => {
+      const when = (e.data as { when?: string } | undefined)?.when;
+      return { source: e.source, target: e.target, ...(when ? { when } : {}) };
+    }),
+  };
 }
 
 /** 좌측 팔레트 — 노드 타입 + 컴포넌트(§7.2.3). HTML5 드래그 + 클릭 삽입(키보드 폴백) 병행. */
@@ -102,10 +162,10 @@ function Palette({ onInsert }: Readonly<{ onInsert: (p: DragPayload) => void }>)
     listComponents().then(setComponents).catch(() => {});
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return q ? components.filter((c) => c.label.toLowerCase().includes(q) || c.path.toLowerCase().includes(q)) : components;
-  }, [components, query]);
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? components.filter((c) => c.label.toLowerCase().includes(q) || c.path.toLowerCase().includes(q))
+    : components;
   const groups: Record<string, WorkflowComponent[]> = { builtin: [], system: [], addon: [] };
   for (const c of filtered) groups[c.category]?.push(c);
 
@@ -148,7 +208,6 @@ function Palette({ onInsert }: Readonly<{ onInsert: (p: DragPayload) => void }>)
                 const payload: DragPayload = {
                   type: "agent",
                   config: { agent_key: c.agent_key, method: c.method, path: c.path },
-                  labelHint: c.label,
                 };
                 return (
                   <button key={`${c.agent_key}-${c.method}-${c.path}`} type="button" draggable
@@ -171,15 +230,15 @@ function Palette({ onInsert }: Readonly<{ onInsert: (p: DragPayload) => void }>)
 
 /** 우측 인스펙터 — 선택 노드의 타입별 구조화 폼 + JSON 폴백, 선택 엣지의 when 편집(§7.2.5 유보 해소). */
 function Inspector({
-  node, edge, nodes, onNodeChange, onNodeRemove, onEdgeChange, onEdgeRemove,
+  node, edge, allIds, onNodeChange, onNodeRemove, onEdgeChange, onEdgeRemove,
 }: Readonly<{
-  node: WorkflowNode | null;
-  edge: WorkflowEdge | null;
-  nodes: WorkflowNode[];
-  onNodeChange: (id: string, patch: Partial<WorkflowNode>) => void;
+  node: RfNode | null;
+  edge: Edge | null;
+  allIds: string[];
+  onNodeChange: (id: string, patch: { id?: string; nodeType?: NodeType; config?: Record<string, unknown> }) => void;
   onNodeRemove: (id: string) => void;
-  onEdgeChange: (e: WorkflowEdge, patch: Partial<WorkflowEdge>) => void;
-  onEdgeRemove: (e: WorkflowEdge) => void;
+  onEdgeChange: (id: string, when: string | undefined) => void;
+  onEdgeRemove: (id: string) => void;
 }>) {
   const [idDraft, setIdDraft] = useState(node?.id ?? "");
   useEffect(() => { setIdDraft(node?.id ?? ""); }, [node?.id]);
@@ -193,17 +252,18 @@ function Inspector({
   }
 
   if (edge) {
+    const when = (edge.data as { when?: string } | undefined)?.when ?? "";
     return (
       <aside aria-label="엣지 속성 편집" className="w-72 shrink-0 border-l border-gray-200 dark:border-gray-700 p-3 overflow-y-auto bg-white dark:bg-gray-900 space-y-3">
         <h2 className="text-xs font-semibold text-gray-500">엣지</h2>
         <p className="text-xs font-mono text-gray-600 dark:text-gray-300">{edge.source} → {edge.target}</p>
         <label className="block text-xs text-gray-500">
           when (조건 분기 — condition 노드의 true/false)
-          <input aria-label="엣지 when" value={edge.when ?? ""} placeholder="true | false | 비움(무조건)"
-            onChange={(e) => onEdgeChange(edge, { when: e.target.value || undefined })}
+          <input aria-label="엣지 when" value={when} placeholder="true | false | 비움(무조건)"
+            onChange={(e) => onEdgeChange(edge.id, e.target.value || undefined)}
             className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
         </label>
-        <button type="button" onClick={() => onEdgeRemove(edge)}
+        <button type="button" onClick={() => onEdgeRemove(edge.id)}
           className="text-xs px-2 py-1 rounded text-red-500 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20">
           엣지 삭제
         </button>
@@ -212,11 +272,11 @@ function Inspector({
   }
 
   const n = node!;
-  const cfg = (n.config ?? {}) as Record<string, unknown>;
+  const cfg = n.data.config ?? {};
   const setCfg = (patch: Record<string, unknown>) => onNodeChange(n.id, { config: { ...cfg, ...patch } });
   const applyId = () => {
     const next = idDraft.trim();
-    if (next && next !== n.id && !nodes.some((x) => x.id === next)) onNodeChange(n.id, { id: next });
+    if (next && next !== n.id && !allIds.includes(next)) onNodeChange(n.id, { id: next });
     else setIdDraft(n.id);
   };
   const textInput = (label: string, key: string, placeholder = "") => (
@@ -232,8 +292,8 @@ function Inspector({
     <aside aria-label="노드 속성 편집" className="w-72 shrink-0 border-l border-gray-200 dark:border-gray-700 p-3 overflow-y-auto bg-white dark:bg-gray-900 space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="text-xs font-semibold text-gray-500">노드 속성</h2>
-        <span className="text-[10px] px-1.5 py-0.5 rounded text-white" style={{ background: NODE_META[n.type].color }}>
-          {NODE_META[n.type].label}
+        <span className="text-[10px] px-1.5 py-0.5 rounded text-white" style={{ background: NODE_META[n.data.nodeType].color }}>
+          {NODE_META[n.data.nodeType].label}
         </span>
       </div>
       <label className="block text-xs text-gray-500">
@@ -246,17 +306,17 @@ function Inspector({
       </label>
       <label className="block text-xs text-gray-500">
         타입
-        <select aria-label="노드 타입" value={n.type}
+        <select aria-label="노드 타입" value={n.data.nodeType}
           onChange={(e) => {
             const t = e.target.value as NodeType;
-            onNodeChange(n.id, { type: t, config: { ...NODE_META[t].defaultConfig } });
+            onNodeChange(n.id, { nodeType: t, config: { ...NODE_META[t].defaultConfig } });
           }}
           className="mt-0.5 w-full text-sm px-2 py-1 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
           {NODE_TYPE_KEYS.map((t) => <option key={t} value={t}>{NODE_META[t].label} ({t})</option>)}
         </select>
       </label>
 
-      {n.type === "agent" && (
+      {n.data.nodeType === "agent" && (
         <>
           {textInput("agent_key", "agent_key", "예: rag")}
           <label className="block text-xs text-gray-500">
@@ -271,7 +331,7 @@ function Inspector({
           <p className="text-[10px] text-gray-400">팔레트의 컴포넌트를 드래그/클릭하면 자동 설정됩니다.</p>
         </>
       )}
-      {n.type === "llm" && (
+      {n.data.nodeType === "llm" && (
         <>
           <label className="block text-xs text-gray-500">
             prompt ({"{{trigger1.input.key}}"} 템플릿 지원)
@@ -282,7 +342,7 @@ function Inspector({
           {textInput("system (선택)", "system")}
         </>
       )}
-      {n.type === "condition" && (
+      {n.data.nodeType === "condition" && (
         <>
           {textInput("left", "left", "{{node.output.key}}")}
           <label className="block text-xs text-gray-500">
@@ -297,7 +357,7 @@ function Inspector({
           <p className="text-[10px] text-gray-400">나가는 엣지의 when 을 true/false 로 지정해 분기합니다.</p>
         </>
       )}
-      {n.type === "http" && (
+      {n.data.nodeType === "http" && (
         <>
           <label className="block text-xs text-gray-500">
             method
@@ -310,10 +370,10 @@ function Inspector({
           {textInput("url", "url", "https://…")}
         </>
       )}
-      {n.type === "notify" && textInput("message", "message", "{{llm1.text}}")}
-      {n.type === "hitl" && <p className="text-[11px] text-gray-400">실행이 이 노드에서 승인 대기(waiting_hitl) 상태가 됩니다.</p>}
-      {n.type === "trigger" && <p className="text-[11px] text-gray-400">워크플로우 입력이 {"{{"}트리거ID.input{"}}"} 으로 노출됩니다.</p>}
-      {n.type === "transform" && <p className="text-[11px] text-gray-400">아래 JSON 의 output 객체가 컨텍스트 템플릿으로 해석됩니다.</p>}
+      {n.data.nodeType === "notify" && textInput("message", "message", "{{llm1.text}}")}
+      {n.data.nodeType === "hitl" && <p className="text-[11px] text-gray-400">실행이 이 노드에서 승인 대기(waiting_hitl) 상태가 됩니다.</p>}
+      {n.data.nodeType === "trigger" && <p className="text-[11px] text-gray-400">워크플로우 입력이 {"{{"}트리거ID.input{"}}"} 으로 노출됩니다.</p>}
+      {n.data.nodeType === "transform" && <p className="text-[11px] text-gray-400">아래 JSON 의 output 객체가 컨텍스트 템플릿으로 해석됩니다.</p>}
 
       <details>
         <summary className="text-[11px] text-gray-400 cursor-pointer">고급 — config JSON 직접 편집</summary>
@@ -337,14 +397,15 @@ function BuilderInner() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { screenToFlowPosition } = useReactFlow();
-  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const editId = id ? Number(id) : null;
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [triggerType, setTriggerType] = useState<"manual" | "webhook">("manual");
-  const [nodes, setNodes] = useState<WorkflowNode[]>([{ id: "trigger1", type: "trigger", position: { x: 40, y: 120 } }]);
-  const [edges, setEdges] = useState<WorkflowEdge[]>([]);
+  // RF 상태가 단일 진실 — applyNodeChanges 가 position/dimensions/select 변경을 그대로 유지한다.
+  const [rfNodes, setRfNodes] = useState<RfNode[]>(() =>
+    editId === null ? toRfNodes([{ id: "trigger1", type: "trigger", position: { x: 60, y: 120 } }], []) : []);
+  const [rfEdges, setRfEdges] = useState<Edge[]>([]);
   const [selNodeId, setSelNodeId] = useState<string | null>(null);
   const [selEdgeId, setSelEdgeId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -360,87 +421,46 @@ function BuilderInner() {
         setName(wf.name);
         setDescription(wf.description ?? "");
         setTriggerType(wf.trigger_type === "webhook" ? "webhook" : "manual");
-        setNodes(wf.definition_json.nodes ?? []);
-        setEdges(wf.definition_json.edges ?? []);
+        setRfNodes(toRfNodes(wf.definition_json.nodes ?? [], wf.definition_json.edges ?? []));
+        setRfEdges(toRfEdges(wf.definition_json.edges ?? []));
         setLoadedVersion(wf.version);
       })
       .catch(() => setError("워크플로우를 불러오지 못했습니다."));
   }, [editId]);
 
-  // ---------- 도메인 ↔ React Flow 매핑(§7.2.5 BFS 폴백 배치 승계) ----------
-  const rfNodes: Node[] = useMemo(() => {
-    const depth: Record<string, number> = {};
-    nodes.forEach((n) => { depth[n.id] = 0; });
-    for (let i = 0; i < nodes.length; i++) {
-      for (const e of edges) {
-        if (depth[e.source] !== undefined && depth[e.target] !== undefined) {
-          depth[e.target] = Math.max(depth[e.target], depth[e.source] + 1);
-        }
-      }
+  const handleNodesChange = useCallback((changes: NodeChange<RfNode>[]) => {
+    setRfNodes((ns) => applyNodeChanges(changes, ns));
+    const removed = changes.filter((c) => c.type === "remove").map((c) => c.id);
+    if (removed.length > 0) {
+      setRfEdges((es) => es.filter((e) => !removed.includes(e.source) && !removed.includes(e.target)));
+      setSelNodeId((s) => (s && removed.includes(s) ? null : s));
     }
-    const perDepth: Record<number, number> = {};
-    return nodes.map((n) => {
-      const d = depth[n.id] ?? 0;
-      const row = perDepth[d] ?? 0;
-      perDepth[d] = row + 1;
-      return {
-        id: n.id,
-        type: "secmp",
-        position: n.position ?? { x: 60 + d * 240, y: 60 + row * 110 },
-        selected: n.id === selNodeId,
-        data: { nodeId: n.id, nodeType: n.type, summary: summarize(n) },
-      };
-    });
-  }, [nodes, edges, selNodeId]);
-
-  const rfEdges: Edge[] = useMemo(() => edges.map((e) => ({
-    id: edgeId(e),
-    source: e.source,
-    target: e.target,
-    label: e.when,
-    animated: true,
-    selected: edgeId(e) === selEdgeId,
-    markerEnd: { type: MarkerType.ArrowClosed },
-  })), [edges, selEdgeId]);
-
-  const handleNodesChange = useCallback((changes: NodeChange[]) => {
-    const removed = new Set(changes.filter((c) => c.type === "remove").map((c) => c.id));
-    if (removed.size > 0) {
-      setNodes((ns) => ns.filter((n) => !removed.has(n.id)));
-      setEdges((es) => es.filter((e) => !removed.has(e.source) && !removed.has(e.target)));
-      setSelNodeId((s) => (s && removed.has(s) ? null : s));
-      return;
-    }
-    const next = applyNodeChanges(changes, rfNodes);
-    const posById = new Map(next.map((n) => [n.id, n.position]));
-    setNodes((ns) => ns.map((n) => (posById.has(n.id) ? { ...n, position: posById.get(n.id) } : n)));
-  }, [rfNodes]);
+  }, []);
 
   const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
-    const removed = new Set(changes.filter((c) => c.type === "remove").map((c) => c.id));
-    if (removed.size === 0) return;
-    setEdges((es) => es.filter((e) => !removed.has(edgeId(e))));
-    setSelEdgeId((s) => (s && removed.has(s) ? null : s));
+    setRfEdges((es) => applyEdgeChanges(changes, es));
+    const removed = changes.filter((c) => c.type === "remove").map((c) => c.id);
+    if (removed.length > 0) setSelEdgeId((s) => (s && removed.includes(s) ? null : s));
   }, []);
 
   const handleConnect = useCallback((conn: Connection) => {
     if (!conn.source || !conn.target || conn.source === conn.target) return;
-    setEdges((es) => (es.some((e) => e.source === conn.source && e.target === conn.target)
+    setRfEdges((es) => (es.some((e) => e.source === conn.source && e.target === conn.target)
       ? es
-      : [...es, { source: conn.source!, target: conn.target! }]));
+      : [...es, { id: `${conn.source}->${conn.target}`, source: conn.source, target: conn.target, data: {}, ...edgeStyleProps() }]));
   }, []);
 
   // ---------- 팔레트 삽입(드롭 좌표 / 클릭 자동 배치) ----------
   const insertNode = useCallback((p: DragPayload, position?: { x: number; y: number }) => {
-    setNodes((ns) => {
+    setRfNodes((ns) => {
       const nid = newNodeId(ns, p.type);
-      const pos = position ?? {
-        x: 60 + Math.max(0, ...ns.map((n) => n.position?.x ?? 0)) + 240,
-        y: 120,
-      };
+      const pos = position ?? { x: 60 + Math.max(0, ...ns.map((n) => n.position.x)) + 240, y: 120 };
       setSelNodeId(nid);
       setSelEdgeId(null);
-      return [...ns, { id: nid, type: p.type, config: { ...(p.config ?? NODE_META[p.type].defaultConfig) }, position: pos }];
+      return [...ns, {
+        id: nid, type: "secmp" as const, position: pos,
+        data: { nodeType: p.type, config: { ...(p.config ?? NODE_META[p.type].defaultConfig) } },
+      }];
     });
   }, []);
 
@@ -462,36 +482,42 @@ function BuilderInner() {
   }, []);
 
   // ---------- 인스펙터 콜백 ----------
-  const selNode = nodes.find((n) => n.id === selNodeId) ?? null;
-  const selEdge = edges.find((e) => edgeId(e) === selEdgeId) ?? null;
+  const selNode = rfNodes.find((n) => n.id === selNodeId) ?? null;
+  const selEdge = rfEdges.find((e) => e.id === selEdgeId) ?? null;
 
-  const onNodeChange = useCallback((nid: string, patch: Partial<WorkflowNode>) => {
-    setNodes((ns) => ns.map((n) => (n.id === nid ? { ...n, ...patch } : n)));
+  const onNodeChange = useCallback((nid: string, patch: { id?: string; nodeType?: NodeType; config?: Record<string, unknown> }) => {
+    setRfNodes((ns) => ns.map((n) => (n.id === nid
+      ? {
+          ...n,
+          id: patch.id ?? n.id,
+          data: {
+            nodeType: patch.nodeType ?? n.data.nodeType,
+            config: patch.config ?? n.data.config,
+          },
+        }
+      : n)));
     if (patch.id && patch.id !== nid) {
-      setEdges((es) => es.map((e) => ({
-        ...e,
-        source: e.source === nid ? patch.id! : e.source,
-        target: e.target === nid ? patch.id! : e.target,
-      })));
+      setRfEdges((es) => es.map((e) => {
+        const source = e.source === nid ? patch.id! : e.source;
+        const target = e.target === nid ? patch.id! : e.target;
+        return { ...e, id: `${source}->${target}`, source, target };
+      }));
       setSelNodeId(patch.id);
     }
   }, []);
 
   const onNodeRemove = useCallback((nid: string) => {
-    setNodes((ns) => ns.filter((n) => n.id !== nid));
-    setEdges((es) => es.filter((e) => e.source !== nid && e.target !== nid));
+    setRfNodes((ns) => ns.filter((n) => n.id !== nid));
+    setRfEdges((es) => es.filter((e) => e.source !== nid && e.target !== nid));
     setSelNodeId(null);
   }, []);
 
-  const onEdgeChange = useCallback((target: WorkflowEdge, patch: Partial<WorkflowEdge>) => {
-    const tid = edgeId(target);
-    setEdges((es) => es.map((e) => (edgeId(e) === tid ? { ...e, ...patch } : e)));
-    setSelEdgeId(edgeId({ ...target, ...patch }));
+  const onEdgeChange = useCallback((eid: string, when: string | undefined) => {
+    setRfEdges((es) => es.map((e) => (e.id === eid ? { ...e, label: when, data: { ...e.data, when } } : e)));
   }, []);
 
-  const onEdgeRemove = useCallback((target: WorkflowEdge) => {
-    const tid = edgeId(target);
-    setEdges((es) => es.filter((e) => edgeId(e) !== tid));
+  const onEdgeRemove = useCallback((eid: string) => {
+    setRfEdges((es) => es.filter((e) => e.id !== eid));
     setSelEdgeId(null);
   }, []);
 
@@ -501,11 +527,12 @@ function BuilderInner() {
     if (!name.trim()) { setError("이름을 입력하세요."); return; }
     setBusy(true);
     try {
+      const definition_json = toDomain(rfNodes, rfEdges);
       if (editId !== null) {
-        const wf = await updateWorkflow(editId, { name, description, definition_json: { nodes, edges } });
+        const wf = await updateWorkflow(editId, { name, description, definition_json });
         setLoadedVersion(wf.version);
       } else {
-        const wf = await createWorkflow({ name, description, definition_json: { nodes, edges }, trigger_type: triggerType });
+        const wf = await createWorkflow({ name, description, definition_json, trigger_type: triggerType });
         if (wf.webhook_secret) setWebhookSecret({ workflowId: wf.id, secret: wf.webhook_secret });
         navigate(`/workflow/builder/${wf.id}`, { replace: true });
         setLoadedVersion(wf.version);
@@ -560,7 +587,7 @@ function BuilderInner() {
       {/* 3분할 본문 */}
       <div className="flex flex-1 min-h-0">
         <Palette onInsert={(p) => insertNode(p)} />
-        <div ref={wrapperRef} className="flex-1 min-w-0" onDrop={onDrop} onDragOver={onDragOver}
+        <div className="flex-1 min-w-0" onDrop={onDrop} onDragOver={onDragOver}
           aria-label="워크플로우 캔버스(마우스 드래그 전용 — 키보드 사용자는 팔레트 클릭 삽입과 우측 속성 폼, 또는 워크플로우 목록의 폼 편집기 이용)">
           <ReactFlow
             nodes={rfNodes} edges={rfEdges} nodeTypes={nodeTypes} fitView
@@ -579,7 +606,7 @@ function BuilderInner() {
           </ReactFlow>
         </div>
         <Inspector
-          node={selNode} edge={selEdge} nodes={nodes}
+          node={selNode} edge={selEdge} allIds={rfNodes.map((n) => n.id)}
           onNodeChange={onNodeChange} onNodeRemove={onNodeRemove}
           onEdgeChange={onEdgeChange} onEdgeRemove={onEdgeRemove}
         />

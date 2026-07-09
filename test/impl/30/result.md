@@ -38,6 +38,28 @@
 | test/impl/26 | Dify DSL Import | ALL PASS |
 | test/impl/2 | 워크플로우 엔진 21케이스 | ALL PASS |
 
+## D. 후속 결함 수정 — 캔버스 노드 미표시(2026-07-09, 사용자 리포트)
+
+- **증상**: 빌더·폼 캔버스 모두 노드/엣지가 그려지지 않음(추가해도 빈 캔버스).
+- **원인**: React Flow v12 는 노드 측정(measure) 결과를 `onNodesChange` 의 `dimensions`
+  변경으로 보내고, 컨트롤드 상태에 `applyNodeChanges` 로 반영돼야 `measured` 가 채워져
+  `visibility: hidden` 이 해제된다. 기존 구현(빌더 + `WorkflowCanvas`, **impl/18 부터 잠재**)은
+  매 렌더 도메인 상태에서 rfNodes 를 `useMemo` 재생성 → `measured` 소실 → 노드 영구 hidden.
+  impl/18·27 시험이 정적 검증(tsc/build)만 수행해 시각적으로 확인된 적이 없었음.
+- **수정**:
+  - `WorkflowBuilderPage.tsx` — **RF Node[]/Edge[] 를 단일 진실 상태로 보유**(`applyNodeChanges`/
+    `applyEdgeChanges` 가 dimensions/position/select 를 그대로 흡수), 도메인 모델로는
+    저장·로드 시점에만 변환(`toRfNodes`/`toRfEdges`/`toDomain`).
+  - `WorkflowCanvas.tsx` — RF 상태를 내부 useState 로 보유 + props(도메인) 변경 시
+    `measured` 보존 merge-sync. 삭제·좌표 변경만 상위 `onChange` 로 전파(기존 API 불변).
+- **E2E 실측(headless Chromium, vite dev + 실 백엔드)**:
+  1. `/workflow/builder` — trigger1 노드 **visible** 렌더(수정 전 `visibility: hidden` 재현 확인).
+  2. 팔레트 클릭 삽입 — llm1·notify1 추가, 3노드 전부 visible.
+  3. 저장 → `POST /workflows` 201, `/workflow/builder/3` 편집 모드 전환, "저장됨" 배지.
+  4. 재로드 — 기존 워크플로우(3노드) 로드·표시 정상.
+  5. `/workflow` 폼 편집기 — trigger1 표시 + "+ 노드 추가" 시 n2 즉시 캔버스 반영.
+  - 검증 산출물: 워크플로우 id=3(`builder-e2e`) — 검증 후 비활성(enabled=false) 보관.
+
 ## 비고
 
 - KWCAG 2.2: 빌더 캔버스는 마우스 중심(§7.2.5 원칙 승계) — 팔레트 클릭 삽입 + 인스펙터

@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
-  ReactFlow, Background, Controls, MiniMap, applyNodeChanges,
+  ReactFlow, Background, Controls, MiniMap, applyNodeChanges, applyEdgeChanges,
   type Node, type Edge, type NodeChange, type EdgeChange, type Connection, MarkerType,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -24,12 +24,19 @@ interface Props {
 
 /** DAG 를 계층(BFS 깊이)별로 배치해 좌→우 흐름으로 시각화(좌표 미지정 노드의 폴백 레이아웃).
  *  impl/27: onChange 지정 시 드래그 이동·연결·삭제 가능한 편집형 캔버스로 승격.
+ *  impl/32 버그 수정: React Flow v12 는 노드 측정(measured)이 컨트롤드 상태에 반영되기 전까지
+ *  visibility:hidden 을 유지한다 — 매 렌더 rfNodes 를 재생성하면 measured 가 소실되어 노드가
+ *  영구히 보이지 않았다. RF Node[] 를 내부 state 로 보유하고 applyNodeChanges 로 dimensions
+ *  변경을 흡수하되, props(도메인 상태) 변경 시 measured 를 보존하며 merge-sync 한다.
  *  KWCAG 2.2: 캔버스는 마우스 중심이라 접근성 대상이 아니며, a11y 폼 편집기(WorkflowPage
  *  DefinitionEditor)가 동일 nodes/edges 상태를 공유하는 대체편집기로 계속 병행된다. */
 export default function WorkflowCanvas({ nodes, edges, onChange }: Readonly<Props>) {
   const editable = !!onChange;
+  const [rfNodes, setRfNodes] = useState<Node[]>([]);
+  const [rfEdges, setRfEdges] = useState<Edge[]>([]);
 
-  const rfNodes: Node[] = useMemo(() => {
+  // 도메인 → RF merge-sync. 기존 RF 노드의 measured(측정값)·드래그 중 좌표를 보존한다.
+  useEffect(() => {
     const depth: Record<string, number> = {};
     nodes.forEach((n) => { depth[n.id] = 0; });
     for (let i = 0; i < nodes.length; i++) {
@@ -40,33 +47,43 @@ export default function WorkflowCanvas({ nodes, edges, onChange }: Readonly<Prop
       }
     }
     const perDepth: Record<number, number> = {};
-    return nodes.map((n) => {
-      const d = depth[n.id] ?? 0;
-      const row = perDepth[d] ?? 0;
-      perDepth[d] = row + 1;
-      return {
-        id: n.id,
-        position: n.position ?? { x: d * 200, y: row * 90 },
-        data: { label: `${n.id}\n(${n.type})` },
-        style: {
-          borderLeft: `4px solid ${NODE_COLOR[n.type] ?? "#6b7280"}`,
-          borderRadius: 6, fontSize: 11, padding: 6, whiteSpace: "pre-line",
-          width: 150, background: "var(--rf-node-bg, #fff)",
-        },
-      };
+    setRfNodes((prev) => {
+      const prevById = new Map(prev.map((n) => [n.id, n]));
+      return nodes.map((n) => {
+        const d = depth[n.id] ?? 0;
+        const row = perDepth[d] ?? 0;
+        perDepth[d] = row + 1;
+        const old = prevById.get(n.id);
+        return {
+          id: n.id,
+          position: n.position ?? old?.position ?? { x: d * 200, y: row * 90 },
+          data: { label: `${n.id}\n(${n.type})` },
+          style: {
+            borderLeft: `4px solid ${NODE_COLOR[n.type] ?? "#6b7280"}`,
+            borderRadius: 6, fontSize: 11, padding: 6, whiteSpace: "pre-line",
+            width: 150, background: "var(--rf-node-bg, #fff)",
+          },
+          ...(old?.measured ? { measured: old.measured } : {}),
+        };
+      });
     });
   }, [nodes, edges]);
 
-  const rfEdges: Edge[] = useMemo(() => edges.map((e) => ({
-    id: edgeId(e),
-    source: e.source,
-    target: e.target,
-    label: e.when,
-    animated: true,
-    markerEnd: { type: MarkerType.ArrowClosed },
-  })), [edges]);
+  useEffect(() => {
+    setRfEdges(edges.map((e) => ({
+      id: edgeId(e),
+      source: e.source,
+      target: e.target,
+      label: e.when,
+      animated: true,
+      markerEnd: { type: MarkerType.ArrowClosed },
+    })));
+  }, [edges]);
 
+  // dimensions/position/select 등 모든 변경을 내부 상태에 반영(측정값 유지의 핵심) 후,
+  // 도메인에 의미 있는 변경(삭제·좌표)만 상위로 전파한다.
   const handleNodesChange = useCallback((changes: NodeChange[]) => {
+    setRfNodes((ns) => applyNodeChanges(changes, ns));
     if (!onChange) return;
     const removed = new Set(changes.filter((c) => c.type === "remove").map((c) => c.id));
     if (removed.size > 0) {
@@ -76,20 +93,24 @@ export default function WorkflowCanvas({ nodes, edges, onChange }: Readonly<Prop
       );
       return;
     }
-    const next = applyNodeChanges(changes, rfNodes);
-    const posById = new Map(next.map((n) => [n.id, n.position]));
-    onChange(nodes.map((n) => (posById.has(n.id) ? { ...n, position: posById.get(n.id) } : n)), edges);
-  }, [nodes, edges, onChange, rfNodes]);
+    const moved = new Map<string, { x: number; y: number }>();
+    for (const c of changes) {
+      if (c.type === "position" && c.position) moved.set(c.id, c.position);
+    }
+    if (moved.size > 0) {
+      onChange(nodes.map((n) => (moved.has(n.id) ? { ...n, position: moved.get(n.id) } : n)), edges);
+    }
+  }, [nodes, edges, onChange]);
 
   const handleEdgesChange = useCallback((changes: EdgeChange[]) => {
+    setRfEdges((es) => applyEdgeChanges(changes, es));
     if (!onChange) return;
     const removed = new Set(changes.filter((c) => c.type === "remove").map((c) => c.id));
-    if (removed.size === 0) return;
-    onChange(nodes, edges.filter((e) => !removed.has(edgeId(e))));
+    if (removed.size > 0) onChange(nodes, edges.filter((e) => !removed.has(edgeId(e))));
   }, [nodes, edges, onChange]);
 
   const handleConnect = useCallback((conn: Connection) => {
-    if (!onChange || !conn.source || !conn.target) return;
+    if (!onChange || !conn.source || !conn.target || conn.source === conn.target) return;
     onChange(nodes, [...edges, { source: conn.source, target: conn.target }]);
   }, [nodes, edges, onChange]);
 
@@ -100,8 +121,8 @@ export default function WorkflowCanvas({ nodes, edges, onChange }: Readonly<Prop
         nodes={rfNodes} edges={rfEdges} fitView proOptions={{ hideAttribution: true }}
         nodesDraggable={editable} nodesConnectable={editable} elementsSelectable={editable}
         deleteKeyCode={editable ? ["Backspace", "Delete"] : []}
-        onNodesChange={editable ? handleNodesChange : undefined}
-        onEdgesChange={editable ? handleEdgesChange : undefined}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={handleEdgesChange}
         onConnect={editable ? handleConnect : undefined}
       >
         <Background />

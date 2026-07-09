@@ -369,6 +369,7 @@ Per-iteration scenario·result: `test/impl/<Nth>/{scenario,result}.md`. impl/3 (
 | Makefile `keycloak-*`/`vault-*`/`harbor-*` targets | leftover SeCuardian security stack (out of SeCMP scope) | to be cleaned up |
 | Playground `pnpm dev` crash-loop (`ERR_PNPM_IGNORED_BUILDS`) | pnpm 11 `verifyDepsBeforeRun` fails pre-check on esbuild's ignored build script | `verifyDepsBeforeRun: false` in `front/pnpm-workspace.yaml` |
 | Guardrails card-number false positives | any 13–19 digit run can match | Luhn checksum required (implemented) — residual false positives possible, refine rules if needed |
+| Workflow canvas nodes invisible (`visibility: hidden`) | React Flow v12 only shows a node once its measured dimensions land back in the controlled state — rebuilding rfNodes from scratch every render drops `measured` | **Fixed (impl/32)** — keep RF Node[] in React state and absorb dimension changes via `applyNodeChanges` (`WorkflowBuilderPage`/`WorkflowCanvas`). Avoid reintroducing the rebuild-per-render pattern |
 
 ---
 
