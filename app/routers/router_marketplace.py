@@ -9,6 +9,11 @@ addon(ZIP) 자산의 실제 무중단 마운트는 기존 router_addon_agent upl
 설치/해제·등록은 admin 이상(require_role). tenant 는 JWT 미포함이라 TENANT_DEFAULT_ID 사용.
 """
 import hashlib
+import io
+import json
+import re
+import shutil
+import zipfile
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
@@ -27,7 +32,8 @@ def _tenant() -> str:
 
 
 class AssetCreate(BaseModel):
-    asset_key: str = Field(min_length=1, max_length=64)
+    # §7.6.2: asset_key 미지정 시 name 슬러그로 서버 자동부여 (지정 시 기존 동작)
+    asset_key: str = Field(default="", max_length=64)
     version: str = Field(default="0.1.0", max_length=32)
     kind: str = Field(default="agent")
     name: str = Field(min_length=1, max_length=128)
@@ -39,6 +45,26 @@ class AssetCreate(BaseModel):
     required_env: str = ""
     checksum: str = ""
     source: str = Field(default="local")
+
+
+def _slugify(name: str) -> str:
+    """name → asset_key 슬러그 (소문자·영숫자·하이픈, §7.6.2). 비ASCII 만이면 'asset'."""
+    slug = re.sub(r"[^a-z0-9]+", "-", name.strip().lower()).strip("-")
+    return slug[:64] or "asset"
+
+
+async def _unique_asset_key(name: str, tenant_id: str) -> str:
+    """슬러그 충돌 시 -2, -3 … 접미로 유일 키 자동부여."""
+    base = _slugify(name)
+    key = base
+    n = 2
+    while await fetch_one(
+        f"SELECT id FROM marketplace_assets WHERE asset_key = {_PH} AND tenant_id = {_PH}",
+        (key, tenant_id),
+    ):
+        key = f"{base[: 64 - len(str(n)) - 1]}-{n}"
+        n += 1
+    return key
 
 
 async def _active_version(asset_key: str, tenant_id: str) -> str | None:
@@ -84,27 +110,32 @@ async def register_asset(
     if body.kind not in ASSET_KINDS:
         raise HTTPException(422, f"kind must be one of {ASSET_KINDS}")
     tid = _tenant()
-    dup = await fetch_one(
-        f"SELECT id FROM marketplace_assets "
-        f"WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
-        (body.asset_key, body.version, tid),
-    )
-    if dup:
-        raise HTTPException(409, f"asset {body.asset_key}@{body.version} already exists")
+    asset_key = body.asset_key.strip()
+    if asset_key:
+        dup = await fetch_one(
+            f"SELECT id FROM marketplace_assets "
+            f"WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
+            (asset_key, body.version, tid),
+        )
+        if dup:
+            raise HTTPException(409, f"asset {asset_key}@{body.version} already exists")
+    else:
+        # §7.6.2: asset_key 자동부여 — name 슬러그 + 충돌 접미
+        asset_key = await _unique_asset_key(body.name, tid)
     await execute_insert(
         f"INSERT INTO marketplace_assets "
         f"(tenant_id, asset_key, version, kind, name, name_en, description, category, "
         f" min_platform_version, governance, required_env, checksum, source) "
         f"VALUES ({','.join([_PH] * 13)})",
         (
-            tid, body.asset_key, body.version, body.kind, body.name, body.name_en,
+            tid, asset_key, body.version, body.kind, body.name, body.name_en,
             body.description, body.category, body.min_platform_version,
             body.governance, body.required_env, body.checksum, body.source,
         ),
     )
     asset = await fetch_one(
         f"SELECT * FROM marketplace_assets WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
-        (body.asset_key, body.version, tid),
+        (asset_key, body.version, tid),
     )
     return await _asset_out(asset, tid)
 
@@ -265,6 +296,90 @@ async def upload_asset_zip(
     return {"asset_key": asset["asset_key"], "version": asset["version"], "checksum": checksum, "size": len(raw)}
 
 
+def _parse_zip_meta(raw: bytes, filename: str) -> dict:
+    """ZIP 내 {key}-meta.json 파싱 → asset_key/name/version/description 추출 (§7.6.2).
+
+    meta 미존재 시 파일명 스템({key}.zip → key)으로 폴백.
+    """
+    stem = re.sub(r"\.zip$", "", filename)
+    meta: dict = {}
+    with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+        names = sorted(
+            (n for n in zf.namelist() if n.endswith("-meta.json")),
+            key=lambda n: n.count("/"),
+        )
+        if names:
+            meta = json.loads(zf.read(names[0]).decode("utf-8"))
+    key = _slugify(str(meta.get("agent_key") or meta.get("key") or stem))
+    return {
+        "asset_key": key,
+        "name": str(meta.get("name") or key),
+        "name_en": str(meta.get("name_en") or ""),
+        "version": str(meta.get("version") or "1.0.0"),
+        "description": str(meta.get("description") or ""),
+    }
+
+
+@router.post("/catalog/zip", status_code=201)
+async def register_assets_from_zips(
+    files: list[UploadFile] = File(...),
+    category: str = "general",
+    user: dict = Depends(require_role("admin", "supervisor")),
+):
+    """§7.6.2: ZIP 다중 등록 — 각 ZIP 의 {key}-meta.json 기반 자산 등록 + 블롭 저장(멱등).
+
+    동일 key@version 존재 시 메타·블롭 갱신. 설치 시 기존 hot-deploy 계약 그대로.
+    """
+    tid = _tenant()
+    uploader = user.get("username") or user.get("sub") or ""
+    out: list[dict] = []
+    for f in files:
+        if not f.filename or not f.filename.endswith(".zip"):
+            raise HTTPException(400, f"ZIP 파일만 허용됩니다: {f.filename}")
+        raw = await f.read()
+        try:
+            meta = _parse_zip_meta(raw, f.filename)
+        except (zipfile.BadZipFile, ValueError, KeyError) as exc:
+            raise HTTPException(400, f"{f.filename}: ZIP 파싱 실패 — {exc}") from exc
+        checksum = hashlib.sha256(raw).hexdigest()
+        exists = await fetch_one(
+            f"SELECT id FROM marketplace_assets WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
+            (meta["asset_key"], meta["version"], tid),
+        )
+        if exists:
+            await execute_write(
+                f"UPDATE marketplace_assets SET name = {_PH}, name_en = {_PH}, description = {_PH}, "
+                f"checksum = {_PH}, updated_at = CURRENT_TIMESTAMP "
+                f"WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
+                (meta["name"], meta["name_en"], meta["description"], checksum,
+                 meta["asset_key"], meta["version"], tid),
+            )
+        else:
+            await execute_insert(
+                f"INSERT INTO marketplace_assets "
+                f"(tenant_id, asset_key, version, kind, name, name_en, description, category, "
+                f" min_platform_version, governance, required_env, checksum, source) "
+                f"VALUES ({','.join([_PH] * 13)})",
+                (tid, meta["asset_key"], meta["version"], "agent", meta["name"], meta["name_en"],
+                 meta["description"], category, "0.1.0", "", "", checksum, "local"),
+            )
+        await execute_write(
+            f"DELETE FROM marketplace_asset_blobs WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
+            (meta["asset_key"], meta["version"], tid),
+        )
+        await execute_insert(
+            f"INSERT INTO marketplace_asset_blobs (tenant_id, asset_key, version, filename, checksum, blob, uploaded_by) "
+            f"VALUES ({_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH})",
+            (tid, meta["asset_key"], meta["version"], f.filename, checksum, raw, uploader),
+        )
+        asset = await fetch_one(
+            f"SELECT * FROM marketplace_assets WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
+            (meta["asset_key"], meta["version"], tid),
+        )
+        out.append(await _asset_out(asset, tid))
+    return {"assets": out}
+
+
 @router.delete("/install/{asset_key}")
 async def uninstall(
     asset_key: str,
@@ -288,7 +403,24 @@ async def uninstall(
         f"WHERE agent_key = {_PH} AND nav_group = 'marketplace'",
         (asset_key,),
     )
-    return {"uninstalled": asset_key}
+    # §7.6.5: hot-deploy 산출물 완전 정리 — addon 행(대소문자 무시)·deployed 디렉터리·front tsx·MCP.
+    # upload 파이프라인이 키를 소문자화할 수 있어 LOWER 매칭. config 행은 유지(재설치 대비).
+    from app.routers.router_addon_agent import _DEPLOYED, _remove_addon_artifacts
+    undeployed = False
+    addon = await fetch_one(
+        f"SELECT agent_key, sql_path FROM tbl_addon_agents WHERE LOWER(agent_key) = LOWER({_PH})",
+        (asset_key,),
+    )
+    if addon:
+        await _remove_addon_artifacts(addon["agent_key"], addon.get("sql_path") or "", delete_config=False)
+        undeployed = True
+    else:
+        # 행 없이 남은 고아 배포 디렉터리 방어적 제거
+        leftover = _DEPLOYED / asset_key
+        if leftover.exists():
+            shutil.rmtree(leftover)
+            undeployed = True
+    return {"uninstalled": asset_key, "undeployed": undeployed}
 
 
 @router.get("/installs")

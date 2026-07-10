@@ -80,8 +80,7 @@
     "assetKind": "종류",
     "assetDesc": "설명",
     "assetZip": "Addon ZIP 첨부 (선택)",
-    "assetZipHint": "스캐폴드 형식 zip ({key}-app.py + {key}-meta.json) — 설치 시 hot-deploy 됩니다",
-    "assetKeyNameRequired": "asset_key/name 필수",
+    "assetZipHint": "스캐폴드 형식 zip ({key}-app.py + {key}-meta.json) — 여러 개 동시 선택 가능, ZIP별 meta 로 자산 등록·설치 시 hot-deploy",
     "assetRegisterFailed": "등록 실패",
     "assetRegisterSubmit": "등록",
     "zipUpload": "Addon 등록",
@@ -102,7 +101,7 @@
     "deleteConfirm2": "삭제 확인",
     "deleteTitle": "에이전트 삭제",
     "deleteMessage": "'{name}' 에이전트를 삭제하시겠습니까?\n등록 정보와 API 라우트가 제거되며 되돌릴 수 없습니다.",
-    "pageDesc": "내장 에이전트와 ADDON 에이전트를 관리하며, 에이전트 활성화 설정 및 MCP 환경설정을 할 수 있습니다.",
+    "pageDesc": "자산 카탈로그에서 에이전트·워크플로우·RAG 파이프라인 자산을 탐색·설치·버전관리하고, 설치된 내장·ADDON 에이전트의 활성화 설정 및 MCP 환경설정을 관리합니다.",
     "export": "추출 / 내보내기",
     "exportZip": "ZIP 추출 (새 이름)",
     "exportStandalone": "Standalone 번들",
@@ -117,7 +116,13 @@
     "exportRun": "추출",
     "exportFailed": "추출 실패",
     "groupBasic": "기본 Agent",
-    "groupBuiltin": "내장 에이전트"
+    "groupBuiltin": "내장 에이전트",
+    "assetNameRequired": "name 필수",
+    "assetNamePlaceholder": "예: security",
+    "assetKeyAuto": "asset_key 는 name 으로 자동부여됩니다",
+    "assetCategory": "카탈로그 (category)",
+    "assetCategoryHint": "새 카테고리명 입력 시 해당 카탈로그가 생성됩니다 (기본 general)",
+    "installedTab": "에이전트(설치됨)"
   },
   "users": {
     "title": "사용자 관리",
@@ -445,7 +450,14 @@
     "importedLocal": "로컬에 편입됨",
     "downloadImport": "다운로드·편입",
     "noRemote": "원격 자산이 없습니다.",
-    "remoteInstallFailed": "원격 설치 실패"
+    "remoteInstallFailed": "원격 설치 실패",
+    "cat": {
+      "security": "보안 (security)",
+      "utilities": "유틸리티 (utilities)",
+      "general": "일반 (general)",
+      "builtin": "내장 (builtin)"
+    },
+    "addToCatalog": "추가"
   },
   "dash": {
     "pageDesc": "플랫폼 상태와 등록된 에이전트 현황.",

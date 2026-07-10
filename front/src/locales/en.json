@@ -80,8 +80,7 @@
     "assetKind": "Kind",
     "assetDesc": "Description",
     "assetZip": "Attach Addon ZIP (optional)",
-    "assetZipHint": "Scaffold-format zip ({key}-app.py + {key}-meta.json) — hot-deployed on install",
-    "assetKeyNameRequired": "asset_key/name required",
+    "assetZipHint": "Scaffold-format zip ({key}-app.py + {key}-meta.json) — multiple selection supported; each ZIP registers an asset via its meta and hot-deploys on install",
     "assetRegisterFailed": "Registration failed",
     "assetRegisterSubmit": "Register",
     "zipUpload": "Register Addon",
@@ -102,7 +101,7 @@
     "deleteConfirm2": "Confirm Delete",
     "deleteTitle": "Delete Agent",
     "deleteMessage": "Delete agent '{name}'?\nIts registration and API routes will be removed. This cannot be undone.",
-    "pageDesc": "Manage built-in and ADDON agents — toggle activation and configure MCP settings.",
+    "pageDesc": "Browse, install, and version agents, workflows, and RAG pipeline assets in the asset catalog, and manage activation and MCP settings for installed built-in and ADDON agents.",
     "export": "Export",
     "exportZip": "Export as ZIP (new name)",
     "exportStandalone": "Standalone Bundle",
@@ -117,7 +116,13 @@
     "exportRun": "Export",
     "exportFailed": "Export failed",
     "groupBasic": "Basic Agent",
-    "groupBuiltin": "Built-in Agent"
+    "groupBuiltin": "Built-in Agent",
+    "assetNameRequired": "name required",
+    "assetNamePlaceholder": "e.g. security",
+    "assetKeyAuto": "asset_key is auto-assigned from name",
+    "assetCategory": "Catalog (category)",
+    "assetCategoryHint": "Entering a new category name creates that catalog (default: general)",
+    "installedTab": "Agents (Installed)"
   },
   "users": {
     "title": "User Management",
@@ -445,7 +450,14 @@
     "importedLocal": "Imported locally",
     "downloadImport": "Download & import",
     "noRemote": "No remote assets.",
-    "remoteInstallFailed": "Remote install failed"
+    "remoteInstallFailed": "Remote install failed",
+    "cat": {
+      "security": "Security",
+      "utilities": "Utilities",
+      "general": "General",
+      "builtin": "Builtin"
+    },
+    "addToCatalog": "Add"
   },
   "dash": {
     "pageDesc": "Platform status and registered agents at a glance.",

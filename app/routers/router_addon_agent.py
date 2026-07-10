@@ -1213,22 +1213,16 @@ async def patch_addon(
     return {"message": "Updated", "agent_key": agent_key}
 
 
-@router.delete("/{agent_key}")
-async def delete_addon(
-    agent_key: str,
-    user: dict = Depends(require_role("supervisor", "admin")),
-):
-    row = await fetch_one(
-        f"SELECT agent_key, sql_path, is_builtin FROM tbl_addon_agents WHERE agent_key = {_PH}",
-        (agent_key,),
-    )
-    if not row:
-        raise HTTPException(status_code=404, detail="Addon not found")
-    if row.get("is_builtin"):
-        raise HTTPException(status_code=403, detail="내장 에이전트는 삭제할 수 없습니다.")
+async def _remove_addon_artifacts(
+    agent_key: str, sql_path: str, *, delete_config: bool = True, rebuild_web: bool = True,
+) -> bool:
+    """addon hot-deploy 산출물 완전 정리 — delete_addon 과 marketplace uninstall 공용 (§7.6.5).
 
+    테이블 DROP → deployed/ 디렉터리·front tsx 삭제 → MCP 중지/설정 삭제 → DB 행 삭제
+    → front 있었으면 web 재빌드. 반환: front tsx 존재 여부(재빌드 시작 여부).
+    라이브 라우터 완전 제거는 앱 재시작 필요(기존 계약).
+    """
     # 1. addon이 생성한 테이블 DROP
-    sql_path = row.get("sql_path") or ""
     if sql_path:
         for table in _extract_table_names(sql_path):
             try:
@@ -1259,15 +1253,34 @@ async def delete_addon(
         f"DELETE FROM tbl_mcp_configs WHERE agent_key = {_PH}", (agent_key,)
     )
 
-    # 4. DB 레코드 삭제
+    # 4. DB 레코드 삭제 — marketplace uninstall 은 config 행을 유지(is_enabled=0, 재설치 대비)
     await execute_write(
         f"DELETE FROM tbl_addon_agents WHERE agent_key = {_PH}", (agent_key,)
     )
-    await execute_write(
-        f"DELETE FROM tbl_agent_config WHERE agent_key = {_PH}", (agent_key,)
-    )
+    if delete_config:
+        await execute_write(
+            f"DELETE FROM tbl_agent_config WHERE agent_key = {_PH}", (agent_key,)
+        )
 
-    if had_front:
+    if had_front and rebuild_web:
         asyncio.create_task(_rebuild_web())
+    return had_front
+
+
+@router.delete("/{agent_key}")
+async def delete_addon(
+    agent_key: str,
+    user: dict = Depends(require_role("supervisor", "admin")),
+):
+    row = await fetch_one(
+        f"SELECT agent_key, sql_path, is_builtin FROM tbl_addon_agents WHERE agent_key = {_PH}",
+        (agent_key,),
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Addon not found")
+    if row.get("is_builtin"):
+        raise HTTPException(status_code=403, detail="내장 에이전트는 삭제할 수 없습니다.")
+
+    had_front = await _remove_addon_artifacts(agent_key, row.get("sql_path") or "")
 
     return {"message": f"'{agent_key}' 삭제 완료. 라우터 제거는 앱 재시작 필요." + (" 백그라운드 web 재빌드 시작." if had_front else "")}

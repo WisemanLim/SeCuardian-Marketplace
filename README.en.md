@@ -31,9 +31,19 @@ bases (RAG).
 
 > All 5 built-in agents have working backend+frontend (tests PASS). 🟡 = extension items remain (remote registry, React Flow canvas, pgvector, MCP proxy, etc). Details: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
-> **UI layout (impl/20 → impl/36, physical `test/impl/34`, §7.6.1 tab merge)**: there is no separate `Agent Management` menu — the **Marketplace menu is the unified agent hub**. Two top tabs: **Built-in Agents** (all `tbl_agent_config` rows: Orchestrator, AI Assistant, Marketplace, Workflow, RAG, Playground, Guardrails + catalog-installed agents), **Addon Agents** (user-uploaded). The 5 built-ins (Marketplace/Workflow/RAG/Playground/Guardrails) are **REQUIRED (cannot be disabled)**. `Register Asset` and the asset catalog (local + remote) live on the Built-in tab (same position as `New Agent` on the Addon tab). The register modal supports **attaching a scaffold-format addon ZIP** — hot-deployed on install.
+> **UI layout (impl/20 → impl/36 → impl/43, physical `test/impl/41`, §7.6.4 three-tab split)**: there is no separate `Agent Management` menu — the **Marketplace menu is the unified agent hub**. Three top tabs: **Asset Catalog** (default: category-grouped assets, per-category `+ Add`, `Register Asset`, remote registry) / **Agents (Installed)** (base/built-in configs + only catalog agents with an **active install** — they appear on install and disappear on uninstall; catalog matching is case-insensitive §7.6.4-6. Shown in the same **category sections** as the catalog: builtin → security → utilities → general …) / **Addon Agents** (user-uploaded, `New Agent`). The 5 built-ins (Marketplace/Workflow/RAG/Playground/Guardrails) are **REQUIRED (cannot be disabled)**. Install/uninstall/registration fires a `marketplaceChanged` event that syncs the tabs instantly; the register modal supports **attaching multiple scaffold-format addon ZIPs** — hot-deployed on install (agents with a screen appear in the left menu).
 >
 > **Security agents moved to the asset catalog (impl/36, §7.6.1)**: the 13 SeCuardian security built-ins formerly shown on the 'System Agents' tab (vasca-cve, cilium-netpol, teler-ids, shuffle-soar, neosync-dlp, otel-collector, teleport-pam, velociraptor-dfir, ai-redteam, isms-p-evidence, behavior-noti, agentic-soc, ai-eval-gate) are now provided as **asset-catalog entries (marketplace_assets, category=security)** — registered by `make seed-security` (with zip blobs) and installed from the catalog. Their 13 packages live under **`marketplace-assets/security/`** (§7.6.1-6 `emb_` abolished, §7.6.1-7 `addon-agents/zip` abolished). `make seed` performs the base seed (settings, accounts) only.
+>
+> **Asset registration UX + categorized catalog (impl/41, physical `test/impl/39`, §7.6.2)**: ① the `Register Asset` modal no longer asks for `asset_key` — enter only **name (e.g. `security`)** and the server auto-assigns the asset_key from a name slug (suffix `-2` on collision; passing an explicit key via the API keeps the old behavior) ② **multiple addon ZIPs** can be attached at once, like the ZIP upload in `Create Agent` — each ZIP is registered as its own asset from its `{key}-meta.json` (new `POST /api/marketplace/catalog/zip`) with the blob stored for hot-deploy on install ③ the asset catalog is grouped into **category sections (security, utilities, general, …)** ④ `make seed-assets` (`scripts/seed_assets.py`) scans `marketplace-assets/{security,utilities}/` and INSERTs only unregistered assets (bringing the 6 utilities into the catalog) ⑤ the catalog refreshes immediately after registration (`marketplaceChanged` event).
+>
+> **Default catalog registration + per-category add (impl/42, physical `test/impl/40`, §7.6.3)**: of the four `marketplace-assets/` groups, only **security and utilities are default asset-catalog targets** (addon = scaffold templates and builtin = core built-ins are excluded) — `make db-fresh` now chains seed (base) → seed-security → seed-assets, so security (13) and utilities (6) are registered right after initialization. Each category section header in the asset catalog has an **`+ Add` button** (admin) that opens the registration modal preset to that category (metadata or multiple ZIPs), while the top `Register Asset` button handles **catalog creation (free-form category, default general) + asset registration**.
+>
+> **Install / Not-installed semantics in detail**: the badge on each catalog card reflects whether the asset has an active install.
+> - **Not installed**: only the metadata exists in `marketplace_assets` — the asset can be browsed and inspected, but does not act as an agent.
+> - **Install** (`Install` button = `POST /api/marketplace/install/{asset_key}`, admin/supervisor) runs a transaction: ① deactivate any previous active install (single active version) ② upsert `tbl_agent_config` (`nav_group='marketplace'`, `is_enabled=1`) — the agent **immediately joins the Built-in Agents tab card deck and Orchestrator intent routing** ③ record the install in `marketplace_installs` ④ if a ZIP blob exists, reuse the addon upload pipeline in-process for a **zero-downtime hot-deploy** (`/api/addon/{key}/...` goes live; a deploy failure does not invalidate the install record and is reported as `deployed=false`).
+> - **After install**: Orchestrator automatically routes AI Assistant queries to the installed agent, and agents with a dedicated screen appear in the left menu. The agent card exposes enable/disable and MCP settings.
+> - **Uninstall** (`DELETE /api/marketplace/install/{asset_key}`, §7.6.5): in addition to deactivating the install history and setting `tbl_agent_config.is_enabled=0`, it **fully cleans up the hot-deploy artifacts** — DROPs addon-created tables, removes `addon-agents/deployed/{key}/`, deletes the deployed screen (tsx), stops MCP and deletes its config, and deletes the `tbl_addon_agents` row (→ the left-nav menu entry disappears immediately), rebuilding the web bundle if a screen existed. The config row is kept so reinstalling re-activates it. Fully removing a live-mounted router still requires an app restart. Bulk-clean legacy remnants with `make cleanup-addons` (uninstalled-asset remnants + orphan deployed directories, idempotent).
 >
 > **Guardrails domain filters (impl/20 §7.8.7)**: all **24 wise-Guardrails domain rulesets are vendored as agent-internal data (`app/data/guardrails/`)**. `global` (PII/financial) is always required; industry domains (finance/healthcare/manufacturing/public-admin, …) get **generated regex** for their classifier rules, and each non-required domain has a **`Filter` toggle** in the catalog to include/exclude it at test time (multi-domain evaluation). Rebuild data: `make guardrails-data` (`scripts/build_guardrails_data.py`).
 >
@@ -92,7 +102,7 @@ sql/{sqlite,pg}/         01_init.sql (idempotent DDL: core + marketplace/workflo
                          02_seed.sql (agent/settings/domain-catalog seed)
 front/src/
   pages/                 chat·users·settings·profile·addon·setup +
-                         marketplace(=unified agent hub: Built-in/Addon 2 tabs + asset catalog, §7.6.1)·
+                         marketplace(=unified agent hub: Catalog/Installed/Addon 3 tabs, §7.6.4)·
                          workflow·rag·playground·guardrails (5 built-in agents)
   api/                   axios client per backend contract (1:1)
 addon-agents/            Addon ZIP assets (deployed/ is runtime bind-mount)
@@ -163,7 +173,9 @@ make staging-all / make prod-all    # uses each .env.<env>
 make db-reset       # recreate schema (FORCE=1 skips confirm)
 make seed           # base seed only — default settings + test accounts
 make seed-security  # register the 13 security agents in the asset catalog (§7.6.1, explicit)
-make db-fresh       # reset + seed (base) — run make seed-security separately if needed
+make seed-assets    # scan marketplace-assets/{security,utilities} and register assets (§7.6.2, INSERT missing only)
+make db-fresh       # reset + seed (base) + seed-security + seed-assets — security/utilities registered right after init (§7.6.3)
+make cleanup-addons # bulk-clean uninstalled-asset hot-deploy remnants + orphan deployed dirs (§7.6.5, idempotent)
 ```
 
 ---
@@ -201,10 +213,16 @@ curl -X POST http://localhost:8100/api/auth/login \
 
 # ── Marketplace (F-MP) — Bearer required; register/install need admin/supervisor ──
 TOKEN=<JWT>
-# register asset
+# register asset — omit asset_key to auto-assign from the name slug (§7.6.2, e.g. "CVE Scanner" → cve-scanner)
 curl -X POST http://localhost:8100/api/marketplace/catalog \
   -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"asset_key":"cve-scanner","version":"1.0.0","kind":"agent","name":"CVE Scanner"}'
+  -d '{"version":"1.0.0","kind":"agent","name":"CVE Scanner"}'
+# → {"asset_key":"cve-scanner","installed":false, ...}  (cve-scanner-2 on collision)
+# register multiple ZIPs — each ZIP registers an asset from its {key}-meta.json + stores the blob (§7.6.2, idempotent)
+curl -X POST http://localhost:8100/api/marketplace/catalog/zip \
+  -H "Authorization: Bearer $TOKEN" \
+  -F 'files=@agent-a.zip' -F 'files=@agent-b.zip'
+# → {"assets":[{"asset_key":"agent-a",...},{"asset_key":"agent-b",...}]}
 # list catalog
 curl http://localhost:8100/api/marketplace/catalog -H "Authorization: Bearer $TOKEN"
 # → {"assets":[{"asset_key":"cve-scanner","installed":false,"active_version":null, ...}]}

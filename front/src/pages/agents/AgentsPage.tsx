@@ -7,7 +7,8 @@ import {
   getMcpConfig, upsertMcpConfig, getMcpStatus, deleteMcpConfig, McpConfig, McpStatusColor,
 } from "../../api/mcpConfig";
 import { getUiConfig } from "../../api/settings";
-import { registerAsset, uploadAssetZip, ASSET_KINDS } from "../../api/marketplace";
+import AssetRegisterModal from "../marketplace/AssetRegisterModal";
+import { listCatalog, MarketplaceAsset } from "../../api/marketplace";
 import { getAuth } from "../../store/auth";
 import { pickDescription } from "../../store/locale";
 import { useLocale } from "../../hooks/useLocale";
@@ -124,85 +125,9 @@ const BUILTIN_KEYS = new Set([
   "general", "chat", "marketplace", "workflow", "rag", "playground", "guardrails",
 ]);
 
-type Tab = "builtin" | "addon";
+// §7.6.4: 3탭 — 자산 카탈로그(기본) / 에이전트(설치됨) / Addon 에이전트
+type Tab = "catalog" | "installed" | "addon";
 
-// 마켓플레이스 자산 등록 모달 — '내장 에이전트'(통합) 탭 상단 '자산 등록' 버튼에서 호출.
-// 기존 마켓플레이스 화면의 등록 폼을 에이전트 관리로 통합(요구 R+, registerAsset 재사용).
-// §7.6.1: addon ZIP(스캐폴드 형식 {key}-app.py + {key}-meta.json) 첨부 시 설치에서 hot-deploy.
-function AssetRegisterModal({ onClose }: Readonly<{ onClose: () => void }>) {
-  const { t } = useLocale();
-  const [form, setForm] = useState({ asset_key: "", name: "", kind: "agent", description: "" });
-  const [zipFile, setZipFile] = useState<File | null>(null);
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function submit() {
-    setError("");
-    if (!form.asset_key.trim() || !form.name.trim()) { setError(t("agent.assetKeyNameRequired")); return; }
-    setBusy(true);
-    try {
-      await registerAsset(form);
-      if (zipFile) await uploadAssetZip(form.asset_key.trim(), zipFile);
-      onClose();
-    } catch (e) {
-      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg || t("agent.assetRegisterFailed"));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-lg rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100">{t("agent.registerAsset")}</h2>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-sm">✕</button>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="text-xs text-gray-500">
-            asset_key
-            <input value={form.asset_key} onChange={(e) => setForm((f) => ({ ...f, asset_key: e.target.value }))}
-              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
-          </label>
-          <label className="text-xs text-gray-500">
-            name
-            <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
-          </label>
-          <label className="text-xs text-gray-500">
-            {t("agent.assetKind")}
-            <select value={form.kind} onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value }))}
-              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800">
-              {ASSET_KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
-            </select>
-          </label>
-          <label className="text-xs text-gray-500 col-span-2">
-            {t("agent.assetDesc")}
-            <input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
-          </label>
-          {/* §7.6.1: addon ZIP(스캐폴드 형식) 첨부 — 선택 사항, 설치 시 hot-deploy */}
-          <label className="text-xs text-gray-500 col-span-2">
-            {t("agent.assetZip")}
-            <input type="file" accept=".zip"
-              onChange={(e) => setZipFile(e.target.files?.[0] ?? null)}
-              className="mt-0.5 w-full text-sm text-gray-500 file:mr-2 file:text-xs file:px-2 file:py-1 file:rounded file:border file:border-gray-300 dark:file:border-gray-600 file:bg-gray-50 dark:file:bg-gray-800 file:text-gray-600 dark:file:text-gray-300" />
-            <span className="block mt-0.5 text-[11px] text-gray-400">{t("agent.assetZipHint")}</span>
-          </label>
-          {error && <p role="alert" className="text-xs text-red-500 col-span-2">{error}</p>}
-          <button onClick={submit} disabled={busy}
-            className="col-span-2 text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
-            {t("agent.assetRegisterSubmit")}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 type ConfirmTarget =
   | { type: "agent"; key: string; name: string }
   | { type: "mcp"; key: string; name: string };
@@ -228,9 +153,11 @@ export default function AgentsPage() {
     return m[g] ?? g;
   };
 
-  const [tab, setTab] = useState<Tab>("builtin");
+  const [tab, setTab] = useState<Tab>("catalog");
   const [configs, setConfigs] = useState<AgentConfig[]>([]);
   const [addons, setAddons]   = useState<AddonAgent[]>([]);
+  // §7.6.4: 설치됨 탭 판정·정렬용 카탈로그 스냅샷 (installed 여부 + 표시 순서)
+  const [catalogAssets, setCatalogAssets] = useState<MarketplaceAsset[]>([]);
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [showBuilder, setShowBuilder]       = useState(false);
   const [showAssetRegister, setShowAssetRegister] = useState(false);
@@ -277,11 +204,16 @@ export default function AgentsPage() {
     setConfigs(c);
     setAddons(a);
     loadMcpStatuses(c, a);
+    // §7.6.4: 설치됨 탭 동기화 — 카탈로그 installed 여부·표시 순서
+    listCatalog().then(setCatalogAssets).catch(() => {});
   }
 
   useEffect(() => {
     reload();
     getUiConfig().then((cfg) => setAgentCreateMode(cfg.agent_create_mode)).catch(() => {});
+    // §7.6.4: 카탈로그 설치/해제/등록 시 설치됨 탭 즉시 갱신
+    window.addEventListener("marketplaceChanged", reload);
+    return () => window.removeEventListener("marketplaceChanged", reload);
   }, []);
 
   async function handleToggle(key: string, enabled: boolean) {
@@ -385,6 +317,50 @@ export default function AgentsPage() {
   // §7.6.1 탭 통합: tbl_agent_config 전체(사용자 Addon 제외)를 '내장 에이전트' 단일 탭으로 표시
   const builtinConfigs = configs.filter((c) => !userAddonKeys.has(c.agent_key));
   const userAddons = addons.filter((a) => !a.is_builtin);
+  // §7.6.4-5·6: 에이전트(설치됨) 탭 — 카탈로그 외 config(builtin) + 활성 설치된 카탈로그 에이전트만.
+  // 카탈로그 매칭은 대소문자 무시(addon upload 가 config 키를 소문자화 — usermanager ↔ UserManager 결함 수정).
+  const CATEGORY_ORDER = ["security", "utilities", "general"];
+  const catOrder = (c: string) => {
+    const i = CATEGORY_ORDER.indexOf(c);
+    return i === -1 ? CATEGORY_ORDER.length : i;
+  };
+  const assetByLowerKey = new Map(catalogAssets.map((a) => [a.asset_key.toLowerCase(), a]));
+  const installedLower = new Set(
+    catalogAssets.filter((a) => a.installed).map((a) => a.asset_key.toLowerCase()),
+  );
+  // 카탈로그 표시 순서 인덱스 (카테고리 순 → 카테고리 내 API 순)
+  const catalogOrderIdx = new Map(
+    [...catalogAssets]
+      .sort((x, y) => catOrder(x.category || "general") - catOrder(y.category || "general")
+        || (x.category || "").localeCompare(y.category || ""))
+      .map((a, i) => [a.asset_key.toLowerCase(), i]),
+  );
+  const installedConfigs = builtinConfigs.filter((c) => {
+    const k = c.agent_key.toLowerCase();
+    return !assetByLowerKey.has(k) || installedLower.has(k);
+  });
+  // §7.6.4-5: 카탈로그와 동일한 카테고리 섹션 그룹 — builtin 먼저, 이후 카탈로그 카테고리 순
+  const installedGroups = (() => {
+    const groups = new Map<string, AgentConfig[]>();
+    for (const c of installedConfigs) {
+      const asset = assetByLowerKey.get(c.agent_key.toLowerCase());
+      const cat = asset ? (asset.category || "general") : "builtin";
+      if (!groups.has(cat)) groups.set(cat, []);
+      groups.get(cat)?.push(c);
+    }
+    for (const [cat, items] of groups) {
+      if (cat !== "builtin") {
+        items.sort((x, y) =>
+          (catalogOrderIdx.get(x.agent_key.toLowerCase()) ?? 0)
+          - (catalogOrderIdx.get(y.agent_key.toLowerCase()) ?? 0));
+      }
+    }
+    return [...groups.entries()].sort(([x], [y]) => {
+      if (x === "builtin") return -1;
+      if (y === "builtin") return 1;
+      return catOrder(x) - catOrder(y) || x.localeCompare(y);
+    });
+  })();
   // export 가능 대상 = tbl_addon_agents 에 소스가 등록된 에이전트 (내장 포함) — F26/F27
   const exportableKeys = new Set(addons.map((a) => a.agent_key));
 
@@ -649,29 +625,33 @@ export default function AgentsPage() {
       {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 */}
       <p className="text-sm text-gray-500 dark:text-gray-400">{t("agent.pageDesc")}</p>
 
-      {/* Tabs: 내장(통합) / ADDON — §7.6.1 내장·시스템 탭 통합 */}
+      {/* Tabs: 자산 카탈로그 / 에이전트(설치됨) / Addon — §7.6.4 3탭 분리 */}
       <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
         <div className="flex gap-1">
-          {(["builtin", "addon"] as Tab[]).map((tb) => (
+          {([
+            { key: "catalog" as Tab, label: t("agent.assetCatalog"), count: catalogAssets.length },
+            { key: "installed" as Tab, label: t("agent.installedTab"), count: installedConfigs.length },
+            { key: "addon" as Tab, label: t("agent.addon"), count: userAddons.length },
+          ]).map((tb) => (
             <button
-              key={tb}
+              key={tb.key}
               type="button"
-              onClick={() => setTab(tb)}
+              onClick={() => setTab(tb.key)}
               className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px transition-colors ${
-                tab === tb
+                tab === tb.key
                   ? "border-blue-600 text-blue-600 dark:text-blue-400"
                   : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               }`}
             >
-              {t(`agent.${tb}`)}
+              {tb.label}
               <span className="ml-1.5 text-[11px] font-normal text-gray-400 dark:text-gray-500">
-                {tb === "builtin" ? builtinConfigs.length : userAddons.length}
+                {tb.count}
               </span>
             </button>
           ))}
         </div>
-        {/* 내장(통합) → '자산 등록'(마켓플레이스), Addon → '새 Agent 만들기' — 동일 위치 (R+, §7.6.1) */}
-        {tab === "builtin" && isAdmin && (
+        {/* 카탈로그 → '자산 등록', Addon → '새 Agent 만들기' — 동일 위치 (R+, §7.6.4) */}
+        {tab === "catalog" && isAdmin && (
           <button
             type="button"
             onClick={() => setShowAssetRegister(true)}
@@ -693,21 +673,27 @@ export default function AgentsPage() {
         )}
       </div>
 
-      {/* Card deck — §7.6.1: 통합 '내장 에이전트' 탭 = 전체 config 카드 + 자산 카탈로그 */}
-      {tab === "builtin" && (
-        <div className="space-y-6">
-          {builtinConfigs.length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500">{t("agent.noAgents")}</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {builtinConfigs.map((c) => <BuiltinCard key={c.agent_key} c={c} />)}
-            </div>
-          )}
-          {/* 마켓플레이스 자산 카탈로그(로컬+원격) — 설치 시 내장 탭/Addon 에이전트로 편입 */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
-            <MarketplacePage />
+      {/* §7.6.4-2: 자산 카탈로그 탭 — 카테고리별 자산 목록(로컬+원격), 설치/해제는 설치됨 탭에 반영 */}
+      {tab === "catalog" && <MarketplacePage />}
+      {/* §7.6.4-3·5: 에이전트(설치됨) 탭 — 카탈로그와 동일한 카테고리 섹션 그룹(builtin→security→utilities…) */}
+      {tab === "installed" && (
+        installedConfigs.length === 0 ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500">{t("agent.noAgents")}</p>
+        ) : (
+          <div className="space-y-6">
+            {installedGroups.map(([cat, items]) => (
+              <section key={cat}>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
+                  {t(`mp.cat.${cat}`) === `mp.cat.${cat}` ? cat : t(`mp.cat.${cat}`)}
+                  <span className="ml-1.5 font-normal">({items.length})</span>
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {items.map((c) => <BuiltinCard key={c.agent_key} c={c} />)}
+                </div>
+              </section>
+            ))}
           </div>
-        </div>
+        )
       )}
       {tab === "addon" && (
         userAddons.length === 0 ? (

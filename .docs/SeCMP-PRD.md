@@ -560,6 +560,99 @@ TENANT_DEFAULT_ID=default                  # off 모드일 때 사용할 고정 
      `_ZIP_TEMPLATE_NAMES` fallback 제거. `deployed/`(bind mount)·seed_security(security 경로)는 무변경.
    - **이미지 포함**: `marketplace-assets/` 는 `.dockerignore` 미제외(`COPY . .`) → 컨테이너에 포함.
 
+### 7.6.2 자산 등록 UX 개선 + 카테고리 카탈로그 (F-MP 확장, impl/41 · 물리 test/impl/39) — 사용자 요구(2026-07-10)
+
+**목표**: 자산 등록 → 카탈로그 생성 → 에이전트 자동 표시의 전 과정을 매끄럽게 한다.
+
+1. **asset_key 자동부여**: `자산 등록` 모달에서 `asset_key` 입력을 제거하고 사용자는 `name`
+   (예: `security`)만 입력 — 서버(`POST /api/marketplace/catalog`)가 name 을 슬러그화해
+   asset_key 를 자동 생성(소문자·영숫자·하이픈, 충돌 시 `-2`,`-3` … 접미). `asset_key` 를
+   명시하면 기존 동작 유지(하위호환).
+2. **Addon ZIP 다중 첨부**: `새 Agent 만들기`의 ZIP 업로드 등록과 동일하게 **여러 ZIP 동시
+   선택**을 지원. 신규 `POST /api/marketplace/catalog/zip`(multipart, files[]) — 각 ZIP 의
+   `{key}-meta.json` 을 파싱해 asset_key(meta key)·name·description(ko/en)·version 을 추출,
+   `marketplace_assets`(kind=agent) 등록 + `marketplace_asset_blobs` 블롭 저장(sha256)을
+   ZIP 별로 멱등 수행(동일 key@version 존재 시 메타·블롭 갱신). 설치 시 기존 hot-deploy 계약 그대로.
+3. **카테고리별 카탈로그 표시**: 자산 카탈로그를 `category`(security·utilities·general …) 별
+   섹션으로 그룹 표시 — 설명 하단에 등록된 보안(security) 에이전트가 용도별로 보이도록 한다.
+4. **utilities 시드**: `scripts/seed_assets.py`(=`make seed-assets`) 신설 —
+   `marketplace-assets/{security,utilities}/` 를 스캔해 `{key}-meta.json` 기반으로 미등록
+   자산만 INSERT(기존 등록분 무변경) + zip 블롭 checksum upsert. utilities 6종
+   (UserManager·server-shell·ai-traffic-monitor·caddy-proxy·grafana-dashboard·truffle-scan)이
+   카탈로그(category=utilities)에 표시된다. builtin(코어)·addon(스캐폴드 템플릿)은 시드 제외.
+5. **등록 즉시 반영**: 자산 등록/ZIP 등록 완료 시 `marketplaceChanged` 이벤트로 카탈로그를
+   재조회 — 페이지 새로고침 없이 등록 자산이 즉시 표시된다.
+6. **README 상세화**: 설치/미설치 배지의 의미와 설치 시 내부 동작(installs 기록 →
+   `tbl_agent_config` upsert → zip 블롭 hot-deploy → 내장 탭·Orchestrator 편입), 설치 후
+   이용 방법을 README.md/README.en.md 에 상세 기술.
+
+### 7.6.3 카탈로그 기본 등록 + 카테고리별 추가 등록 (F-MP 확장, impl/42 · 물리 test/impl/40) — 사용자 요구(2026-07-10)
+
+**목표**: security·utilities 자산은 DB 에 기본 등록된 상태로 제공하고, 카탈로그(카테고리)별로
+에이전트를 추가 등록할 수 있게 한다.
+
+1. **기본 등록 범위**: `marketplace-assets/` 4분류 중 **security·utilities 만** 자산 카탈로그
+   대상 — addon(스캐폴드 템플릿)·builtin(코어 내장)은 카탈로그 등록에서 제외한다.
+   결과적으로 마켓플레이스 화면 자산 카탈로그에 security(13)·utilities(6) 섹션이 기본 표시된다.
+2. **DB 기본 등록**: `make db-fresh` 가 seed(기반) → seed-security(보안 curated) →
+   seed-assets(스캔) 를 순차 수행해 **초기화 직후에도 security·utilities 가 등록 상태**가 되도록
+   체인을 확장한다. 기존 dev DB 에는 `make seed-assets` 1회 실행으로 utilities 를 편입(완료).
+3. **카테고리별 추가 등록 버튼**: 자산 카탈로그의 각 카테고리 섹션 헤더에 `+ 추가` 버튼(admin) —
+   해당 category 가 프리셋된 자산 등록 모달을 열어 에이전트(메타 또는 ZIP 다중)를 그 카탈로그에
+   바로 추가한다. 상단 `자산 등록` 버튼은 **카탈로그(신규 category 자유 입력) 생성 + 자산 등록**
+   역할 — category 입력(기본 general)을 노출한다.
+4. **구현 형태**: `AssetRegisterModal` 을 독립 컴포넌트로 분리(`category` prop 프리셋 지원),
+   `registerAsset`(body.category)·`registerAssetZips`(query category) 로 백엔드 기존 계약 재사용
+   (백엔드 무변경).
+
+### 7.6.4 마켓플레이스 3탭 재구성 — 카탈로그/설치됨/Addon 분리 (F-MP 확장, impl/43 · 물리 test/impl/41) — 사용자 요구(2026-07-10)
+
+**배경**: §7.6.1 탭 통합 후 '내장 에이전트' 탭에 builtin 에이전트와 카탈로그·설치 자산이 한 화면에
+섞여 표시(스크린샷 접수) — 카탈로그와 설치본을 분리한다.
+
+1. **탭 구성 변경**: 마켓플레이스 진입 시 3탭 — **`자산 카탈로그` / `에이전트(설치됨)` /
+   `Addon 에이전트`** (기본 탭 = 자산 카탈로그). 종전 `내장 에이전트` 단일 탭을 분해.
+2. **자산 카탈로그 탭**: 현행 유지 — 카테고리(security·utilities·general …)별 자산 목록 +
+   카테고리별 `+ 추가`(§7.6.3) + 상단 `자산 등록` 버튼 + 원격 레지스트리 섹션.
+3. **에이전트(설치됨) 탭**: builtin(기본·내장 7종 등 카탈로그 외 config) + **활성 설치된**
+   카탈로그 에이전트만 표시. 카탈로그에서 설치하면 나타나고 해제하면 숨는다 —
+   판정 기준은 `tbl_agent_config` 존재 여부가 아니라 **카탈로그 자산의 활성 설치 여부**
+   (`installed=true`). 설치/해제 시 `marketplaceChanged` 이벤트로 두 탭 즉시 동기화.
+4. **좌측 네비게이션**: 화면(front) 있는 에이전트는 설치(hot-deploy) 시 좌측 메뉴에 노출 —
+   기존 hot-deploy 경로 그대로(무변경).
+5. **분류·정렬(보완 2026-07-10, impl/45 · 물리 test/impl/43)**: 설치됨 탭도 자산 카탈로그와
+   동일하게 **카테고리 섹션으로 그룹 표시** — `builtin`(기본·내장 등 카탈로그 외 config) 섹션을
+   먼저, 이어서 `security`·`utilities`·`general` … 순(카탈로그 카테고리 순서와 동일).
+   섹션 내 정렬은 builtin=config 기존 순서, 카탈로그 그룹=카탈로그 표시 순서.
+   (최초 구현의 단일 그리드+우선순위 정렬을 카테고리 그룹핑으로 정정 — 사용자 재확인)
+6. **해제 잔존 결함 수정(impl/45)**: 설치됨 탭 판정·그룹핑의 카탈로그 매칭을 **대소문자 무시**로
+   수행 — addon upload 파이프라인이 config 키를 소문자화(예: `usermanager`)해 자산 키
+   (`UserManager`)와 불일치, 해제 후에도 builtin 으로 오분류되어 잔존하던 결함 해소.
+
+### 7.6.5 해제 시 hot-deploy 잔재 완전 정리 + 상단 설명 (F-MP 확장, impl/44 · 물리 test/impl/42) — 사용자 요구(2026-07-10)
+
+**배경(결함)**: 카탈로그 설치 시 zip 블롭이 addon upload 파이프라인으로 hot-deploy 되지만,
+**해제는 installs 비활성화 + config disable 만** 수행 — `tbl_addon_agents` 행,
+`addon-agents/deployed/{key}/` 디렉터리, `front/src/pages/addon/deployed/{key}.tsx` 가 잔존해
+좌측 네비게이션(= `tbl_addon_agents.is_active && has_front`) 메뉴가 남는다.
+설치본은 `is_builtin=1` 로 등록되어 addon 삭제 API(403 가드)로도 정리 불가.
+
+1. **상단 설명 수정**: 마켓플레이스 페이지 설명(`agent.pageDesc`)에 자산 카탈로그(탐색·설치·
+   버전관리) 설명을 포함해 3탭 구성을 반영한다(ko/en).
+2. **해제 = 완전 undeploy**: `DELETE /api/marketplace/install/{key}` 가 기존 처리
+   (installs 비활성 + config disable)에 더해 hot-deploy 산출물을 정리한다 —
+   addon 테이블 DROP·`deployed/{key}` 삭제·front tsx 삭제·MCP 중지/설정 삭제·
+   `tbl_addon_agents` 행 삭제·front 존재 시 web 재빌드. `delete_addon` 본문을 공용 헬퍼로
+   분리해 재사용(중복 구현 금지). addon 키는 **대소문자 무시 매칭**(upload 파이프라인 소문자화 대응).
+   라이브 라우터 완전 제거는 기존 계약대로 앱 재시작 필요(메뉴·목록은 즉시 반영).
+3. **네비 즉시 동기화**: 프론트 설치/해제 시 `agentConfigChanged` 이벤트도 발행 —
+   AppLayout 네비가 즉시 갱신된다.
+4. **잔재 정리 스크립트**: `scripts/cleanup_addon_remnants.py`(=`make cleanup-addons`) —
+   ① 활성 설치가 없는 카탈로그 자산의 addon 행+deployed 디렉터리+front tsx 제거(대소문자 무시)
+   ② addon 행이 없는 고아 deployed 디렉터리 제거. 과거 결함·시험으로 누적된 잔재의 일괄 정리용(멱등).
+5. **addon-agents/ 디렉터리 정책**: `deployed/`(런타임 bind-mount·loader·compose 참조)와
+   README 만 유지 — 디렉터리 자체는 런타임 필수라 삭제하지 않는다(§7.6.1-7 재확인).
+
 ### 7.7 Playground (F-PG)
 
 - 프롬프트/모델/에이전트/RAG 컬렉션 조합 대화형 실험, A/B 비교(응답·비용·지연·인용), eval 실행. 승격 경로: Playground → Workflow 노드 / Marketplace 게시.
@@ -980,6 +1073,11 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-10 | v0.38 | **impl/45(물리 `test/impl/43`) — §7.6.4-5·6 설치됨 탭 카테고리 그룹핑 + 해제 잔존 결함 수정**(사용자 결함 보고: 해제해도 설치됨 탭 잔존 + "카탈로그처럼 builtin·security·utilities 분류·정렬" 재확인). ① 설치됨 탭 카탈로그 매칭을 **대소문자 무시**로 정정 — addon upload 가 config 키를 소문자화(`usermanager`)해 자산 키(`UserManager`)와 불일치 → builtin 오분류 잔존하던 결함 해소 ② 설치됨 탭을 카탈로그와 동일한 **카테고리 섹션 그룹**(builtin 먼저 → security → utilities → general …)으로 표시, 섹션 내 정렬 = builtin 기존 순서·카탈로그 그룹 카탈로그 순서 ③ `mp.cat.builtin` 로케일 키 추가 | front(AgentsPage.tsx·locales), README(.en), test/impl/43 |
+| 2026-07-10 | v0.37 | **impl/44(물리 `test/impl/42`) — §7.6.5 해제 시 hot-deploy 잔재 완전 정리 + 상단 설명**(사용자 결함 보고: 해제해도 좌측 네비 메뉴·`addon-agents/deployed` 잔존). ① `agent.pageDesc` 에 자산 카탈로그 설명 포함(ko/en) ② marketplace uninstall = installs 비활성+config disable **+ 완전 undeploy**(addon 테이블 DROP·deployed 디렉터리·front tsx·MCP·`tbl_addon_agents` 행 삭제·web 재빌드) — `delete_addon` 본문을 `_remove_addon_artifacts` 공용 헬퍼로 분리 재사용, addon 키 대소문자 무시 매칭 ③ 설치/해제 시 `agentConfigChanged` 발행 → 네비 즉시 동기화 ④ `scripts/cleanup_addon_remnants.py`(=`make cleanup-addons`) 잔재 일괄 정리(멱등) — dev 환경 잔재(고아 deployed 14→정리) 적용 ⑤ addon-agents/ 는 deployed/ 런타임 필수라 유지 결정 | app/routers/{router_marketplace,router_addon_agent}.py, scripts/cleanup_addon_remnants.py, Makefile, front(MarketplacePage.tsx·locales), README(.en), test/impl/42 |
+| 2026-07-10 | v0.36 | **impl/43(물리 `test/impl/41`) — §7.6.4 마켓플레이스 3탭 재구성**(사용자 요구: builtin 과 자산등록 에이전트가 한 탭에 혼재). ① 탭 = `자산 카탈로그`(기본) / `에이전트(설치됨)` / `Addon 에이전트` — 종전 `내장 에이전트` 탭 분해 ② 카탈로그 탭 현행 유지(카테고리별 목록·`+ 추가`·자산 등록) ③ 설치됨 탭 = 카탈로그 외 config(기본·내장) + **활성 설치**(installed=true) 카탈로그 에이전트만 — 설치/해제 시 `marketplaceChanged` 이벤트로 즉시 표시/숨김 ④ 좌측 네비 노출은 기존 hot-deploy 무변경 ⑤ 설치됨 정렬 = 기본·내장 우선 후 카탈로그 표시 순서 동일 | front(AgentsPage.tsx·MarketplacePage.tsx·locales), README(.en), test/impl/41 |
+| 2026-07-10 | v0.35 | **impl/42(물리 `test/impl/40`) — §7.6.3 카탈로그 기본 등록 + 카테고리별 추가 등록**(사용자 요구). ① security·utilities 만 카탈로그 기본 등록 대상(addon·builtin 제외) — dev DB 에 `make seed-assets` 실행으로 utilities 6종 편입 완료 ② `make db-fresh` 체인 확장(seed → seed-security → seed-assets)으로 초기화 직후에도 등록 상태 보장 ③ 카탈로그 카테고리 섹션 헤더에 `+ 추가` 버튼(admin) — category 프리셋 자산 등록 모달(에이전트 메타/ZIP 다중 추가) ④ 상단 `자산 등록` = 카탈로그 생성 + 자산 등록(category 자유 입력, 기본 general) ⑤ `AssetRegisterModal` 독립 컴포넌트 분리(category prop), 백엔드 무변경 | .docs/SeCMP-PRD.md, Makefile, front(marketplace/AssetRegisterModal.tsx 신규·MarketplacePage.tsx·AgentsPage.tsx·locales), README(.en), test/impl/40 |
+| 2026-07-10 | v0.34 | **impl/41(물리 `test/impl/39`) — §7.6.2 자산 등록 UX 개선 + 카테고리 카탈로그**(사용자 요구). ① `자산 등록` asset_key 자동부여 — 모달 입력 제거, name(예: security) 슬러그화로 서버 자동 생성(충돌 시 `-2` 접미, 명시 시 하위호환) ② Addon ZIP **다중 첨부** — 신규 `POST /api/marketplace/catalog/zip`(files[]) 이 ZIP 별 `{key}-meta.json` 파싱→자산 등록+블롭 저장 멱등 수행 ③ 자산 카탈로그 category(security·utilities…) 별 그룹 표시 ④ `scripts/seed_assets.py`(=`make seed-assets`) — security·utilities 스캔 시드(미등록만 INSERT, utilities 6종 카탈로그 편입) ⑤ 등록 완료 시 `marketplaceChanged` 이벤트로 카탈로그 즉시 갱신 ⑥ README(.en) 설치/미설치 동작 상세화 | app/routers/router_marketplace.py, scripts/seed_assets.py, Makefile, front(api/marketplace.ts·AgentsPage.tsx·MarketplacePage.tsx·locales), README(.en), test/impl/39 |
 | 2026-07-09 | v0.33 | **impl/40(물리 `test/impl/38`) — AI 어시스턴트 tool-call 루프 설정화 + `.env.*` 지원**(§7.11.2-6, 사용자 요구: "오류 loop 횟수를 시스템에서 관리 + `.env.*` 로 설정"). ① `llm_tool_max_rounds` 설정 신설(기본 6, 최소 1) — `config.py` 필드 + `_db_llm_settings` 플럼빙(`LLM_TOOL_MAX_ROUNDS` env 맵·DB 키·pydantic 기본값) + seed(sqlite/pg) + SettingsPage `EDITABLE_KEYS`, Anthropic/Ollama tool-call 루프 양쪽 적용 ② `.env.example` 활성 키 + `.env.{local,dev,staging,prod}` 키 등재(pydantic env_file 경로로 설정 가능) ③ 효율 개선 — Ollama 루프 동일 `(method, path, status)` 오류 반복 시 조기 종료(405 × 6회 → 2회, 재시도 1회 허용). 시험 test/impl/38 | app/core/config.py, app/agents/orchestrator.py, sql/{sqlite,pg}/02_seed.sql, front/src/pages/settings/SettingsPage.tsx, .env.example, .env.{local,dev,staging,prod}, test/impl/38 |
 | 2026-07-09 | v0.32 | **impl/39(물리 `test/impl/37`) — 다국어 설명 authoring 소스 전환 + jp 확장**(§7.11.2-5, 사용자 오류 보고: "확장 구조 개선됐다 했으나 미적용 — descriptions 를 split 컬럼 아닌 `{"ko","en","jp"}` JSON 으로, 언어셋 없으면 선호언어 표출"). impl/33 은 구조·프론트 fallback·선호언어 UI 를 갖췄으나 **authoring 소스가 여전히 split 컬럼**이라 타 언어 추가 경로가 없었음. 정정: ① `02_seed.sql`(sqlite/pg) 내장 7종 `descriptions`·`agent_names` **JSON 직접 저자(ko/en/jp)**, split `description`/`description_en` authoring 제거(레거시 컬럼은 읽기 폴백용 스키마만 유지) ② orchestrator `_active_agents_block` — `descriptions`(ko→en→첫 언어)에서 프롬프트 설명 읽기 ③ 마이페이지 `PREFERRED_LANGS` 에 `jp` 추가(`locale.jp` 라벨) — UI 언어 키 없을 때 선호언어로 표출 ④ `router_marketplace` install upsert 에 `descriptions` JSON 기록 ⑤ `db.py` 중복 `backfill_descriptions` 제거. addon 경로는 이미 확장형 무변경. 시험 test/impl/37(격리 sqlite: 시드 jp·API·pickDescription jp fallback·orchestrator block·dedupe) | sql/{sqlite,pg}/02_seed.sql, app/db.py, app/agents/orchestrator.py, app/routers/router_marketplace.py, front(store/locale.ts·profile/ProfilePage.tsx·locales), test/impl/37 |
 | 2026-07-09 | v0.31 | **impl/35(물리 `test/impl/33`) — 에이전트 표시명 다국어 agent_names 싱크**(§7.11.2-4, 사용자 요구 "agent_name 도 descriptions 방식으로 확장"). SeCuardian impl/56 복제: `tbl_agent_config.agent_names` JSON 컬럼(init+멱등 ALTER+`{"ko": agent_name}` 백필), **내장 7종 시드 en 표시명**(마켓플레이스→Marketplace 등 — en UI 에서 한국어 표시명 노출 해소), meta.json `display_name` dict 형 정규화·배포 동기·addon 목록 노출, `_templates` 6종 dict 화 재패키징. 프론트: AgentsPage `nameOf`(10개소)·AppLayout nav/헤더(names dict 상태 보존, locale 전환 즉시 반영)·GuardrailsPage 에이전트 셀렉트. 시험 test/impl/33 4/4 PASS(격리 sqlite 기동·시드·API + import/tsc) |

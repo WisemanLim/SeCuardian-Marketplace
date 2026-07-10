@@ -37,7 +37,7 @@ export async function listCatalog(): Promise<MarketplaceAsset[]> {
 }
 
 export async function registerAsset(body: {
-  asset_key: string;
+  asset_key?: string; // §7.6.2: 미지정 시 서버가 name 슬러그로 자동부여
   version?: string;
   kind?: string;
   name: string;
@@ -61,6 +61,17 @@ export async function uploadAssetZip(assetKey: string, file: File, version?: str
     headers: { "Content-Type": "multipart/form-data" },
   });
   return data;
+}
+
+// §7.6.2: ZIP 다중 등록 — 각 ZIP 의 {key}-meta.json 기반 자산 등록 + 블롭 저장
+export async function registerAssetZips(files: File[], category?: string): Promise<MarketplaceAsset[]> {
+  const form = new FormData();
+  files.forEach((f) => form.append("files", f));
+  const { data } = await client.post<{ assets: MarketplaceAsset[] }>("/marketplace/catalog/zip", form, {
+    params: category ? { category } : undefined,
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.assets ?? [];
 }
 
 export async function installAsset(assetKey: string, version?: string): Promise<MarketplaceInstall> {

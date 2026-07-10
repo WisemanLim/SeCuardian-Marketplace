@@ -5,7 +5,7 @@
         dev-all dev-stop dev-logs \
         staging-all staging-stop staging-logs \
         prod-all prod-stop prod-logs \
-        db-reset seed seed-security db-fresh guardrails-data
+        db-reset seed seed-security seed-assets db-fresh guardrails-data
 ENV ?= local
 
 # web(front) 이미지에서 배포된 ADDON 화면(front) 제외 여부 (front/Dockerfile 빌드 인자).
@@ -151,13 +151,21 @@ seed:    ## 기본 설정 + 테스트 계정 삽입 — 기반 시드만 (ENV=pr
 seed-security: ## 보안 에이전트 13종 자산 카탈로그 등록 (§7.6.1 — seed 와 분리, 필요 시 명시 실행)
 	$(_DB_RUN) python scripts/seed_security.py
 
+seed-assets: ## marketplace-assets/{security,utilities} 스캔 자산 등록 (§7.6.2 — 미등록만 INSERT)
+	$(_DB_RUN) python scripts/seed_assets.py
+
+cleanup-addons: ## 미설치 자산 hot-deploy 잔재 + 고아 deployed 디렉터리 일괄 정리 (§7.6.5, 멱등)
+	$(_DB_RUN) python scripts/cleanup_addon_remnants.py
+
 guardrails-data: ## F-GRD 도메인 규칙 데이터 재컴파일 (GUARDRAILS_SCRIPTS_DIR 로 소스 지정, §7.8.7)
 	$(_DB_RUN) python scripts/build_guardrails_data.py
 
-db-fresh: ## db-reset + seed(기반) 순차 실행 — 보안 에이전트는 make seed-security 별도 (FORCE=1 로 확인 생략)
+db-fresh: ## db-reset + seed(기반) + seed-security + seed-assets — 초기화 직후 security·utilities 등록 상태 (§7.6.3, FORCE=1 로 확인 생략)
 	$(_CONFIRM_DESTRUCTIVE)
 	$(_DB_RUN) python scripts/db_reset.py
 	$(_DB_RUN) python scripts/seed.py
+	$(_DB_RUN) python scripts/seed_security.py
+	$(_DB_RUN) python scripts/seed_assets.py
 
 # ── CI / 품질 ─────────────────────────────────────────────────────────────────
 test:    ## pytest 실행

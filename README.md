@@ -30,9 +30,19 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
-> **UI 구성(impl/20 → impl/36·물리 `test/impl/34`, §7.6.1 탭 통합)**: 별도 `에이전트 관리` 메뉴 없이 **마켓플레이스 메뉴가 통합 에이전트 허브**다. 상단탭 2분류 — **내장 에이전트**(`tbl_agent_config` 전체: Orchestrator·AI 어시스턴트·마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일 + 카탈로그 설치 에이전트) / **Addon 에이전트**(사용자 업로드). 내장 5종(마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일)은 **REQUIRED(비활성 불가)**. `자산 등록`·자산 카탈로그(로컬·원격)는 내장 에이전트 탭에 편입(Addon 탭 `새 Agent 만들기`와 동일 위치). 자산 등록 모달에서 **addon ZIP(스캐폴드 형식) 첨부** 시 설치에서 hot-deploy 된다.
+> **UI 구성(impl/20 → impl/36 → impl/43·물리 `test/impl/41`, §7.6.4 3탭 재구성)**: 별도 `에이전트 관리` 메뉴 없이 **마켓플레이스 메뉴가 통합 에이전트 허브**다. 상단탭 3분류 — **자산 카탈로그**(기본 탭: 카테고리별 자산 목록·`+ 추가`·`자산 등록`·원격 레지스트리) / **에이전트(설치됨)**(기본·내장 config + **활성 설치된** 카탈로그 에이전트만 — 카탈로그에서 설치하면 나타나고 해제하면 숨김, 카탈로그 매칭은 대소문자 무시 §7.6.4-6. 카탈로그와 동일한 **카테고리 섹션 그룹**으로 표시: builtin → security → utilities → general …) / **Addon 에이전트**(사용자 업로드, `새 Agent 만들기`). 내장 5종(마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일)은 **REQUIRED(비활성 불가)**. 설치/해제/등록 시 `marketplaceChanged` 이벤트로 탭 간 즉시 동기화되며, 자산 등록 모달에서 **addon ZIP(스캐폴드 형식) 다중 첨부** 시 설치에서 hot-deploy 된다(화면 있는 에이전트는 설치 시 좌측 메뉴 노출).
 >
 > **보안 에이전트 자산 카탈로그 이관(impl/36, §7.6.1)**: 종전 '시스템 에이전트' 탭의 SeCuardian 보안 내장 13종(vasca-cve·cilium-netpol·teler-ids·shuffle-soar·neosync-dlp·otel-collector·teleport-pam·velociraptor-dfir·ai-redteam·isms-p-evidence·behavior-noti·agentic-soc·ai-eval-gate)은 **자산 카탈로그(marketplace_assets, category=security)** 로 이관 — `make seed-security` 로 등록(zip 블롭 포함)하고 카탈로그에서 설치한다. 패키지 13종은 **`marketplace-assets/security/`** 에서 관리(§7.6.1-6 `emb_` 폐지, §7.6.1-7 `addon-agents/zip` 폐지). `make seed` 는 기반 시드(설정·계정)만 수행.
+>
+> **자산 등록 UX 개선 + 카테고리 카탈로그(impl/41·물리 `test/impl/39`, §7.6.2)**: ① `자산 등록` 모달에서 `asset_key` 입력 제거 — **name(예: `security`)만 입력**하면 서버가 name 슬러그로 asset_key 를 자동부여(충돌 시 `-2` 접미, API 로 명시하면 기존 동작 유지) ② **addon ZIP 다중 첨부** — `새 Agent 만들기` ZIP 업로드처럼 여러 ZIP 을 동시 선택하면 각 ZIP 의 `{key}-meta.json` 기반으로 자산이 개별 등록(신규 `POST /api/marketplace/catalog/zip`)되고 블롭이 저장돼 설치 시 hot-deploy 된다 ③ 자산 카탈로그는 **category(보안 security·유틸리티 utilities·일반 general …) 별 섹션**으로 그룹 표시 ④ `make seed-assets`(`scripts/seed_assets.py`) — `marketplace-assets/{security,utilities}/` 스캔으로 미등록 자산만 카탈로그 INSERT(utilities 6종 편입) ⑤ 등록 완료 시 카탈로그 즉시 갱신(`marketplaceChanged` 이벤트).
+>
+> **카탈로그 기본 등록 + 카테고리별 추가 등록(impl/42·물리 `test/impl/40`, §7.6.3)**: `marketplace-assets/` 4분류 중 **security·utilities 만 자산 카탈로그 기본 등록 대상**(addon=스캐폴드 템플릿·builtin=코어 내장 제외) — `make db-fresh` 가 seed(기반)→seed-security→seed-assets 를 순차 수행해 초기화 직후에도 security(13)·utilities(6) 가 등록 상태다. 자산 카탈로그의 **각 카테고리 섹션 헤더 `+ 추가` 버튼**(admin)으로 해당 카탈로그에 에이전트(메타 또는 ZIP 다중)를 바로 추가할 수 있고, 상단 `자산 등록` 버튼은 **카탈로그 생성(category 자유 입력, 기본 general) + 자산 등록**을 담당한다.
+>
+> **마켓플레이스 설치/미설치 동작 상세**: 자산 카탈로그 카드의 배지는 해당 자산의 활성 설치 여부를 뜻한다.
+> - **미설치**: `marketplace_assets` 에 메타만 등록된 상태 — 카탈로그에서 탐색·상세 조회만 가능하고 에이전트로는 동작하지 않는다.
+> - **설치**(`설치` 버튼 = `POST /api/marketplace/install/{asset_key}`, admin/supervisor): 트랜잭션으로 ① 기존 활성 설치 비활성화(단일 활성 버전) ② `tbl_agent_config` upsert(`nav_group='marketplace'`, `is_enabled=1`) — **내장 에이전트 탭 카드덱과 Orchestrator 인텐트 라우팅에 즉시 편입** ③ `marketplace_installs` 설치 이력 기록 ④ ZIP 블롭이 있으면 addon upload 파이프라인 in-proc 재사용으로 **무중단 hot-deploy**(`/api/addon/{key}/...` 라이브 마운트, 실패해도 설치 기록은 유지되고 `deployed=false` 로 표시).
+> - **설치 후 이용**: AI 어시스턴트 질의 시 Orchestrator 가 설치된 에이전트로 자동 라우팅하고, 전용 화면이 있는 에이전트는 좌측 메뉴에 노출된다. 에이전트 카드에서 활성/비활성 토글·MCP 노출 설정 가능.
+> - **해제**(`DELETE /api/marketplace/install/{asset_key}`, §7.6.5): 설치 이력 비활성화 + `tbl_agent_config.is_enabled=0` 에 더해 **hot-deploy 산출물을 완전 정리**한다 — addon 이 만든 테이블 DROP, `addon-agents/deployed/{key}/` 삭제, 배포 화면(tsx) 삭제, MCP 중지/설정 삭제, `tbl_addon_agents` 행 삭제(→ 좌측 네비 메뉴 즉시 제거), 화면이 있었으면 web 재빌드. config 행은 유지되어 재설치 시 다시 활성화된다. 라이브 라우터의 완전 제거는 앱 재시작 필요. 과거 잔재 일괄 정리: `make cleanup-addons`(미설치 자산 잔재 + 고아 deployed 디렉터리, 멱등).
 >
 > **가드레일 도메인 필터(impl/20 §7.8.7)**: wise-Guardrails 규칙 **24개 도메인 전체를 에이전트 내부 데이터(`app/data/guardrails/`)로 관리**한다. `global`(PII/신용정보)은 무조건 필수, 업종 도메인(금융·의료·제조·공공행정 등)은 classifier 규칙에 **regex 를 생성**해 결정적 판정에 사용하며, 도메인 카탈로그의 **`필터적용` 토글**로 테스트 시 적용 여부를 반영(다도메인 동시 판정). 데이터 재빌드: `make guardrails-data` (`scripts/build_guardrails_data.py`).
 >
@@ -91,7 +101,7 @@ sql/{sqlite,pg}/         01_init.sql(멱등 DDL: 코어 + marketplace/workflow/r
                          02_seed.sql(에이전트/설정/도메인카탈로그 시드)
 front/src/
   pages/                 chat·users·settings·profile·addon·setup +
-                         marketplace(=agents 통합 허브: 내장/Addon 2탭+자산카탈로그, §7.6.1)·
+                         marketplace(=agents 통합 허브: 카탈로그/설치됨/Addon 3탭, §7.6.4)·
                          workflow·rag·playground·guardrails (내장 에이전트 5종)
   api/                   백엔드 계약별 axios 클라이언트(1:1 대응)
 addon-agents/            Addon ZIP 자산 (deployed/ 는 런타임 bind-mount)
@@ -162,7 +172,9 @@ make staging-all / make prod-all    # 각 .env.<env> 사용
 make db-reset       # 스키마 재생성 (FORCE=1 확인 생략)
 make seed           # 기반 시드만 — 기본 설정 + 테스트 계정
 make seed-security  # 보안 에이전트 13종 자산 카탈로그 등록 (§7.6.1 — 필요 시 명시 실행)
-make db-fresh       # reset + seed(기반) — 보안 에이전트는 make seed-security 별도
+make seed-assets    # marketplace-assets/{security,utilities} 스캔 자산 등록 (§7.6.2 — 미등록만 INSERT)
+make db-fresh       # reset + seed(기반) + seed-security + seed-assets — 초기화 직후 security·utilities 등록 상태 (§7.6.3)
+make cleanup-addons # 미설치 자산 hot-deploy 잔재 + 고아 deployed 디렉터리 일괄 정리 (§7.6.5, 멱등)
 ```
 
 ---
@@ -200,10 +212,16 @@ curl -X POST http://localhost:8100/api/auth/login \
 
 # ── Marketplace (F-MP) — Bearer 필요, 등록/설치는 admin/supervisor ──
 TOKEN=<JWT>
-# 자산 등록
+# 자산 등록 — asset_key 생략 시 name 슬러그로 자동부여 (§7.6.2, 예: "CVE Scanner" → cve-scanner)
 curl -X POST http://localhost:8100/api/marketplace/catalog \
   -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"asset_key":"cve-scanner","version":"1.0.0","kind":"agent","name":"CVE 스캐너"}'
+  -d '{"version":"1.0.0","kind":"agent","name":"CVE Scanner"}'
+# → {"asset_key":"cve-scanner","installed":false, ...}  (충돌 시 cve-scanner-2)
+# ZIP 다중 등록 — 각 ZIP 의 {key}-meta.json 기반 자산 등록 + 블롭 저장 (§7.6.2, 멱등)
+curl -X POST http://localhost:8100/api/marketplace/catalog/zip \
+  -H "Authorization: Bearer $TOKEN" \
+  -F 'files=@agent-a.zip' -F 'files=@agent-b.zip'
+# → {"assets":[{"asset_key":"agent-a",...},{"asset_key":"agent-b",...}]}
 # 카탈로그 조회
 curl http://localhost:8100/api/marketplace/catalog -H "Authorization: Bearer $TOKEN"
 # → {"assets":[{"asset_key":"cve-scanner","installed":false,"active_version":null, ...}]}
