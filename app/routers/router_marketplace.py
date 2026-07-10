@@ -16,7 +16,7 @@ import shutil
 import zipfile
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
 from app.core.config import settings
@@ -87,21 +87,29 @@ async def _active_version(asset_key: str, tenant_id: str) -> str | None:
 _MARKET_ASSETS_DIR = Path("marketplace-assets")
 
 
-def _disk_backed(asset_key: str) -> bool:
-    """디스크 `marketplace-assets/*/{key}.zip` 보유 여부(대소문자 무시) — 기본 제공 자산 판별(§7.6.6).
+# §7.6.6 v0.47: 시드 보호 = seed_assets 대상 디렉터리만 — addon(스캐폴드)·builtin 유래
+# 사용자 등록 자산은 삭제 가능해야 하므로 보호 범위에서 제외한다.
+_SEED_CATEGORIES = ("security", "utilities")
 
-    디스크 보유 자산은 삭제 불가(재기동·seed 시 재등장하므로 삭제가 무의미 + 기본 제공 보호).
-    """
-    if not _MARKET_ASSETS_DIR.exists():
-        return False
+
+def _seed_category(asset_key: str) -> str | None:
+    """시드 카탈로그 디렉터리(`marketplace-assets/{security,utilities}/{key}.zip`, 대소문자 무시)
+    보유 시 해당 카테고리명 반환 — 시드 보호 자산 판별(§7.6.6 v0.47)."""
     key = asset_key.lower()
-    for cat in _MARKET_ASSETS_DIR.iterdir():
-        if not cat.is_dir() or cat.name.startswith("."):
+    for cat_name in _SEED_CATEGORIES:
+        cat = _MARKET_ASSETS_DIR / cat_name
+        if not cat.is_dir():
             continue
         for z in cat.glob("*.zip"):
             if z.stem.lower() == key:
-                return True
-    return False
+                return cat_name
+    return None
+
+
+def _disk_backed(asset_key: str) -> bool:
+    """시드 보호 자산 여부 — 시드(security/utilities) 보유 자산은 삭제 불가
+    (seed 재실행 시 재등장하므로 삭제가 무의미 + 기본 제공 보호)."""
+    return _seed_category(asset_key) is not None
 
 
 async def _asset_out(asset: dict, tenant_id: str) -> dict:
@@ -347,7 +355,13 @@ async def delete_category(
     category: str,
     user: dict = Depends(require_role("admin", "supervisor")),
 ):
-    """사용자 카탈로그(카테고리) 일괄 삭제 — 전 자산 deletable·비설치일 때만 (§7.6.6)."""
+    """사용자 카탈로그(카테고리) 일괄 삭제 (§7.6.6 v0.47).
+
+    설치 중 자산만 차단(409). 시드 보호 자산(security/utilities 디스크 보유)이
+    사용자 카탈로그로 이동돼 있으면 삭제 대신 원 시드 카탈로그로 반환한다 —
+    사용자가 만든 카탈로그는 항상 삭제 가능. 시드 카탈로그 자체에 시드 자산이
+    남아 있으면 409(기본 제공 카탈로그 보호).
+    """
     tid = _tenant()
     rows = await fetch_all(
         f"SELECT DISTINCT asset_key FROM marketplace_assets WHERE category = {_PH} AND tenant_id = {_PH}",
@@ -358,15 +372,28 @@ async def delete_category(
     keys = [r["asset_key"] for r in rows]
     blockers: list[str] = []
     for k in keys:
-        if _disk_backed(k):
-            blockers.append(f"{k}(기본 제공)")
-        elif await _active_version(k, tid):
+        if await _active_version(k, tid):
             blockers.append(f"{k}(설치됨)")
+        elif _seed_category(k) == category:
+            blockers.append(f"{k}(기본 제공)")
     if blockers:
         raise HTTPException(409, f"삭제 불가 자산 존재: {', '.join(blockers)}")
+    deleted: list[str] = []
+    returned: list[str] = []
     for k in keys:
-        await _delete_asset_rows(k, tid)
-    return {"deleted_category": category, "deleted_assets": keys}
+        seed_cat = _seed_category(k)
+        if seed_cat:
+            # 시드 보호 자산 — 삭제 대신 원 시드 카탈로그로 반환
+            await execute_write(
+                f"UPDATE marketplace_assets SET category = {_PH}, updated_at = CURRENT_TIMESTAMP "
+                f"WHERE asset_key = {_PH} AND tenant_id = {_PH}",
+                (seed_cat, k, tid),
+            )
+            returned.append(k)
+        else:
+            await _delete_asset_rows(k, tid)
+            deleted.append(k)
+    return {"deleted_category": category, "deleted_assets": deleted, "returned_assets": returned}
 
 
 @router.post("/catalog/{asset_key}/zip", status_code=201)
@@ -448,15 +475,26 @@ def _parse_zip_meta(raw: bytes, filename: str) -> dict:
 async def register_assets_from_zips(
     files: list[UploadFile] = File(...),
     category: str = "general",
+    confirm: bool = False,
+    name: str = Form(""),
+    name_en: str = Form(""),
+    description: str = Form(""),
+    description_en: str = Form(""),
+    kind: str = Form(""),
     user: dict = Depends(require_role("admin", "supervisor")),
 ):
     """§7.6.2: ZIP 다중 등록 — 각 ZIP 의 {key}-meta.json 기반 자산 등록 + 블롭 저장(멱등).
 
-    동일 key@version 존재 시 메타·블롭 갱신. 설치 시 기존 hot-deploy 계약 그대로.
+    동일 key@version 존재 시 메타·블롭 갱신(요청 category 로 이동 포함).
+    §7.6.6: 단일 ZIP + 폼 name 입력 시 폼 값(name/description/kind)이 ZIP meta 를 덮어씀 —
+    등록 모달의 필수 입력이 실제 카탈로그 표기에 반영되도록 한다.
+    §7.6.6 v0.47: 기존 등록 asset_key 포함 시 confirm 없이는 409
+    {"code":"duplicate","assets":[…]} — 사용자가 확인(confirm=true)하면 요청 카탈로그로 이동 등록.
+    설치 시 기존 hot-deploy 계약 그대로.
     """
     tid = _tenant()
     uploader = user.get("username") or user.get("sub") or ""
-    out: list[dict] = []
+    entries: list[tuple[str, bytes, dict]] = []
     for f in files:
         if not f.filename or not f.filename.endswith(".zip"):
             raise HTTPException(400, f"ZIP 파일만 허용됩니다: {f.filename}")
@@ -465,19 +503,51 @@ async def register_assets_from_zips(
             meta = _parse_zip_meta(raw, f.filename)
         except (zipfile.BadZipFile, ValueError, KeyError) as exc:
             raise HTTPException(400, f"{f.filename}: ZIP 파싱 실패 — {exc}") from exc
+        if len(files) == 1 and name.strip():
+            _m = norm_descriptions({
+                "display_name": {"ko": name.strip(), "en": name_en.strip()},
+                "description": {"ko": description.strip(), "en": description_en.strip()},
+            })
+            meta.update(
+                name=_m["agent_names"].get("ko") or name.strip(),
+                name_en=_m["agent_names"].get("en", ""),
+                names=_m["agent_names"],
+                description=_m["description"],
+                descriptions=_m["descriptions"],
+            )
+        entries.append((f.filename, raw, meta))
+    if not confirm:
+        # §7.6.6 v0.47: 중복 pre-check — 이미 등록된 key 는 사용자 확인 후에만 재등록(이동)
+        dups: list[dict] = []
+        for _, _, meta in entries:
+            row = await fetch_one(
+                f"SELECT name, category FROM marketplace_assets "
+                f"WHERE asset_key = {_PH} AND tenant_id = {_PH} ORDER BY version DESC LIMIT 1",
+                (meta["asset_key"], tid),
+            )
+            if row:
+                dups.append({"asset_key": meta["asset_key"],
+                             "name": row["name"], "category": row["category"]})
+        if dups:
+            raise HTTPException(409, {"code": "duplicate", "assets": dups})
+    asset_kind = kind if (len(files) == 1 and kind in ASSET_KINDS) else "agent"
+    out: list[dict] = []
+    for filename, raw, meta in entries:
         checksum = hashlib.sha256(raw).hexdigest()
         exists = await fetch_one(
             f"SELECT id FROM marketplace_assets WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
             (meta["asset_key"], meta["version"], tid),
         )
         if exists:
+            # 요청 category 반영 — 기존 key@version 재등록 시 지정 카탈로그로 이동
             await execute_write(
                 f"UPDATE marketplace_assets SET name = {_PH}, name_en = {_PH}, description = {_PH}, "
-                f"names = {_PH}, descriptions = {_PH}, checksum = {_PH}, updated_at = CURRENT_TIMESTAMP "
+                f"names = {_PH}, descriptions = {_PH}, category = {_PH}, checksum = {_PH}, "
+                f"updated_at = CURRENT_TIMESTAMP "
                 f"WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
                 (meta["name"], meta["name_en"], meta["description"],
                  lang_json(meta["names"]), lang_json(meta["descriptions"]),
-                 checksum, meta["asset_key"], meta["version"], tid),
+                 category, checksum, meta["asset_key"], meta["version"], tid),
             )
         else:
             await execute_insert(
@@ -485,7 +555,7 @@ async def register_assets_from_zips(
                 f"(tenant_id, asset_key, version, kind, name, name_en, description, names, descriptions, category, "
                 f" min_platform_version, governance, required_env, checksum, source) "
                 f"VALUES ({','.join([_PH] * 15)})",
-                (tid, meta["asset_key"], meta["version"], "agent", meta["name"], meta["name_en"],
+                (tid, meta["asset_key"], meta["version"], asset_kind, meta["name"], meta["name_en"],
                  meta["description"], lang_json(meta["names"]), lang_json(meta["descriptions"]),
                  category, "0.1.0", "", "", checksum, "local"),
             )
@@ -496,7 +566,7 @@ async def register_assets_from_zips(
         await execute_insert(
             f"INSERT INTO marketplace_asset_blobs (tenant_id, asset_key, version, filename, checksum, blob, uploaded_by) "
             f"VALUES ({_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH})",
-            (tid, meta["asset_key"], meta["version"], f.filename, checksum, raw, uploader),
+            (tid, meta["asset_key"], meta["version"], filename, checksum, raw, uploader),
         )
         asset = await fetch_one(
             f"SELECT * FROM marketplace_assets WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",

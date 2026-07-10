@@ -72,14 +72,29 @@ export async function uploadAssetZip(assetKey: string, file: File, version?: str
 }
 
 // §7.6.2: ZIP 다중 등록 — 각 ZIP 의 {key}-meta.json 기반 자산 등록 + 블롭 저장
-export async function registerAssetZips(files: File[], category?: string): Promise<MarketplaceAsset[]> {
+export async function registerAssetZips(
+  files: File[],
+  category?: string,
+  // §7.6.6: 단일 ZIP 등록 시 폼 입력(name/description/kind)이 ZIP meta 를 덮어씀
+  fields?: { name?: string; name_en?: string; description?: string; description_en?: string; kind?: string },
+  // §7.6.6 v0.47: 기존 등록 key 존재 시 confirm 없이는 409 duplicate — 사용자 확인 후 true 로 재요청
+  confirm = false,
+): Promise<MarketplaceAsset[]> {
   const form = new FormData();
   files.forEach((f) => form.append("files", f));
+  Object.entries(fields ?? {}).forEach(([k, v]) => { if (v?.trim()) form.append(k, v.trim()); });
   const { data } = await client.post<{ assets: MarketplaceAsset[] }>("/marketplace/catalog/zip", form, {
-    params: category ? { category } : undefined,
+    params: { ...(category ? { category } : {}), ...(confirm ? { confirm: true } : {}) },
     headers: { "Content-Type": "multipart/form-data" },
   });
   return data.assets ?? [];
+}
+
+// §7.6.6 v0.47: 중복 등록 409 detail — {"code":"duplicate","assets":[…]}
+export interface DuplicateAssetInfo {
+  asset_key: string;
+  name: string;
+  category: string;
 }
 
 // §7.6.6: 사용자 등록 자산 삭제 (디스크 미보유·비설치만 — 서버 검증)

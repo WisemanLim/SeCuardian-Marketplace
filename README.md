@@ -30,6 +30,10 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
+> **중복 등록 사용자 확인 + 시드 보호 범위 축소 + 카탈로그 삭제 시 시드 반환(impl/51·물리 `test/impl/49`, §7.6.6 v0.47)**: ① 이미 등록된 asset_key 를 다시 등록하면 `confirm` 없이는 409 `{"code":"duplicate","assets":[…]}` — UI 가 커스텀 ConfirmDialog 로 "이미 등록된 자산(현재 카탈로그)" 정보를 보여주고 **등록 여부는 사용자가 판단**, 확인 시 요청 카탈로그로 이동 등록 ② `deletable` 판정을 시드 카탈로그(`marketplace-assets/{security,utilities}`) 보유로 한정 — **`addon/`(스캐폴드)·`builtin/` 유래라도 사용자가 등록한 자산은 삭제 가능** ③ 카탈로그 삭제는 설치 중 자산만 차단 — 시드 보호 자산이 이동돼 있으면 삭제 대신 원 시드 카탈로그로 반환(`returned_assets`) → **사용자 카탈로그는 항상 삭제 가능**.
+>
+> **자산 등록 회귀 수정 — 카탈로그(category)·폼 입력 반영(impl/50·물리 `test/impl/48`, §7.6.6)**: ① `POST /api/marketplace/catalog/zip` 이 동일 key@version 재등록(UPDATE 분기) 시에도 **요청 `category` 를 반영** — 기존 자산 ZIP 을 새 카탈로그명으로 등록하면 해당 카탈로그로 이동·생성된다(impl/49 ZIP-only 통합에서 카탈로그가 생성되지 않던 회귀 수정) ② **단일 ZIP + 폼 입력 시 폼 값(자산명/설명/종류, ko·en)이 ZIP meta 를 덮어씀** — 등록 모달의 필수 입력이 실제 카탈로그 표기에 반영. 다중 ZIP·폼 미전송(레거시 API 호출)은 종전대로 ZIP meta 우선.
+>
 > **자산 등록 ZIP 필수 + 사용자 자산·카탈로그 삭제(impl/49·물리 `test/impl/47`, §7.6.6)**: ① `자산 등록`·카테고리 `+ 추가` 모달은 이제 **addon ZIP 1개 이상 첨부 필수** — 실제 에이전트 파일 없는 빈 자산 등록 차단(메타-only `POST /api/marketplace/catalog` 는 AI 어시스턴트·프로그래매틱 경로용 유지) ② 카탈로그 응답에 `deletable`(디스크 `marketplace-assets/*/{key}.zip` 미보유 = 사용자 등록 자산) 노출 ③ `DELETE /api/marketplace/catalog/{asset_key}` — deletable·비설치 자산만(디스크 보유 403·설치 중 409), assets 전 버전·blobs·installs 이력·marketplace config 행 정리 ④ `DELETE /api/marketplace/catalog-category/{category}` — 전 자산 deletable·비설치 시 카탈로그 일괄 삭제 ⑤ UI: 미설치 사용자 자산 카드 `삭제` 버튼 + 전 자산 deletable 카테고리 헤더 `카탈로그 삭제` 버튼(admin) — 확인은 커스텀 ConfirmDialog(R18-1) ⑥ 회귀 수정: `seed_assets` 가 impl/62 의 `*_worker` 메타 디렉터리를 설치형 자산으로 오등록하던 결함 스킵 처리(R22-4).
 >
 > **Worker 설치 가이드 동일 적용 + 카탈로그 카드덱 개편 + 가드레일 카탈로그명 다국어(impl/48·물리 `test/impl/46`)**: ① SeCuardian impl/63 동일 적용 — `/api/addon-agents/{key}/worker-{guide,package}` 포팅(메타 = `deployed/{key}` → `marketplace-assets/*/{key}` 폴백, 패키지 zip = marketplace-assets 카테고리 전역), 활성화 응답 worker 요약 + list_addons `has_worker`, MCP 가이드 톤 WorkerGuideModal + 카드 상시 가이드 아이콘(WorkerCorner) ② 자산 카탈로그 — 상단 설명 블록 제거, 설치여부 배지 = 자산명 옆·설치/해제 버튼 = 카드 우상단, 카테고리별 카드 색상(security=보라·utilities=파랑·general=초록) ③ 가드레일 도메인 카탈로그명 다국어 — `guardrails_domain_catalog.display_name_en`(init+멱등 ALTER) 을 `sync_catalog`·API·`pickDescription` 으로 관통, English 모드 영문 표시.
@@ -118,6 +122,16 @@ test/dev-env/            개발환경 표준 검증(최초 1회)
 ```
 
 **서비스(컨테이너)**: `postgres:17` · `redis:7.4` · `ollama` · `api`(profile `app`) · `web`(profile `web`).
+
+### 2.1 자산·Addon 에이전트 파일 저장 경로
+
+| 대상 | 저장 위치 | 비고 |
+|---|---|---|
+| 사용자 자산 등록 ZIP (`POST /api/marketplace/catalog/zip`) | DB **`marketplace_asset_blobs`** 테이블 (BLOB) | 파일시스템에 저장하지 않음. key@version 당 1개 — 재등록 시 블롭 교체 |
+| 기본 제공(시드) 자산 ZIP·메타 | `marketplace-assets/{security,utilities}/{key}.zip` + `{key}/{key}-meta.json` | `make seed-assets` 가 카탈로그로 시드. 이 디렉터리에 ZIP 이 있는 key 는 `deletable=false`(시드 보호) |
+| 스캐폴드 템플릿 / 코어 내장 | `marketplace-assets/addon/` / `marketplace-assets/builtin/` | 카탈로그 시드 대상 아님 — 동일 key 라도 **사용자가 UI 로 등록한 자산은 삭제 가능**(§7.6.6 v0.47) |
+| 설치(hot-deploy) 백엔드 파일 | **`addon-agents/deployed/{key}/`** (`{key}-app.py`·`{key}-meta.json` 등) | 설치 시 등록 블롭(또는 시드 ZIP)을 압축 해제. 해제/자산 삭제 시 제거. 컨테이너 실행 시 bind-mount |
+| Addon 프론트 화면(TSX) | `front/src/pages/addon/deployed/{key}.tsx` | front 포함 에이전트 설치 시 생성, 해제 시 삭제 |
 
 ---
 

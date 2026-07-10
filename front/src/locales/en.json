@@ -131,6 +131,8 @@
     "assetKeyAuto": "asset_key is auto-assigned from name",
     "assetCategory": "Catalog (category)",
     "assetCategoryHint": "Entering a new category name creates that catalog (default: general)",
+    "assetDupTitle": "Asset already registered",
+    "assetDupConfirm": "The following assets are already in the catalog: {list}\nContinuing will move them to the selected catalog. Register anyway?",
     "installedTab": "Agents (Installed)"
   },
   "users": {

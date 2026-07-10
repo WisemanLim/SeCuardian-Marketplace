@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { registerAssetZips, ASSET_KINDS } from "../../api/marketplace";
+import { registerAssetZips, ASSET_KINDS, DuplicateAssetInfo } from "../../api/marketplace";
 import { useLocale } from "../../hooks/useLocale";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 // 마켓플레이스 자산 등록 모달 (§7.6.2·§7.6.3) — 두 진입점:
 //  - 상단 '자산 등록' 버튼(category 미지정): 카탈로그(신규 category 자유 입력) 생성 + 자산 등록
@@ -18,8 +19,10 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
   const [zipFiles, setZipFiles] = useState<File[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  // §7.6.6 v0.47: 이미 등록된 asset_key — 정보를 보여주고 등록(이동) 여부는 사용자가 판단
+  const [dupAssets, setDupAssets] = useState<DuplicateAssetInfo[] | null>(null);
 
-  async function submit() {
+  async function submit(confirmDup = false) {
     setError("");
     // 필수값: 자산명·설명·ZIP(§7.6.6 — 메타-only 빈 자산 등록 차단)
     if (!form.name.trim()) { setError(t("agent.assetNameRequired")); return; }
@@ -28,12 +31,22 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
     setBusy(true);
     try {
       const cat = form.category.trim() || "general";
-      await registerAssetZips(zipFiles, cat); // ZIP 별 자산 등록 + 블롭 저장 (다중)
+      // ZIP 별 자산 등록 + 블롭 저장 (다중) — 단일 ZIP 이면 폼 입력이 meta 를 덮어씀 (§7.6.6)
+      await registerAssetZips(zipFiles, cat, {
+        name: form.name, name_en: form.name_en,
+        description: form.description, description_en: form.description_en,
+        kind: form.kind,
+      }, confirmDup);
       window.dispatchEvent(new CustomEvent("marketplaceChanged")); // 카탈로그 즉시 갱신
       onClose();
     } catch (e) {
-      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg || t("agent.assetRegisterFailed"));
+      const detail = (e as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
+      const dup = detail as { code?: string; assets?: DuplicateAssetInfo[] };
+      if (dup?.code === "duplicate" && dup.assets?.length) {
+        setDupAssets(dup.assets); // 커스텀 ConfirmDialog 로 사용자 확인 (R18-1)
+      } else {
+        setError(typeof detail === "string" ? detail : t("agent.assetRegisterFailed"));
+      }
     } finally {
       setBusy(false);
     }
@@ -113,12 +126,27 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
             )}
           </label>
           {error && <p role="alert" className="text-xs text-red-500 col-span-2">{error}</p>}
-          <button onClick={submit} disabled={busy}
+          <button onClick={() => submit()} disabled={busy}
             className="col-span-2 text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
             {t("agent.assetRegisterSubmit")}
           </button>
         </div>
       </div>
+      {/* §7.6.6 v0.47: 동일 asset_key 중복 — 이미 등록됨 정보 표시, 등록(이동) 여부는 사용자 판단 (R18-1) */}
+      {dupAssets && (
+        <ConfirmDialog
+          title={t("agent.assetDupTitle")}
+          message={t("agent.assetDupConfirm").replace(
+            "{list}",
+            dupAssets.map((d) => `${d.name || d.asset_key} (${d.category})`).join(", "),
+          )}
+          confirmLabel={t("agent.assetRegisterSubmit")}
+          cancelLabel={t("common.cancel")}
+          danger={false}
+          onConfirm={() => { setDupAssets(null); submit(true); }}
+          onCancel={() => setDupAssets(null)}
+        />
+      )}
     </div>
   );
 }

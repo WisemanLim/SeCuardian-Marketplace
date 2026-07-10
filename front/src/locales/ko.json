@@ -131,6 +131,8 @@
     "assetKeyAuto": "asset_key 는 name 으로 자동부여됩니다",
     "assetCategory": "카탈로그 (category)",
     "assetCategoryHint": "새 카테고리명 입력 시 해당 카탈로그가 생성됩니다 (기본 general)",
+    "assetDupTitle": "이미 등록된 자산",
+    "assetDupConfirm": "다음 자산이 이미 카탈로그에 등록되어 있습니다: {list}\n계속하면 선택한 카탈로그로 이동 등록됩니다. 등록하시겠습니까?",
     "installedTab": "에이전트(설치됨)"
   },
   "users": {

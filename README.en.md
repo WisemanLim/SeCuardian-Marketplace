@@ -31,6 +31,10 @@ bases (RAG).
 
 > All 5 built-in agents have working backend+frontend (tests PASS). 🟡 = extension items remain (remote registry, React Flow canvas, pgvector, MCP proxy, etc). Details: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
+> **Duplicate-registration user confirmation + narrower seed protection + seed-asset return on catalog delete (impl/51, physical `test/impl/49`, §7.6.6 v0.47)**: ① re-registering an existing asset_key without `confirm` now returns 409 `{"code":"duplicate","assets":[…]}` — the UI shows an "already registered (current catalog)" custom ConfirmDialog and **the user decides**; on confirm the asset is move-registered into the requested catalog ② `deletable` is now limited to seed-catalog disk presence (`marketplace-assets/{security,utilities}`) — **assets registered by the user remain deletable even when the same key exists under `addon/` (scaffold) or `builtin/`** ③ catalog deletion is blocked only by installed assets — moved-in seed-protected assets are returned to their original seed catalog (`returned_assets`) instead of blocking → **user-created catalogs are always deletable**.
+>
+> **Asset registration regression fix — catalog (category) & form inputs applied (impl/50, physical `test/impl/48`, §7.6.6)**: ① `POST /api/marketplace/catalog/zip` now applies the requested **`category` even on re-registration of an existing key@version (UPDATE branch)** — registering an existing asset ZIP under a new catalog name moves it there and creates the catalog (fixes the impl/49 ZIP-only regression where the catalog never appeared) ② with a **single ZIP, the form inputs (name/description/kind, ko·en) override the ZIP meta** — the modal's required fields now show up in the catalog. Multi-ZIP and form-less (legacy API) calls keep the previous ZIP-meta-first behavior.
+>
 > **Asset registration requires ZIP + user asset/catalog deletion (impl/49, physical `test/impl/47`, §7.6.6)**: ① the `Register asset` / category `+ Add` modal now **requires at least one addon ZIP** — blocks empty assets with no actual agent files (metadata-only `POST /api/marketplace/catalog` is kept for the AI assistant / programmatic path) ② the catalog response exposes `deletable` (no `marketplace-assets/*/{key}.zip` on disk = user-registered asset) ③ `DELETE /api/marketplace/catalog/{asset_key}` — deletable & not-installed assets only (403 for disk-backed, 409 while installed); removes all asset versions, blobs, install history, and the marketplace config row ④ `DELETE /api/marketplace/catalog-category/{category}` — bulk-deletes a catalog when every asset in it is deletable & not installed ⑤ UI: `Delete` button on uninstalled user asset cards + `Delete catalog` button on category headers where all assets are deletable (admin) — confirmation via the custom ConfirmDialog (R18-1) ⑥ regression fix: `seed_assets` no longer registers impl/62's `*_worker` meta directories as installable assets (R22-4).
 >
 > **Worker install guide parity + asset catalog card-deck rework + guardrails catalog-name i18n (impl/48, physical `test/impl/46`)**: ① same as SeCuardian impl/63 — ported `/api/addon-agents/{key}/worker-{guide,package}` (meta resolved from `deployed/{key}` with `marketplace-assets/*/{key}` fallback; package zips searched across marketplace-assets categories), `worker` summary in the activation response + `has_worker` in list_addons, MCP-guide-toned WorkerGuideModal + always-visible guide icon (WorkerCorner) on agent cards ② asset catalog — removed the header description block, moved the install-state badge next to the asset name and the install/uninstall button to the card's top-right, per-category card tones (security=violet, utilities=blue, general=emerald) ③ guardrails domain catalog names now localized — `guardrails_domain_catalog.display_name_en` (init + idempotent ALTER) flows through `sync_catalog`, the API, and `pickDescription`, so English mode shows English domain names.
@@ -119,6 +123,16 @@ test/dev-env/            dev-env standard verification (once)
 ```
 
 **Services (containers)**: `postgres:17` · `redis:7.4` · `ollama` · `api` (profile `app`) · `web` (profile `web`).
+
+### 2.1 Asset & Addon-agent file storage paths
+
+| Target | Location | Notes |
+|---|---|---|
+| User asset registration ZIP (`POST /api/marketplace/catalog/zip`) | DB table **`marketplace_asset_blobs`** (BLOB) | Not stored on the filesystem. One blob per key@version — replaced on re-registration |
+| Bundled (seed) asset ZIP & meta | `marketplace-assets/{security,utilities}/{key}.zip` + `{key}/{key}-meta.json` | Seeded into the catalog by `make seed-assets`. Keys with a ZIP here are `deletable=false` (seed-protected) |
+| Scaffold templates / core built-ins | `marketplace-assets/addon/` / `marketplace-assets/builtin/` | Not seeded into the catalog — even for the same key, **assets registered by the user via the UI remain deletable** (§7.6.6 v0.47) |
+| Installed (hot-deploy) backend files | **`addon-agents/deployed/{key}/`** (`{key}-app.py`, `{key}-meta.json`, …) | Extracted from the registered blob (or seed ZIP) on install; removed on uninstall/asset delete. Bind-mounted when running in containers |
+| Addon frontend page (TSX) | `front/src/pages/addon/deployed/{key}.tsx` | Created when installing an agent with a frontend, removed on uninstall |
 
 ---
 

@@ -691,15 +691,26 @@ TENANT_DEFAULT_ID=default                  # off 모드일 때 사용할 고정 
    `POST /api/marketplace/catalog` 는 프로그래매틱/AI 어시스턴트(call_api) 경로용으로
    유지하되 UI 등록 경로에서는 사용하지 않는다.
 2. **사용자 자산 삭제**: `DELETE /api/marketplace/catalog/{asset_key}` (admin) —
-   **디스크 비보유 자산만**(카탈로그 응답 `deletable=true`, `marketplace-assets/*/{key}.zip`
-   대소문자 무시 부재 기준) 허용. 활성 설치 존재 시 409(먼저 해제). 삭제 범위 =
-   `marketplace_assets`(전 버전)·`marketplace_asset_blobs`·`marketplace_installs` 이력·
-   marketplace 설치가 만든 `tbl_agent_config` 행(LOWER 매칭).
-   디스크 보유 자산(기본 제공 security·utilities 등)은 403.
+   **시드 비보호 자산만**(카탈로그 응답 `deletable=true`) 허용. 활성 설치 존재 시 409(먼저 해제).
+   삭제 범위 = `marketplace_assets`(전 버전)·`marketplace_asset_blobs`·`marketplace_installs` 이력·
+   marketplace 설치가 만든 `tbl_agent_config` 행(LOWER 매칭). 시드 보호 자산은 403.
+   **시드 보호 기준(v0.47 개정, 사용자 요구 2026-07-10)**: `deletable=false` 는
+   **시드 카탈로그 디렉터리(`marketplace-assets/{security,utilities}/{key}.zip`, 대소문자 무시)
+   보유 자산만** — `addon/`(스캐폴드 템플릿)·`builtin/` 은 카탈로그 시드 대상이 아니므로,
+   해당 디렉터리에 동일 key ZIP 이 있어도 **사용자가 UI 로 등록한 자산은 삭제 가능**하다.
 3. **카탈로그(카테고리) 삭제**: `DELETE /api/marketplace/catalog-category/{category}` (admin) —
-   해당 카테고리의 **모든 자산이 deletable** 하고 활성 설치가 없을 때만 일괄 삭제(아니면 409
-   + 차단 사유 목록). UI: 카테고리 헤더에 전 자산 deletable 일 때만 `카탈로그 삭제` 버튼,
+   활성 설치 자산이 있으면 409(먼저 해제). **시드 보호 자산이 사용자 카탈로그로 이동돼 있으면
+   삭제 대신 원래 시드 카탈로그(security/utilities)로 반환**하고 나머지는 일괄 삭제 —
+   사용자가 만든 카탈로그는 설치 중 자산만 없으면 항상 삭제 가능(v0.47 개정).
+   시드 카탈로그 자체(카테고리 = 시드 디렉터리명)에 시드 자산이 남아 있으면 409.
+   UI: 카테고리 헤더에 전 자산 deletable 일 때만 `카탈로그 삭제` 버튼,
    카드에는 미설치·deletable 자산에 `삭제` 버튼.
+4. **동일 asset_key 중복 등록 확인(v0.47 신설, 사용자 요구 2026-07-10)**:
+   `POST /api/marketplace/catalog/zip` 은 첨부 ZIP 의 asset_key 가 이미 카탈로그에 존재하면
+   `confirm` 파라미터 없이 **409 + `{"code":"duplicate","assets":[{asset_key,name,category}…]}`** 반환.
+   UI 는 이를 받아 커스텀 ConfirmDialog(R18-1)로 "이미 등록된 자산(현재 카탈로그 표시)" 정보를
+   보여주고, 사용자가 확인하면 `confirm=true` 로 재요청 — 자산은 요청 카탈로그로 **이동 등록**된다
+   (`UNIQUE(tenant_id, asset_key, version)` 유지, 복제 아님). 등록 여부 판단 주체 = 사용자.
 
 ### 7.7 Playground (F-PG)
 
@@ -1121,6 +1132,8 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-10 | v0.47 | **impl/51(물리 `test/impl/49`) — §7.6.6 개정: 중복 등록 사용자 확인 + 시드 보호 범위 축소 + 카탈로그 삭제 시 시드 자산 반환**(사용자 요구: ① 동일 에이전트도 별도 카탈로그로 등록 가능해야 — 이미 등록됨 정보를 보여주고 등록 여부는 사용자가 판단 ② `marketplace-assets/addon` 유래라도 사용자가 카탈로그 생성하며 등록한 자산은 삭제 가능해야). 수정 = ① `POST /catalog/zip` 중복 pre-check — `confirm` 없이 기존 key 존재 시 409 `{"code":"duplicate","assets":[…]}`, UI ConfirmDialog 확인 후 `confirm=true` 재요청 시 요청 카탈로그로 이동 등록 ② `deletable` 판정을 시드 카탈로그(`marketplace-assets/{security,utilities}`) 보유로 한정 — addon/builtin 유래 사용자 등록 자산 삭제 가능 ③ `DELETE /catalog-category` — 설치 중만 차단, 시드 보호 자산은 삭제 대신 원 시드 카탈로그로 반환(`returned_assets` 응답) → 사용자 카탈로그 항상 삭제 가능 | app/routers/router_marketplace.py, front(api/marketplace.ts·AssetRegisterModal.tsx·locales), PRD §7.6.6, README(.en), test/impl/49 |
+| 2026-07-10 | v0.46 | **impl/50(물리 `test/impl/48`) — §7.6.6 회귀 수정: 자산 등록 시 카탈로그(category)·폼 입력 미반영**(사용자 결함 보고: 새 카탈로그명으로 등록해도 카탈로그가 생성되지 않고 등록 에이전트 확인 불가 — v0.45 ZIP-only 통합의 회귀). 원인 = ① `POST /catalog/zip` UPDATE 분기(동일 key@version 존재)가 `category` 를 갱신하지 않음 — 기존 자산 ZIP(예: Board.zip) 재등록 시 제자리 갱신만 발생 ② 모달 필수 입력(자산명·설명·종류)이 서버로 전송되지 않아 ZIP meta 가 항상 우선. 수정 = ① UPDATE 분기에 `category` 반영(요청 카탈로그로 이동, seed 는 category 불변이라 재시드에 안정) ② 단일 ZIP + 폼 name 입력 시 폼 값(name/name_en/description/description_en/kind)이 meta 를 덮어씀 — 다중 ZIP·폼 미전송(레거시)은 종전 meta 우선 유지 | app/routers/router_marketplace.py, front(api/marketplace.ts·AssetRegisterModal.tsx), test/impl/48 |
 | 2026-07-10 | v0.45 | **impl/49(물리 `test/impl/47`) — §7.6.6 신설: 자산 등록 ZIP 필수 + 사용자 자산·카탈로그 삭제**(사용자 결함 보고: ZIP 0개로도 등록됨 + 사용자 등록 자산 삭제 수단 없음). ① 등록 모달(자산 등록·`+ 추가` 공용) ZIP 1개 이상 필수 검증 — 메타-only `POST /catalog` 는 AI 어시스턴트(call_api)·프로그래매틱 경로용 유지 ② `deletable`(디스크 `marketplace-assets/*/{key}.zip` 대소문자 무시 부재) 카탈로그 응답 노출 ③ `DELETE /catalog/{asset_key}` — deletable+비설치만, assets(전 버전)·blobs·installs·config 행 정리 ④ `DELETE /catalog-category/{category}` — 전 자산 deletable+비설치 시 일괄 삭제 ⑤ 카드 `삭제`·카테고리 헤더 `카탈로그 삭제` 버튼(admin) — 삭제 확인은 browser confirm 이 아닌 **커스텀 ConfirmDialog**(R18-1, 사용자 추가 요구) ⑤-2 등록 모달 UX(사용자 추가 요구) — 입력 순서 카탈로그→name→종류→이름(영문)…, '(선택)' 라벨 제거 + 필수 항목(ZIP) 적색 `*` 표시 ⑥ 회귀 수정 — `seed_assets` 가 impl/62 `*_worker` 메타 디렉터리를 설치형 자산으로 오등록(R22-4 위반, impl/39 C1 FAIL) → 스킵 처리 | app/routers/router_marketplace.py, scripts/seed_assets.py, front(marketplace.ts·MarketplacePage.tsx·AssetRegisterModal.tsx·locales), PRD §7.6.6, README(.en), test/impl/47 |
 | 2026-07-10 | v0.44 | **페이지 상단 설명 폰트 통일**(사용자 요구: 마켓플레이스 상단 설명 스타일 기준). 대시보드·워크플로우·RAG·플레이그라운드·가드레일 5개 페이지의 `pageDesc` 를 `text-xs text-gray-500` → `text-sm text-gray-500 dark:text-gray-400`(R18 표준, SeCuardian 과 동일) 통일. 브라우저 실측 14px 확인 | front/src/pages/{dashboard/DashboardPage,workflow/WorkflowPage,rag/RagPage,playground/PlaygroundPage,guardrails/GuardrailsPage}.tsx |
 | 2026-07-10 | v0.43 | **impl/48 근본 원인 수정 — 구버전 배포본 메타가 worker 폴백 차단**(사용자 재보고: 캐시 삭제·재기동에도 미반영 — 헤드리스 브라우저 실증으로 확정). 원인 = 카탈로그 설치가 `marketplace_asset_blobs` 의 impl/62 이전 zip blob 을 배포 → deployed meta 에 worker 블록 없음 + `_agent_worker_meta` 가 deployed meta 발견 시 worker 없어도 조기 None 반환(marketplace-assets 폴백 불가). 수정 = ① worker 없는 meta 는 다음 base 로 폴백(`break`, SeCuardian 동일 적용) ② 디스크 zip 기준 blob 20종 멱등 갱신 + vasca-cve 재설치. 실증 = headless 브라우저에서 설치됨 탭 VASCA 카드 아이콘·가이드 모달 렌더 스크린샷 확보 | app/routers/router_addon_agent.py, SeCuardian(app/routers/router_addon_agent.py), marketplace_asset_blobs(데이터 20종), test/impl/46 |

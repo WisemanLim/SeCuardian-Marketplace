@@ -81,9 +81,10 @@ with TestClient(m.app) as c:
     r = c.delete("/api/marketplace/catalog/del-b", headers=UH)
     chk(r.status_code == 403, "TC-47-03 user role -> 403")
 
-    # TC-47-05: 카테고리 삭제 — 디스크 보유 포함 409, 사용자 카테고리 200
+    # TC-47-05(§7.6.6 v0.47 개정): 시드 key 포함 사용자 카테고리 → 시드 카탈로그 반환 + 200
     r = c.delete("/api/marketplace/catalog-category/diskcat", headers=H)
-    chk(r.status_code == 409, f"TC-47-05 disk-backed category -> 409 ({r.status_code})")
+    chk(r.status_code == 200 and r.json().get("returned_assets") == ["vasca-cve"],
+        f"TC-47-05 seed-key category -> returned+200 ({r.status_code} {r.text[:80]})")
     r = c.delete("/api/marketplace/catalog-category/usercat", headers=H)
     chk(r.status_code == 200 and r.json()["deleted_assets"] == ["del-b"],
         f"TC-47-05 user category deleted ({r.status_code} {r.text[:100]})")
