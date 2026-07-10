@@ -19,8 +19,8 @@
 - impl/36 (`pytest`) — 10 passed / 1 failed:
   - 갱신: _EXPECTED addon 6종·utilities 5종, TC-36-04 UserManager download 200,
     TC-36-01 `*_worker` 메타 디렉터리 필터(R22-4 정합)
-  - **잔존 FAIL = TC-36-06 (기존 결함, 본 건 무관)**: `builtin/guardrails.zip` 에
-    `data/guardrails/*.json` 구조 누락 — 이동 전 HEAD 에서도 동일 실패 확인(사전 존재). 별도 수정 필요.
+  - ~~잔존 FAIL = TC-36-06 (기존 결함, 본 건 무관)~~ → **후속 수정 완료(PRD v0.49)**:
+    `builtin/guardrails.zip` 재패키징(data/guardrails 24종 포함, 28 엔트리) — impl/36 전체 11/11 PASS.
 - impl/40 — ALL PASS (16): B1 utilities 5+1, C1 시드 5종 부분집합,
   D1 `registerAssetZips(zipFiles, cat,` (impl/48 호출부 다행화 반영)
 - impl/45 — PASS 34/34: UserManager 카테고리 utilities → addon
