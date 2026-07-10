@@ -445,6 +445,33 @@ POST /api/marketplace-remote/install/{key}   # 다운로드→체크섬/서명 �
 5. 설치 시 체크섬(기본) + 서명(엔터프라이즈 옵션) 검증 통과해야 hot-deploy 진행.
 6. 폐쇄망은 `MARKETPLACE_REMOTE_ENABLED=false` 유지, 필요 자산은 수동 반입 절차(에어갭 모드) 사용.
 
+#### 7.3.5 Marketplace-host 공개 카탈로그 API(host 측, impl/47 · 물리 test/impl/45) — 사용자 요구(2026-07-10)
+
+**목표**: SeCMP 가 **host(레지스트리 서버)** 로서, 외부 SeCuardian 인스턴스가 addon agent 를
+카테고리별로 조회·다운로드·배포할 수 있는 공개 카탈로그 API 를 제공한다. **DB 설치 여부와 무관하게
+`marketplace-assets/` 파일시스템의 제공 자산 전량**(addon·builtin·security·utilities …)이 대상이다
+(§7.3.1~7.3.4 의 remote **클라이언트**와 대칭 — 종전에는 host 측 서빙 API 가 없었음).
+
+`app/routers/router_marketplace_host.py` (`/api/marketplace-host`):
+```
+GET /api/marketplace-host/ping               # 연결성/인증 확인 {ok, service, categories, total}
+GET /api/marketplace-host/catalog            # 전 자산 목록 — ?category= 필터, groups(카테고리별)+assets 반환
+GET /api/marketplace-host/catalog/{key}      # 자산 상세 (version·checksum·download_path 포함)
+GET /api/marketplace-host/download/{key}     # 자산 ZIP 다운로드 (FileResponse)
+```
+
+- **소스 = `marketplace-assets/{category}/{Name}.zip`** + 동명 디렉터리의 `{Name}-meta.json`
+  (display_name/description 다국어 dict — §7.11.2-5 `norm_descriptions` 정규화). `asset_key` = ZIP 스템.
+- **설치유무 무관**: `marketplace_installs`/`tbl_addon_agents` 를 참조하지 않는다 — 배포 가능한
+  제공 자산 전량이 항상 노출된다(레지스트리 계약).
+- `checksum` = ZIP SHA256(파일 mtime 기반 캐시) — 클라이언트 다운로드 검증용.
+  `download_path` = `/download/{key}` (클라이언트가 base URL 에 이어붙임 — §7.3.3 원격 계약과 동일 형식).
+- **인증**: `.env.*` `MARKETPLACE_HOST_API_KEY` 설정 시 `Authorization: Bearer <키>` 필수(불일치 401),
+  미설정 시 개방(폐쇄망 온프렘 기본) — 운영(staging/prod)은 키 설정 권장.
+- 클라이언트 측(SeCuardian): `.env.*` `MARKETPLACE_{HOST,PORT,BASE_URL,API_KEY}` 로 접속 —
+  SeCuardian PRD §21 (R21) 참조. 기존 §7.3 remote 클라이언트(`/api/marketplace-remote`)도
+  `MARKETPLACE_HOST_URL=http://<host>:<port>/api/marketplace-host` 로 지정하면 본 API 를 그대로 소비 가능.
+
 ### 7.4 멀티테넌시 격리 (`.env.*` 기반 확장형)
 
 **목표**: 1차 출시는 **단일 테넌트(off)** 를 기본으로 하되, `.env.*` 설정만으로 **네임스페이스 격리 → 물리 격리**까지 재구성 코드 변경 없이 확장 가능하게 설계.
@@ -1073,6 +1100,7 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-10 | v0.40 | **impl/47(물리 `test/impl/45`) — §7.3.5 신설: Marketplace-host 공개 카탈로그 API**(사용자 요구: "SeCuardian addon agent 배포 방식 scaffold·zip·marketplace 3종 확장 — SeCMP 는 카테고리별 자산 목록을 설치유무 무관 전량 제공, 선택 배포 가능해야"). ① `router_marketplace_host.py` 신설(`/api/marketplace-host`) — ping/catalog(카테고리 groups+assets, `?category=` 필터)/catalog/{key}/download/{key}. 소스 = `marketplace-assets/{category}/{Name}.zip` 파일시스템 전량(installs/addon DB 미참조) ② `checksum`=ZIP SHA256(mtime 캐시)·`download_path` — §7.3.3 원격 클라이언트 계약 호환 ③ 인증 `MARKETPLACE_HOST_API_KEY`(설정 시 Bearer 필수, 미설정 개방) — config.py + `.env.*` 등재 ④ 클라이언트 측 구현은 SeCuardian PRD §21(R21, test/impl/61) | app/routers/router_marketplace_host.py 신규, app/core/config.py, app/main.py, .env.example, .env.{local,dev,staging,prod}, README(.en), test/impl/45 |
 | 2026-07-10 | v0.39 | **impl/46(물리 `test/impl/44`) — §7.11.2-5 확장: 자산 계층 다국어 dict 일원화 + 설치됨 탭 UserManager 중복 해소**(사용자 결함 보고: "일부만 dict 적용·카탈로그 카드 raw repr 노출·UserManager 2중 표시" + 설계 지침: "split 컬럼(description_en) 금지 — `{'ko','en'}` key:value 데이터 + 공통 파싱 함수로 언어 확장 시 코드 수정 없어야 함"). ① 전 자산 meta.json 29종 `display_name`/`description` = `{"ko","en"}` dict 통일 + zip 재빌드 ② 공통 파서 `app/core/i18n.py`(`norm_descriptions`/`parse_lang_map`/`lang_json`) 신설 — addon 업로드·마켓플레이스 등록(ZIP/API/원격)·시드 전 경로 일원화(종전 `str(dict)` 저장 → 카탈로그 카드 `{'ko': …}` repr 노출 결함 수정) ③ `marketplace_assets.names/descriptions` JSON 컬럼(init+멱등 ALTER) — 카탈로그 카드 프론트 공통함수(`parseLangMap`+`pickDescription`) 언어 전환 반영, 등록 모달 dict 전송 ④ asset_key/config 키 소문자 통일 + `seed-assets` 멱등 정규화(대소문자 키·config 중복 행·빈 nav_group·repr 오염 행 복구) — 설치됨 탭 UserManager/usermanager 2중 카드 해소 ⑤ SeCuardian 복제 싱크(`core/i18n.py`·`locale.ts`·`seed_security` agent_names JSON·`addon-agents/zip` 보안 13종 meta+zip) | app/core/i18n.py 신규, app/db.py, sql/{sqlite,pg}/01_init.sql, app/routers/{router_marketplace,router_marketplace_remote,router_addon_agent,router_agent_config}.py, scripts/{seed_assets,seed_security}.py, marketplace-assets(29종 meta+zip), front(store/locale.ts·api/marketplace.ts·MarketplacePage.tsx·AssetRegisterModal.tsx·locales), SeCuardian(core/i18n.py·routers 2종·seed_security.py·locale.ts·addon-agents/zip 13종), README(.en), test/impl/44 |
 | 2026-07-10 | v0.38 | **impl/45(물리 `test/impl/43`) — §7.6.4-5·6 설치됨 탭 카테고리 그룹핑 + 해제 잔존 결함 수정**(사용자 결함 보고: 해제해도 설치됨 탭 잔존 + "카탈로그처럼 builtin·security·utilities 분류·정렬" 재확인). ① 설치됨 탭 카탈로그 매칭을 **대소문자 무시**로 정정 — addon upload 가 config 키를 소문자화(`usermanager`)해 자산 키(`UserManager`)와 불일치 → builtin 오분류 잔존하던 결함 해소 ② 설치됨 탭을 카탈로그와 동일한 **카테고리 섹션 그룹**(builtin 먼저 → security → utilities → general …)으로 표시, 섹션 내 정렬 = builtin 기존 순서·카탈로그 그룹 카탈로그 순서 ③ `mp.cat.builtin` 로케일 키 추가 | front(AgentsPage.tsx·locales), README(.en), test/impl/43 |
 | 2026-07-10 | v0.37 | **impl/44(물리 `test/impl/42`) — §7.6.5 해제 시 hot-deploy 잔재 완전 정리 + 상단 설명**(사용자 결함 보고: 해제해도 좌측 네비 메뉴·`addon-agents/deployed` 잔존). ① `agent.pageDesc` 에 자산 카탈로그 설명 포함(ko/en) ② marketplace uninstall = installs 비활성+config disable **+ 완전 undeploy**(addon 테이블 DROP·deployed 디렉터리·front tsx·MCP·`tbl_addon_agents` 행 삭제·web 재빌드) — `delete_addon` 본문을 `_remove_addon_artifacts` 공용 헬퍼로 분리 재사용, addon 키 대소문자 무시 매칭 ③ 설치/해제 시 `agentConfigChanged` 발행 → 네비 즉시 동기화 ④ `scripts/cleanup_addon_remnants.py`(=`make cleanup-addons`) 잔재 일괄 정리(멱등) — dev 환경 잔재(고아 deployed 14→정리) 적용 ⑤ addon-agents/ 는 deployed/ 런타임 필수라 유지 결정 | app/routers/{router_marketplace,router_addon_agent}.py, scripts/cleanup_addon_remnants.py, Makefile, front(MarketplacePage.tsx·locales), README(.en), test/impl/42 |

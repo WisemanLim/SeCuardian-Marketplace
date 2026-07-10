@@ -31,6 +31,8 @@ bases (RAG).
 
 > All 5 built-in agents have working backend+frontend (tests PASS). 🟡 = extension items remain (remote registry, React Flow canvas, pgvector, MCP proxy, etc). Details: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
+> **Marketplace-host public catalog API (impl/47, physical `test/impl/45`, §7.3.5)**: opens SeCMP as a host (registry server) to external SeCuardian instances — `/api/marketplace-host/{ping,catalog,catalog/{key},download/{key}}`. Source is the `marketplace-assets/{category}/{Name}.zip` filesystem — **all assets regardless of install state** — returned as per-category groups+assets, with `checksum` (ZIP SHA256) and `download_path` for client-side verification. Auth via `MARKETPLACE_HOST_API_KEY` (Bearer required when set, open when unset — `.env.local`/`.env.prod` pair a randomly issued key with SeCuardian's `MARKETPLACE_API_KEY`). The client side (3 deploy modes: scaffold/zip/marketplace) is SeCuardian R21 (test/impl/61).
+>
 > **Unified multilingual language-set dicts + installed-tab duplicate fix (impl/46, physical `test/impl/44`, §7.11.2-5)**: ① Unified `display_name`/`description` of all 29 asset meta.json files as `{"ko":…, "en":…}` dicts and rebuilt the zips — establishing the principle that **adding a language (jp/ch/…) requires only new data keys, no code changes** (split-column authoring is prohibited). ② New common parser **`app/core/i18n.py`** (`norm_descriptions`/`parse_lang_map`/`lang_json`) — addon upload, marketplace registration (ZIP/API/remote), and seeds all normalize through it (fixes the defect where `str(dict)` storage leaked raw `{'ko': …}` reprs onto catalog cards; `seed-assets` idempotently repairs previously polluted rows). ③ Added **`names`/`descriptions` JSON columns** to `marketplace_assets` — catalog cards now react to language switching via the shared front-end chain `parseLangMap`+`pickDescription` (fallback: UI locale → preferred language → ko → first available), and the asset-register modal submits multilingual dicts. ④ **Lower-cased asset_key/config keys** — fixes the duplicate card in the Agents (Installed) tab caused by the install seam ("UserManager") and the addon deploy ("usermanager") creating two `tbl_agent_config` rows (`seed-assets` idempotently normalizes legacy mixed-case keys, duplicate rows, and empty nav_group). ⑤ SeCuardian replication sync — `core/i18n.py`/`locale.ts` synced, `seed_security` now authors `agent_names` JSON, and the 13 security metas+zips are replicated into `addon-agents/zip/`.
 >
 > **UI layout (impl/20 → impl/36 → impl/43, physical `test/impl/41`, §7.6.4 three-tab split)**: there is no separate `Agent Management` menu — the **Marketplace menu is the unified agent hub**. Three top tabs: **Asset Catalog** (default: category-grouped assets, per-category `+ Add`, `Register Asset`, remote registry) / **Agents (Installed)** (base/built-in configs + only catalog agents with an **active install** — they appear on install and disappear on uninstall; catalog matching is case-insensitive §7.6.4-6. Shown in the same **category sections** as the catalog: builtin → security → utilities → general …) / **Addon Agents** (user-uploaded, `New Agent`). The 5 built-ins (Marketplace/Workflow/RAG/Playground/Guardrails) are **REQUIRED (cannot be disabled)**. Install/uninstall/registration fires a `marketplaceChanged` event that syncs the tabs instantly; the register modal supports **attaching multiple scaffold-format addon ZIPs** — hot-deployed on install (agents with a screen appear in the left menu).
@@ -235,6 +237,15 @@ curl -X POST http://localhost:8100/api/marketplace/install/cve-scanner \
 # uninstall
 curl -X DELETE http://localhost:8100/api/marketplace/install/cve-scanner -H "Authorization: Bearer $TOKEN"
 
+# ── Marketplace-host public catalog API (§7.3.5) — consumed by external SeCuardian, all assets regardless of installs ──
+# Auth: when MARKETPLACE_HOST_API_KEY is set, `-H "Authorization: Bearer <key>"` is required (401 on mismatch); open when unset
+curl http://localhost:8100/api/marketplace-host/ping
+# → {"ok":true,"service":"SeCuardian-Marketplace","categories":["addon","builtin","security","utilities"],"total":29}
+curl "http://localhost:8100/api/marketplace-host/catalog?category=security"   # groups+assets per category
+curl http://localhost:8100/api/marketplace-host/catalog/Board                 # detail (version, checksum, download_path)
+curl -O http://localhost:8100/api/marketplace-host/download/Board             # ZIP download (SHA256 == checksum)
+# Source = marketplace-assets/{category}/{Name}.zip filesystem — no DB (installs) lookup = install-state independent
+
 # ── Marketplace remote registry (F-MP E1.5) — requires MARKETPLACE_REMOTE_ENABLED=true ──
 curl http://localhost:8100/api/marketplace-remote/ping -H "Authorization: Bearer $TOKEN"
 curl http://localhost:8100/api/marketplace-remote/catalog -H "Authorization: Bearer $TOKEN"   # cached (sync_interval TTL)
@@ -386,6 +397,7 @@ python test/impl/27/test_webhook_security.py     # F-WF webhook security hardeni
 python test/impl/28/test_workflow_enabled_toggle.py  # F-WF enabled toggle PATCH (11 asserts)
 python test/impl/29/test_pgvector_benchmark.py     # F-RAG pgvector benchmark (7 asserts, needs real PostgreSQL: docker compose up -d postgres)
 python test/impl/30/test_workflow_builder_patch.py # F-WF full-screen builder partial-edit PATCH (17 asserts)
+python test/impl/45/test_marketplace_host.py       # §7.3.5 Marketplace-host public catalog API (34 assert)
 make lint                                   # ruff
 cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # frontend type-check + build
 ```

@@ -30,6 +30,8 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
+> **Marketplace-host 공개 카탈로그 API(impl/47·물리 `test/impl/45`, §7.3.5)**: SeCMP 를 host(레지스트리 서버)로서 외부 SeCuardian 에 개방 — `/api/marketplace-host/{ping,catalog,catalog/{key},download/{key}}`. 소스는 `marketplace-assets/{category}/{Name}.zip` 파일시스템 **전량(설치유무 무관)**, 카테고리별 groups+assets 반환, `checksum`(ZIP SHA256)·`download_path` 로 클라이언트 검증 지원. 인증은 `MARKETPLACE_HOST_API_KEY`(설정 시 Bearer 필수, 미설정 개방 — `.env.local`/`.env.prod` 는 임의 발급 키를 SeCuardian `MARKETPLACE_API_KEY` 와 페어링). 클라이언트 측(3종 배포 방식 scaffold/zip/marketplace)은 SeCuardian R21(test/impl/61).
+>
 > **다국어 언어셋 dict 일원화 + 설치됨 중복 해소(impl/46·물리 `test/impl/44`, §7.11.2-5)**: ① 전 자산 meta.json(29종)의 `display_name`/`description` 을 `{"ko":…, "en":…}` dict 로 통일하고 zip 재빌드 — **언어 확장(jp/ch/…) 시 코드 수정 없이 데이터 키만 추가**하는 원칙 확립(split 컬럼 authoring 금지). ② 공통 파서 **`app/core/i18n.py`**(`norm_descriptions`/`parse_lang_map`/`lang_json`) 신설 — addon 업로드·마켓플레이스 등록(ZIP/API/원격)·시드가 전부 이 함수로 정규화(종전 `str(dict)` 저장으로 카탈로그 카드에 `{'ko': …}` raw repr 이 노출되던 결함 수정, 기존 오염 행은 `seed-assets` 가 멱등 복구). ③ `marketplace_assets` 에 **`names`/`descriptions` JSON 컬럼** 추가 — 카탈로그 카드가 프론트 공통함수 `parseLangMap`+`pickDescription`(fallback: UI언어→선호언어→ko→첫 언어) 으로 언어 전환에 즉시 반응, 자산 등록 모달도 다국어 dict 로 전송. ④ **asset_key/config 키 소문자 통일** — install seam("UserManager")과 addon 배포("usermanager")가 `tbl_agent_config` 에 2행을 만들어 에이전트(설치됨) 탭에 중복 카드가 뜨던 결함 해소(`seed-assets` 가 기존 대소문자 혼용 키·중복 행·빈 nav_group 을 멱등 정규화). ⑤ SeCuardian 복제 싱크 — `core/i18n.py`·`locale.ts` 동기, `seed_security` 에 `agent_names` JSON 저자 추가, 보안 13종 meta+zip 을 `addon-agents/zip/` 에 복제.
 >
 > **UI 구성(impl/20 → impl/36 → impl/43·물리 `test/impl/41`, §7.6.4 3탭 재구성)**: 별도 `에이전트 관리` 메뉴 없이 **마켓플레이스 메뉴가 통합 에이전트 허브**다. 상단탭 3분류 — **자산 카탈로그**(기본 탭: 카테고리별 자산 목록·`+ 추가`·`자산 등록`·원격 레지스트리) / **에이전트(설치됨)**(기본·내장 config + **활성 설치된** 카탈로그 에이전트만 — 카탈로그에서 설치하면 나타나고 해제하면 숨김, 카탈로그 매칭은 대소문자 무시 §7.6.4-6. 카탈로그와 동일한 **카테고리 섹션 그룹**으로 표시: builtin → security → utilities → general …) / **Addon 에이전트**(사용자 업로드, `새 Agent 만들기`). 내장 5종(마켓플레이스·워크플로우·RAG·플레이그라운드·가드레일)은 **REQUIRED(비활성 불가)**. 설치/해제/등록 시 `marketplaceChanged` 이벤트로 탭 간 즉시 동기화되며, 자산 등록 모달에서 **addon ZIP(스캐폴드 형식) 다중 첨부** 시 설치에서 hot-deploy 된다(화면 있는 에이전트는 설치 시 좌측 메뉴 노출).
@@ -234,6 +236,15 @@ curl -X POST http://localhost:8100/api/marketplace/install/cve-scanner \
 # 해제
 curl -X DELETE http://localhost:8100/api/marketplace/install/cve-scanner -H "Authorization: Bearer $TOKEN"
 
+# ── Marketplace-host 공개 카탈로그 API (§7.3.5) — 외부 SeCuardian 소비용, 설치유무 무관 전량 ──
+# 인증: MARKETPLACE_HOST_API_KEY 설정 시 `-H "Authorization: Bearer <키>"` 필수(불일치 401), 미설정 시 개방
+curl http://localhost:8100/api/marketplace-host/ping
+# → {"ok":true,"service":"SeCuardian-Marketplace","categories":["addon","builtin","security","utilities"],"total":29}
+curl "http://localhost:8100/api/marketplace-host/catalog?category=security"   # 카테고리별 groups+assets
+curl http://localhost:8100/api/marketplace-host/catalog/Board                 # 상세(version·checksum·download_path)
+curl -O http://localhost:8100/api/marketplace-host/download/Board             # ZIP 다운로드 (SHA256=checksum)
+# 소스 = marketplace-assets/{category}/{Name}.zip 파일시스템 — DB(installs) 미참조 = 설치유무 무관
+
 # ── Marketplace 원격 레지스트리 (F-MP E1.5) — MARKETPLACE_REMOTE_ENABLED=true 필요 ──
 curl http://localhost:8100/api/marketplace-remote/ping -H "Authorization: Bearer $TOKEN"
 curl http://localhost:8100/api/marketplace-remote/catalog -H "Authorization: Bearer $TOKEN"   # 캐시(sync_interval TTL)
@@ -385,6 +396,7 @@ python test/impl/27/test_webhook_security.py     # F-WF webhook 보안 강화(�
 python test/impl/28/test_workflow_enabled_toggle.py  # F-WF enabled 토글 PATCH (11 assert)
 python test/impl/29/test_pgvector_benchmark.py     # F-RAG pgvector 실측 (7 assert, 실 PostgreSQL 필요: docker compose up -d postgres)
 python test/impl/30/test_workflow_builder_patch.py # F-WF 풀스크린 빌더 PATCH 부분 편집 (17 assert)
+python test/impl/45/test_marketplace_host.py       # §7.3.5 Marketplace-host 공개 카탈로그 API (34 assert)
 make lint                                   # ruff
 cd front && pnpm exec tsc --noEmit && pnpm exec vite build   # 프론트 타입체크+빌드
 ```

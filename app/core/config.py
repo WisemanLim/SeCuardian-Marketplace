@@ -104,6 +104,9 @@ class Settings(BaseSettings):
     marketplace_install_verify_checksum: bool = True     # 다운로드 ZIP SHA256 검증 강제
     marketplace_install_require_signature: bool = False  # GPG 서명 검증(엔터프라이즈 옵션)
 
+    # Marketplace-host 공개 카탈로그 API (§7.3.5) — 외부 SeCuardian 이 소비하는 host 측 인증키
+    marketplace_host_api_key: str = ""  # 설정 시 Bearer 필수, 미설정 시 개방(폐쇄망 온프렘 기본)
+
     # 멀티테넌시 (§7.4)
     tenant_isolation_level: str = "off"        # off | namespace | physical
     tenant_db_strategy: str = "shared"         # shared | schema-per-tenant | db-per-tenant

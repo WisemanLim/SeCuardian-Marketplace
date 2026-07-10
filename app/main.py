@@ -40,6 +40,7 @@ from app.routers import (
     router_mcp,
     router_mcp_config,
     router_marketplace,   # Marketplace 내장 에이전트 (F-MP)
+    router_marketplace_host,    # Marketplace-host 공개 카탈로그 API (§7.3.5)
     router_marketplace_remote,  # Marketplace 원격 레지스트리 클라이언트 (F-MP E1.5)
     router_workflow,      # Workflow 내장 에이전트 (F-WF)
     router_rag,           # RAG 내장 에이전트 (F-RAG)
@@ -127,6 +128,7 @@ app.include_router(router_a2a.router)        # A2A Protocol v1.0 (F12)
 app.include_router(router_mcp.router)        # MCP JSON-RPC 2.0 (F12)
 app.include_router(router_mcp_config.router) # MCP Proxy 설정 관리 (F12)
 app.include_router(router_marketplace.router)  # Marketplace 내장 에이전트 (F-MP)
+app.include_router(router_marketplace_host.router)    # Marketplace-host 공개 카탈로그 API (§7.3.5)
 app.include_router(router_marketplace_remote.router)  # 원격 레지스트리 클라이언트 (F-MP E1.5)
 app.include_router(router_workflow.router)      # Workflow 내장 에이전트 (F-WF)
 app.include_router(router_rag.router)           # RAG 내장 에이전트 (F-RAG)
