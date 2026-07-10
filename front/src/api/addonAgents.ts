@@ -10,6 +10,7 @@ export interface AddonAgent {
   has_front: boolean;
   is_builtin: boolean;
   is_active: boolean;
+  has_worker?: boolean;          // R22-3: worker 필요 — 카드 설치 가이드 아이콘 상시 노출
   description?: string;
   description_en?: string;
   descriptions?: Record<string, string> | null;
@@ -34,10 +35,29 @@ export async function uploadAddonAgent(
   return data;
 }
 
+// R22-3: worker 필요 에이전트 요약 (활성화 응답·가이드 응답 공용)
+export interface WorkerInfo {
+  required: boolean;
+  kind: "bundled" | "external";
+  name: string;
+  version?: string;
+  guide_path: string;
+  package?: string;
+  download_path?: string;
+}
+
 export async function toggleAddonAgent(
   key: string
-): Promise<{ agent_key: string; is_active: boolean }> {
+): Promise<{ agent_key: string; is_active: boolean; worker?: WorkerInfo }> {
   const { data } = await client.patch(`/addon-agents/${key}/toggle`);
+  return data;
+}
+
+/** R22-3 — worker 설치 가이드(markdown) + worker 요약 조회 */
+export async function getWorkerGuide(
+  key: string
+): Promise<{ agent_key: string; worker: WorkerInfo; guide: string }> {
+  const { data } = await client.get(`/addon-agents/${key}/worker-guide`);
   return data;
 }
 

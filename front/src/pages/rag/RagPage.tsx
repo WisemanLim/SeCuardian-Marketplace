@@ -72,7 +72,7 @@ export default function RagPage() {
       <div className="col-span-1">
         {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 (R18 표준) */}
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs text-gray-500">{t("rag.pageDesc")}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t("rag.pageDesc")}</p>
           <button onClick={() => setShowCreate((v) => !v)}
             className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 shrink-0">
             {showCreate ? t("common.close") : t("rag.addCollection")}

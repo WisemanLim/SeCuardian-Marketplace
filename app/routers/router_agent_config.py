@@ -33,7 +33,12 @@ async def list_agents(user: dict = Depends(get_current_user)):
         "nav_group, sort_order, updated_at "
         "FROM tbl_agent_config ORDER BY sort_order, agent_key"
     )
-    return {"agents": [_expand_descriptions(r) for r in rows]}
+    agents = [_expand_descriptions(r) for r in rows]
+    # R22-5: worker 필요 여부 — 카드 설치 가이드 아이콘 상시 노출용 (addon 미등록 내장도 커버)
+    from app.routers.router_addon_agent import _agent_worker_meta
+    for a in agents:
+        a["has_worker"] = _agent_worker_meta(a["agent_key"])[0] is not None
+    return {"agents": agents}
 
 
 @router.get("/{agent_key}")
@@ -116,4 +121,11 @@ async def patch_agent(
         await execute_write(
             f"DELETE FROM tbl_mcp_configs WHERE agent_key = {_PH}", (agent_key,)
         )
-    return {"message": "Updated", "agent_key": agent_key}
+    result = {"message": "Updated", "agent_key": agent_key}
+    # R22-3: 활성화 시 worker 필요 여부 안내 — 에이전트(설치됨) 탭 활성화 주경로
+    if body.is_enabled:
+        from app.routers.router_addon_agent import _agent_worker_meta, _worker_summary
+        worker, _src = _agent_worker_meta(agent_key)
+        if worker:
+            result["worker"] = _worker_summary(worker, agent_key)
+    return result

@@ -137,23 +137,26 @@ async def sync_catalog() -> int:
         )
         real_n = d.get("real_rule_count", 0)
         heur_n = d.get("heuristic_rule_count", 0)
+        name_en = d.get("display_name_en", "")
         if existing:
             fe = 1 if required else existing["filter_enabled"]
             await execute_write(
-                f"UPDATE guardrails_domain_catalog SET display_name = {_PH}, status = {_PH}, "
+                f"UPDATE guardrails_domain_catalog SET display_name = {_PH}, display_name_en = {_PH}, "
+                f"status = {_PH}, "
                 f"rule_count = {_PH}, regex_rule_count = {_PH}, real_rule_count = {_PH}, "
                 f"heuristic_rule_count = {_PH}, is_required = {_PH}, "
                 f"filter_enabled = {_PH}, last_synced_at = CURRENT_TIMESTAMP WHERE domain_key = {_PH}",
-                (d["display_name"], d["status"], d["rule_count"], d["regex_rule_count"],
+                (d["display_name"], name_en, d["status"], d["rule_count"], d["regex_rule_count"],
                  real_n, heur_n, required, fe, dk),
             )
         else:
             await execute_write(
                 f"INSERT INTO guardrails_domain_catalog "
-                f"(domain_key, display_name, status, rule_count, regex_rule_count, real_rule_count, "
+                f"(domain_key, display_name, display_name_en, status, rule_count, regex_rule_count, "
+                f"real_rule_count, "
                 f"heuristic_rule_count, is_required, filter_enabled, last_synced_at) "
-                f"VALUES ({_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, CURRENT_TIMESTAMP)",
-                (dk, d["display_name"], d["status"], d["rule_count"], d["regex_rule_count"],
+                f"VALUES ({_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, {_PH}, CURRENT_TIMESTAMP)",
+                (dk, d["display_name"], name_en, d["status"], d["rule_count"], d["regex_rule_count"],
                  real_n, heur_n, required, required),
             )
     logger.info("[guardrails_rules] 카탈로그 %d 도메인 동기화", len(doms))

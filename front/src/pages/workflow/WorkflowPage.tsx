@@ -412,7 +412,7 @@ export default function WorkflowPage() {
     <div className="page">
       <div className="flex items-center justify-between mb-4">
         {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 (R18 표준) */}
-        <p className="text-xs text-gray-500">{t("wf.pageDesc")}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t("wf.pageDesc")}</p>
         <div className="flex items-center gap-2">
           {/* impl/32(§7.2.8) — Flowise/Dify 준용 풀스크린 빌더(팔레트 drag&drop) */}
           <button onClick={() => navigate("/workflow/builder")}

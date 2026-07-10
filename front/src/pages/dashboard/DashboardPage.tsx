@@ -61,7 +61,7 @@ export default function DashboardPage() {
   return (
     <div className="page space-y-6">
       {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 (R18 표준) */}
-      <p className="text-xs text-gray-500">{t("dash.pageDesc")}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">{t("dash.pageDesc")}</p>
 
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard

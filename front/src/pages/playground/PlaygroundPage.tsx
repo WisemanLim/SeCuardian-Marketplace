@@ -93,7 +93,7 @@ export default function PlaygroundPage() {
     <div className="page">
       <div className="flex items-center justify-between mb-2">
         {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 (R18 표준) */}
-        <p className="text-xs text-gray-500">{t("pg.pageDesc")}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t("pg.pageDesc")}</p>
         <label className="flex items-center gap-1.5 text-xs text-gray-500">
           <input type="checkbox" checked={compareMode} onChange={(e) => setCompareMode(e.target.checked)} />
           {t("pg.abCompare")}

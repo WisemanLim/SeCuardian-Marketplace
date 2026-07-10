@@ -1,4 +1,5 @@
 import client from "./client";
+import type { WorkerInfo } from "./addonAgents";
 
 export interface AgentConfig {
   agent_key: string;
@@ -15,6 +16,7 @@ export interface AgentConfig {
   disabled_reason_en: string | null;
   nav_group: string | null;
   sort_order: number;
+  has_worker?: boolean;          // R22-5: worker 필요 — 카드 설치 가이드 아이콘 상시 노출
 }
 
 export async function listAgentConfigs(): Promise<AgentConfig[]> {
@@ -25,7 +27,9 @@ export async function listAgentConfigs(): Promise<AgentConfig[]> {
 export async function patchAgentConfig(
   key: string,
   payload: { is_enabled?: boolean; model?: string | null; system_prompt?: string | null }
-): Promise<AgentConfig> {
-  const { data } = await client.patch<AgentConfig>(`/agent-config/${key}`, payload);
+): Promise<AgentConfig & { worker?: WorkerInfo }> {
+  const { data } = await client.patch<AgentConfig & { worker?: WorkerInfo }>(
+    `/agent-config/${key}`, payload
+  );
   return data;
 }

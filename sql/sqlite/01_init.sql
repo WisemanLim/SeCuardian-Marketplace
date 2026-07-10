@@ -351,6 +351,7 @@ CREATE INDEX IF NOT EXISTS idx_pg_runs_tenant ON playground_runs(tenant_id, crea
 CREATE TABLE IF NOT EXISTS guardrails_domain_catalog (
     domain_key       VARCHAR(64) PRIMARY KEY,
     display_name     VARCHAR(128) NOT NULL,
+    display_name_en  VARCHAR(128),                       -- 영문 표시명 (R18-7 다국어)
     status           VARCHAR(16)  NOT NULL DEFAULT 'catalog_only',  -- functional | heuristic | catalog_only
     rule_count       INTEGER      NOT NULL DEFAULT 0,
     regex_rule_count INTEGER      NOT NULL DEFAULT 0,   -- 판정 가능 규칙 수(실판정+휴리스틱)

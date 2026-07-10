@@ -3,6 +3,7 @@ import client from "./client";
 export interface GuardrailsDomain {
   domain_key: string;
   display_name: string;
+  display_name_en?: string | null;
   status: "functional" | "heuristic" | "catalog_only";
   rule_count: number;
   regex_rule_count: number;

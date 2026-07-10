@@ -259,6 +259,8 @@ async def list_addons(user: dict = Depends(get_current_user)):
             row["descriptions"] = {}
             row["agent_names"] = {}
         row.pop("meta_json", None)
+        # R22-3: worker 필요 여부 — 카드에 설치 가이드 아이콘 상시 노출용
+        row["has_worker"] = _agent_worker_meta(row["agent_key"])[0] is not None
     return {"addons": rows}
 
 
@@ -907,6 +909,83 @@ async def export_standalone(
     )
 
 
+# ── R22: 에이전트 Worker 동봉·독립 설치 — 가이드 조회·패키지 다운로드 ─────────
+
+_MARKET_ASSETS = Path("marketplace-assets")
+
+
+def _agent_worker_meta(agent_key: str) -> tuple[dict | None, Path | None]:
+    """meta.json 의 worker 블록 해석 — deployed/{key}/ → marketplace-assets/*/{key}/ 폴백 (R22-3)."""
+    bases = [_DEPLOYED / agent_key]
+    if _MARKET_ASSETS.exists():
+        bases += [
+            d / agent_key
+            for d in _MARKET_ASSETS.iterdir()
+            if d.is_dir() and not d.name.startswith(".")
+        ]
+    for base in bases:
+        if not base.is_dir():
+            continue
+        for meta_file in sorted(base.glob("*-meta.json")):
+            try:
+                meta = json.loads(meta_file.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            worker = meta.get("worker")
+            if isinstance(worker, dict) and worker.get("required"):
+                return worker, base
+            break  # 이 base 의 meta 에 worker 없음(구버전 배포본 가능) → 다음 base 폴백
+    return None, None
+
+
+def _worker_summary(worker: dict, agent_key: str) -> dict:
+    """활성화 응답·가이드 응답 공용 worker 요약 (R22-3)."""
+    summary = {
+        "required": True,
+        "kind": worker.get("kind", "external"),
+        "name": worker.get("name", ""),
+        "version": worker.get("version", ""),
+        "guide_path": f"/api/addon-agents/{agent_key}/worker-guide",
+    }
+    if worker.get("package"):
+        summary["package"] = worker["package"]
+        summary["download_path"] = f"/api/addon-agents/{agent_key}/worker-package"
+    return summary
+
+
+@router.get("/{agent_key}/worker-guide")
+async def worker_guide(agent_key: str, user: dict = Depends(get_current_user)):
+    """worker 설치 가이드 md + worker 요약 반환 — 활성화 시 프론트 모달 소스 (R22-3)."""
+    if not _NAME_RE.match(agent_key):
+        raise HTTPException(status_code=400, detail="invalid agent_key")
+    worker, src = _agent_worker_meta(agent_key)
+    if not worker:
+        raise HTTPException(status_code=404, detail="worker 가 필요 없는 에이전트입니다")
+    content = ""
+    guide_name = worker.get("guide") or ""
+    if guide_name and "/" not in guide_name and ".." not in guide_name and src:
+        f = src / guide_name
+        if f.exists():
+            content = f.read_text(encoding="utf-8")
+    return {"agent_key": agent_key, "worker": _worker_summary(worker, agent_key), "guide": content}
+
+
+@router.get("/{agent_key}/worker-package")
+async def worker_package(agent_key: str, user: dict = Depends(get_current_user)):
+    """bundled worker 배포 패키지(zip) 다운로드 — marketplace-assets/{category}/{package} (R22-3)."""
+    if not _NAME_RE.match(agent_key):
+        raise HTTPException(status_code=400, detail="invalid agent_key")
+    worker, _src = _agent_worker_meta(agent_key)
+    if not worker or not worker.get("package"):
+        raise HTTPException(status_code=404, detail="bundled worker 패키지가 없는 에이전트입니다")
+    package = Path(worker["package"]).name  # 경로 성분 제거
+    if _MARKET_ASSETS.exists():
+        for d in _MARKET_ASSETS.iterdir():
+            if d.is_dir() and (d / package).exists():
+                return FileResponse(str(d / package), media_type="application/zip", filename=package)
+    raise HTTPException(status_code=404, detail=f"worker 패키지 없음: {package}")
+
+
 @router.patch("/{agent_key}/toggle")
 async def toggle_addon(
     agent_key: str,
@@ -939,7 +1018,13 @@ async def toggle_addon(
         await execute_write(
             f"DELETE FROM tbl_mcp_configs WHERE agent_key = {_PH}", (agent_key,)
         )
-    return {"agent_key": agent_key, "is_active": bool(new_active)}
+    result = {"agent_key": agent_key, "is_active": bool(new_active)}
+    # R22-3: 활성화 시 worker 필요 에이전트 → 프론트가 설치 가이드 모달 자동 표시
+    if new_active:
+        worker, _src = _agent_worker_meta(agent_key)
+        if worker:
+            result["worker"] = _worker_summary(worker, agent_key)
+    return result
 
 
 @router.post("/upload")

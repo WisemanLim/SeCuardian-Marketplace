@@ -89,13 +89,16 @@ export default function MarketplacePage() {
     }
   }
 
+  // 카테고리별 카드덱 색상 — 플랫폼 UI/UX 톤(보안=보라, 유틸리티=파랑, 일반=초록, 그 외=회색)
+  const CATEGORY_TONE: Record<string, string> = {
+    security: "border-violet-200 dark:border-violet-800/60 bg-violet-50/50 dark:bg-violet-900/10 hover:border-violet-300 dark:hover:border-violet-700",
+    utilities: "border-blue-200 dark:border-blue-800/60 bg-blue-50/50 dark:bg-blue-900/10 hover:border-blue-300 dark:hover:border-blue-700",
+    general: "border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/50 dark:bg-emerald-900/10 hover:border-emerald-300 dark:hover:border-emerald-700",
+  };
+  const DEFAULT_TONE = "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600";
+
   return (
     <div>
-      <div className="mb-3">
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("agent.assetCatalog")}</h2>
-        <p className="text-xs text-gray-500 mt-0.5">{t("mp.catalogDesc")} ({t("mp.registerHint")} ‘{t("agent.registerAsset")}’)</p>
-      </div>
-
       {error && <p role="alert" className="mb-3 text-xs text-red-500">{error}</p>}
 
       {/* §7.6.2: 카테고리별 섹션 — security·utilities·general … */}
@@ -116,32 +119,35 @@ export default function MarketplacePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {grouped[cat].map((a) => (
-              <div key={`${a.asset_key}-${a.version}`} className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-                <div className="flex items-start justify-between">
+              <div key={`${a.asset_key}-${a.version}`}
+                className={`p-3 rounded border transition-colors ${CATEGORY_TONE[cat] ?? DEFAULT_TONE}`}>
+                <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{assetName(a)}</p>
+                    {/* 설치여부 배지 — 에이전트명 바로 옆 */}
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{assetName(a)}</p>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded shrink-0 ${
+                        a.installed ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                    : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
+                        {a.installed ? `${t("mp.installed")} (${a.active_version})` : t("mp.notInstalled")}
+                      </span>
+                    </div>
                     <p className="text-xs text-gray-400">{a.asset_key} · {a.kind} · v{a.version}</p>
                   </div>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded shrink-0 ${
-                    a.installed ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
-                    {a.installed ? `${t("mp.installed")} (${a.active_version})` : t("mp.notInstalled")}
-                  </span>
-                </div>
-                {assetDesc(a) && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{assetDesc(a)}</p>}
-                <div className="mt-2 flex gap-2">
+                  {/* 설치/해제 버튼 — 카드 우상단(기존 배지 위치) */}
                   {a.installed ? (
                     <button disabled={busy === a.asset_key} onClick={() => handleUninstall(a)}
-                      className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-40">
+                      className="shrink-0 text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-40">
                       {t("mp.uninstall")}
                     </button>
                   ) : (
                     <button disabled={busy === a.asset_key} onClick={() => handleInstall(a)}
-                      className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
+                      className="shrink-0 text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
                       {t("mp.install")}
                     </button>
                   )}
                 </div>
+                {assetDesc(a) && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{assetDesc(a)}</p>}
               </div>
             ))}
           </div>

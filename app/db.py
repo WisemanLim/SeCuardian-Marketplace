@@ -214,6 +214,7 @@ def _apply_pg_column_migrations() -> None:
         "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS heuristic_rule_count INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS is_required INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS filter_enabled INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE guardrails_domain_catalog ADD COLUMN IF NOT EXISTS display_name_en VARCHAR(128)",
         # F-WF §7.2.6: Dify DSL Import 어댑터(impl/28)
         "ALTER TABLE workflows ADD COLUMN IF NOT EXISTS dify_dsl_source TEXT",
         "ALTER TABLE workflows ADD COLUMN IF NOT EXISTS dify_dsl_version VARCHAR(32)",
@@ -350,6 +351,7 @@ async def apply_column_migrations() -> None:
             ("heuristic_rule_count", "INTEGER NOT NULL DEFAULT 0"),
             ("is_required", "INTEGER NOT NULL DEFAULT 0"),
             ("filter_enabled", "INTEGER NOT NULL DEFAULT 0"),
+            ("display_name_en", "VARCHAR(128)"),
         ] if grd_cols else []):
             if col not in grd_cols:
                 await conn.execute(f"ALTER TABLE guardrails_domain_catalog ADD COLUMN {col} {typedef}")

@@ -103,7 +103,7 @@ export default function GuardrailsPage() {
   return (
     <div className="page space-y-6">
       {/* 타이틀은 상단 헤더(AppLayout)에 표시 — 본문에는 설명만 (R18 표준) */}
-      <p className="text-xs text-gray-500">
+      <p className="text-sm text-gray-500 dark:text-gray-400">
         {t("grd.desc1")}<code className="font-mono">global</code>{t("grd.desc2")}<b>{t("grd.filterApply")}</b>{t("grd.desc3")}
       </p>
 
@@ -135,7 +135,7 @@ export default function GuardrailsPage() {
                 on ? "border-blue-300 dark:border-blue-700 bg-blue-50/40 dark:bg-blue-900/10"
                    : "border-gray-200 dark:border-gray-700"}`}>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="font-medium text-gray-700 dark:text-gray-200 truncate" title={d.domain_key}>{d.display_name}</p>
+                  <p className="font-medium text-gray-700 dark:text-gray-200 truncate" title={d.domain_key}>{pickDescription(null, d.display_name, d.display_name_en)}</p>
                   {d.is_required ? (
                     <span className="shrink-0 border-2 border-red-500 text-red-500 text-[9px] font-black px-1 rounded-sm uppercase leading-none">{t("grd.requiredBadge")}</span>
                   ) : isAdmin ? (
@@ -207,7 +207,7 @@ export default function GuardrailsPage() {
               <label key={d.domain_key} className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={isEnabled(d.domain_key)}
                   onChange={(e) => toggleDomain(d.domain_key, e.target.checked)} />
-                {d.display_name}
+                {pickDescription(null, d.display_name, d.display_name_en)}
                 <span className="text-[10px] text-gray-400">({t(statusBadge(d.status).labelKey)})</span>
               </label>
             ))}

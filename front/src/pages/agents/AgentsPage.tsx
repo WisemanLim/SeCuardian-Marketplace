@@ -16,6 +16,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 import MarketplacePage from "../marketplace/MarketplacePage";
 import AgentBuilderModal from "./AgentBuilderModal";
 import McpGuideModal from "./McpGuideModal";
+import WorkerGuideModal from "./WorkerGuideModal";
 import McpEditModal from "./McpEditModal";
 import ExportAgentModal from "./ExportAgentModal";
 
@@ -67,6 +68,15 @@ function IcTrash() {
   return (
     <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
       <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916ZM6.5 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5Zm3 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5Z" />
+    </svg>
+  );
+}
+
+// R22-3: worker 설치 가이드 아이콘 (박스/패키지)
+function IcWorker() {
+  return (
+    <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+      <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113ZM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24ZM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6ZM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184Z" />
     </svg>
   );
 }
@@ -170,6 +180,7 @@ export default function AgentsPage() {
   const [mcpMenuConfig, setMcpMenuConfig] = useState<McpConfig | null>(null);
   const [mcpMenuLoading, setMcpMenuLoading] = useState(false);
   const [mcpGuideKey, setMcpGuideKey] = useState<{ key: string; name: string } | null>(null);
+  const [workerGuideKey, setWorkerGuideKey] = useState<string | null>(null);  // R22-3
   const [mcpEditKey, setMcpEditKey]   = useState<{ key: string; name: string } | null>(null);
   // Export (F26/F27) — ZIP/Standalone 모드는 모달 내 탭에서 선택
   const [exportTarget, setExportTarget] = useState<{ key: string; name: string } | null>(null);
@@ -219,10 +230,12 @@ export default function AgentsPage() {
   async function handleToggle(key: string, enabled: boolean) {
     setLoadingKey(key);
     try {
-      await patchAgentConfig(key, { is_enabled: enabled });
+      const result = await patchAgentConfig(key, { is_enabled: enabled });
       setConfigs((prev) => prev.map((c) => (c.agent_key === key ? { ...c, is_enabled: enabled } : c)));
       window.dispatchEvent(new CustomEvent("agentConfigChanged"));
       refreshMcpStatus(key);
+      // R22-3: 활성화 시 worker 필요 에이전트 → 설치 가이드 모달 자동 표시
+      if (enabled && result?.worker) setWorkerGuideKey(key);
     } catch { /* ignore */ } finally {
       setLoadingKey(null);
     }
@@ -243,6 +256,8 @@ export default function AgentsPage() {
       setAddons((prev) => prev.map((a) => (a.agent_key === key ? { ...a, is_active: result.is_active } : a)));
       window.dispatchEvent(new CustomEvent("agentConfigChanged"));
       refreshMcpStatus(key);
+      // R22-3: 활성화 시 worker 필요 에이전트 → 설치 가이드 모달 자동 표시
+      if (result.is_active && result.worker) setWorkerGuideKey(key);
     } catch { /* ignore */ } finally {
       setLoadingKey(null);
     }
@@ -363,6 +378,12 @@ export default function AgentsPage() {
   })();
   // export 가능 대상 = tbl_addon_agents 에 소스가 등록된 에이전트 (내장 포함) — F26/F27
   const exportableKeys = new Set(addons.map((a) => a.agent_key));
+  // R22-3: worker 필요 에이전트 — 카드에 설치 가이드 아이콘 상시 노출
+  // (설치됨 탭의 카탈로그 설치 에이전트도 configs.has_worker 로 커버 — R22-5)
+  const workerKeys = new Set([
+    ...addons.filter((a) => a.has_worker).map((a) => a.agent_key),
+    ...configs.filter((c) => c.has_worker).map((c) => c.agent_key),
+  ]);
 
   // 카드 우상단 MCP 아이콘 + 팝오버 메뉴 (활성화 토글·가이드·설정·삭제)
   function McpCorner({ agentKey, agentName, eligible }: { agentKey: string; agentName: string; eligible: boolean }) {
@@ -498,6 +519,21 @@ export default function AgentsPage() {
     );
   }
 
+  // R22-3: worker 설치 가이드 아이콘 — 활성화 여부와 무관하게 상시 노출
+  function WorkerCorner({ agentKey }: { agentKey: string }) {
+    if (!workerKeys.has(agentKey)) return null;
+    return (
+      <button
+        type="button"
+        onClick={() => setWorkerGuideKey(agentKey)}
+        className="p-1.5 rounded-lg border border-amber-200 dark:border-amber-700/60 bg-amber-50 dark:bg-amber-900/20 text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 hover:border-amber-400 dark:hover:border-amber-600 transition-colors"
+        title={t("agent.workerGuideTitle")}
+      >
+        <IcWorker />
+      </button>
+    );
+  }
+
   // MCP 우측 — ZIP추출/Standalone 번들 통합 아이콘 (F26/F27, 모드는 모달에서 선택)
   function ExportIcons({ agentKey, agentName }: { agentKey: string; agentName: string }) {
     return (
@@ -537,6 +573,7 @@ export default function AgentsPage() {
             />
           )}
           <McpCorner agentKey={c.agent_key} agentName={nameOf(c)} eligible={mcpEligible} />
+          <WorkerCorner agentKey={c.agent_key} />
           {canExport && <ExportIcons agentKey={c.agent_key} agentName={nameOf(c)} />}
         </div>
 
@@ -588,6 +625,7 @@ export default function AgentsPage() {
             />
           )}
           <McpCorner agentKey={a.agent_key} agentName={nameOf(a)} eligible={!!a.is_active} />
+          <WorkerCorner agentKey={a.agent_key} />
           {isAdmin && <ExportIcons agentKey={a.agent_key} agentName={nameOf(a)} />}
           {isAdmin && (
             <button
@@ -724,6 +762,20 @@ export default function AgentsPage() {
           agentKey={mcpGuideKey.key}
           agentName={mcpGuideKey.name}
           onClose={() => setMcpGuideKey(null)}
+        />
+      )}
+
+      {/* R22-3: worker 배포·설치 가이드 — 활성화 시 자동 + 카드 아이콘으로 상시 열람 */}
+      {workerGuideKey && (
+        <WorkerGuideModal
+          agentKey={workerGuideKey}
+          agentName={(() => {
+            const c = configs.find((x) => x.agent_key === workerGuideKey);
+            if (c) return nameOf(c);
+            const a = addons.find((x) => x.agent_key === workerGuideKey);
+            return a ? nameOf(a) : workerGuideKey;
+          })()}
+          onClose={() => setWorkerGuideKey(null)}
         />
       )}
 
