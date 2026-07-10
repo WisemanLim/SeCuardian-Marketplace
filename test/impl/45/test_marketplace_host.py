@@ -55,7 +55,7 @@ def main() -> int:
     check("total 일치", cat["total"] == fs_zip_count(), f"({cat['total']})")
     check("groups 키 == categories", set(cat["groups"].keys()) == set(cat["categories"]))
     keys = {a["asset_key"]: a["category"] for a in cat["assets"]}
-    for k, c in (("Board", "addon"), ("rag", "builtin"), ("agentic-soc", "security"), ("UserManager", "utilities")):
+    for k, c in (("Board", "addon"), ("rag", "builtin"), ("agentic-soc", "security"), ("UserManager", "addon")):
         check(f"{k} ∈ {c}", keys.get(k) == c)
     src = (ROOT / "app/routers/router_marketplace_host.py").read_text()
     check("DB 미참조(설치유무 무관)", "from app.db" not in src and "fetch_" not in src)

@@ -170,10 +170,10 @@ async def test_tc34_07_templates(tmp_path, monkeypatch):
     async with _client() as c:
         r = await c.get("/api/addon-agents/templates/list", headers=_headers())
         named = {t["name"]: t for t in r.json()["templates"]}
-        # 스캐폴드 템플릿 5종만 (UserManager 는 utilities 로 이관 — 템플릿 아님)
-        for name in ("Board", "RagAgent", "ServiceAgent", "ShellAgent", "ToolProxyAgent"):
+        # 스캐폴드 템플릿 6종 (impl/52: UserManager utilities → addon 재이관)
+        for name in ("Board", "RagAgent", "ServiceAgent", "ShellAgent", "ToolProxyAgent", "UserManager"):
             assert name in named and named[name]["has_zip"] is True, name
-        assert "UserManager" not in named
+        assert "server-shell" not in named  # utilities 는 템플릿 아님
 
         r = await c.get("/api/addon-agents/templates/download/Board", headers=_headers())
         assert r.status_code == 200

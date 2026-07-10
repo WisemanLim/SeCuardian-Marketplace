@@ -30,6 +30,8 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
+> **UserManager 자산 addon 이관(impl/52·물리 `test/impl/50`)**: `marketplace-assets/utilities/UserManager{,.zip}` → `marketplace-assets/addon/` 이동 — 카탈로그 시드 대상 제외(utilities 5종), **스캐폴드 템플릿 편입**(`새 Agent 만들기` templates 6종), 시드 보호 해제(사용자가 등록하면 `deletable=true`). `seed_assets` 는 시드 유래 고아 행(시드 디렉터리에서 제거된 key, 블롭 `uploaded_by='seed-assets'` 한정)을 멱등 정리한다 — 사용자 등록 자산 불변, 설치 중 자산은 건너뜀.
+>
 > **중복 등록 사용자 확인 + 시드 보호 범위 축소 + 카탈로그 삭제 시 시드 반환(impl/51·물리 `test/impl/49`, §7.6.6 v0.47)**: ① 이미 등록된 asset_key 를 다시 등록하면 `confirm` 없이는 409 `{"code":"duplicate","assets":[…]}` — UI 가 커스텀 ConfirmDialog 로 "이미 등록된 자산(현재 카탈로그)" 정보를 보여주고 **등록 여부는 사용자가 판단**, 확인 시 요청 카탈로그로 이동 등록 ② `deletable` 판정을 시드 카탈로그(`marketplace-assets/{security,utilities}`) 보유로 한정 — **`addon/`(스캐폴드)·`builtin/` 유래라도 사용자가 등록한 자산은 삭제 가능** ③ 카탈로그 삭제는 설치 중 자산만 차단 — 시드 보호 자산이 이동돼 있으면 삭제 대신 원 시드 카탈로그로 반환(`returned_assets`) → **사용자 카탈로그는 항상 삭제 가능**.
 >
 > **자산 등록 회귀 수정 — 카탈로그(category)·폼 입력 반영(impl/50·물리 `test/impl/48`, §7.6.6)**: ① `POST /api/marketplace/catalog/zip` 이 동일 key@version 재등록(UPDATE 분기) 시에도 **요청 `category` 를 반영** — 기존 자산 ZIP 을 새 카탈로그명으로 등록하면 해당 카탈로그로 이동·생성된다(impl/49 ZIP-only 통합에서 카탈로그가 생성되지 않던 회귀 수정) ② **단일 ZIP + 폼 입력 시 폼 값(자산명/설명/종류, ko·en)이 ZIP meta 를 덮어씀** — 등록 모달의 필수 입력이 실제 카탈로그 표기에 반영. 다중 ZIP·폼 미전송(레거시 API 호출)은 종전대로 ZIP meta 우선.

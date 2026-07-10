@@ -220,6 +220,49 @@ async def _repair_dict_repr_rows(tid: str) -> None:
         print(f"[seed-assets] config dict repr 복구: {row['agent_key']}")
 
 
+async def _cleanup_orphaned_seed_rows(tid: str) -> None:
+    """시드 유래 고아 행 정리 (멱등) — 시드 디렉터리에서 제거/이동된 자산의 카탈로그 행 삭제.
+
+    대상 = 블롭 uploaded_by='seed-assets'(시드가 만든 행)이면서 현재
+    `marketplace-assets/{security,utilities}/{key}.zip` 이 없는 key
+    (예: UserManager 의 utilities → addon 이관). 사용자가 UI 로 등록한 자산
+    (uploaded_by=사용자)은 건드리지 않는다. 활성 설치 중이면 건너뛴다(먼저 해제).
+    """
+    disk_keys = {
+        z.stem.lower()
+        for category in _CATEGORIES
+        if (_ASSETS_ROOT / category).is_dir()
+        for z in (_ASSETS_ROOT / category).glob("*.zip")
+    }
+    rows = await fetch_all(
+        f"SELECT DISTINCT asset_key FROM marketplace_asset_blobs "
+        f"WHERE tenant_id = {_PH} AND uploaded_by = 'seed-assets'",
+        (tid,),
+    )
+    for row in rows:
+        key = row["asset_key"]
+        if key.lower() in disk_keys:
+            continue
+        active = await fetch_one(
+            f"SELECT id FROM marketplace_installs WHERE asset_key = {_PH} AND tenant_id = {_PH} AND active = 1",
+            (key, tid),
+        )
+        if active:
+            print(f"[seed-assets] ⚠️ 시드 고아 {key}: 설치 중 — 해제 후 재실행 시 정리")
+            continue
+        for table, cond in (
+            ("marketplace_asset_blobs", f"asset_key = {_PH} AND tenant_id = {_PH}"),
+            ("marketplace_installs", f"asset_key = {_PH} AND tenant_id = {_PH}"),
+            ("marketplace_assets", f"asset_key = {_PH} AND tenant_id = {_PH}"),
+        ):
+            await execute_write(f"DELETE FROM {table} WHERE {cond}", (key, tid))
+        await execute_write(
+            f"DELETE FROM tbl_agent_config WHERE LOWER(agent_key) = LOWER({_PH}) AND nav_group = 'marketplace'",
+            (key,),
+        )
+        print(f"[seed-assets] 시드 고아 정리: {key} (시드 디렉터리 미보유)")
+
+
 async def main() -> None:
     await apply_column_migrations()
     await run_migrations()
@@ -227,6 +270,7 @@ async def main() -> None:
     tid = _tenant()
     await _normalize_legacy_keys(tid)
     await _repair_dict_repr_rows(tid)
+    await _cleanup_orphaned_seed_rows(tid)
     total = 0
     for category in _CATEGORIES:
         cat_dir = _ASSETS_ROOT / category

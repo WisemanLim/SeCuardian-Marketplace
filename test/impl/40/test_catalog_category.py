@@ -80,9 +80,9 @@ with TestClient(m.app) as c:
     # 13 seeded + sec-extra-agent(A1 에서 카테고리 추가 등록) = 14
     chk(len(sec) == 14 and {"agentic-soc", "vasca-cve", "sec-extra-agent"} <= sec,
         f"B1 security 13+1 ({len(sec)})")
-    # utilities 6 seeded + util-extra from A2
-    chk(len(utils) == 7 and {"server-shell", "caddy-proxy", "util-extra"} <= utils,
-        f"B1 utilities 6+1 ({sorted(utils)})")
+    # utilities 5 seeded + util-extra from A2 (impl/52: UserManager 는 addon 으로 이관)
+    chk(len(utils) == 6 and {"server-shell", "caddy-proxy", "util-extra"} <= utils,
+        f"B1 utilities 5+1 ({sorted(utils)})")
     # addon/builtin 카테고리는 카탈로그에 없음 (§7.6.3-1)
     cats = {a["category"] for a in c.get("/api/marketplace/catalog", headers=H).json()["assets"]}
     chk("addon" not in cats and "builtin" not in cats, f"B1 addon/builtin excluded ({cats})")
@@ -102,8 +102,8 @@ util_keys = {r[0] for r in con.execute(
 sec_cnt = con.execute(
     "SELECT COUNT(*) FROM marketplace_assets WHERE category='security'").fetchone()[0]
 con.close()
-SEED_UTILS = {"UserManager", "ai-traffic-monitor", "caddy-proxy", "grafana-dashboard",
-              "server-shell", "truffle-scan"}
+SEED_UTILS = {"ai-traffic-monitor", "caddy-proxy", "grafana-dashboard",
+              "server-shell", "truffle-scan"}  # impl/52: UserManager 는 addon 으로 이관
 chk(sec_cnt >= 13 and SEED_UTILS <= util_keys,
     f"C1 dev DB registered (security={sec_cnt}, utilities={sorted(util_keys)})")
 
@@ -113,8 +113,8 @@ modal_src = (ROOT / "front/src/pages/marketplace/AssetRegisterModal.tsx").read_t
 mp_src = (ROOT / "front/src/pages/marketplace/MarketplacePage.tsx").read_text(encoding="utf-8")
 chk('from "../marketplace/AssetRegisterModal"' in agents_src
     and "function AssetRegisterModal" not in agents_src, "D1 AgentsPage inline modal removed")
-chk("category?: string" in modal_src and "registerAssetZips(zipFiles, cat)" in modal_src,
-    "D1 modal category prop + zip category")
+chk("category?: string" in modal_src and "registerAssetZips(zipFiles, cat," in modal_src,
+    "D1 modal category prop + zip category")  # impl/48: 폼 필드 인자 추가로 호출부 다행화
 chk("setAddCategory(cat)" in mp_src and "AssetRegisterModal category={addCategory}" in mp_src,
     "D1 per-category add button wired")
 

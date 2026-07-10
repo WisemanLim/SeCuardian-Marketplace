@@ -604,9 +604,12 @@ TENANT_DEFAULT_ID=default                  # off 모드일 때 사용할 고정 
    섹션으로 그룹 표시 — 설명 하단에 등록된 보안(security) 에이전트가 용도별로 보이도록 한다.
 4. **utilities 시드**: `scripts/seed_assets.py`(=`make seed-assets`) 신설 —
    `marketplace-assets/{security,utilities}/` 를 스캔해 `{key}-meta.json` 기반으로 미등록
-   자산만 INSERT(기존 등록분 무변경) + zip 블롭 checksum upsert. utilities 6종
-   (UserManager·server-shell·ai-traffic-monitor·caddy-proxy·grafana-dashboard·truffle-scan)이
+   자산만 INSERT(기존 등록분 무변경) + zip 블롭 checksum upsert. utilities 5종
+   (server-shell·ai-traffic-monitor·caddy-proxy·grafana-dashboard·truffle-scan)이
    카탈로그(category=utilities)에 표시된다. builtin(코어)·addon(스캐폴드 템플릿)은 시드 제외.
+   (v0.48: UserManager 는 utilities → addon 이관 — 스캐폴드 템플릿 편입, 시드 대상 제외.
+   시드가 만든 행 중 시드 디렉터리에서 제거된 key 는 `_cleanup_orphaned_seed_rows` 가
+   멱등 정리한다 — 블롭 uploaded_by='seed-assets' 한정, 사용자 등록 자산 불변, 설치 중 스킵.)
 5. **등록 즉시 반영**: 자산 등록/ZIP 등록 완료 시 `marketplaceChanged` 이벤트로 카탈로그를
    재조회 — 페이지 새로고침 없이 등록 자산이 즉시 표시된다.
 6. **README 상세화**: 설치/미설치 배지의 의미와 설치 시 내부 동작(installs 기록 →
@@ -620,7 +623,8 @@ TENANT_DEFAULT_ID=default                  # off 모드일 때 사용할 고정 
 
 1. **기본 등록 범위**: `marketplace-assets/` 4분류 중 **security·utilities 만** 자산 카탈로그
    대상 — addon(스캐폴드 템플릿)·builtin(코어 내장)은 카탈로그 등록에서 제외한다.
-   결과적으로 마켓플레이스 화면 자산 카탈로그에 security(13)·utilities(6) 섹션이 기본 표시된다.
+   결과적으로 마켓플레이스 화면 자산 카탈로그에 security(13)·utilities(5) 섹션이 기본 표시된다
+   (v0.48: UserManager 는 addon 으로 이관).
 2. **DB 기본 등록**: `make db-fresh` 가 seed(기반) → seed-security(보안 curated) →
    seed-assets(스캔) 를 순차 수행해 **초기화 직후에도 security·utilities 가 등록 상태**가 되도록
    체인을 확장한다. 기존 dev DB 에는 `make seed-assets` 1회 실행으로 utilities 를 편입(완료).
@@ -1132,6 +1136,7 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-10 | v0.48 | **impl/52(물리 `test/impl/50`) — UserManager 자산 utilities → addon 이관**(사용자 요구). ① `marketplace-assets/utilities/UserManager{,.zip}` → `marketplace-assets/addon/` 이동 — 카탈로그 시드 대상 제외(utilities 6→5종), 스캐폴드 템플릿 편입(templates list 5→6종), 시드 보호 해제(사용자 등록 시 deletable) ② `seed_assets` 에 `_cleanup_orphaned_seed_rows` 신설 — 시드 유래(블롭 uploaded_by='seed-assets') 행 중 시드 디렉터리 미보유 key 를 멱등 정리(사용자 등록 자산 불변·설치 중 스킵), dev DB usermanager 행 정리 완료 ③ 구 시험 정합 — impl/34(템플릿 6종)·impl/36(배치·다운로드, `*_worker` R22-4 필터)·impl/40(utilities 5종, impl/48 호출부 다행화 반영)·impl/45(UserManager=addon) 갱신, 전부 PASS. 잔존 기존 결함: TC-36-06 builtin/guardrails.zip 에 data/guardrails 구조 누락(본 건과 무관, 별도 수정 필요) | marketplace-assets/{addon,utilities}, scripts/seed_assets.py, test/impl/{34,36,40,45,50}, PRD §7.6.2-4·§7.6.3-1, README(.en) |
 | 2026-07-10 | v0.47 | **impl/51(물리 `test/impl/49`) — §7.6.6 개정: 중복 등록 사용자 확인 + 시드 보호 범위 축소 + 카탈로그 삭제 시 시드 자산 반환**(사용자 요구: ① 동일 에이전트도 별도 카탈로그로 등록 가능해야 — 이미 등록됨 정보를 보여주고 등록 여부는 사용자가 판단 ② `marketplace-assets/addon` 유래라도 사용자가 카탈로그 생성하며 등록한 자산은 삭제 가능해야). 수정 = ① `POST /catalog/zip` 중복 pre-check — `confirm` 없이 기존 key 존재 시 409 `{"code":"duplicate","assets":[…]}`, UI ConfirmDialog 확인 후 `confirm=true` 재요청 시 요청 카탈로그로 이동 등록 ② `deletable` 판정을 시드 카탈로그(`marketplace-assets/{security,utilities}`) 보유로 한정 — addon/builtin 유래 사용자 등록 자산 삭제 가능 ③ `DELETE /catalog-category` — 설치 중만 차단, 시드 보호 자산은 삭제 대신 원 시드 카탈로그로 반환(`returned_assets` 응답) → 사용자 카탈로그 항상 삭제 가능 | app/routers/router_marketplace.py, front(api/marketplace.ts·AssetRegisterModal.tsx·locales), PRD §7.6.6, README(.en), test/impl/49 |
 | 2026-07-10 | v0.46 | **impl/50(물리 `test/impl/48`) — §7.6.6 회귀 수정: 자산 등록 시 카탈로그(category)·폼 입력 미반영**(사용자 결함 보고: 새 카탈로그명으로 등록해도 카탈로그가 생성되지 않고 등록 에이전트 확인 불가 — v0.45 ZIP-only 통합의 회귀). 원인 = ① `POST /catalog/zip` UPDATE 분기(동일 key@version 존재)가 `category` 를 갱신하지 않음 — 기존 자산 ZIP(예: Board.zip) 재등록 시 제자리 갱신만 발생 ② 모달 필수 입력(자산명·설명·종류)이 서버로 전송되지 않아 ZIP meta 가 항상 우선. 수정 = ① UPDATE 분기에 `category` 반영(요청 카탈로그로 이동, seed 는 category 불변이라 재시드에 안정) ② 단일 ZIP + 폼 name 입력 시 폼 값(name/name_en/description/description_en/kind)이 meta 를 덮어씀 — 다중 ZIP·폼 미전송(레거시)은 종전 meta 우선 유지 | app/routers/router_marketplace.py, front(api/marketplace.ts·AssetRegisterModal.tsx), test/impl/48 |
 | 2026-07-10 | v0.45 | **impl/49(물리 `test/impl/47`) — §7.6.6 신설: 자산 등록 ZIP 필수 + 사용자 자산·카탈로그 삭제**(사용자 결함 보고: ZIP 0개로도 등록됨 + 사용자 등록 자산 삭제 수단 없음). ① 등록 모달(자산 등록·`+ 추가` 공용) ZIP 1개 이상 필수 검증 — 메타-only `POST /catalog` 는 AI 어시스턴트(call_api)·프로그래매틱 경로용 유지 ② `deletable`(디스크 `marketplace-assets/*/{key}.zip` 대소문자 무시 부재) 카탈로그 응답 노출 ③ `DELETE /catalog/{asset_key}` — deletable+비설치만, assets(전 버전)·blobs·installs·config 행 정리 ④ `DELETE /catalog-category/{category}` — 전 자산 deletable+비설치 시 일괄 삭제 ⑤ 카드 `삭제`·카테고리 헤더 `카탈로그 삭제` 버튼(admin) — 삭제 확인은 browser confirm 이 아닌 **커스텀 ConfirmDialog**(R18-1, 사용자 추가 요구) ⑤-2 등록 모달 UX(사용자 추가 요구) — 입력 순서 카탈로그→name→종류→이름(영문)…, '(선택)' 라벨 제거 + 필수 항목(ZIP) 적색 `*` 표시 ⑥ 회귀 수정 — `seed_assets` 가 impl/62 `*_worker` 메타 디렉터리를 설치형 자산으로 오등록(R22-4 위반, impl/39 C1 FAIL) → 스킵 처리 | app/routers/router_marketplace.py, scripts/seed_assets.py, front(marketplace.ts·MarketplacePage.tsx·AssetRegisterModal.tsx·locales), PRD §7.6.6, README(.en), test/impl/47 |

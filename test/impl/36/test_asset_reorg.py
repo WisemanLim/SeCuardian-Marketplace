@@ -23,8 +23,9 @@ _EXPECTED = {
         "isms-p-evidence", "behavior-noti", "agentic-soc", "ai-eval-gate",
     ),
     "builtin": ("marketplace", "workflow", "rag", "playground", "guardrails"),
-    "addon": ("Board", "RagAgent", "ServiceAgent", "ShellAgent", "ToolProxyAgent"),
-    "utilities": ("UserManager", "server-shell", "ai-traffic-monitor",
+    # impl/52: UserManager utilities → addon 이관 (스캐폴드 템플릿 편입)
+    "addon": ("Board", "RagAgent", "ServiceAgent", "ShellAgent", "ToolProxyAgent", "UserManager"),
+    "utilities": ("server-shell", "ai-traffic-monitor",
                   "caddy-proxy", "grafana-dashboard", "truffle-scan"),
 }
 
@@ -50,8 +51,10 @@ def test_tc36_01_directory_layout():
     assert not Path("addon-agents/zip").exists()
     assert not Path("addon-agents/_templates").exists()
     for cat, keys in _EXPECTED.items():
+        # R22-4: {Name}_worker 는 다운로드 전용 worker 메타 — 설치형 자산 아님 (seed 도 스킵)
         dirs = sorted(d.name for d in (_ASSETS / cat).iterdir()
-                      if d.is_dir() and not d.name.startswith("."))
+                      if d.is_dir() and not d.name.startswith(".")
+                      and not d.name.endswith("_worker"))
         assert dirs == sorted(keys), cat
 
 
@@ -77,12 +80,14 @@ async def test_tc36_03_templates_list_addon_only(tmp_path, monkeypatch):
 
 @pytest.mark.asyncio
 async def test_tc36_04_download(tmp_path, monkeypatch):
-    """TC-36-04: download/Board 200, utilities UserManager 404."""
+    """TC-36-04(impl/52 개정): download/Board·UserManager(addon) 200, utilities server-shell 404."""
     await _setup_db(tmp_path, monkeypatch)
     async with _client() as c:
         r = await c.get("/api/addon-agents/templates/download/Board", headers=_headers())
         assert r.status_code == 200 and r.headers["content-type"] == "application/zip"
-        r404 = await c.get("/api/addon-agents/templates/download/UserManager", headers=_headers())
+        r = await c.get("/api/addon-agents/templates/download/UserManager", headers=_headers())
+        assert r.status_code == 200 and r.headers["content-type"] == "application/zip"
+        r404 = await c.get("/api/addon-agents/templates/download/server-shell", headers=_headers())
         assert r404.status_code == 404
 
 
