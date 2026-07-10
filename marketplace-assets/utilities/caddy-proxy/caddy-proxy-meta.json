@@ -1,12 +1,19 @@
 {
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "Caddy Proxy Monitor",
+    "en": "Caddy Proxy Monitor"
+  },
+  "description": {
+    "ko": "Caddy 리버스 프록시를 admin API로 모니터링·관리하며 상태·설정 조회, 라우트 목록, 라이브 설정 리로드 도구를 제공합니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "Monitors and manages the Caddy reverse proxy via its admin API, providing status/config queries, route listing, and live config reload tools. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant."
+  },
   "key": "caddy-proxy",
   "name": "Caddy Proxy Monitor",
   "type": "tool-proxy",
   "epic": "E04",
   "layer": "L3 Network",
-  "description": "Caddy 리버스 프록시를 admin API로 모니터링·관리하며 상태·설정 조회, 라우트 목록, 라이브 설정 리로드 도구를 제공합니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
   "description_en": "Monitors and manages the Caddy reverse proxy via its admin API. Exposes tools for status, configuration inspection, route listing, and live configuration reload. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
-  "version": "1.0.0",
   "endpoints": [
     {
       "method": "GET",

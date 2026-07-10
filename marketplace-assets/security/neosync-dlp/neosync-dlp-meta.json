@@ -1,11 +1,17 @@
 {
-  "agent_key": "neosync-dlp",
   "agent_type": "service",
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "Neosync DLP",
+    "en": "Neosync DLP"
+  },
+  "description": {
+    "ko": "Neosync DLP 파이프라인 상태를 모니터링하고 Job 실행을 관리하는 데이터 보호 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "Data protection agent that monitors Neosync DLP pipeline status and manages job runs. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant."
+  },
+  "agent_key": "neosync-dlp",
   "epic": "E14",
   "layer": "L4 Data",
-  "version": "1.0.0",
-  "display_name": "Neosync DLP Monitor",
-  "description": "Neosync DLP 파이프라인 상태를 모니터링하고 Job 실행을 관리하는 데이터 보호 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
   "description_en": "Data protection agent that monitors Neosync DLP pipeline status and manages job runs. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
   "capabilities": [
     {

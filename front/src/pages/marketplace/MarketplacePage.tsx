@@ -4,11 +4,18 @@ import {
 } from "../../api/marketplace";
 import { RemoteAsset, remoteCatalog, remoteInstall } from "../../api/marketplaceRemote";
 import { useLocale } from "../../hooks/useLocale";
+import { parseLangMap, pickDescription } from "../../store/locale";
 import { getAuth } from "../../store/auth";
 import AssetRegisterModal from "./AssetRegisterModal";
 
 export default function MarketplacePage() {
   const { t } = useLocale();
+  // R18-7: 카탈로그 카드 이름·설명 다국어 — names/descriptions JSON({"ko":…,"en":…,…}) 을
+  // 공통함수(parseLangMap+pickDescription)로 해석, 레거시 컬럼은 폴백만. 언어 확장 시 데이터만 추가.
+  const assetName = (a: { name: string; name_en?: string | null; names?: string | null }) =>
+    pickDescription(parseLangMap(a.names), a.name, a.name_en) || a.name;
+  const assetDesc = (a: { description?: string | null; descriptions?: string | null }) =>
+    pickDescription(parseLangMap(a.descriptions), a.description, null);
   const user = getAuth();
   const isAdmin = user?.role === "supervisor" || user?.role === "admin";
   const [assets, setAssets] = useState<MarketplaceAsset[]>([]);
@@ -112,7 +119,7 @@ export default function MarketplacePage() {
               <div key={`${a.asset_key}-${a.version}`} className="p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                 <div className="flex items-start justify-between">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{a.name}</p>
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{assetName(a)}</p>
                     <p className="text-xs text-gray-400">{a.asset_key} · {a.kind} · v{a.version}</p>
                   </div>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded shrink-0 ${
@@ -121,7 +128,7 @@ export default function MarketplacePage() {
                     {a.installed ? `${t("mp.installed")} (${a.active_version})` : t("mp.notInstalled")}
                   </span>
                 </div>
-                {a.description && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{a.description}</p>}
+                {assetDesc(a) && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{assetDesc(a)}</p>}
                 <div className="mt-2 flex gap-2">
                   {a.installed ? (
                     <button disabled={busy === a.asset_key} onClick={() => handleUninstall(a)}
@@ -161,11 +168,11 @@ export default function MarketplacePage() {
                 <div key={`${a.asset_key}-${a.version}`} className="p-3 rounded border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900">
                   <div className="flex items-start justify-between">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{a.name}</p>
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{assetName(a)}</p>
                       <p className="text-xs text-gray-400">{a.asset_key} · {a.kind} · v{a.version} · {t("mp.remoteTag")}</p>
                     </div>
                   </div>
-                  {a.description && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{a.description}</p>}
+                  {assetDesc(a) && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{assetDesc(a)}</p>}
                   <button disabled={busy === `remote:${a.asset_key}` || localHas} onClick={() => handleRemoteInstall(a)}
                     className="mt-2 text-xs px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40">
                     {localHas ? t("mp.importedLocal") : t("mp.downloadImport")}

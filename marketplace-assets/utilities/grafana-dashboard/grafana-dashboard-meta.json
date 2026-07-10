@@ -1,9 +1,15 @@
 {
-  "agent_key": "grafana-dashboard",
   "agent_type": "rag",
   "version": "1.0.0",
-  "display_name": "Grafana Dashboard RAG Agent",
-  "description": "Grafana 대시보드 패널 정보를 임베딩하고 벡터 검색으로 질의에 답변하는 RAG Agent입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "display_name": {
+    "ko": "Grafana Dashboard RAG Agent",
+    "en": "Grafana Dashboard RAG Agent"
+  },
+  "description": {
+    "ko": "Grafana 대시보드 패널 정보를 임베딩하고 벡터 검색으로 질의에 답변하는 RAG Agent입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "RAG agent that embeds Grafana dashboard panel information and answers queries via vector search. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant."
+  },
+  "agent_key": "grafana-dashboard",
   "description_en": "RAG agent that embeds Grafana dashboard panel information and answers queries via vector search. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
   "epic": null,
   "layer": "Cross",

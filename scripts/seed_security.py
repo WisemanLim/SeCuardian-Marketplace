@@ -22,6 +22,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.core.config import settings as _settings
+from app.core.i18n import lang_json
 from app.db import execute_insert, execute_write, fetch_one, run_migrations, apply_column_migrations, _PH
 
 _ASSETS_DIR = Path(__file__).resolve().parent.parent / "marketplace-assets" / "security"
@@ -96,32 +97,34 @@ async def main() -> None:
             f"SELECT id FROM marketplace_assets WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
             (asset_key, _VERSION, tid),
         )
+        # §7.11.2-5: 다국어 dict(JSON) 저자 — 언어 확장 시 데이터만 추가
+        names_json = lang_json({"ko": name, "en": name_en or name})
+        descs_json = lang_json({"ko": desc_ko, "en": desc_en})
         if dup:
             # 멱등 갱신 — 설명·거버넌스·checksum 만 동기 (설치 상태 불변)
             await execute_write(
                 f"UPDATE marketplace_assets SET name = {_PH}, name_en = {_PH}, description = {_PH}, "
-                f"category = 'security', checksum = {_PH}, updated_at = CURRENT_TIMESTAMP "
+                f"names = {_PH}, descriptions = {_PH}, category = 'security', checksum = {_PH}, "
+                f"updated_at = CURRENT_TIMESTAMP "
                 f"WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
-                (name, name_en, desc_ko, checksum, asset_key, _VERSION, tid),
+                (name, name_en, desc_ko, names_json, descs_json, checksum, asset_key, _VERSION, tid),
             )
             print(f"[seed-security] asset (갱신): {asset_key}")
         else:
             await execute_insert(
                 f"INSERT INTO marketplace_assets "
-                f"(tenant_id, asset_key, version, kind, name, name_en, description, category, "
+                f"(tenant_id, asset_key, version, kind, name, name_en, description, names, descriptions, category, "
                 f" min_platform_version, governance, required_env, checksum, source) "
-                f"VALUES ({','.join([_PH] * 13)})",
-                (tid, asset_key, _VERSION, "agent", name, name_en, desc_ko, "security",
+                f"VALUES ({','.join([_PH] * 15)})",
+                (tid, asset_key, _VERSION, "agent", name, name_en, desc_ko, names_json, descs_json, "security",
                  "0.1.0", "", "", checksum, "local"),
             )
             print(f"[seed-security] asset: {asset_key}")
 
-        # §7.11.2-5: 설치된(설치 이력 있는) 에이전트의 descriptions JSON 에 ko/en 을 동기(split 컬럼 대신).
-        # marketplace_assets 에는 en 설명 컬럼이 없어 카탈로그 카드는 ko 만 보유 — 설치본은 여기서 en 보강.
-        import json as _json
+        # §7.11.2-5: 설치된(설치 이력 있는) 에이전트의 descriptions/agent_names JSON 동기 (split 컬럼 대신)
         await execute_write(
-            f"UPDATE tbl_agent_config SET descriptions = {_PH} WHERE agent_key = {_PH}",
-            (_json.dumps({"ko": desc_ko, "en": desc_en}, ensure_ascii=False), asset_key),
+            f"UPDATE tbl_agent_config SET descriptions = {_PH}, agent_names = {_PH} WHERE agent_key = {_PH}",
+            (descs_json, names_json, asset_key),
         )
 
         if raw:

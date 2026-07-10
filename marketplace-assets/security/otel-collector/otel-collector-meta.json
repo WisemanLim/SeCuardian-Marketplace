@@ -1,9 +1,15 @@
 {
-  "agent_key": "otel-collector",
   "agent_type": "tool-proxy",
   "version": "1.0.0",
-  "display_name": "OpenTelemetry Collector",
-  "description": "OpenTelemetry Collector의 헬스·파이프라인·메트릭 상태를 MCP Tool로 노출하는 어댑터 Agent입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+  "display_name": {
+    "ko": "OpenTelemetry Collector",
+    "en": "OpenTelemetry Collector"
+  },
+  "description": {
+    "ko": "OpenTelemetry Collector의 헬스·파이프라인·메트릭 상태를 MCP Tool로 노출하는 어댑터 Agent입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "Adapter agent that exposes OpenTelemetry Collector health, pipeline, and metric status as MCP tools. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant."
+  },
+  "agent_key": "otel-collector",
   "description_en": "Adapter agent that exposes OpenTelemetry Collector health, pipeline, and metrics status as MCP tools. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
   "epic": "E15",
   "layer": "Cross",

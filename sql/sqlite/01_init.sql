@@ -193,6 +193,8 @@ CREATE TABLE IF NOT EXISTS marketplace_assets (
     name          VARCHAR(128) NOT NULL,
     name_en       VARCHAR(128) DEFAULT '',
     description   TEXT         DEFAULT '',
+    names         TEXT         DEFAULT '',   -- 다국어 이름 JSON {"ko":…, "en":…, …} (§7.11.2-5)
+    descriptions  TEXT         DEFAULT '',   -- 다국어 설명 JSON {"ko":…, "en":…, …}
     category      VARCHAR(64)  DEFAULT 'general',
     min_platform_version VARCHAR(32) DEFAULT '0.1.0',
     governance    TEXT         DEFAULT '',

@@ -1,24 +1,69 @@
 {
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "ISMS-P Evidence Collector",
+    "en": "ISMS-P Evidence Collector"
+  },
+  "description": {
+    "ko": "ISMS-P 인증 대응을 위한 감사 증거를 자동 수집·보고하는 컴플라이언스 에이전트입니다 (내장 router_isms 의 ADDON 판). Wazuh·Keycloak·Vault·Teleport·VASCA·Neosync·SOAR 상태를 통제항목별로 점검합니다. 전용 화면이 없어 AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "Compliance agent that automatically collects and reports audit evidence for ISMS-P certification (ADDON edition of the built-in router_isms). Checks Wazuh, Keycloak, Vault, Teleport, VASCA, Neosync, and SOAR status per control item. It has no dedicated screen — use it via Q&A through the AI Assistant."
+  },
   "key": "isms-p-evidence",
   "name": "ISMS-P Evidence Collector",
   "type": "service",
   "epic": "E22",
   "layer": "Cross-cutting",
-  "description": "ISMS-P 인증 대응을 위한 감사 증거를 자동 수집·보고하는 컴플라이언스 에이전트입니다 (내장 router_isms 의 ADDON 판). Wazuh·Keycloak·Vault·Teleport·VASCA·Neosync·SOAR 상태를 통제항목별로 점검합니다. 전용 화면이 없어 AI 어시스턴트를 통해 질의응답으로 사용합니다.",
   "description_en": "Compliance agent that automatically collects and reports audit evidence for ISMS-P certification (ADDON packaging of the built-in router_isms). Checks Wazuh, Keycloak, Vault, Teleport, VASCA, Neosync, and SOAR per control item. No dedicated screen — use via Q&A through the AI Assistant.",
-  "version": "1.0.0",
   "endpoints": [
-    {"method": "GET", "path": "/status", "auth": true, "description": "Evidence collection status + control list"},
-    {"method": "POST", "path": "/evidence", "auth": true, "description": "Collect evidence per control (internal API + doc checks)"},
-    {"method": "GET", "path": "/evidence", "auth": true, "description": "List collected evidence (latest first)"},
-    {"method": "POST", "path": "/report", "auth": true, "description": "Generate ISMS-P audit report from collected evidence"}
+    {
+      "method": "GET",
+      "path": "/status",
+      "auth": true,
+      "description": "Evidence collection status + control list"
+    },
+    {
+      "method": "POST",
+      "path": "/evidence",
+      "auth": true,
+      "description": "Collect evidence per control (internal API + doc checks)"
+    },
+    {
+      "method": "GET",
+      "path": "/evidence",
+      "auth": true,
+      "description": "List collected evidence (latest first)"
+    },
+    {
+      "method": "POST",
+      "path": "/report",
+      "auth": true,
+      "description": "Generate ISMS-P audit report from collected evidence"
+    }
   ],
   "env_vars": [
-    {"name": "ISMS_AUTO_COLLECT", "default": "false", "description": "Enable scheduled auto collection"},
-    {"name": "ISMS_REPORT_DIR", "default": "logs/isms-reports", "description": "Report output directory"},
-    {"name": "ISMS_BACKEND_BASE", "default": "http://localhost:8200", "description": "SeCuardian API base URL for internal status checks"}
+    {
+      "name": "ISMS_AUTO_COLLECT",
+      "default": "false",
+      "description": "Enable scheduled auto collection"
+    },
+    {
+      "name": "ISMS_REPORT_DIR",
+      "default": "logs/isms-reports",
+      "description": "Report output directory"
+    },
+    {
+      "name": "ISMS_BACKEND_BASE",
+      "default": "http://localhost:8200",
+      "description": "SeCuardian API base URL for internal status checks"
+    }
   ],
-  "dependencies": ["httpx"],
+  "dependencies": [
+    "httpx"
+  ],
   "db_tables": [],
-  "base_agent": {"agent_key": "isms-p-evidence", "source": "app/routers/router_isms.py", "platform": "SeCuardian"}
+  "base_agent": {
+    "agent_key": "isms-p-evidence",
+    "source": "app/routers/router_isms.py",
+    "platform": "SeCuardian"
+  }
 }

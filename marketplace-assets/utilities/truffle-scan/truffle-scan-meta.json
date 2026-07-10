@@ -1,13 +1,19 @@
 {
-  "agent_key": "truffle-scan",
   "agent_type": "execution",
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "TruffleHog Secret Scan Receiver",
+    "en": "TruffleHog Secret Scan Receiver"
+  },
+  "description": {
+    "ko": "TruffleHog 시크릿 스캔 결과를 웹훅으로 수신·저장하고 스캔·심각도·검증 상태별 조회를 제공하는 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "Agent that receives and stores TruffleHog secret-scan results via webhook and provides queries by scan, severity, and verification status. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant."
+  },
+  "agent_key": "truffle-scan",
   "epic": "E08",
   "layer": "L4",
   "layer_name": "Application",
-  "display_name": "TruffleHog Secret Scan Receiver",
-  "description": "TruffleHog 시크릿 스캔 결과를 웹훅으로 수신·저장하고 스캔·심각도·검증 상태별 조회를 제공하는 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
   "description_en": "Receives and stores TruffleHog secret-scanning results via webhook. Provides query endpoints for reviewing discovered secrets by scan, severity, and verification status. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
-  "version": "1.0.0",
   "router_prefix": "/truffle-scan",
   "tags": [
     "truffle-scan"

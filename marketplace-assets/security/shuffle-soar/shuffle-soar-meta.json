@@ -1,13 +1,20 @@
 {
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "Shuffle SOAR",
+    "en": "Shuffle SOAR"
+  },
+  "description": {
+    "ko": "Shuffle SOAR 워크플로를 트리거하고 실행 결과를 수집하는 보안 자동화 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "Security automation agent that triggers Shuffle SOAR workflows and collects execution results. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant."
+  },
   "key": "shuffle-soar",
   "name": "Shuffle SOAR",
   "type": "execution",
   "epic": "E13",
   "layer": "L5",
   "layer_name": "Detection",
-  "description": "Shuffle SOAR 워크플로를 트리거하고 실행 결과를 수집하는 보안 자동화 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
   "description_en": "Shuffle SOAR workflow execution bridge. Triggers workflows via webhook, maintains an in-memory execution log, and accepts result callbacks from Shuffle. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
-  "version": "1.0.0",
   "endpoints": [
     {
       "method": "GET",

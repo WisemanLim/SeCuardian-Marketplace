@@ -196,6 +196,10 @@ def _apply_pg_column_migrations() -> None:
         "ALTER TABLE tbl_addon_agents ADD COLUMN IF NOT EXISTS has_app INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE tbl_addon_agents ADD COLUMN IF NOT EXISTS agent_type TEXT NOT NULL DEFAULT 'app'",
         "ALTER TABLE tbl_addon_agents ADD COLUMN IF NOT EXISTS meta_json TEXT",
+        # §7.11.2-5: 카탈로그 자산 다국어 이름·설명 — {"ko":…, "en":…, …} JSON dict
+        # (언어 확장 시 코드 수정 없이 데이터만 추가 — split 컬럼 authoring 금지)
+        "ALTER TABLE marketplace_assets ADD COLUMN IF NOT EXISTS names TEXT DEFAULT ''",
+        "ALTER TABLE marketplace_assets ADD COLUMN IF NOT EXISTS descriptions TEXT DEFAULT ''",
         # F23: tbl_agent_registry v2 columns
         "ALTER TABLE tbl_agent_registry ADD COLUMN IF NOT EXISTS agent_type TEXT NOT NULL DEFAULT 'service'",
         "ALTER TABLE tbl_agent_registry ADD COLUMN IF NOT EXISTS capabilities_json TEXT",
@@ -289,6 +293,16 @@ async def apply_column_migrations() -> None:
             if col not in addon_cols:
                 await conn.execute(f"ALTER TABLE tbl_addon_agents ADD COLUMN {col} {typedef}")
                 logger.info("[db] added column tbl_addon_agents.%s", col)
+        await conn.commit()
+
+    # marketplace_assets — 다국어 이름·설명 JSON 컬럼 (§7.11.2-5, tbl_agent_config 와 동일 패턴)
+    async with aiosqlite.connect(_db_path()) as conn:
+        async with conn.execute("PRAGMA table_info(marketplace_assets)") as cur:
+            mp_cols = {row[1] async for row in cur}
+        for col in (["names", "descriptions"] if mp_cols else []):
+            if col not in mp_cols:
+                await conn.execute(f"ALTER TABLE marketplace_assets ADD COLUMN {col} TEXT DEFAULT ''")
+                logger.info("[db] added column marketplace_assets.%s", col)
         await conn.commit()
 
     # tbl_agent_registry — F23 v2 columns

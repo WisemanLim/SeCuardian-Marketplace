@@ -1,12 +1,19 @@
 {
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "Teleport PAM",
+    "en": "Teleport PAM"
+  },
+  "description": {
+    "ko": "Teleport 특권 접근(PAM) 감사 이벤트를 수집하고 활성 세션·사용자를 조회하는 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "Agent that collects Teleport privileged access (PAM) audit events and lists active sessions and users. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant."
+  },
   "key": "teleport-pam",
   "name": "Teleport PAM",
   "type": "service",
   "epic": "E17",
   "layer": "L1 Identity",
-  "description": "Teleport 특권 접근(PAM) 감사 이벤트를 수집하고 활성 세션·사용자를 조회하는 에이전트입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
   "description_en": "Privileged access monitor for Teleport — ingests webhook audit events, queries live sessions and users, and exposes a filtered in-memory event log. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
-  "version": "1.0.0",
   "endpoints": [
     {
       "method": "GET",

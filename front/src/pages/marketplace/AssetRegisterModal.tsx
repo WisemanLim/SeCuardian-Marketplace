@@ -12,7 +12,8 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
 }>) {
   const { t } = useLocale();
   const [form, setForm] = useState({
-    name: "", kind: "agent", description: "", category: category ?? "general",
+    name: "", name_en: "", kind: "agent", description: "", description_en: "",
+    category: category ?? "general",
   });
   const [zipFiles, setZipFiles] = useState<File[]>([]);
   const [error, setError] = useState("");
@@ -28,7 +29,18 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
       if (zipFiles.length > 0) {
         await registerAssetZips(zipFiles, cat); // ZIP 별 자산 등록 + 블롭 저장 (다중)
       } else {
-        await registerAsset({ ...form, category: cat });
+        // R18-7: 다국어 dict({"ko":…,"en":…})로 전송 — 저장·파싱은 공통함수, 언어 확장 시 데이터만 추가
+        const langMap = (ko: string, en: string) => {
+          const m: Record<string, string> = {};
+          if (ko.trim()) m.ko = ko.trim();
+          if (en.trim()) m.en = en.trim();
+          return Object.keys(m).length ? m : undefined;
+        };
+        await registerAsset({
+          name: form.name, kind: form.kind, category: cat,
+          names: langMap(form.name, form.name_en),
+          descriptions: langMap(form.description, form.description_en),
+        });
       }
       window.dispatchEvent(new CustomEvent("marketplaceChanged")); // 카탈로그 즉시 갱신
       onClose();
@@ -83,9 +95,20 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
               <span className="block mt-0.5 text-[11px] text-gray-400">{t("agent.assetCategoryHint")}</span>
             </label>
           )}
+          {/* R18-7: 다국어 — name(ko)/name_en, description(ko)/description_en */}
+          <label className="text-xs text-gray-500 col-span-2">
+            {t("agent.assetNameEn")}
+            <input value={form.name_en} onChange={(e) => setForm((f) => ({ ...f, name_en: e.target.value }))}
+              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
+          </label>
           <label className="text-xs text-gray-500 col-span-2">
             {t("agent.assetDesc")}
             <input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
+          </label>
+          <label className="text-xs text-gray-500 col-span-2">
+            {t("agent.assetDescEn")}
+            <input value={form.description_en} onChange={(e) => setForm((f) => ({ ...f, description_en: e.target.value }))}
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
           </label>
           {/* §7.6.2: addon ZIP 다중 첨부 — ZIP 별 meta.json 으로 자산 등록, 설치 시 hot-deploy */}

@@ -182,13 +182,20 @@ async def remote_install(
     )
     if dup:
         raise HTTPException(409, f"asset {asset_key}@{version} already in local catalog")
+    # R18-7: 원격 메타의 description/display_name 도 다국어 dict 허용 — 공통함수로 정규화해
+    # names/descriptions JSON 으로 저장 (raw dict repr 저장 방지, 언어 확장 시 데이터만 추가)
+    from app.core.i18n import lang_json, norm_descriptions
+    _m = norm_descriptions(dict(meta))
+    _names = _m.get("agent_names") or {}
     await execute_insert(
         f"INSERT INTO marketplace_assets "
-        f"(tenant_id, asset_key, version, kind, name, name_en, description, category, checksum, source) "
-        f"VALUES ({','.join([_PH] * 10)})",
-        (tid, asset_key, version, meta.get("kind", "agent"), meta.get("name", asset_key),
-         meta.get("name_en", ""), meta.get("description", ""), meta.get("category", "general"),
-         actual, "remote"),
+        f"(tenant_id, asset_key, version, kind, name, name_en, description, names, descriptions, category, checksum, source) "
+        f"VALUES ({','.join([_PH] * 12)})",
+        (tid, asset_key, version, meta.get("kind", "agent"),
+         _names.get("ko") or meta.get("name") or asset_key,
+         _names.get("en") or meta.get("name_en") or "",
+         _m.get("description", ""), lang_json(_names), lang_json(_m.get("descriptions")),
+         meta.get("category", "general"), actual, "remote"),
     )
     asset = await fetch_one(
         f"SELECT * FROM marketplace_assets WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",

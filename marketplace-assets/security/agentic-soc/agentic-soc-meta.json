@@ -1,13 +1,20 @@
 {
-  "agent_key": "agentic-soc",
   "agent_type": "federation",
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "Agentic SOC Platform",
+    "en": "Agentic SOC Platform"
+  },
+  "description": {
+    "ko": "보안 에이전트들을 A2A로 오케스트레이션하고 인시던트 트리아지·플레이북을 실행하는 Agentic SOC 플랫폼입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "Agentic SOC platform that orchestrates security agents over A2A and runs incident triage and playbooks. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant."
+  },
+  "agent_key": "agentic-soc",
   "epic": "E20",
   "layer": "L5",
   "layer_name": "Detection",
   "name": "Agentic SOC",
-  "description": "보안 에이전트들을 A2A로 오케스트레이션하고 인시던트 트리아지·플레이북을 실행하는 Agentic SOC 플랫폼입니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
   "description_en": "Federation platform that orchestrates security agents via A2A messaging, manages findings, and executes response playbooks. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
-  "version": "1.0.0",
   "router_prefix": "/agentic-soc",
   "tags": [
     "agentic-soc"

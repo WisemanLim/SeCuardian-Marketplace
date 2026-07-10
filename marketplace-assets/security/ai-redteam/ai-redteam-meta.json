@@ -1,11 +1,18 @@
 {
+  "display_name": {
+    "ko": "AI Red Team ⚠️ Isolated",
+    "en": "AI Red Team ⚠️ Isolated"
+  },
+  "description": {
+    "ko": "PyRIT·SkillSpector로 LLM 탈옥·프롬프트 인젝션 등 적대적 스캔을 수행하는 AI 레드팀 에이전트입니다. 격리 네트워크와 명시적 옵트인이 필요합니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
+    "en": "AI red-team agent that runs adversarial scans such as LLM jailbreak and prompt injection with PyRIT and SkillSpector. Requires an isolated network and explicit opt-in. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant."
+  },
   "key": "ai-redteam",
   "name": "AI Red Team",
   "type": "execution",
   "epic": "E21",
   "layer": "L6",
   "layer_name": "Forensics",
-  "description": "PyRIT·SkillSpector로 LLM 탈옥·프롬프트 인젝션 등 적대적 스캔을 수행하는 AI 레드팀 에이전트입니다. 격리 네트워크와 명시적 옵트인이 필요합니다. 전용 화면이 없어 좌측 메뉴에는 표시되지 않으며, AI 어시스턴트를 통해 질의응답으로 사용합니다.",
   "description_en": "AI red-team agent using PyRIT and SkillSpector. Performs adversarial LLM scanning (jailbreak, prompt injection, data exfiltration) and agent skill evaluation. Requires an isolation network and explicit opt-in. It has no dedicated screen and does not appear in the left menu — use it via Q&A through the AI Assistant.",
   "default_enabled": false,
   "required_role": "supervisor",

@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field
 
 from app.core.config import settings
 from app.core.deps import get_current_user, require_role
+from app.core.i18n import lang_json, norm_descriptions, parse_lang_map
 from app.db import _PH, execute_insert, execute_write, fetch_all, fetch_one
 
 router = APIRouter(prefix="/api/marketplace", tags=["marketplace"])
@@ -39,6 +40,11 @@ class AssetCreate(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     name_en: str = Field(default="", max_length=128)
     description: str = ""
+    description_en: str = ""
+    # §7.11.2-5: 다국어 dict 직접 지정 ({"ko":…, "en":…, "jp":…}) — 지정 시 위 레거시 필드보다 우선.
+    # 저장은 항상 dict(JSON) — 언어 확장 시 코드 수정 없이 데이터만 추가.
+    names: dict[str, str] | None = None
+    descriptions: dict[str, str] | None = None
     category: str = Field(default="general", max_length=64)
     min_platform_version: str = Field(default="0.1.0", max_length=32)
     governance: str = ""
@@ -122,14 +128,21 @@ async def register_asset(
     else:
         # §7.6.2: asset_key 자동부여 — name 슬러그 + 충돌 접미
         asset_key = await _unique_asset_key(body.name, tid)
+    # §7.11.2-5: 모든 입력(dict 형·레거시 필드)을 공통함수로 정규화 → names/descriptions JSON 저자
+    _m = norm_descriptions({
+        "display_name": body.names or {"ko": body.name, "en": body.name_en},
+        "description": body.descriptions or {"ko": body.description, "en": body.description_en},
+    })
     await execute_insert(
         f"INSERT INTO marketplace_assets "
-        f"(tenant_id, asset_key, version, kind, name, name_en, description, category, "
+        f"(tenant_id, asset_key, version, kind, name, name_en, description, names, descriptions, category, "
         f" min_platform_version, governance, required_env, checksum, source) "
-        f"VALUES ({','.join([_PH] * 13)})",
+        f"VALUES ({','.join([_PH] * 15)})",
         (
-            tid, asset_key, body.version, body.kind, body.name, body.name_en,
-            body.description, body.category, body.min_platform_version,
+            tid, asset_key, body.version, body.kind,
+            _m["agent_names"].get("ko") or body.name, _m["agent_names"].get("en", ""),
+            _m["description"], lang_json(_m["agent_names"]), lang_json(_m["descriptions"]),
+            body.category, body.min_platform_version,
             body.governance, body.required_env, body.checksum, body.source,
         ),
     )
@@ -187,16 +200,20 @@ async def install(
         #    §7.11.2-5: descriptions/agent_names 를 JSON(다국어 확장형)으로 저자.
         cfg_key = None
         if asset["kind"] == "agent":
-            import json as _json
-            cfg_key = asset["asset_key"]
-            descriptions = _json.dumps(
-                {"ko": asset["description"]} if asset.get("description") else {},
-                ensure_ascii=False,
-            )
-            _names = {"ko": asset["name"]}
-            if asset.get("name_en"):
-                _names["en"] = asset["name_en"]
-            agent_names = _json.dumps(_names, ensure_ascii=False)
+            # §7.6.5: addon 업로드 파이프라인이 zip 스템을 소문자화하므로 config 키도 소문자로
+            # 통일 — 대소문자 혼용 시 tbl_agent_config 에 동일 에이전트가 2행(중복 카드) 생기는 결함 방지.
+            cfg_key = asset["asset_key"].lower()
+            # §7.11.2-5: 자산의 names/descriptions JSON(dict) 그대로 전파 — 레거시 컬럼은 폴백만
+            _descs = parse_lang_map(asset.get("descriptions"))
+            if not _descs and asset.get("description"):
+                _descs = {"ko": asset["description"]}
+            _names = parse_lang_map(asset.get("names"))
+            if not _names:
+                _names = {"ko": asset["name"]}
+                if asset.get("name_en"):
+                    _names["en"] = asset["name_en"]
+            descriptions = lang_json(_descs)
+            agent_names = lang_json(_names)
             exists = await fetch_one(
                 f"SELECT agent_key FROM tbl_agent_config WHERE agent_key = {_PH}", (cfg_key,)
             )
@@ -300,6 +317,8 @@ def _parse_zip_meta(raw: bytes, filename: str) -> dict:
     """ZIP 내 {key}-meta.json 파싱 → asset_key/name/version/description 추출 (§7.6.2).
 
     meta 미존재 시 파일명 스템({key}.zip → key)으로 폴백.
+    R18-7: description/display_name 은 다국어 dict 형({"ko":…, "en":…, …})·레거시 문자열 모두 허용 —
+    공통함수 norm_descriptions 로 정규화해 raw dict repr 이 카탈로그에 저장되던 결함을 방지.
     """
     stem = re.sub(r"\.zip$", "", filename)
     meta: dict = {}
@@ -310,11 +329,15 @@ def _parse_zip_meta(raw: bytes, filename: str) -> dict:
         )
         if names:
             meta = json.loads(zf.read(names[0]).decode("utf-8"))
+    meta = norm_descriptions(meta)
     key = _slugify(str(meta.get("agent_key") or meta.get("key") or stem))
+    agent_names = meta.get("agent_names") or {}
     return {
         "asset_key": key,
-        "name": str(meta.get("name") or key),
-        "name_en": str(meta.get("name_en") or ""),
+        "name": str(agent_names.get("ko") or meta.get("name") or key),
+        "name_en": str(agent_names.get("en") or meta.get("name_en") or ""),
+        "names": agent_names,
+        "descriptions": meta.get("descriptions") or {},
         "version": str(meta.get("version") or "1.0.0"),
         "description": str(meta.get("description") or ""),
     }
@@ -349,19 +372,21 @@ async def register_assets_from_zips(
         if exists:
             await execute_write(
                 f"UPDATE marketplace_assets SET name = {_PH}, name_en = {_PH}, description = {_PH}, "
-                f"checksum = {_PH}, updated_at = CURRENT_TIMESTAMP "
+                f"names = {_PH}, descriptions = {_PH}, checksum = {_PH}, updated_at = CURRENT_TIMESTAMP "
                 f"WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
-                (meta["name"], meta["name_en"], meta["description"], checksum,
-                 meta["asset_key"], meta["version"], tid),
+                (meta["name"], meta["name_en"], meta["description"],
+                 lang_json(meta["names"]), lang_json(meta["descriptions"]),
+                 checksum, meta["asset_key"], meta["version"], tid),
             )
         else:
             await execute_insert(
                 f"INSERT INTO marketplace_assets "
-                f"(tenant_id, asset_key, version, kind, name, name_en, description, category, "
+                f"(tenant_id, asset_key, version, kind, name, name_en, description, names, descriptions, category, "
                 f" min_platform_version, governance, required_env, checksum, source) "
-                f"VALUES ({','.join([_PH] * 13)})",
+                f"VALUES ({','.join([_PH] * 15)})",
                 (tid, meta["asset_key"], meta["version"], "agent", meta["name"], meta["name_en"],
-                 meta["description"], category, "0.1.0", "", "", checksum, "local"),
+                 meta["description"], lang_json(meta["names"]), lang_json(meta["descriptions"]),
+                 category, "0.1.0", "", "", checksum, "local"),
             )
         await execute_write(
             f"DELETE FROM marketplace_asset_blobs WHERE asset_key = {_PH} AND version = {_PH} AND tenant_id = {_PH}",
@@ -397,10 +422,10 @@ async def uninstall(
         f"updated_at = CURRENT_TIMESTAMP WHERE asset_key = {_PH} AND tenant_id = {_PH} AND active = 1",
         (asset_key, tid),
     )
-    # agent config 비활성화 (marketplace 로 설치된 addon 만)
+    # agent config 비활성화 (marketplace 로 설치된 addon 만) — 키 대소문자 혼용 이력 방어(LOWER)
     await execute_write(
         f"UPDATE tbl_agent_config SET is_enabled = 0, updated_at = CURRENT_TIMESTAMP "
-        f"WHERE agent_key = {_PH} AND nav_group = 'marketplace'",
+        f"WHERE LOWER(agent_key) = LOWER({_PH}) AND nav_group = 'marketplace'",
         (asset_key,),
     )
     # §7.6.5: hot-deploy 산출물 완전 정리 — addon 행(대소문자 무시)·deployed 디렉터리·front tsx·MCP.

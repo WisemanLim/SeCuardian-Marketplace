@@ -1,26 +1,12 @@
 """Agent 설정 관리 라우터 (F8) — 활성화 토글·모델·프롬프트 변경."""
-import json
-
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.core.deps import get_current_user, require_role
+from app.core.i18n import parse_lang_map as _parse_lang_dict  # R18-7 공통 파서로 일원화
 from app.db import execute_write, fetch_all, fetch_one, _PH
 
 router = APIRouter(prefix="/api/agent-config", tags=["agent-config"])
-
-
-def _parse_lang_dict(raw) -> dict:
-    """JSON 문자열 → {lang: str} dict (유효 문자열 값만)."""
-    if not raw:
-        return {}
-    try:
-        parsed = json.loads(raw)
-        if isinstance(parsed, dict):
-            return {k: v for k, v in parsed.items() if isinstance(v, str) and v.strip()}
-    except (ValueError, TypeError):
-        pass
-    return {}
 
 
 def _expand_descriptions(row: dict) -> dict:

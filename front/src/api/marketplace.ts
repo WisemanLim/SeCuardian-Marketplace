@@ -9,6 +9,9 @@ export interface MarketplaceAsset {
   name: string;
   name_en: string;
   description: string;
+  /** 다국어 JSON TEXT {"ko":…, "en":…, …} — parseLangMap 으로 파싱 (R18-7) */
+  names: string;
+  descriptions: string;
   category: string;
   min_platform_version: string;
   governance: string;
@@ -43,6 +46,10 @@ export async function registerAsset(body: {
   name: string;
   name_en?: string;
   description?: string;
+  description_en?: string;
+  /** 다국어 dict 직접 지정 — 지정 시 레거시 필드보다 우선 (R18-7) */
+  names?: Record<string, string>;
+  descriptions?: Record<string, string>;
   category?: string;
   required_env?: string;
 }): Promise<MarketplaceAsset> {

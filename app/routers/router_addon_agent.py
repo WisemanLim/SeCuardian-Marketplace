@@ -18,6 +18,7 @@ from pydantic import BaseModel
 
 from app.addon_agent_loader import load_router
 from app.core.deps import get_current_user, require_role
+from app.core.i18n import norm_descriptions as _norm_descriptions
 from app.db import execute_write, fetch_all, fetch_one, _PH, _IS_SQLITE
 
 logger = logging.getLogger("uvicorn.error")
@@ -127,47 +128,7 @@ def _safe_extract(zf: zipfile.ZipFile, dest: Path) -> None:
     zf.extractall(dest)
 
 
-def _norm_descriptions(meta: dict) -> dict:
-    """R18-7: meta 의 description 을 다국어 dict 로 정규화.
-
-    허용 형식 — ① dict 형: description={"ko": "...", "en": "..."} (확장형, 타 언어 키 허용)
-               ② 레거시: description(문자열=ko) + description_en(문자열=en)
-    정규화 후 meta 에는 세 키가 모두 존재: description(ko 문자열, 하위호환),
-    description_en(en 문자열, 하위호환), descriptions(dict).
-    """
-    desc = meta.get("description")
-    d: dict[str, str] = {}
-    if isinstance(desc, dict):
-        d = {k: v for k, v in desc.items() if isinstance(v, str) and v.strip()}
-    elif isinstance(desc, str) and desc.strip():
-        d["ko"] = desc.strip()
-    en = meta.get("description_en")
-    if isinstance(en, str) and en.strip():
-        d.setdefault("en", en.strip())
-    # dict 형이 넘어온 경우에도 legacy 키 병행 유지
-    existing = meta.get("descriptions")
-    if isinstance(existing, dict):
-        for k, v in existing.items():
-            if isinstance(v, str) and v.strip():
-                d.setdefault(k, v.strip())
-    meta["descriptions"] = d
-    meta["description"] = d.get("ko", "")
-    meta["description_en"] = d.get("en", "")
-    # R18-7 확장: display_name 도 dict 형(다국어) 허용 → agent_names 정규화
-    disp = meta.get("display_name")
-    names: dict[str, str] = {}
-    if isinstance(disp, dict):
-        names = {k: v for k, v in disp.items() if isinstance(v, str) and v.strip()}
-    elif isinstance(disp, str) and disp.strip():
-        names["ko"] = disp.strip()
-    existing_names = meta.get("agent_names")
-    if isinstance(existing_names, dict):
-        for k, v in existing_names.items():
-            if isinstance(v, str) and v.strip():
-                names.setdefault(k, v.strip())
-    meta["agent_names"] = names
-    meta["display_name"] = names.get("ko", "") or (disp if isinstance(disp, str) else "")
-    return meta
+# R18-7: 다국어 정규화 공통 함수는 app/core/i18n.norm_descriptions 로 승격 (상단 import 참조)
 
 
 def _parse_meta_json(dest: Path, zip_stem: str) -> dict:
