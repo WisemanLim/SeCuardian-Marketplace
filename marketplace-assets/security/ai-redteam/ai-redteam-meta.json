@@ -113,5 +113,11 @@
     "skillspector",
     "llm-security",
     "forensics"
-  ]
+  ],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "AI Red-Team Service",
+    "guide": "ai-redteam-worker-guide.md"
+  }
 }

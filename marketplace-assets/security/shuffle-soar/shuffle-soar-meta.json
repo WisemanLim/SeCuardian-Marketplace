@@ -69,5 +69,11 @@
   "dependencies": [
     "httpx"
   ],
-  "db_tables": false
+  "db_tables": false,
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Shuffle SOAR",
+    "guide": "shuffle-soar-worker-guide.md"
+  }
 }

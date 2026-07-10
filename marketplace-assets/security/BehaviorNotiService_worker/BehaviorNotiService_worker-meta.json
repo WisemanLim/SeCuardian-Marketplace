@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "display_name": { "ko": "BehaviorNotiService Worker (C++)", "en": "BehaviorNotiService Worker (C++)" },
+  "agent_names": { "ko": "BehaviorNotiService Worker (C++)", "en": "BehaviorNotiService Worker (C++)" },
+  "descriptions": {
+    "ko": "behavior-noti 에이전트의 실작업 worker (C++ 소스 + Dockerfile). 감시 대상 호스트·PC·Edge 디바이스에 설치합니다. 설치 방법은 에이전트에 내장된 behavior-noti-worker-guide.md 참조.",
+    "en": "Worker for the behavior-noti agent (C++ source + Dockerfile). Install on each monitored host/PC/Edge device. See behavior-noti-worker-guide.md embedded in the agent."
+  },
+  "kind": "worker",
+  "agent_type": "service"
+}

@@ -89,5 +89,11 @@
     "Teleport API calls use verify=False to handle self-signed certificates.",
     "Audit events are stored in a deque — they are lost on restart; use a DB sink for persistence.",
     "POST /audit/events is intentionally unauthenticated — protect it at the network/firewall level."
-  ]
+  ],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Teleport",
+    "guide": "teleport-pam-worker-guide.md"
+  }
 }

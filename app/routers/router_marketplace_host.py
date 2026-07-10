@@ -71,7 +71,8 @@ def _asset_entry(category_dir: Path, zip_path: Path) -> dict:
         "description": meta.get("description", ""),
         "descriptions": meta.get("descriptions") or {},
         "version": str(meta.get("version") or "1.0.0"),
-        "kind": "agent",
+        # R22-4(SeCuardian PRD §22): {Name}_worker.zip 은 다운로드 전용 worker 자산
+        "kind": "worker" if stem.endswith("_worker") else "agent",
         "agent_type": meta.get("agent_type", "app"),
         "category": category_dir.name,
         "size": zip_path.stat().st_size,

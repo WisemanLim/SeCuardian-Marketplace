@@ -64,5 +64,11 @@
     "agent_key": "ai-eval-gate",
     "source": "app/routers/router_ai_eval.py",
     "platform": "SeCuardian"
+  },
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "AI Eval Service",
+    "guide": "ai-eval-gate-worker-guide.md"
   }
 }

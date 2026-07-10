@@ -161,5 +161,11 @@
   "in_memory": {
     "findings_store": "deque(maxlen=AGENTIC_SOC_FINDINGS_MAX)",
     "playbook_store": "dict"
+  },
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Agentic SOC Platform",
+    "guide": "agentic-soc-worker-guide.md"
   }
 }

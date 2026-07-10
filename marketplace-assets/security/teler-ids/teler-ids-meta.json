@@ -68,5 +68,11 @@
     }
   ],
   "dependencies": [],
-  "db_tables": false
+  "db_tables": false,
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "teler IDS",
+    "guide": "teler-ids-worker-guide.md"
+  }
 }

@@ -85,5 +85,11 @@
   "dependencies": [
     "httpx"
   ],
-  "db_tables": []
+  "db_tables": [],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Cilium/Hubble",
+    "guide": "cilium-netpol-worker-guide.md"
+  }
 }

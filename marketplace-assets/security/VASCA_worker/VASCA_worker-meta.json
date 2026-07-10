@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "display_name": { "ko": "VASCA Worker (CVE 스캐너)", "en": "VASCA Worker (CVE Scanner)" },
+  "agent_names": { "ko": "VASCA Worker (CVE 스캐너)", "en": "VASCA Worker (CVE Scanner)" },
+  "descriptions": {
+    "ko": "vasca-cve 에이전트의 실작업 worker (Go 바이너리 동봉). 스캔 대상 호스트·PC·Edge 디바이스에 설치합니다. 설치 방법은 에이전트에 내장된 vasca-cve-worker-guide.md 참조.",
+    "en": "Worker for the vasca-cve agent (bundled Go binary). Install on each scan-target host/PC/Edge device. See vasca-cve-worker-guide.md embedded in the agent."
+  },
+  "kind": "worker",
+  "agent_type": "service"
+}

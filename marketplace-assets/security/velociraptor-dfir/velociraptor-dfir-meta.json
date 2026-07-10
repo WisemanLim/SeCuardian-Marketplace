@@ -104,5 +104,11 @@
     "hunting",
     "incident-response",
     "endpoint"
-  ]
+  ],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Velociraptor",
+    "guide": "velociraptor-dfir-worker-guide.md"
+  }
 }

@@ -86,5 +86,13 @@
   "storage": "in-memory deque",
   "db_tables": false,
   "hmac_header": "X-BehaviorNoti-Signature",
-  "hmac_algorithm": "sha256"
+  "hmac_algorithm": "sha256",
+  "worker": {
+    "required": true,
+    "kind": "bundled",
+    "name": "BehaviorNotiService_worker",
+    "version": "1.0.0",
+    "package": "BehaviorNotiService_worker.zip",
+    "guide": "behavior-noti-worker-guide.md"
+  }
 }
