@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import {
-  MarketplaceAsset, listCatalog, installAsset, uninstallAsset,
+  MarketplaceAsset, listCatalog, installAsset, uninstallAsset, deleteAsset, deleteCategory,
 } from "../../api/marketplace";
 import { RemoteAsset, remoteCatalog, remoteInstall } from "../../api/marketplaceRemote";
 import { useLocale } from "../../hooks/useLocale";
 import { parseLangMap, pickDescription } from "../../store/locale";
 import { getAuth } from "../../store/auth";
+import ConfirmDialog from "../../components/ConfirmDialog";
 import AssetRegisterModal from "./AssetRegisterModal";
 
 export default function MarketplacePage() {
@@ -23,6 +24,10 @@ export default function MarketplacePage() {
   const [busy, setBusy] = useState<string | null>(null);
   // §7.6.3: 카테고리별 추가 등록 — '+ 추가' 클릭 시 해당 category 프리셋 모달
   const [addCategory, setAddCategory] = useState<string | null>(null);
+  // §7.6.6: 삭제 확인 — 커스텀 ConfirmDialog (R18-1, browser confirm 금지)
+  const [confirmDel, setConfirmDel] = useState<
+    { type: "asset"; asset: MarketplaceAsset } | { type: "category"; cat: string } | null
+  >(null);
   // 원격 레지스트리(E1.5) — MARKETPLACE_REMOTE_ENABLED=false 면 409 → 섹션 숨김
   const [remoteAssets, setRemoteAssets] = useState<RemoteAsset[]>([]);
   const [remoteEnabled, setRemoteEnabled] = useState(false);
@@ -89,6 +94,45 @@ export default function MarketplacePage() {
     }
   }
 
+  // §7.6.6: 사용자 등록 자산 삭제 — deletable(디스크 미보유)·비설치만 (서버 재검증)
+  async function handleDeleteAsset(a: MarketplaceAsset) {
+    setError("");
+    setBusy(a.asset_key);
+    try {
+      await deleteAsset(a.asset_key);
+      window.dispatchEvent(new CustomEvent("marketplaceChanged"));
+    } catch (e) {
+      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(msg || t("mp.deleteFailed"));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  // §7.6.6: 사용자 카탈로그(카테고리) 일괄 삭제 — 전 자산 deletable 일 때만 버튼 노출
+  async function handleDeleteCategory(cat: string) {
+    setError("");
+    setBusy(`cat:${cat}`);
+    try {
+      await deleteCategory(cat);
+      window.dispatchEvent(new CustomEvent("marketplaceChanged"));
+    } catch (e) {
+      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(msg || t("mp.deleteFailed"));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  // 커스텀 다이얼로그 확인 → 실제 삭제 실행 (R18-1)
+  async function handleConfirmDelete() {
+    if (!confirmDel) return;
+    const target = confirmDel;
+    setConfirmDel(null);
+    if (target.type === "asset") await handleDeleteAsset(target.asset);
+    else await handleDeleteCategory(target.cat);
+  }
+
   // 카테고리별 카드덱 색상 — 플랫폼 UI/UX 톤(보안=보라, 유틸리티=파랑, 일반=초록, 그 외=회색)
   const CATEGORY_TONE: Record<string, string> = {
     security: "border-violet-200 dark:border-violet-800/60 bg-violet-50/50 dark:bg-violet-900/10 hover:border-violet-300 dark:hover:border-violet-700",
@@ -111,10 +155,20 @@ export default function MarketplacePage() {
             </h3>
             {/* §7.6.3: 카테고리별 추가 등록 — category 프리셋 자산 등록 모달 */}
             {isAdmin && (
-              <button type="button" onClick={() => setAddCategory(cat)}
-                className="text-[11px] px-2 py-0.5 rounded border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-blue-600 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
-                + {t("mp.addToCatalog")}
-              </button>
+              <div className="flex items-center gap-1.5">
+                {/* §7.6.6: 사용자 카탈로그 삭제 — 전 자산 deletable(디스크 미보유)일 때만 */}
+                {grouped[cat].every((a) => a.deletable) && (
+                  <button type="button" disabled={busy === `cat:${cat}`}
+                    onClick={() => setConfirmDel({ type: "category", cat })}
+                    className="text-[11px] px-2 py-0.5 rounded border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-red-500 hover:border-red-300 dark:hover:border-red-700 transition-colors disabled:opacity-40">
+                    {t("mp.deleteCategory")}
+                  </button>
+                )}
+                <button type="button" onClick={() => setAddCategory(cat)}
+                  className="text-[11px] px-2 py-0.5 rounded border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:text-blue-600 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+                  + {t("mp.addToCatalog")}
+                </button>
+              </div>
             )}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -135,17 +189,27 @@ export default function MarketplacePage() {
                     <p className="text-xs text-gray-400">{a.asset_key} · {a.kind} · v{a.version}</p>
                   </div>
                   {/* 설치/해제 버튼 — 카드 우상단(기존 배지 위치) */}
-                  {a.installed ? (
-                    <button disabled={busy === a.asset_key} onClick={() => handleUninstall(a)}
-                      className="shrink-0 text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-40">
-                      {t("mp.uninstall")}
-                    </button>
-                  ) : (
-                    <button disabled={busy === a.asset_key} onClick={() => handleInstall(a)}
-                      className="shrink-0 text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
-                      {t("mp.install")}
-                    </button>
-                  )}
+                  <div className="shrink-0 flex items-center gap-1.5">
+                    {/* §7.6.6: 사용자 등록 자산 삭제 — deletable·비설치만 */}
+                    {isAdmin && a.deletable && !a.installed && (
+                      <button disabled={busy === a.asset_key} onClick={() => setConfirmDel({ type: "asset", asset: a })}
+                        className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-400 hover:text-red-500 hover:border-red-300 dark:hover:border-red-700 disabled:opacity-40"
+                        title={t("mp.deleteAsset")}>
+                        {t("mp.deleteAsset")}
+                      </button>
+                    )}
+                    {a.installed ? (
+                      <button disabled={busy === a.asset_key} onClick={() => handleUninstall(a)}
+                        className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-40">
+                        {t("mp.uninstall")}
+                      </button>
+                    ) : (
+                      <button disabled={busy === a.asset_key} onClick={() => handleInstall(a)}
+                        className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40">
+                        {t("mp.install")}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 {assetDesc(a) && <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{assetDesc(a)}</p>}
               </div>
@@ -160,6 +224,22 @@ export default function MarketplacePage() {
       {/* §7.6.3: 카테고리 프리셋 자산 등록 모달 — 등록 완료 시 marketplaceChanged 로 자동 갱신 */}
       {addCategory && (
         <AssetRegisterModal category={addCategory} onClose={() => setAddCategory(null)} />
+      )}
+
+      {/* §7.6.6: 삭제 확인 — 커스텀 ConfirmDialog (R18-1) */}
+      {confirmDel && (
+        <ConfirmDialog
+          title={confirmDel.type === "asset" ? t("mp.deleteAsset") : t("mp.deleteCategory")}
+          message={
+            confirmDel.type === "asset"
+              ? t("mp.deleteAssetConfirm").replace("{name}", assetName(confirmDel.asset))
+              : t("mp.deleteCategoryConfirm").replace("{name}", confirmDel.cat)
+          }
+          confirmLabel={t("common.delete")}
+          cancelLabel={t("common.cancel")}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setConfirmDel(null)}
+        />
       )}
 
       {remoteEnabled && (

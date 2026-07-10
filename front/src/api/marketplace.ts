@@ -20,6 +20,7 @@ export interface MarketplaceAsset {
   source: "local" | "remote";
   installed: boolean;
   active_version: string | null;
+  deletable?: boolean;           // §7.6.6: 사용자 등록 자산(디스크 미보유)만 true
 }
 
 export interface MarketplaceInstall {
@@ -79,6 +80,18 @@ export async function registerAssetZips(files: File[], category?: string): Promi
     headers: { "Content-Type": "multipart/form-data" },
   });
   return data.assets ?? [];
+}
+
+// §7.6.6: 사용자 등록 자산 삭제 (디스크 미보유·비설치만 — 서버 검증)
+export async function deleteAsset(assetKey: string): Promise<{ deleted: string }> {
+  const { data } = await client.delete(`/marketplace/catalog/${assetKey}`);
+  return data;
+}
+
+// §7.6.6: 사용자 카탈로그(카테고리) 일괄 삭제 — 전 자산 deletable·비설치일 때만
+export async function deleteCategory(category: string): Promise<{ deleted_category: string; deleted_assets: string[] }> {
+  const { data } = await client.delete(`/marketplace/catalog-category/${encodeURIComponent(category)}`);
+  return data;
 }
 
 export async function installAsset(assetKey: string, version?: string): Promise<MarketplaceInstall> {

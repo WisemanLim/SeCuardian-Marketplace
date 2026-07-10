@@ -234,6 +234,9 @@ async def main() -> None:
             print(f"[seed-assets] ⚠️ 디렉터리 없음: {cat_dir}")
             continue
         for asset_dir in sorted(p for p in cat_dir.iterdir() if p.is_dir()):
+            # R22-4: {Name}_worker 는 다운로드 전용 worker 자산 — 설치형 카탈로그 시드 제외
+            if asset_dir.name.endswith("_worker"):
+                continue
             await _seed_one(category, asset_dir, tid)
             total += 1
 

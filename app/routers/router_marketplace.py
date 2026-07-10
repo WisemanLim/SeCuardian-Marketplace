@@ -14,6 +14,7 @@ import json
 import re
 import shutil
 import zipfile
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
@@ -83,9 +84,33 @@ async def _active_version(asset_key: str, tenant_id: str) -> str | None:
     return row["version"] if row else None
 
 
+_MARKET_ASSETS_DIR = Path("marketplace-assets")
+
+
+def _disk_backed(asset_key: str) -> bool:
+    """디스크 `marketplace-assets/*/{key}.zip` 보유 여부(대소문자 무시) — 기본 제공 자산 판별(§7.6.6).
+
+    디스크 보유 자산은 삭제 불가(재기동·seed 시 재등장하므로 삭제가 무의미 + 기본 제공 보호).
+    """
+    if not _MARKET_ASSETS_DIR.exists():
+        return False
+    key = asset_key.lower()
+    for cat in _MARKET_ASSETS_DIR.iterdir():
+        if not cat.is_dir() or cat.name.startswith("."):
+            continue
+        for z in cat.glob("*.zip"):
+            if z.stem.lower() == key:
+                return True
+    return False
+
+
 async def _asset_out(asset: dict, tenant_id: str) -> dict:
     ver = await _active_version(asset["asset_key"], tenant_id)
-    return {**asset, "installed": ver is not None, "active_version": ver}
+    return {
+        **asset, "installed": ver is not None, "active_version": ver,
+        # §7.6.6: 사용자 등록 자산(디스크 미보유)만 삭제 가능
+        "deletable": not _disk_backed(asset["asset_key"]),
+    }
 
 
 @router.get("/catalog")
@@ -266,6 +291,82 @@ async def install(
         "id": iid, "asset_key": asset["asset_key"], "version": asset["version"],
         "status": "installed", "active": True, "agent_config_key": cfg_key, "deployed": deployed,
     }
+
+
+# ── §7.6.6: 사용자 등록 자산·카탈로그(카테고리) 삭제 ─────────────────────────
+
+async def _delete_asset_rows(asset_key: str, tid: str) -> None:
+    """자산 삭제 공용 — assets(전 버전)·blobs·installs 이력·marketplace config 행 정리."""
+    await execute_write(
+        f"DELETE FROM marketplace_asset_blobs WHERE asset_key = {_PH} AND tenant_id = {_PH}",
+        (asset_key, tid),
+    )
+    await execute_write(
+        f"DELETE FROM marketplace_installs WHERE asset_key = {_PH} AND tenant_id = {_PH}",
+        (asset_key, tid),
+    )
+    await execute_write(
+        f"DELETE FROM marketplace_assets WHERE asset_key = {_PH} AND tenant_id = {_PH}",
+        (asset_key, tid),
+    )
+    # marketplace 설치가 만든 config 행 정리 (LOWER — upload 파이프라인 소문자화 대응)
+    await execute_write(
+        f"DELETE FROM tbl_agent_config WHERE LOWER(agent_key) = LOWER({_PH}) AND nav_group = 'marketplace'",
+        (asset_key,),
+    )
+
+
+async def _assert_deletable(asset_key: str, tid: str) -> None:
+    """삭제 가능 검증 — 존재·디스크 비보유·활성 설치 없음 (§7.6.6)."""
+    asset = await fetch_one(
+        f"SELECT asset_key FROM marketplace_assets WHERE asset_key = {_PH} AND tenant_id = {_PH} LIMIT 1",
+        (asset_key, tid),
+    )
+    if not asset:
+        raise HTTPException(404, f"asset {asset_key} not found")
+    if _disk_backed(asset_key):
+        raise HTTPException(403, f"{asset_key}: 기본 제공 자산(marketplace-assets 보유)은 삭제할 수 없습니다")
+    if await _active_version(asset_key, tid):
+        raise HTTPException(409, f"{asset_key}: 설치된 자산입니다 — 먼저 해제하세요")
+
+
+@router.delete("/catalog/{asset_key}")
+async def delete_asset(
+    asset_key: str,
+    user: dict = Depends(require_role("admin", "supervisor")),
+):
+    """사용자 등록 자산 삭제 — 디스크 미보유(deletable)·비설치 자산만 (§7.6.6)."""
+    tid = _tenant()
+    await _assert_deletable(asset_key, tid)
+    await _delete_asset_rows(asset_key, tid)
+    return {"deleted": asset_key}
+
+
+@router.delete("/catalog-category/{category}")
+async def delete_category(
+    category: str,
+    user: dict = Depends(require_role("admin", "supervisor")),
+):
+    """사용자 카탈로그(카테고리) 일괄 삭제 — 전 자산 deletable·비설치일 때만 (§7.6.6)."""
+    tid = _tenant()
+    rows = await fetch_all(
+        f"SELECT DISTINCT asset_key FROM marketplace_assets WHERE category = {_PH} AND tenant_id = {_PH}",
+        (category, tid),
+    )
+    if not rows:
+        raise HTTPException(404, f"category {category} not found")
+    keys = [r["asset_key"] for r in rows]
+    blockers: list[str] = []
+    for k in keys:
+        if _disk_backed(k):
+            blockers.append(f"{k}(기본 제공)")
+        elif await _active_version(k, tid):
+            blockers.append(f"{k}(설치됨)")
+    if blockers:
+        raise HTTPException(409, f"삭제 불가 자산 존재: {', '.join(blockers)}")
+    for k in keys:
+        await _delete_asset_rows(k, tid)
+    return {"deleted_category": category, "deleted_assets": keys}
 
 
 @router.post("/catalog/{asset_key}/zip", status_code=201)

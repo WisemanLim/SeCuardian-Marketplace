@@ -680,6 +680,27 @@ TENANT_DEFAULT_ID=default                  # off 모드일 때 사용할 고정 
 5. **addon-agents/ 디렉터리 정책**: `deployed/`(런타임 bind-mount·loader·compose 참조)와
    README 만 유지 — 디렉터리 자체는 런타임 필수라 삭제하지 않는다(§7.6.1-7 재확인).
 
+### 7.6.6 자산 등록 ZIP 필수 + 사용자 자산·카탈로그 삭제 (F-MP 확장, impl/49 · 물리 test/impl/47) — 사용자 요구(2026-07-10)
+
+**배경(결함)**: `자산 등록`·카테고리 `+ 추가` 모달이 ZIP 미첨부(메타만)로도 등록을 허용 —
+실제 에이전트 파일이 없는 빈 자산이 카탈로그에 생성된다(설치해도 hot-deploy 없음).
+또한 사용자가 UI 로 등록한 자산(디스크 `marketplace-assets/` 미보유)은 삭제 수단이 없다.
+
+1. **등록 시 ZIP 1개 이상 필수**: 자산 등록 모달(상단 `자산 등록`·카테고리 `+ 추가` 공용)은
+   addon ZIP 을 1개 이상 첨부해야 등록 가능(미첨부 시 검증 오류). 메타-only
+   `POST /api/marketplace/catalog` 는 프로그래매틱/AI 어시스턴트(call_api) 경로용으로
+   유지하되 UI 등록 경로에서는 사용하지 않는다.
+2. **사용자 자산 삭제**: `DELETE /api/marketplace/catalog/{asset_key}` (admin) —
+   **디스크 비보유 자산만**(카탈로그 응답 `deletable=true`, `marketplace-assets/*/{key}.zip`
+   대소문자 무시 부재 기준) 허용. 활성 설치 존재 시 409(먼저 해제). 삭제 범위 =
+   `marketplace_assets`(전 버전)·`marketplace_asset_blobs`·`marketplace_installs` 이력·
+   marketplace 설치가 만든 `tbl_agent_config` 행(LOWER 매칭).
+   디스크 보유 자산(기본 제공 security·utilities 등)은 403.
+3. **카탈로그(카테고리) 삭제**: `DELETE /api/marketplace/catalog-category/{category}` (admin) —
+   해당 카테고리의 **모든 자산이 deletable** 하고 활성 설치가 없을 때만 일괄 삭제(아니면 409
+   + 차단 사유 목록). UI: 카테고리 헤더에 전 자산 deletable 일 때만 `카탈로그 삭제` 버튼,
+   카드에는 미설치·deletable 자산에 `삭제` 버튼.
+
 ### 7.7 Playground (F-PG)
 
 - 프롬프트/모델/에이전트/RAG 컬렉션 조합 대화형 실험, A/B 비교(응답·비용·지연·인용), eval 실행. 승격 경로: Playground → Workflow 노드 / Marketplace 게시.
@@ -1100,6 +1121,7 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-07-10 | v0.45 | **impl/49(물리 `test/impl/47`) — §7.6.6 신설: 자산 등록 ZIP 필수 + 사용자 자산·카탈로그 삭제**(사용자 결함 보고: ZIP 0개로도 등록됨 + 사용자 등록 자산 삭제 수단 없음). ① 등록 모달(자산 등록·`+ 추가` 공용) ZIP 1개 이상 필수 검증 — 메타-only `POST /catalog` 는 AI 어시스턴트(call_api)·프로그래매틱 경로용 유지 ② `deletable`(디스크 `marketplace-assets/*/{key}.zip` 대소문자 무시 부재) 카탈로그 응답 노출 ③ `DELETE /catalog/{asset_key}` — deletable+비설치만, assets(전 버전)·blobs·installs·config 행 정리 ④ `DELETE /catalog-category/{category}` — 전 자산 deletable+비설치 시 일괄 삭제 ⑤ 카드 `삭제`·카테고리 헤더 `카탈로그 삭제` 버튼(admin) — 삭제 확인은 browser confirm 이 아닌 **커스텀 ConfirmDialog**(R18-1, 사용자 추가 요구) ⑤-2 등록 모달 UX(사용자 추가 요구) — 입력 순서 카탈로그→name→종류→이름(영문)…, '(선택)' 라벨 제거 + 필수 항목(ZIP) 적색 `*` 표시 ⑥ 회귀 수정 — `seed_assets` 가 impl/62 `*_worker` 메타 디렉터리를 설치형 자산으로 오등록(R22-4 위반, impl/39 C1 FAIL) → 스킵 처리 | app/routers/router_marketplace.py, scripts/seed_assets.py, front(marketplace.ts·MarketplacePage.tsx·AssetRegisterModal.tsx·locales), PRD §7.6.6, README(.en), test/impl/47 |
 | 2026-07-10 | v0.44 | **페이지 상단 설명 폰트 통일**(사용자 요구: 마켓플레이스 상단 설명 스타일 기준). 대시보드·워크플로우·RAG·플레이그라운드·가드레일 5개 페이지의 `pageDesc` 를 `text-xs text-gray-500` → `text-sm text-gray-500 dark:text-gray-400`(R18 표준, SeCuardian 과 동일) 통일. 브라우저 실측 14px 확인 | front/src/pages/{dashboard/DashboardPage,workflow/WorkflowPage,rag/RagPage,playground/PlaygroundPage,guardrails/GuardrailsPage}.tsx |
 | 2026-07-10 | v0.43 | **impl/48 근본 원인 수정 — 구버전 배포본 메타가 worker 폴백 차단**(사용자 재보고: 캐시 삭제·재기동에도 미반영 — 헤드리스 브라우저 실증으로 확정). 원인 = 카탈로그 설치가 `marketplace_asset_blobs` 의 impl/62 이전 zip blob 을 배포 → deployed meta 에 worker 블록 없음 + `_agent_worker_meta` 가 deployed meta 발견 시 worker 없어도 조기 None 반환(marketplace-assets 폴백 불가). 수정 = ① worker 없는 meta 는 다음 base 로 폴백(`break`, SeCuardian 동일 적용) ② 디스크 zip 기준 blob 20종 멱등 갱신 + vasca-cve 재설치. 실증 = headless 브라우저에서 설치됨 탭 VASCA 카드 아이콘·가이드 모달 렌더 스크린샷 확보 | app/routers/router_addon_agent.py, SeCuardian(app/routers/router_addon_agent.py), marketplace_asset_blobs(데이터 20종), test/impl/46 |
 | 2026-07-10 | v0.42 | **impl/48 오류 수정(물리 `test/impl/46` 재시험) — 에이전트(설치됨) 탭 Worker 가이드 팝업·아이콘 미표시**(사용자 결함 보고 2건). 원인 = ① config 경로(`patch_agent`)가 worker 요약 미반환 + 프론트 `handleToggle` 미확인(SeCuardian impl/62 는 양 경로 구현, SeCMP 미포팅) ② `workerKeys` 가 addons 만 참조 — 설치됨 탭 카드는 configs 기반. 수정 = `patch_agent` 활성화 응답 worker 요약 + `list_agents` `has_worker` + 프론트 `patchAgentConfig` worker 타입·`handleToggle` 팝업·`workerKeys = configs ∪ addons` (TC-46-09, 6/6 PASS). SeCuardian 아이콘 동일 수정 = impl/63 TC-63-05 | app/routers/router_agent_config.py, front(api/agentConfig.ts·pages/agents/AgentsPage.tsx), test/impl/46 |

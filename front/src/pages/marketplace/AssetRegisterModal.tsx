@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { registerAsset, registerAssetZips, ASSET_KINDS } from "../../api/marketplace";
+import { registerAssetZips, ASSET_KINDS } from "../../api/marketplace";
 import { useLocale } from "../../hooks/useLocale";
 
 // 마켓플레이스 자산 등록 모달 (§7.6.2·§7.6.3) — 두 진입점:
@@ -21,27 +21,14 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
 
   async function submit() {
     setError("");
-    // ZIP 첨부 시 각 ZIP 의 meta.json 이 name/설명을 제공 — name 은 메타 없는 수동 등록에만 필수
-    if (zipFiles.length === 0 && !form.name.trim()) { setError(t("agent.assetNameRequired")); return; }
+    // 필수값: 자산명·설명·ZIP(§7.6.6 — 메타-only 빈 자산 등록 차단)
+    if (!form.name.trim()) { setError(t("agent.assetNameRequired")); return; }
+    if (!form.description.trim()) { setError(t("agent.assetDescRequired")); return; }
+    if (zipFiles.length === 0) { setError(t("agent.assetZipRequired")); return; }
     setBusy(true);
     try {
       const cat = form.category.trim() || "general";
-      if (zipFiles.length > 0) {
-        await registerAssetZips(zipFiles, cat); // ZIP 별 자산 등록 + 블롭 저장 (다중)
-      } else {
-        // R18-7: 다국어 dict({"ko":…,"en":…})로 전송 — 저장·파싱은 공통함수, 언어 확장 시 데이터만 추가
-        const langMap = (ko: string, en: string) => {
-          const m: Record<string, string> = {};
-          if (ko.trim()) m.ko = ko.trim();
-          if (en.trim()) m.en = en.trim();
-          return Object.keys(m).length ? m : undefined;
-        };
-        await registerAsset({
-          name: form.name, kind: form.kind, category: cat,
-          names: langMap(form.name, form.name_en),
-          descriptions: langMap(form.description, form.description_en),
-        });
-      }
+      await registerAssetZips(zipFiles, cat); // ZIP 별 자산 등록 + 블롭 저장 (다중)
       window.dispatchEvent(new CustomEvent("marketplaceChanged")); // 카탈로그 즉시 갱신
       onClose();
     } catch (e) {
@@ -70,8 +57,19 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
           <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-sm">✕</button>
         </div>
         <div className="grid grid-cols-2 gap-3">
+          {/* §7.6.3: category 프리셋(카테고리별 추가) 시 입력 숨김, 상단 등록은 자유 입력 = 카탈로그 생성.
+              입력 순서: 카탈로그 → name → 종류 → 이름(영문) … (사용자 요구 2026-07-10) */}
+          {!category && (
+            <label className="text-xs text-gray-500 col-span-2">
+              {t("agent.assetCategory")}
+              <input value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                placeholder="general"
+                className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
+              <span className="block mt-0.5 text-[11px] text-gray-400">{t("agent.assetCategoryHint")}</span>
+            </label>
+          )}
           <label className="text-xs text-gray-500">
-            name
+            {t("agent.assetName")}<span className="ml-0.5 text-red-500 font-bold">*</span>
             <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               placeholder={t("agent.assetNamePlaceholder")}
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
@@ -85,16 +83,6 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
               {ASSET_KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
             </select>
           </label>
-          {/* §7.6.3: category 프리셋(카테고리별 추가) 시 입력 숨김, 상단 등록은 자유 입력 = 카탈로그 생성 */}
-          {!category && (
-            <label className="text-xs text-gray-500 col-span-2">
-              {t("agent.assetCategory")}
-              <input value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                placeholder="general"
-                className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
-              <span className="block mt-0.5 text-[11px] text-gray-400">{t("agent.assetCategoryHint")}</span>
-            </label>
-          )}
           {/* R18-7: 다국어 — name(ko)/name_en, description(ko)/description_en */}
           <label className="text-xs text-gray-500 col-span-2">
             {t("agent.assetNameEn")}
@@ -102,7 +90,7 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
           </label>
           <label className="text-xs text-gray-500 col-span-2">
-            {t("agent.assetDesc")}
+            {t("agent.assetDesc")}<span className="ml-0.5 text-red-500 font-bold">*</span>
             <input value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
           </label>
@@ -111,9 +99,9 @@ export default function AssetRegisterModal({ category, onClose }: Readonly<{
             <input value={form.description_en} onChange={(e) => setForm((f) => ({ ...f, description_en: e.target.value }))}
               className="mt-0.5 w-full text-sm px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 dark:bg-gray-800" />
           </label>
-          {/* §7.6.2: addon ZIP 다중 첨부 — ZIP 별 meta.json 으로 자산 등록, 설치 시 hot-deploy */}
+          {/* §7.6.2·§7.6.6: addon ZIP 다중 첨부(필수) — ZIP 별 meta.json 으로 자산 등록, 설치 시 hot-deploy */}
           <label className="text-xs text-gray-500 col-span-2">
-            {t("agent.assetZip")}
+            {t("agent.assetZip")}<span className="ml-0.5 text-red-500 font-bold" title={t("agent.assetZipRequired")}>*</span>
             <input type="file" accept=".zip" multiple
               onChange={(e) => setZipFiles(Array.from(e.target.files ?? []))}
               className="mt-0.5 w-full text-sm text-gray-500 file:mr-2 file:text-xs file:px-2 file:py-1 file:rounded file:border file:border-gray-300 dark:file:border-gray-600 file:bg-gray-50 dark:file:bg-gray-800 file:text-gray-600 dark:file:text-gray-300" />
