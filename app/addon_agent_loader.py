@@ -58,16 +58,34 @@ async def init(app: FastAPI) -> None:
 async def _load_all_from_disk() -> None:
     """DB 에 등록된 활성 Addon Agent — SQL 적용 후 라우터 로드 (앱 재시작 복원)."""
     from app.db import fetch_all
+    # 설정에서 비활성화된 에이전트(tbl_agent_config.is_enabled=0)는 복원하지 않는다 —
+    # 보안 승인 전 기본 비활성인 내장 에이전트의 라우트가 패키지 등록만으로 열리던 결함 방지 (R22-6).
     rows = await fetch_all(
-        "SELECT agent_key, router_path, api_prefix, sql_path FROM tbl_addon_agents WHERE is_active = 1"
+        "SELECT a.agent_key, a.router_path, a.api_prefix, a.sql_path "
+        "FROM tbl_addon_agents a "
+        "LEFT JOIN tbl_agent_config c ON c.agent_key = a.agent_key "
+        "WHERE a.is_active = 1 AND COALESCE(c.is_enabled, 1) = 1"
     )
     count = 0
+    stale = 0
     for row in rows:
+        router_path = row.get("router_path") or ""
+        # 소스 파일이 사라진 등록분(수동 삭제·배포 실패 잔여)은 오류가 아니라 경고로 알린다
+        if router_path and not Path(router_path).exists():
+            stale += 1
+            logger.warning(
+                "[addon_loader] %s 소스 없음 — 등록 정보만 남아 스킵: %s",
+                row["agent_key"], router_path,
+            )
+            continue
         if row.get("sql_path"):
             await apply_sql(row["sql_path"])
         if load_router(row["agent_key"], row["router_path"], row["api_prefix"]):
             count += 1
-    logger.info("[addon_loader] restored %d/%d addon(s) from DB", count, len(rows))
+    logger.info(
+        "[addon_loader] restored %d/%d addon(s) from DB%s",
+        count, len(rows), f" (소스 없음 {stale}건)" if stale else "",
+    )
 
 
 def _remove_routes_for_prefix(api_prefix: str) -> None:

@@ -30,6 +30,8 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
+> **ADDON 등록 파이프라인 오류 수정 — 내장 키 중복·잔여 압축 해제(물리 `test/impl/51`, SeCuardian R22-6 동일 적용)**: ① 내장 에이전트 키와 중복되는 ZIP 이 조용히 `is_builtin=1` 로 등록되어 ADDON 목록(=`is_builtin=0` 필터)에서 사라지던 결함 → **등록 불가**(409 `builtin_conflict`, `overwritable=false`, force 로도 우회 불가, ZIP 파일명 변경 안내) — 업로드 성공분은 항상 ADDON 목록에 노출된다 ② 영문 원문 `already exists. Use force=true` → 구조화 detail(`code`/`overwritable`/한·영 메시지) + 프론트 덮어쓰기 확인 배너(일반 중복만) ③ 등록 불가 ZIP(worker 배포본 등)이 `addon-agents/deployed/` 에 압축 해제되던 문제 → **해제 前 검증**(경로 안전성·구성 파일 존재) + 라우터 로드 실패 시 롤백 ④ 활성 상태를 `tbl_agent_config.is_enabled` 와 동기(비활성 에이전트 라우터 무단 개방 차단) · 소스 없는 등록분 경고 스킵 · meta `type` 폴백.
+>
 > **UserManager 자산 addon 이관(impl/52·물리 `test/impl/50`)**: `marketplace-assets/utilities/UserManager{,.zip}` → `marketplace-assets/addon/` 이동 — 카탈로그 시드 대상 제외(utilities 5종), **스캐폴드 템플릿 편입**(`새 Agent 만들기` templates 6종), 시드 보호 해제(사용자가 등록하면 `deletable=true`). `seed_assets` 는 시드 유래 고아 행(시드 디렉터리에서 제거된 key, 블롭 `uploaded_by='seed-assets'` 한정)을 멱등 정리한다 — 사용자 등록 자산 불변, 설치 중 자산은 건너뜀.
 >
 > **중복 등록 사용자 확인 + 시드 보호 범위 축소 + 카탈로그 삭제 시 시드 반환(impl/51·물리 `test/impl/49`, §7.6.6 v0.47)**: ① 이미 등록된 asset_key 를 다시 등록하면 `confirm` 없이는 409 `{"code":"duplicate","assets":[…]}` — UI 가 커스텀 ConfirmDialog 로 "이미 등록된 자산(현재 카탈로그)" 정보를 보여주고 **등록 여부는 사용자가 판단**, 확인 시 요청 카탈로그로 이동 등록 ② `deletable` 판정을 시드 카탈로그(`marketplace-assets/{security,utilities}`) 보유로 한정 — **`addon/`(스캐폴드)·`builtin/` 유래라도 사용자가 등록한 자산은 삭제 가능** ③ 카탈로그 삭제는 설치 중 자산만 차단 — 시드 보호 자산이 이동돼 있으면 삭제 대신 원 시드 카탈로그로 반환(`returned_assets`) → **사용자 카탈로그는 항상 삭제 가능**.

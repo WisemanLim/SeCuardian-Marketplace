@@ -4,7 +4,8 @@ import {
   Upload, Package, BookOpen, Trash2, PackagePlus,
 } from "lucide-react";
 import {
-  scaffoldAgent, uploadAddonAgent, deleteAddonAgent,
+  scaffoldAgent, uploadAddonAgent, deleteAddonAgent, DeployConflict,
+  parseDeployError, pickMessage,
   AddonAgent, AddonTemplate, listAddonAgents, listTemplates, getGuide,
 } from "../../api/addonAgents";
 import { getAuth } from "../../store/auth";
@@ -139,7 +140,7 @@ const NAME_RE = /^[A-Za-z][A-Za-z0-9_-]*$/;
 // ── 컴포넌트 ───────────────────────────────────────────────────────────────────
 
 export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agentCreateMode = "both" }: Props) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const user = getAuth();
   const isAdmin = user?.role === "supervisor" || user?.role === "admin";
 
@@ -175,6 +176,8 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadOk, setUploadOk]     = useState<string | null>(null);
   const [deleteKey, setDeleteKey]   = useState<string | null>(null);
+  // R22-6: 중복 키(내장 충돌 포함) — 사용자 확인 후에만 덮어쓰기(force) 재요청
+  const [conflicts, setConflicts]   = useState<{ file: File; conflict: DeployConflict }[]>([]);
 
   const userAddons = addons.filter((a) => !a.is_builtin);
   // .omc 등 dot-prefix 시스템 임시 파일은 표시하지 않음
@@ -274,7 +277,8 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
       }
       onDeployed();
     } catch (e: unknown) {
-      setError((e as Error).message ?? "배포 실패");
+      const { conflict, message } = parseDeployError(e);
+      setError(conflict ? pickMessage(conflict, locale) : (message ?? (e as Error).message ?? "배포 실패"));
     } finally { setBusy(false); }
   }
 
@@ -282,29 +286,55 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (files.length === 0) return;
-    setUploadError(null); setUploadOk(null); setUploading(true);
-    const okNames: string[] = [];
+    setUploadError(null); setUploadOk(null); setConflicts([]);
+    await runUploads(files.map((f) => ({ file: f, force: false })));
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  /** 업로드 실행 공통 — 409 중복은 확인 대기 목록(conflicts)으로 넘긴다 (R22-6) */
+  async function runUploads(items: { file: File; force: boolean }[]) {
+    setUploading(true);
+    const okMsgs: string[] = [];
     const failMsgs: string[] = [];
-    for (let i = 0; i < files.length; i++) {
-      setUploadProgress(files.length > 1 ? `(${i + 1}/${files.length}) ${files[i].name}` : null);
+    const pending: { file: File; conflict: DeployConflict }[] = [];
+    for (let i = 0; i < items.length; i++) {
+      const { file, force } = items[i];
+      setUploadProgress(items.length > 1 ? `(${i + 1}/${items.length}) ${file.name}` : null);
       try {
-        const result = await uploadAddonAgent(files[i]);
-        okNames.push(result.agent_name);
+        const result = await uploadAddonAgent(file, force);
+        okMsgs.push(`'${result.agent_name}' ${t("agent.registrationComplete")}`);
       } catch (err: unknown) {
-        const detail = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail;
-        failMsgs.push(`${files[i].name}: ${detail ?? t("agent.uploadFailed")}`);
+        const { conflict, message } = parseDeployError(err);
+        // 내장 키 충돌은 등록 불가 — 덮어쓰기 확인 없이 사유를 그대로 오류로 표시
+        if (conflict && conflict.code === "builtin_conflict") {
+          failMsgs.push(`${file.name}: ${pickMessage(conflict, locale)}`);
+        } else if (conflict) {
+          pending.push({ file, conflict });
+        } else {
+          failMsgs.push(`${file.name}: ${message ?? t("agent.uploadFailed")}`);
+        }
       }
     }
-    if (okNames.length > 0) {
-      setUploadOk(`'${okNames.join("', '")}' ${t("agent.registrationComplete")}`);
+    if (okMsgs.length > 0) {
+      setUploadOk(okMsgs.join("\n"));
       const updated = await listAddonAgents().catch(() => null);
       if (updated) setAddons(updated);
       onChanged?.();
     }
+    // 이번 배치 대상만 교체 — 다른 파일의 확인 대기 항목은 유지
+    setConflicts((prev) => [
+      ...prev.filter((p) => !items.some((i) => i.file === p.file)),
+      ...pending,
+    ]);
     if (failMsgs.length > 0) setUploadError(failMsgs.join("\n"));
     setUploading(false);
     setUploadProgress(null);
-    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  async function handleOverwrite(item: { file: File; conflict: DeployConflict }) {
+    setUploadError(null); setUploadOk(null);
+    setConflicts((prev) => prev.filter((c) => c !== item));
+    await runUploads([{ file: item.file, force: true }]);
   }
 
   async function handleDeleteAddon(key: string) {
@@ -743,11 +773,45 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
                     </div>
                   )}
                   {uploadOk && (
-                    <div className="flex items-center gap-2 mt-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-lg px-3 py-2">
-                      <CheckCircle2 size={15} />
+                    <div className="flex items-start gap-2 mt-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 rounded-lg px-3 py-2 whitespace-pre-line">
+                      <CheckCircle2 size={15} className="mt-0.5 shrink-0" />
                       {uploadOk}
                     </div>
                   )}
+                  {/* R22-6: 중복 키 확인 — 내장 충돌은 등록 불가로 오류 표시(확인 대상 아님) */}
+                  {conflicts.map((item) => (
+                    <div
+                      key={item.file.name}
+                      className="mt-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-2.5"
+                    >
+                      <div className="flex items-start gap-2 text-sm text-amber-800 dark:text-amber-300">
+                        <AlertCircle size={15} className="mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-semibold">
+                            {item.file.name} — {t("agent.conflictDuplicateTitle")}
+                          </p>
+                          <p className="mt-1 text-xs leading-relaxed">{pickMessage(item.conflict, locale)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-2 justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setConflicts((prev) => prev.filter((c) => c !== item))}
+                          className="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        >
+                          {t("common.cancel")}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={uploading}
+                          onClick={() => handleOverwrite(item)}
+                          className="text-xs px-2.5 py-1.5 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors disabled:opacity-50"
+                        >
+                          {t("agent.conflictOverwrite")}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </section>
               )}
 

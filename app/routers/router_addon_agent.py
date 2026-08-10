@@ -120,12 +120,66 @@ def _pg_to_sqlite(sql: str) -> str:
     return sql
 
 
-def _safe_extract(zf: zipfile.ZipFile, dest: Path) -> None:
-    """경로 탐색 공격 방지: '..' 또는 절대 경로 포함 항목 차단."""
+def _check_safe_names(zf: zipfile.ZipFile) -> None:
+    """경로 탐색 공격 방지: '..' 또는 절대 경로 포함 항목 차단 (압축 해제 前 검사)."""
     for member in zf.namelist():
         if ".." in member or member.startswith("/"):
             raise ValueError(f"Unsafe path in ZIP: {member}")
-    zf.extractall(dest)
+
+
+def _invalid_package_message(zip_stem: str) -> str:
+    """에이전트 구성 파일이 없는 ZIP 의 거부 사유 — worker 배포본은 별도 안내 (R22-6)."""
+    if zip_stem.lower().endswith("_worker"):
+        return (
+            f"'{zip_stem}.zip' 은 에이전트가 아닌 worker 배포 패키지로 보입니다. "
+            f"worker 는 플랫폼에 등록하지 않고 대상 디바이스에 직접 설치합니다 "
+            f"— 에이전트 카드의 'Worker 설치 가이드' 를 참고하세요."
+        )
+    return (
+        f"{zip_stem}-app.py 또는 {zip_stem}-front.tsx 중 하나가 ZIP 최상위에 있어야 합니다 "
+        f"(ZIP 파일명과 파일 접두어가 같아야 합니다)"
+    )
+
+
+def _conflict_detail(agent_key: str, is_builtin: bool, registered: bool) -> dict:
+    """중복 키 409 상세 — 프론트가 code 로 분기하고 message/message_en 을 그대로 노출 (R22-6).
+
+    builtin_conflict 는 **등록 불가**(덮어쓰기 불가) — ADDON 목록은 is_builtin=0 만 표시하므로
+    내장 키로 등록하면 어느 목록에서도 보이지 않는 상태가 된다. 키 변경만이 유효한 조치다.
+    """
+    if is_builtin:
+        return {
+            "code": "builtin_conflict",
+            "agent_key": agent_key,
+            "is_builtin": True,
+            "registered": registered,
+            "overwritable": False,
+            "message": (
+                f"'{agent_key}' 는 내장 에이전트의 키와 중복되어 ADDON 에이전트로 "
+                f"등록할 수 없습니다. ZIP 파일명(= 에이전트 키)을 다른 이름으로 바꿔 등록하세요. "
+                f"(내장 에이전트 '{agent_key}' 는 에이전트 관리 → 내장 에이전트 탭에서 관리합니다.)"
+            ),
+            "message_en": (
+                f"'{agent_key}' collides with a built-in agent key and cannot be registered "
+                f"as an ADDON agent. Rename the ZIP file (= agent key) and upload again. "
+                f"(Built-in agent '{agent_key}' is managed under Agent Management → Built-in Agents.)"
+            ),
+        }
+    return {
+        "code": "duplicate",
+        "agent_key": agent_key,
+        "is_builtin": False,
+        "registered": registered,
+        "overwritable": True,
+        "message": (
+            f"'{agent_key}' 는 이미 등록된 에이전트입니다. "
+            f"덮어쓰기를 선택하면 기존 등록본을 이 ZIP 으로 교체합니다."
+        ),
+        "message_en": (
+            f"'{agent_key}' is already registered. Overwriting replaces the existing "
+            f"registration with this ZIP."
+        ),
+    }
 
 
 # R18-7: 다국어 정규화 공통 함수는 app/core/i18n.norm_descriptions 로 승격 (상단 import 참조)
@@ -139,7 +193,8 @@ def _parse_meta_json(dest: Path, zip_stem: str) -> dict:
     try:
         data = json.loads(meta_file.read_text(encoding="utf-8"))
         if data.get("agent_type") not in _VALID_TYPES:
-            data["agent_type"] = "app"
+            # 내장 에이전트 배포본은 유형을 "type" 키로 기록한다 — 폴백 후 app 기본값
+            data["agent_type"] = data.get("type") if data.get("type") in _VALID_TYPES else "app"
         return _norm_descriptions(data)
     except Exception:
         return _norm_descriptions({"agent_type": "app", "capabilities": []})
@@ -1048,45 +1103,61 @@ async def upload_addon(
     existing = await fetch_one(
         f"SELECT agent_key, is_builtin FROM tbl_addon_agents WHERE agent_key = {_PH}", (agent_key,)
     )
-    if existing and not force:
-        raise HTTPException(
-            status_code=409,
-            detail=f"'{agent_key}' already exists. Use force=true to overwrite.",
-        )
+    cfg_pre = await fetch_one(
+        f"SELECT agent_key, is_enabled FROM tbl_agent_config WHERE agent_key = {_PH}", (agent_key,)
+    )
 
     # 내장 에이전트 키와의 충돌 판정 — 업로드 前부터 tbl_agent_config 에 존재하고(=시드된 내장)
-    # addon 행은 아직 없다면, 이 업로드는 내장 에이전트의 패키지(built-in) 로 간주해 is_builtin=1 로 표시한다.
-    # → 에이전트 관리 UI/AI 어시스턴트 목록이 addon(is_builtin=0)만 ADDON 으로 분류하므로,
-    #    내장이 ADDON 목록으로 이중 노출되어 내장 목록에서 사라지고 ADDON 갯수가 부풀려지던 결함을 방지.
+    # addon 행은 아직 없다면, 이 업로드는 내장 에이전트의 패키지(built-in) 로 간주된다.
     if existing:
         is_builtin = int(existing.get("is_builtin") or 0)  # 재업로드 시 기존 분류 보존
     else:
-        cfg_pre = await fetch_one(
-            f"SELECT agent_key FROM tbl_agent_config WHERE agent_key = {_PH}", (agent_key,)
-        )
         is_builtin = 1 if cfg_pre else 0
 
-    dest = _DEPLOYED / agent_key
-    dest.mkdir(parents=True, exist_ok=True)
+    # 내장 키 충돌은 등록 불가 — force 로도 우회할 수 없다. ADDON 목록은 is_builtin=0 만
+    # 표시하므로 내장 키로 등록하면 "등록 성공인데 어느 목록에도 없는" 상태가 된다 (R22-6).
+    if is_builtin:
+        raise HTTPException(
+            status_code=409,
+            detail=_conflict_detail(agent_key, True, bool(existing)),
+        )
+    # 일반 중복(이미 등록된 ADDON)은 사용자 확인 후 덮어쓰기 가능
+    if existing and not force:
+        raise HTTPException(
+            status_code=409,
+            detail=_conflict_detail(agent_key, False, True),
+        )
 
+    # ZIP 내용 검증은 **디스크에 풀기 前** 수행한다 — 등록 불가 패키지(구성 파일 미충족·
+    # worker 배포본 등)가 addon-agents/deployed/ 에 남던 결함 방지 (R22-6).
     try:
-        with zipfile.ZipFile(io.BytesIO(raw)) as zf:
-            _safe_extract(zf, dest)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except zipfile.BadZipFile:
-        raise HTTPException(status_code=400, detail="유효하지 않은 ZIP 파일")
+        zf = zipfile.ZipFile(io.BytesIO(raw))
+    except zipfile.BadZipFile as exc:
+        raise HTTPException(status_code=400, detail="유효하지 않은 ZIP 파일") from exc
+
+    with zf:
+        try:
+            _check_safe_names(zf)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        names = set(zf.namelist())
+        if f"{zip_stem}-app.py" not in names and f"{zip_stem}-front.tsx" not in names:
+            raise HTTPException(status_code=400, detail=_invalid_package_message(zip_stem))
+
+        dest = _DEPLOYED / agent_key
+        newly_created = not dest.exists()
+        dest.mkdir(parents=True, exist_ok=True)
+        try:
+            zf.extractall(dest)
+        except Exception:
+            if newly_created:
+                shutil.rmtree(dest, ignore_errors=True)
+            raise
 
     app_file = dest / f"{zip_stem}-app.py"
     front_file = dest / f"{zip_stem}-front.tsx"
     has_app = app_file.exists()
     has_front = front_file.exists()
-
-    if not has_app and not has_front:
-        raise HTTPException(
-            status_code=400,
-            detail=f"{zip_stem}-app.py 또는 {zip_stem}-front.tsx 중 하나가 ZIP에 있어야 합니다",
-        )
 
     # Front TSX → front/src/pages/addon/deployed/{agent_key}.tsx
     if has_front:
@@ -1111,13 +1182,20 @@ async def upload_addon(
     agent_type = meta.get("agent_type", "app")
     meta_json_val = json.dumps(meta, ensure_ascii=False)
 
-    # 라우터 핫 로드 (app.py 있을 때만)
+    # 활성 상태는 기존 설정(tbl_agent_config.is_enabled)을 따른다 — 보안 승인 전 기본 비활성인
+    # 내장 에이전트를 패키지 업로드가 임의로 활성화하지 않도록 한다 (R22-6).
+    is_active = int(cfg_pre.get("is_enabled") or 0) if cfg_pre else 1
+
+    # 라우터 핫 로드 (app.py 있고 활성 상태일 때만)
     api_prefix = f"/api/addon/{agent_key}"
-    ok = False
-    if has_app:
-        ok = load_router(agent_key, str(app_file), api_prefix)
-        if not ok:
+    if has_app and is_active:
+        if not load_router(agent_key, str(app_file), api_prefix):
+            # 등록 실패분이 deployed/ 에 남지 않도록 신규 생성분은 되돌린다 (R22-6)
+            if newly_created:
+                shutil.rmtree(dest, ignore_errors=True)
             raise HTTPException(status_code=500, detail="라우터 로드 실패 — app.py 문법 오류 확인")
+    elif has_app:
+        logger.info("[addon] %s 비활성 상태 — 라우터 로드 스킵 (활성화 시 로드)", agent_key)
 
     # DB 등록
     router_path = str(app_file) if has_app else ""
@@ -1125,20 +1203,20 @@ async def upload_addon(
         await execute_write(
             f"UPDATE tbl_addon_agents SET agent_name={_PH}, router_path={_PH}, "
             f"api_prefix={_PH}, has_app={_PH}, has_front={_PH}, sql_path={_PH}, "
-            f"agent_type={_PH}, meta_json={_PH}, "
+            f"agent_type={_PH}, meta_json={_PH}, is_active={_PH}, "
             f"uploaded_by={_PH}, uploaded_at=CURRENT_TIMESTAMP "
             f"WHERE agent_key={_PH}",
             (agent_name, router_path, api_prefix, int(has_app), int(has_front),
-             sql_path_val, agent_type, meta_json_val, user["sub"], agent_key),
+             sql_path_val, agent_type, meta_json_val, is_active, user["sub"], agent_key),
         )
     else:
         await execute_write(
             f"INSERT INTO tbl_addon_agents "
             f"(agent_key, agent_name, router_path, api_prefix, has_app, has_front, "
-            f"sql_path, agent_type, meta_json, is_builtin, uploaded_by) "
-            f"VALUES ({_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH})",
+            f"sql_path, agent_type, meta_json, is_builtin, is_active, uploaded_by) "
+            f"VALUES ({_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH},{_PH})",
             (agent_key, agent_name, router_path, api_prefix, int(has_app), int(has_front),
-             sql_path_val, agent_type, meta_json_val, is_builtin, user["sub"]),
+             sql_path_val, agent_type, meta_json_val, is_builtin, is_active, user["sub"]),
         )
 
     # Agent 설정 등록 (이미 있으면 스킵) — 설명은 meta_json 기준으로 항상 최신화 (다국어 dict + 레거시)
@@ -1211,6 +1289,8 @@ async def upload_addon(
     if has_front:
         asyncio.create_task(_rebuild_web())
 
+    front_note = " (프론트 포함 — 백그라운드 web 재빌드 시작, 약 30초 후 활성화)" if has_front else ""
+    front_note_en = " (front included — web rebuild started in background, active in ~30s)" if has_front else ""
     return {
         "agent_key": agent_key,
         "agent_name": agent_name,
@@ -1218,7 +1298,10 @@ async def upload_addon(
         "api_prefix": api_prefix,
         "has_app": has_app,
         "has_front": has_front,
-        "message": "배포 완료" + (" (프론트 포함 — 백그라운드 web 재빌드 시작, 약 30초 후 활성화)" if has_front else ""),
+        "is_builtin": bool(is_builtin),
+        "is_active": bool(is_active),
+        "message": "배포 완료" + front_note,
+        "message_en": "Deployed" + front_note_en,
     }
 
 

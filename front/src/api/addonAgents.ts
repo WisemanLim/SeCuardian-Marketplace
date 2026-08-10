@@ -24,10 +24,45 @@ export async function listAddonAgents(): Promise<AddonAgent[]> {
   return data.addons ?? [];
 }
 
-export async function uploadAddonAgent(
-  file: File,
-  force = false
-): Promise<{ agent_key: string; agent_name: string; message: string }> {
+export interface DeployResult {
+  agent_key: string;
+  agent_name: string;
+  message: string;
+  message_en?: string;
+  is_builtin?: boolean;
+  is_active?: boolean;
+}
+
+/** R22-6 — 중복 키 409 상세 (내장 키 충돌 / 기존 등록 중복) */
+export interface DeployConflict {
+  code: "duplicate" | "builtin_conflict";
+  agent_key: string;
+  is_builtin: boolean;
+  registered: boolean;
+  overwritable: boolean;
+  message: string;
+  message_en?: string;
+}
+
+/** 409 구조화 detail 이면 conflict, 그 외에는 문자열 메시지로 정규화 */
+export function parseDeployError(err: unknown): { conflict?: DeployConflict; message?: string } {
+  const detail = (err as { response?: { data?: { detail?: unknown } } }).response?.data?.detail;
+  if (detail && typeof detail === "object" && "code" in (detail as Record<string, unknown>)) {
+    return { conflict: detail as DeployConflict };
+  }
+  return { message: typeof detail === "string" ? detail : undefined };
+}
+
+/** locale 에 맞는 메시지 선택 (en 없으면 ko 폴백) */
+export function pickMessage(
+  o: { message: string; message_en?: string } | undefined,
+  locale: string
+): string {
+  if (!o) return "";
+  return locale === "en" ? (o.message_en || o.message) : o.message;
+}
+
+export async function uploadAddonAgent(file: File, force = false): Promise<DeployResult> {
   const form = new FormData();
   form.append("file", file);
   form.append("force", String(force));
