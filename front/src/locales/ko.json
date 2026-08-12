@@ -464,6 +464,9 @@
     "importedLocal": "로컬에 편입됨",
     "downloadImport": "다운로드·편입",
     "noRemote": "원격 자산이 없습니다.",
+    "installFailed": "설치 실패",
+    "installConflictTitle": "이미 등록/설치된 자산 — 덮어쓰기 확인",
+    "installOverwrite": "덮어쓰기 설치",
     "remoteInstallFailed": "원격 설치 실패",
     "cat": {
       "security": "보안 (security)",

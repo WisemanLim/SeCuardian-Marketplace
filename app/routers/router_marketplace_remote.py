@@ -118,12 +118,13 @@ class RemoteInstallBody(BaseModel):
     version: str | None = None
     expected_checksum: str | None = Field(default=None, description="원격 메타의 SHA256 (미제공 시 원격 상세에서 조회)")
     hot_deploy: bool = Field(default=True, description="검증 통과 시 다운로드 ZIP 을 addon upload 파이프라인으로 무중단 배포(§7.6)")
+    force: bool = Field(default=False, description="R22-7: 중복(기등록 키) 덮어쓰기 — 사용자 확인 후에만 true")
 
 
-async def _hot_deploy(blob: bytes, asset_key: str, user: dict) -> dict:
+async def _hot_deploy(blob: bytes, asset_key: str, user: dict, force: bool = False) -> dict:
     """공용 배포 헬퍼 위임(§7.6). 별도 재구현 금지 — services/addon_deploy 사용."""
     from app.services.addon_deploy import deploy_zip
-    return await deploy_zip(blob, asset_key, user)
+    return await deploy_zip(blob, asset_key, user, force=force)
 
 
 @router.post("/install/{asset_key}", status_code=201)
@@ -170,9 +171,14 @@ async def remote_install(
     deploy_result: dict | None = None
     if body.hot_deploy:
         try:
-            deploy_result = await _hot_deploy(blob, asset_key, user)
+            deploy_result = await _hot_deploy(blob, asset_key, user, force=body.force)
         except Exception as exc:  # noqa: BLE001 — 배포 실패가 catalog 편입을 막지 않음
             deploy_result = {"status_code": 0, "body": f"hot-deploy skipped: {exc}"}
+        # R22-7: 중복(409)은 흡수 금지 — 카탈로그 편입 前에 확인 요청으로 반환한다
+        if deploy_result.get("status_code") == 409:
+            rbody = deploy_result.get("body")
+            detail = rbody.get("detail") if isinstance(rbody, dict) else rbody
+            raise HTTPException(409, detail)
 
     # 4) 로컬 marketplace_assets 편입(source='remote')
     tid = _tenant()

@@ -109,11 +109,17 @@ export async function deleteCategory(category: string): Promise<{ deleted_catego
   return data;
 }
 
-export async function installAsset(assetKey: string, version?: string): Promise<MarketplaceInstall> {
+// R22-7: force=true 는 중복(기존 에이전트 키 점유·동일 버전 활성 설치) 사용자 확인 후에만
+export async function installAsset(
+  assetKey: string, version?: string, force = false
+): Promise<MarketplaceInstall> {
+  const params: Record<string, string | boolean> = {};
+  if (version) params.version = version;
+  if (force) params.force = true;
   const { data } = await client.post<MarketplaceInstall>(
     `/marketplace/install/${assetKey}`,
     {},
-    { params: version ? { version } : undefined },
+    { params: Object.keys(params).length ? params : undefined },
   );
   return data;
 }

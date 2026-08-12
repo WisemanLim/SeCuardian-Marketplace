@@ -199,10 +199,59 @@ async def get_asset(asset_key: str, user: dict = Depends(get_current_user)):
     return await _asset_out(asset, tid)
 
 
+def _install_conflict_detail(asset_key: str, reason: str, extra: str, extra_en: str) -> dict:
+    """설치 중복 409 상세 — 프론트가 code 로 분기하고 message/message_en 을 노출 (R22-7).
+
+    확인(force=true) 후에는 진행 가능하므로 overwritable=true.
+    """
+    return {
+        "code": "install_conflict",
+        "asset_key": asset_key,
+        "reason": reason,
+        "overwritable": True,
+        "message": f"'{asset_key}' {extra} 계속하면 이 자산으로 덮어씁니다.",
+        "message_en": f"'{asset_key}' {extra_en} Continuing overwrites it with this asset.",
+    }
+
+
+async def _check_install_conflict(asset: dict, tid: str, force: bool) -> None:
+    """설치 전 중복 확인 (R22-7) — 확인 없는 조용한 덮어쓰기 금지.
+
+    ① 마켓플레이스 출처가 아닌 `tbl_agent_config` 키 점유(내장·타출처 에이전트)
+    ② 동일 버전이 이미 활성 설치됨
+    """
+    if force:
+        return
+    asset_key = asset["asset_key"]
+    if asset["kind"] == "agent":
+        cfg = await fetch_one(
+            f"SELECT agent_key, nav_group FROM tbl_agent_config WHERE agent_key = {_PH}",
+            (asset_key.lower(),),
+        )
+        if cfg and (cfg.get("nav_group") or "") != "marketplace":
+            raise HTTPException(409, _install_conflict_detail(
+                asset_key, "agent_config_occupied",
+                "는 마켓플레이스 설치본이 아닌 기존(내장) 에이전트로 이미 등록되어 있습니다.",
+                "is already registered as an existing (built-in) agent, not a marketplace install.",
+            ))
+    active = await fetch_one(
+        f"SELECT id FROM marketplace_installs WHERE asset_key = {_PH} AND version = {_PH} "
+        f"AND tenant_id = {_PH} AND active = 1",
+        (asset_key, asset["version"], tid),
+    )
+    if active:
+        raise HTTPException(409, _install_conflict_detail(
+            asset_key, "already_installed",
+            f"{asset['version']} 은 이미 설치(활성)되어 있습니다.",
+            f"{asset['version']} is already installed and active.",
+        ))
+
+
 @router.post("/install/{asset_key}", status_code=201)
 async def install(
     asset_key: str,
     version: str | None = None,
+    force: bool = False,   # R22-7: 중복은 사용자 확인 후에만 덮어쓰기
     user: dict = Depends(require_role("admin", "supervisor")),
 ):
     tid = _tenant()
@@ -219,6 +268,8 @@ async def install(
         )
     if not asset:
         raise HTTPException(404, f"asset {asset_key} not found")
+
+    await _check_install_conflict(asset, tid, force)
 
     installed_by = user.get("username") or user.get("sub") or ""
     try:

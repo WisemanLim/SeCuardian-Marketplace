@@ -30,6 +30,8 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
+> **설치·배포 경로 중복 확인 일원화 + worker↔에이전트 링크(물리 `test/impl/52`, SeCuardian R22-7 동일 적용, §7.6.7)**: 카탈로그 ZIP 등록·addon 업로드에는 있던 중복 확인이 **설치 경로에는 없어** 조용히 덮어쓰던 결함 수정. ① `POST /api/marketplace/install/{asset_key}` 에 `force`(기본 false) — 확인 없이 ⓐ `tbl_agent_config` 에 동일 키가 `nav_group≠marketplace`(내장·타출처)로 존재(`reason=agent_config_occupied`) ⓑ 동일 버전이 이미 활성 설치(`reason=already_installed`)면 409 `{"code":"install_conflict","overwritable":true,…}` → UI ConfirmDialog 확인 후 `force=true` 재요청 ② 원격 install 은 hot-deploy 를 무조건 `force=true` 로 호출하지 않고 요청의 `force` 를 전달하며, **409 를 흡수하지 않고**(카탈로그 편입 전) 그대로 반환 ③ `GET /api/addon-agents/key-check/{key}` — 스캐폴드 이름 단계 사전 중복 경고 + 배포 409 덮어쓰기 확인 배너 ④ worker 자산 meta `agent_key`(짝 에이전트)를 host 카탈로그 엔트리에 노출 — 클라이언트 worker 카드에서 에이전트 즉시 배포.
+>
 > **ADDON 등록 파이프라인 오류 수정 — 내장 키 중복·잔여 압축 해제(물리 `test/impl/51`, SeCuardian R22-6 동일 적용)**: ① 내장 에이전트 키와 중복되는 ZIP 이 조용히 `is_builtin=1` 로 등록되어 ADDON 목록(=`is_builtin=0` 필터)에서 사라지던 결함 → **등록 불가**(409 `builtin_conflict`, `overwritable=false`, force 로도 우회 불가, ZIP 파일명 변경 안내) — 업로드 성공분은 항상 ADDON 목록에 노출된다 ② 영문 원문 `already exists. Use force=true` → 구조화 detail(`code`/`overwritable`/한·영 메시지) + 프론트 덮어쓰기 확인 배너(일반 중복만) ③ 등록 불가 ZIP(worker 배포본 등)이 `addon-agents/deployed/` 에 압축 해제되던 문제 → **해제 前 검증**(경로 안전성·구성 파일 존재) + 라우터 로드 실패 시 롤백 ④ 활성 상태를 `tbl_agent_config.is_enabled` 와 동기(비활성 에이전트 라우터 무단 개방 차단) · 소스 없는 등록분 경고 스킵 · meta `type` 폴백.
 >
 > **UserManager 자산 addon 이관(impl/52·물리 `test/impl/50`)**: `marketplace-assets/utilities/UserManager{,.zip}` → `marketplace-assets/addon/` 이동 — 카탈로그 시드 대상 제외(utilities 5종), **스캐폴드 템플릿 편입**(`새 Agent 만들기` templates 6종), 시드 보호 해제(사용자가 등록하면 `deletable=true`). `seed_assets` 는 시드 유래 고아 행(시드 디렉터리에서 제거된 key, 블롭 `uploaded_by='seed-assets'` 한정)을 멱등 정리한다 — 사용자 등록 자산 불변, 설치 중 자산은 건너뜀.
@@ -255,6 +257,11 @@ curl http://localhost:8100/api/marketplace/catalog -H "Authorization: Bearer $TO
 curl -X POST http://localhost:8100/api/marketplace/install/cve-scanner \
   -H "Authorization: Bearer $TOKEN"
 # → {"id":1,"asset_key":"cve-scanner","version":"1.0.0","status":"installed","active":true,"agent_config_key":"cve-scanner"}
+# 중복(내장/타출처 키 점유·동일 버전 활성)은 확인 없이 덮어쓰지 않는다 — §7.6.7
+# → 409 {"detail":{"code":"install_conflict","reason":"already_installed","overwritable":true,...}}
+#   확인 후 ?force=true 로 재요청:
+curl -X POST "http://localhost:8100/api/marketplace/install/cve-scanner?force=true" \
+  -H "Authorization: Bearer $TOKEN"
 # 해제
 curl -X DELETE http://localhost:8100/api/marketplace/install/cve-scanner -H "Authorization: Bearer $TOKEN"
 
@@ -264,6 +271,9 @@ curl http://localhost:8100/api/marketplace-host/ping
 # → {"ok":true,"service":"SeCuardian-Marketplace","categories":["addon","builtin","security","utilities"],"total":29}
 curl "http://localhost:8100/api/marketplace-host/catalog?category=security"   # 카테고리별 groups+assets
 curl http://localhost:8100/api/marketplace-host/catalog/Board                 # 상세(version·checksum·download_path)
+# worker 자산 엔트리는 kind="worker" + agent_key(짝 에이전트 asset_key) 노출 — 클라이언트가 카드에서 즉시 배포
+curl http://localhost:8100/api/marketplace-host/catalog/VASCA_worker
+# → {"kind":"worker","agent_key":"vasca-cve","checksum":"<sha256>","download_path":"/download/VASCA_worker",...}
 curl -O http://localhost:8100/api/marketplace-host/download/Board             # ZIP 다운로드 (SHA256=checksum)
 # 소스 = marketplace-assets/{category}/{Name}.zip 파일시스템 — DB(installs) 미참조 = 설치유무 무관
 

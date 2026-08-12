@@ -73,6 +73,9 @@ def _asset_entry(category_dir: Path, zip_path: Path) -> dict:
         "version": str(meta.get("version") or "1.0.0"),
         # R22-4(SeCuardian PRD §22): {Name}_worker.zip 은 다운로드 전용 worker 자산
         "kind": "worker" if stem.endswith("_worker") else "agent",
+        # R22-4: worker 자산이 지원하는 짝 에이전트 asset_key — 클라이언트가 worker 카드에서
+        # 에이전트를 바로 배포할 수 있도록 노출 (meta 미기재 시 빈 문자열)
+        "agent_key": str(meta.get("agent_key") or ""),
         "agent_type": meta.get("agent_type", "app"),
         "category": category_dir.name,
         "size": zip_path.stat().st_size,

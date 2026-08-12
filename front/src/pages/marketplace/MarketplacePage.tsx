@@ -28,6 +28,10 @@ export default function MarketplacePage() {
   const [confirmDel, setConfirmDel] = useState<
     { type: "asset"; asset: MarketplaceAsset } | { type: "category"; cat: string } | null
   >(null);
+  // R22-7: 설치 중복 확인 — 조용한 덮어쓰기 금지, 확인 시 force 재요청
+  const [confirmInstall, setConfirmInstall] = useState<
+    { kind: "local" | "remote"; asset: MarketplaceAsset | RemoteAsset; message: string } | null
+  >(null);
   // 원격 레지스트리(E1.5) — MARKETPLACE_REMOTE_ENABLED=false 면 409 → 섹션 숨김
   const [remoteAssets, setRemoteAssets] = useState<RemoteAsset[]>([]);
   const [remoteEnabled, setRemoteEnabled] = useState(false);
@@ -58,29 +62,65 @@ export default function MarketplacePage() {
     return (ix === -1 ? CATEGORY_ORDER.length : ix) - (iy === -1 ? CATEGORY_ORDER.length : iy) || x.localeCompare(y);
   });
 
-  async function handleRemoteInstall(a: RemoteAsset) {
+  /** R22-7: 409 중복 상세(문자열/구조화 detail 공용) → 확인 문구 추출 */
+  function conflictMessage(e: unknown): string | null {
+    const res = (e as { response?: { status?: number; data?: { detail?: unknown } } })?.response;
+    if (res?.status !== 409) return null;
+    const detail = res.data?.detail;
+    if (detail && typeof detail === "object") {
+      const d = detail as { message?: string; overwritable?: boolean };
+      return d.overwritable ? (d.message ?? "") : null;
+    }
+    return typeof detail === "string" ? detail : null;
+  }
+
+  async function handleRemoteInstall(a: RemoteAsset, force = false) {
     setBusy(`remote:${a.asset_key}`);
     try {
-      await remoteInstall(a.asset_key, a.checksum);
+      await remoteInstall(a.asset_key, a.checksum, force);
       window.dispatchEvent(new CustomEvent("marketplaceChanged"));
     } catch (e) {
-      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setError(msg || t("mp.remoteInstallFailed"));
+      // R22-7: 중복은 확인 다이얼로그로 — 확인 시 force 재요청
+      const conflict = conflictMessage(e);
+      if (conflict !== null) {
+        setConfirmInstall({ kind: "remote", asset: a, message: conflict });
+      } else {
+        const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+        setError(msg || t("mp.remoteInstallFailed"));
+      }
     } finally {
       setBusy(null);
     }
   }
 
-  async function handleInstall(a: MarketplaceAsset) {
+  async function handleInstall(a: MarketplaceAsset, force = false) {
     setBusy(a.asset_key);
+    setError("");
     try {
-      await installAsset(a.asset_key, a.version);
+      await installAsset(a.asset_key, a.version, force);
       // §7.6.4: 설치됨 탭·카탈로그 동시 갱신 (자기 자신도 리스너로 load)
       window.dispatchEvent(new CustomEvent("marketplaceChanged"));
       window.dispatchEvent(new CustomEvent("agentConfigChanged")); // §7.6.5: 좌측 네비 즉시 동기화
+    } catch (e) {
+      // R22-7: 중복(기존 에이전트 키 점유·동일 버전 활성)은 조용히 덮어쓰지 않고 확인받는다
+      const conflict = conflictMessage(e);
+      if (conflict !== null) {
+        setConfirmInstall({ kind: "local", asset: a, message: conflict });
+      } else {
+        const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+        setError(msg || t("mp.installFailed"));
+      }
     } finally {
       setBusy(null);
     }
+  }
+
+  function handleConfirmInstall() {
+    const c = confirmInstall;
+    setConfirmInstall(null);
+    if (!c) return;
+    if (c.kind === "remote") void handleRemoteInstall(c.asset as RemoteAsset, true);
+    else void handleInstall(c.asset as MarketplaceAsset, true);
   }
 
   async function handleUninstall(a: MarketplaceAsset) {
@@ -239,6 +279,19 @@ export default function MarketplacePage() {
           cancelLabel={t("common.cancel")}
           onConfirm={handleConfirmDelete}
           onCancel={() => setConfirmDel(null)}
+        />
+      )}
+
+      {/* R22-7: 설치 중복 확인 — 덮어쓰기(force) 여부를 사용자가 결정 */}
+      {confirmInstall && (
+        <ConfirmDialog
+          title={t("mp.installConflictTitle")}
+          message={confirmInstall.message}
+          confirmLabel={t("mp.installOverwrite")}
+          cancelLabel={t("common.cancel")}
+          danger={false}
+          onConfirm={handleConfirmInstall}
+          onCancel={() => setConfirmInstall(null)}
         />
       )}
 

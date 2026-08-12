@@ -31,6 +31,8 @@ bases (RAG).
 
 > All 5 built-in agents have working backend+frontend (tests PASS). 🟡 = extension items remain (remote registry, React Flow canvas, pgvector, MCP proxy, etc). Details: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
+> **Unified duplicate confirmation on install/deploy paths + worker↔agent link (physical `test/impl/52`, parity with SeCuardian R22-7, §7.6.7)**: catalog ZIP registration and addon upload already asked for confirmation, but **the install path did not** and silently overwrote. ① `POST /api/marketplace/install/{asset_key}` gains `force` (default false) — without it, 409 `{"code":"install_conflict","overwritable":true,…}` when ⓐ `tbl_agent_config` holds the same key with `nav_group≠marketplace` (built-in/other origin, `reason=agent_config_occupied`) or ⓑ the same version is already installed and active (`reason=already_installed`) → the UI confirms via ConfirmDialog and retries with `force=true` ② remote install no longer calls hot-deploy with a hard-coded `force=true`; it passes the request's `force` and **surfaces 409 instead of swallowing it** (before catalog ingestion) ③ `GET /api/addon-agents/key-check/{key}` warns about key collisions at the scaffold name step, and a deploy 409 renders an overwrite-confirm banner ④ worker asset meta `agent_key` (paired agent) is exposed in the host catalog entry so client worker cards can deploy the agent directly.
+>
 > **ADDON registration pipeline fixes — built-in key collision & leftover extraction (physical `test/impl/51`, parity with SeCuardian R22-6)**: ① a ZIP colliding with a built-in agent key was silently registered as `is_builtin=1` and disappeared from the ADDON list (which filters `is_builtin=0`) → now **rejected** (409 `builtin_conflict`, `overwritable=false`, not bypassable with force, tells the user to rename the ZIP) — any successful upload always shows up in the ADDON list ② raw English `already exists. Use force=true` → structured detail (`code`/`overwritable`/ko+en messages) plus an overwrite-confirm banner (regular duplicates only) ③ rejected ZIPs (e.g. worker bundles) were still extracted into `addon-agents/deployed/` → **validation before extraction** (path safety, required entries) with rollback when the router fails to load ④ active state synced with `tbl_agent_config.is_enabled` (no unintended router exposure for disabled agents), stale registrations skipped with a warning, meta `type` fallback.
 >
 > **UserManager asset moved to addon (impl/52, physical `test/impl/50`)**: `marketplace-assets/utilities/UserManager{,.zip}` moved to `marketplace-assets/addon/` — excluded from catalog seeding (utilities now 5), **added to the scaffold templates** (`Create new Agent` templates: 6), and no longer seed-protected (registering it as a user asset makes it `deletable=true`). `seed_assets` now idempotently cleans up seed-originated orphan rows (keys removed from the seed directories, limited to blobs with `uploaded_by='seed-assets'`) — user-registered assets are untouched and installed assets are skipped.
@@ -256,6 +258,11 @@ curl http://localhost:8100/api/marketplace/catalog -H "Authorization: Bearer $TO
 curl -X POST http://localhost:8100/api/marketplace/install/cve-scanner \
   -H "Authorization: Bearer $TOKEN"
 # → {"id":1,"asset_key":"cve-scanner","version":"1.0.0","status":"installed","active":true,"agent_config_key":"cve-scanner"}
+# Duplicates (key held by a built-in/other origin, or same version already active) are never overwritten silently — §7.6.7
+# → 409 {"detail":{"code":"install_conflict","reason":"already_installed","overwritable":true,...}}
+#   after confirmation, retry with ?force=true:
+curl -X POST "http://localhost:8100/api/marketplace/install/cve-scanner?force=true" \
+  -H "Authorization: Bearer $TOKEN"
 # uninstall
 curl -X DELETE http://localhost:8100/api/marketplace/install/cve-scanner -H "Authorization: Bearer $TOKEN"
 
@@ -265,6 +272,9 @@ curl http://localhost:8100/api/marketplace-host/ping
 # → {"ok":true,"service":"SeCuardian-Marketplace","categories":["addon","builtin","security","utilities"],"total":29}
 curl "http://localhost:8100/api/marketplace-host/catalog?category=security"   # groups+assets per category
 curl http://localhost:8100/api/marketplace-host/catalog/Board                 # detail (version, checksum, download_path)
+# worker entries expose kind="worker" plus agent_key (paired agent asset_key) so clients can deploy the agent from the card
+curl http://localhost:8100/api/marketplace-host/catalog/VASCA_worker
+# → {"kind":"worker","agent_key":"vasca-cve","checksum":"<sha256>","download_path":"/download/VASCA_worker",...}
 curl -O http://localhost:8100/api/marketplace-host/download/Board             # ZIP download (SHA256 == checksum)
 # Source = marketplace-assets/{category}/{Name}.zip filesystem — no DB (installs) lookup = install-state independent
 

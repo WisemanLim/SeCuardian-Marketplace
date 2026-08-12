@@ -9,8 +9,12 @@ import httpx
 from app.core.security import create_access_token
 
 
-async def deploy_zip(blob: bytes, asset_key: str, user: dict) -> dict:
-    """ZIP 바이트를 addon upload 파이프라인으로 in-process 배포. 반환: {status_code, body}."""
+async def deploy_zip(blob: bytes, asset_key: str, user: dict, force: bool = True) -> dict:
+    """ZIP 바이트를 addon upload 파이프라인으로 in-process 배포. 반환: {status_code, body}.
+
+    force=False 면 기등록 키는 upload 가 409(중복 확인)을 반환한다 — 호출측이 사용자
+    확인 후 force=True 로 재요청해야 한다 (R22-7).
+    """
     from app.main import app as _app
     token = create_access_token({
         "sub": user.get("sub"), "role": user.get("role"),
@@ -22,6 +26,6 @@ async def deploy_zip(blob: bytes, asset_key: str, user: dict) -> dict:
             "/api/addon-agents/upload",
             headers={"Authorization": f"Bearer {token}"},
             files={"file": (f"{asset_key}.zip", blob, "application/zip")},
-            data={"force": "true"},
+            data={"force": "true" if force else "false"},
         )
     return {"status_code": resp.status_code, "body": resp.json() if resp.status_code < 500 else resp.text}

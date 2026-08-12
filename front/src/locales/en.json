@@ -464,6 +464,9 @@
     "importedLocal": "Imported locally",
     "downloadImport": "Download & import",
     "noRemote": "No remote assets.",
+    "installFailed": "Install failed",
+    "installConflictTitle": "Asset already registered/installed — confirm overwrite",
+    "installOverwrite": "Overwrite install",
     "remoteInstallFailed": "Remote install failed",
     "cat": {
       "security": "Security",

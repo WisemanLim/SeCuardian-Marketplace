@@ -62,6 +62,14 @@ export function pickMessage(
   return locale === "en" ? (o.message_en || o.message) : o.message;
 }
 
+// R22-7: 스캐폴드 이름(= 에이전트 키) 사전 중복 확인 — 배포 전에 알린다
+export async function checkAgentKey(
+  agentKey: string
+): Promise<{ agent_key: string; available: boolean; conflict: DeployConflict | null }> {
+  const { data } = await client.get(`/addon-agents/key-check/${encodeURIComponent(agentKey)}`);
+  return data;
+}
+
 export async function uploadAddonAgent(file: File, force = false): Promise<DeployResult> {
   const form = new FormData();
   form.append("file", file);

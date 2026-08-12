@@ -7,5 +7,6 @@
     "en": "Worker for the vasca-cve agent (bundled Go binary). Install on each scan-target host/PC/Edge device. See vasca-cve-worker-guide.md embedded in the agent."
   },
   "kind": "worker",
+  "agent_key": "vasca-cve",
   "agent_type": "service"
 }

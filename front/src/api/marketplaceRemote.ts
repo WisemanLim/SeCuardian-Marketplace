@@ -29,10 +29,13 @@ export async function remoteCatalog(refresh = false): Promise<{ assets: RemoteAs
   return data;
 }
 
-export async function remoteInstall(assetKey: string, expectedChecksum?: string): Promise<{ registered: boolean; checksum: string }> {
+// R22-7: force=true 는 hot-deploy 중복(기등록 키) 사용자 확인 후에만
+export async function remoteInstall(
+  assetKey: string, expectedChecksum?: string, force = false
+): Promise<{ registered: boolean; checksum: string }> {
   const { data } = await client.post<{ registered: boolean; checksum: string }>(
     `/marketplace-remote/install/${assetKey}`,
-    { expected_checksum: expectedChecksum },
+    { expected_checksum: expectedChecksum, force },
   );
   return data;
 }

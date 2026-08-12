@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import {
   scaffoldAgent, uploadAddonAgent, deleteAddonAgent, DeployConflict,
-  parseDeployError, pickMessage,
+  parseDeployError, pickMessage, checkAgentKey,
   AddonAgent, AddonTemplate, listAddonAgents, listTemplates, getGuide,
 } from "../../api/addonAgents";
 import { getAuth } from "../../store/auth";
@@ -153,6 +153,9 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
   const [description, setDesc]      = useState("");
   const [domain, setDomain]         = useState("");
   const [nameError, setNameError]   = useState("");
+  // R22-7: 스캐폴드 키 중복 — 이름 단계 사전 경고 + 배포 시 덮어쓰기 확인
+  const [nameConflict, setNameConflict] = useState<DeployConflict | null>(null);
+  const [scConflict, setScConflict] = useState<DeployConflict | null>(null);
   const [busy, setBusy]             = useState(false);
   const [error, setError]           = useState<string | null>(null);
   const [success, setSuccess]       = useState<string | null>(null);
@@ -211,6 +214,10 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
     const err = validateName(agentName);
     if (err) { setNameError(err); return; }
     setNameError("");
+    // R22-7: 키 중복은 배포 시점이 아니라 이름 단계에서 알린다 (조회 실패는 통과 — 배포 시 재검증)
+    void checkAgentKey(agentName)
+      .then((r) => setNameConflict(r.available ? null : r.conflict))
+      .catch(() => setNameConflict(null));
     setStep(3);
   }
 
@@ -254,13 +261,13 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
     } finally { setBusy(false); }
   }
 
-  async function handleDeploy() {
+  async function handleDeploy(force = false) {
     if (!selectedType) return;
-    setError(null); setBusy(true);
+    setError(null); setScConflict(null); setBusy(true);
     try {
       const blob = await scaffoldAgent(scaffoldPayload());
       const file = new File([blob], `${agentName}.zip`, { type: "application/zip" });
-      const result = await uploadAddonAgent(file);
+      const result = await uploadAddonAgent(file, force);
       // MCP proxy 활성 시 배포 직후 MCP 설정 자동 등록 (포트·custom args) — #3
       if (mcpProxyActive()) {
         try {
@@ -275,10 +282,16 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
       } else {
         setSuccess(`'${result.agent_name}' 배포 완료`);
       }
+      setNameConflict(null);
       onDeployed();
     } catch (e: unknown) {
       const { conflict, message } = parseDeployError(e);
-      setError(conflict ? pickMessage(conflict, locale) : (message ?? (e as Error).message ?? "배포 실패"));
+      // R22-7: 덮어쓰기 가능한 중복은 확인 배너로, 내장 키 충돌은 조치 안내 오류로 표시
+      if (conflict?.overwritable) {
+        setScConflict(conflict);
+      } else {
+        setError(conflict ? pickMessage(conflict, locale) : (message ?? (e as Error).message ?? "배포 실패"));
+      }
     } finally { setBusy(false); }
   }
 
@@ -505,7 +518,10 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
                     <input
                       type="text"
                       value={agentName}
-                      onChange={(e) => { setAgentName(e.target.value); setNameError(""); }}
+                      onChange={(e) => {
+                        setAgentName(e.target.value);
+                        setNameError(""); setNameConflict(null); setScConflict(null);
+                      }}
                       placeholder="예: HrPolicyQa"
                       className={`w-full text-sm px-3 py-2 rounded-lg border ${
                         nameError ? "border-red-400 dark:border-red-500" : "border-gray-200 dark:border-gray-600"
@@ -707,7 +723,7 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
                     </button>
                     <button
                       type="button"
-                      onClick={handleDeploy}
+                      onClick={() => void handleDeploy()}
                       disabled={busy}
                       className="flex flex-col items-center gap-3 p-5 rounded-xl border-2 border-indigo-200 dark:border-indigo-800 hover:border-indigo-400 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-all disabled:opacity-50"
                     >
@@ -718,6 +734,49 @@ export default function AgentBuilderModal({ onClose, onDeployed, onChanged, agen
                       </div>
                     </button>
                   </div>
+                  {/* R22-7: 키 중복 사전 경고 — 배포 전에 알린다 (내장 충돌은 키 변경만 유효) */}
+                  {nameConflict && !scConflict && (
+                    <div className="flex items-start gap-2 text-xs text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
+                      <AlertCircle size={15} className="mt-0.5 shrink-0" />
+                      <div>
+                        <p className="font-semibold">
+                          {nameConflict.code === "builtin_conflict"
+                            ? t("agent.conflictBuiltinTitle")
+                            : t("agent.conflictDuplicateTitle")}
+                        </p>
+                        <p className="mt-1 leading-relaxed">{pickMessage(nameConflict, locale)}</p>
+                      </div>
+                    </div>
+                  )}
+                  {/* R22-7: 배포 시 확인 가능한 중복 — 덮어쓰기(force) 재요청 */}
+                  {scConflict && (
+                    <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 px-3 py-2.5">
+                      <div className="flex items-start gap-2 text-sm text-amber-800 dark:text-amber-300">
+                        <AlertCircle size={15} className="mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-semibold">{t("agent.conflictDuplicateTitle")}</p>
+                          <p className="mt-1 text-xs leading-relaxed">{pickMessage(scConflict, locale)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-2 justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setScConflict(null)}
+                          className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                        >
+                          {t("common.cancel")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void handleDeploy(true)}
+                          disabled={busy}
+                          className="text-xs px-2.5 py-1.5 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors disabled:opacity-50"
+                        >
+                          {t("agent.conflictOverwrite")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   {busy && (
                     <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500" />

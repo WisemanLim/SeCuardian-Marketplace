@@ -539,6 +539,33 @@ async def get_config(user: dict = Depends(require_role("supervisor", "admin"))):
 '''
 
 
+@router.get("/key-check/{agent_key}")
+async def key_check(agent_key: str, user: dict = Depends(get_current_user)):
+    """스캐폴드 이름(= 에이전트 키) 사용 가능 여부 사전 확인 (R22-7).
+
+    배포 시점에야 409 로 알던 중복을 이름 입력 단계에서 미리 알린다.
+    판정 기준은 `_deploy_zip_bytes` 와 동일 — tbl_addon_agents 등록분 + tbl_agent_config 내장 시드.
+    """
+    key = agent_key.strip().lower()
+    if not key or not _NAME_RE.match(key):
+        raise HTTPException(status_code=400, detail="agent_key 형식이 올바르지 않습니다")
+
+    existing = await fetch_one(
+        f"SELECT agent_key, is_builtin FROM tbl_addon_agents WHERE agent_key = {_PH}", (key,)
+    )
+    cfg = await fetch_one(
+        f"SELECT agent_key FROM tbl_agent_config WHERE agent_key = {_PH}", (key,)
+    )
+    if not existing and not cfg:
+        return {"agent_key": key, "available": True, "conflict": None}
+    is_builtin = bool(existing.get("is_builtin")) if existing else bool(cfg)
+    return {
+        "agent_key": key,
+        "available": False,
+        "conflict": _conflict_detail(key, is_builtin, bool(existing)),
+    }
+
+
 @router.post("/scaffold")
 async def scaffold_addon(
     body: ScaffoldRequest,

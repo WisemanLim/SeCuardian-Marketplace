@@ -7,5 +7,6 @@
     "en": "Worker for the behavior-noti agent (C++ source + Dockerfile). Install on each monitored host/PC/Edge device. See behavior-noti-worker-guide.md embedded in the agent."
   },
   "kind": "worker",
+  "agent_key": "behavior-noti",
   "agent_type": "service"
 }

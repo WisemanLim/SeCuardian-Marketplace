@@ -716,6 +716,32 @@ TENANT_DEFAULT_ID=default                  # off 모드일 때 사용할 고정 
    보여주고, 사용자가 확인하면 `confirm=true` 로 재요청 — 자산은 요청 카탈로그로 **이동 등록**된다
    (`UNIQUE(tenant_id, asset_key, version)` 유지, 복제 아님). 등록 여부 판단 주체 = 사용자.
 
+### 7.6.7 설치·배포 경로 중복 확인 일원화 + worker↔에이전트 링크 (SeCuardian R22-7 준용, impl/52 · 물리 test/impl/52) — 사용자 보고(2026-08-12)
+
+**배경(결함)**: 카탈로그 ZIP 등록(§7.6.6-4)·addon 업로드(R22-6)에는 중복 확인이 있으나
+**설치(install) 경로에는 없었다** — ① 로컬 install 이 `tbl_agent_config` 를 무조건 upsert 해
+마켓플레이스 출처가 아닌(내장) 에이전트 설정 행을 조용히 점유하고 동일 버전 재설치도
+무통보 진행 ② 원격 install 의 hot-deploy 가 `deploy_zip` 을 항상 `force=true` 로 호출하고
+409 를 흡수해 기등록 키를 사용자 모르게 덮어썼다 ③ 스캐폴드 경로에는 키 사전 확인·
+덮어쓰기 확인 수단이 없었다.
+
+1. **로컬 install 중복 확인**: `POST /api/marketplace/install/{asset_key}` 에 `force`
+   (기본 false) 추가. 확인 없이 다음이면 409 +
+   `{"code":"install_conflict","reason":…,"overwritable":true,"message","message_en"}` —
+   ① `reason=agent_config_occupied`: `tbl_agent_config` 에 동일 키가 `nav_group≠marketplace`
+   (내장·타출처)로 존재 ② `reason=already_installed`: 동일 버전이 이미 활성 설치.
+   UI 는 ConfirmDialog(R18-1)로 확인받고 `force=true` 로 재요청한다.
+2. **원격 install**: 요청 본문 `force`(기본 false)를 hot-deploy 로 전달하고
+   `deploy_zip(force=…)` 이 upload 파이프라인에 그대로 넘긴다. hot-deploy 가 409 면
+   **흡수 금지** — 카탈로그 편입 전에 409 로 반환해 사용자가 확인할 수 있게 한다.
+3. **스캐폴드 사전 확인**: `GET /api/addon-agents/key-check/{agent_key}` (판정 기준 =
+   `_deploy_zip_bytes` 와 동일: `tbl_addon_agents` 등록분 + `tbl_agent_config` 내장 시드).
+   이름 입력 단계에서 경고하고, 배포 시 409 는 덮어쓰기 확인 배너로 노출한다
+   (`builtin_conflict` 는 확인 수단 없이 키 변경 안내 — R22-6 유지).
+4. **worker↔에이전트 링크**: worker 자산 meta 의 `agent_key`(짝 에이전트 asset_key)를
+   host 카탈로그(`/api/marketplace-host/catalog`) 엔트리에 노출한다 — 클라이언트가 worker
+   카드에서 짝 에이전트를 바로 배포할 수 있게 하기 위한 계약(에이전트 자산은 빈 문자열).
+
 ### 7.7 Playground (F-PG)
 
 - 프롬프트/모델/에이전트/RAG 컬렉션 조합 대화형 실험, A/B 비교(응답·비용·지연·인용), eval 실행. 승격 경로: Playground → Workflow 노드 / Marketplace 게시.
