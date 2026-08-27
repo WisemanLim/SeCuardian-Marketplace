@@ -20,7 +20,7 @@ import shlex
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from app.core.deps import require_role
+from app.addon_sdk import require_role
 
 router = APIRouter(tags=["shell-agent"])
 

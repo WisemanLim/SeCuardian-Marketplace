@@ -629,6 +629,8 @@ async def scaffold_addon(
                             for cap in meta.get("capabilities", []):
                                 cap["domain"] = body.domain
                         meta["agent_type"] = body.agent_type
+                        # B2: 설치 키 정합 — meta 의 key 필드를 새 이름 소문자로 갱신
+                        meta = _finalize_generated_meta(meta, name.lower())
                         content = json.dumps(meta, ensure_ascii=False, indent=2)
                     except Exception:
                         pass
@@ -648,6 +650,24 @@ async def scaffold_addon(
 # ── F26 Agent ZIP 추출 / F27 Standalone 배포 번들 export ─────────────────────
 
 _NAME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
+
+
+def _finalize_generated_meta(meta: dict, agent_key: str) -> dict:
+    """생성/파생 meta 의 key 필드를 새 이름 소문자로 정합화 (B2).
+
+    스캐폴드/Export 는 파일 내용의 PascalCase 템플릿명만 치환하므로,
+    meta 에 남은 원본 key 로 설치되는 키 불일치를 여기서 바로잡는다.
+    meta 가 이미 쓰는 필드(`agent_key`/`key`)를 갱신하고, 둘 다 없으면 `agent_key` 를 기입한다.
+    """
+    wrote = False
+    for field in ("agent_key", "key"):
+        if field in meta:
+            meta[field] = agent_key
+            wrote = True
+    if not wrote:
+        meta["agent_key"] = agent_key
+    return meta
+
 
 
 def _resolve_agent_source(row: dict) -> tuple[Path, str]:
@@ -701,7 +721,8 @@ def _derived_meta(meta: dict, row: dict, new_name: str, description: str) -> dic
         "platform": "SeCuardian",
         "exported_at": datetime.now(timezone.utc).isoformat(),
     }
-    return meta
+    # B2: 파생 ZIP 도 설치 키 정합 — meta key = 새 이름 소문자
+    return _finalize_generated_meta(meta, new_name.lower())
 
 
 class ExportRequest(BaseModel):
