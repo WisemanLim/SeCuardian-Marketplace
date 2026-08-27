@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "agent_key": "hardening-auditor",
+  "display_name": {"ko": "Linux 하드닝 감사자", "en": "Linux Hardening Auditor"},
+  "description": {
+    "ko": "Ansible 하드닝 플레이북(linux_hardening.yml / audit_hardening.yml)의 감사 결과를 webhook 으로 수신·보관하고 실행 힌트와 최근 보고서를 제공하는 엔드포인트 보안 에이전트(L2 Endpoint)입니다. 전용 화면이 없어 AI 어시스턴트 질의응답(endpoint_security)으로 사용합니다. SeCuardian 내장 router_hardening 이식 — 보고서 수신 경로가 /api/addon/hardening-auditor/report 로 변경됩니다.",
+    "en": "Endpoint-security agent (L2) that receives and stores audit results from the Ansible hardening playbooks (linux_hardening.yml / audit_hardening.yml) via webhook and serves run hints and the latest report. No dedicated screen — use via the AI Assistant (endpoint_security). Ported from SeCuardian built-in router_hardening; the report endpoint moves to /api/addon/hardening-auditor/report."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "categories": ["security", "endpoint", "hardening"],
+  "has_front": false,
+  "dependencies": {"python": []},
+  "requires": {"core": ">=1.0.0", "sdk": ">=1.0.0", "agents": []},
+  "tables_owned": [],
+  "permissions": ["webhook.ingress"],
+  "required_env": ["HARDENING_WEBHOOK_ENABLED"],
+  "optional_env": ["HARDENING_REPORTS_MAX", "HARDENING_PLAYBOOK_DIR"],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Ansible (linux_hardening / audit_hardening playbooks)",
+    "version": ">=2.15",
+    "guide": "hardening-auditor-worker-guide.md"
+  },
+  "capabilities": [
+    {"verb": "receive", "domain": "endpoint.hardening.report", "description": "Ansible 하드닝 감사 결과 보고서를 수신·보관합니다", "endpoint": "POST /report"},
+    {"verb": "query", "domain": "endpoint.hardening.reports", "description": "저장된 감사 보고서와 최근 합격 여부를 조회합니다", "endpoint": "GET /reports"},
+    {"verb": "query", "domain": "endpoint.hardening.status", "description": "플레이북 위치·실행 힌트·webhook 상태를 조회합니다", "endpoint": "GET /status"}
+  ],
+  "governance": {"isolation_required": false, "approval": "none"},
+  "base_agent": {"platform": "SeCuardian", "router": "router_hardening.py"},
+  "publisher": "edentns",
+  "license": "Proprietary"
+}

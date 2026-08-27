@@ -1,0 +1,36 @@
+{
+  "schema_version": 2,
+  "agent_key": "compliance-isms",
+  "display_name": {"ko": "ISMS-P 컴플라이언스 증거 수집", "en": "ISMS-P Compliance Evidence"},
+  "description": {
+    "ko": "KISA ISMS-P(2023) 통제항목 10종에 대해 연동 보안 Addon(keycloak-monitor·vault-monitor·wazuh-siem·vasca-cve·shuffle-soar·neosync-dlp·teleport-pam)의 상태 스냅숏과 문서 존재 여부를 증거로 수집하고 준수율 보고서를 생성하는 크로스커팅 컴플라이언스 에이전트입니다. 전용 화면이 없어 AI 어시스턴트 질의응답(compliance_report)으로 사용합니다. SeCuardian 내장 router_isms 이식 — 내부 API 호출은 Addon 경로(/api/addon/{key}/status)로 변경되고 호출자 JWT 를 전달하며, 연동 Addon 미설치 시 NOT_INSTALLED 로 표시됩니다. ※ 기존 Addon `isms-p-evidence` 와 역할이 겹칩니다: isms-p-evidence 는 환경변수 기반 독립 증거 수집기, compliance-isms 는 내장판 이식본(Addon 상태 스냅숏 중심)으로 둘 중 하나만 설치하는 것을 권장합니다.",
+    "en": "Cross-cutting compliance agent that collects evidence for 10 KISA ISMS-P (2023) controls — status snapshots from companion security Addons (keycloak-monitor, vault-monitor, wazuh-siem, vasca-cve, shuffle-soar, neosync-dlp, teleport-pam) plus document presence — and generates compliance-rate reports. No dedicated screen — use via the AI Assistant (compliance_report). Ported from SeCuardian built-in router_isms; internal calls now target Addon paths (/api/addon/{key}/status) with the caller's JWT forwarded, and missing companion Addons are reported as NOT_INSTALLED. Note: overlaps with the existing `isms-p-evidence` Addon (an env-driven standalone collector); install only one of the two."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "categories": ["security", "compliance", "governance"],
+  "has_front": false,
+  "dependencies": {"python": []},
+  "requires": {"core": ">=1.0.0", "sdk": ">=1.0.0", "agents": []},
+  "tables_owned": [],
+  "permissions": ["network.internal", "filesystem.read"],
+  "required_env": [],
+  "optional_env": ["ISMS_INTERNAL_BASE_URL", "ISMS_DOC_ROOT", "ISMS_AUTO_COLLECT", "ISMS_REPORT_DIR", "PORT"],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Companion security Addons (keycloak-monitor, vault-monitor, wazuh-siem, ...)",
+    "version": ">=1.0.0",
+    "guide": "compliance-isms-worker-guide.md"
+  },
+  "capabilities": [
+    {"verb": "collect", "domain": "compliance.isms-p.evidence", "description": "ISMS-P 통제항목별 증거(연동 Addon 상태·문서 존재)를 수집합니다", "endpoint": "POST /evidence"},
+    {"verb": "query", "domain": "compliance.isms-p.evidence", "description": "수집된 증거를 통제항목별로 조회합니다", "endpoint": "GET /evidence"},
+    {"verb": "report", "domain": "compliance.isms-p.report", "description": "통제항목 준수 현황과 준수율 감사 보고서를 생성합니다", "endpoint": "POST /report"},
+    {"verb": "query", "domain": "compliance.isms-p.status", "description": "증거 수집·보고서 생성 현황과 통제항목 목록을 조회합니다", "endpoint": "GET /status"}
+  ],
+  "governance": {"isolation_required": false, "approval": "none"},
+  "base_agent": {"platform": "SeCuardian", "router": "router_isms.py", "overlaps_with": "isms-p-evidence"},
+  "publisher": "edentns",
+  "license": "Proprietary"
+}

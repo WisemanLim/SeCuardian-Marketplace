@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "agent_key": "vault-monitor",
+  "display_name": {"ko": "Vault 시크릿 모니터", "en": "Vault Secrets Monitor"},
+  "description": {
+    "ko": "HashiCorp Vault 의 헬스·봉인 상태·AppRole/PKI 엔진 구성·KV v2 경로 접근성을 점검하는 시크릿 관리 모니터링 에이전트입니다. 전용 화면이 없어 AI 어시스턴트 질의응답(secrets_query)으로 사용합니다. SeCuardian 내장 router_vault + core/vault.py 를 이식했으며, core/vault_loader.py 의 KV→환경변수 로더는 vault_monitor_lib.loader 선택 헬퍼로 제공합니다(기동 시 settings 패치는 배포 계층 책임).",
+    "en": "Secrets-management monitoring agent that checks HashiCorp Vault health, seal status, AppRole/PKI engine configuration, and KV v2 path accessibility. No dedicated screen — use via the AI Assistant (secrets_query). Ported from SeCuardian built-in router_vault + core/vault.py; the vault_loader KV-to-env helper is provided as an optional library (vault_monitor_lib.loader) — startup settings patching is left to the deployment layer."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "categories": ["security", "secrets", "identity"],
+  "has_front": false,
+  "dependencies": {"python": ["hvac>=2,<3"]},
+  "requires": {"core": ">=1.0.0", "sdk": ">=1.0.0", "agents": []},
+  "tables_owned": [],
+  "permissions": ["network.egress"],
+  "required_env": ["VAULT_ADDR"],
+  "optional_env": ["VAULT_TOKEN", "VAULT_ROLE_ID", "VAULT_SECRET_ID"],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "HashiCorp Vault",
+    "version": ">=1.15",
+    "guide": "vault-monitor-worker-guide.md"
+  },
+  "capabilities": [
+    {"verb": "query", "domain": "secrets.vault.health", "description": "Vault 헬스·초기화·봉인 상태를 조회합니다", "endpoint": "GET /status"},
+    {"verb": "query", "domain": "secrets.vault.approle", "description": "AppRole/PKI 엔진 활성 여부와 secuardian 역할 존재를 확인합니다", "endpoint": "GET /approle/status"},
+    {"verb": "verify", "domain": "secrets.vault.kv", "description": "KV v2 시크릿 경로 접근 가능 여부를 값 노출 없이 점검합니다", "endpoint": "GET /kv/check"}
+  ],
+  "governance": {"isolation_required": false, "approval": "none"},
+  "base_agent": {"platform": "SeCuardian", "router": "router_vault.py", "lib": "app/core/vault.py, app/core/vault_loader.py"},
+  "publisher": "edentns",
+  "license": "Proprietary"
+}

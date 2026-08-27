@@ -1,0 +1,36 @@
+{
+  "schema_version": 2,
+  "agent_key": "crowdsec-monitor",
+  "display_name": {"ko": "CrowdSec 위협 탐지 모니터", "en": "CrowdSec Threat Monitor"},
+  "description": {
+    "ko": "CrowdSec LAPI 헬스와 차단 결정(decisions)을 조회하고, CrowdSec HTTP notification 알림을 webhook 으로 수신·보관하는 네트워크 계층(L3) 위협 인텔리전스 에이전트입니다. 전용 화면이 없어 AI 어시스턴트 질의응답(threat_intel)으로 사용합니다. SeCuardian 내장 router_crowdsec 이식 — webhook 경로가 /api/addon/crowdsec-monitor/alerts 로 변경되므로 notifications/http.yaml 을 갱신해야 합니다.",
+    "en": "Network-layer (L3) threat-intelligence agent that queries CrowdSec LAPI health and block decisions, and receives/stores CrowdSec HTTP-notification alerts via webhook. No dedicated screen — use via the AI Assistant (threat_intel). Ported from SeCuardian built-in router_crowdsec; the webhook path moves to /api/addon/crowdsec-monitor/alerts, so update notifications/http.yaml."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "categories": ["security", "network", "threat-intel"],
+  "has_front": false,
+  "dependencies": {"python": []},
+  "requires": {"core": ">=1.0.0", "sdk": ">=1.0.0", "agents": []},
+  "tables_owned": [],
+  "permissions": ["network.egress", "webhook.ingress"],
+  "required_env": ["CROWDSEC_LAPI_URL"],
+  "optional_env": ["CROWDSEC_BOUNCER_KEY", "CROWDSEC_SIMULATION_MODE", "CROWDSEC_WEBHOOK_ENABLED", "CROWDSEC_ALERTS_MAX"],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "CrowdSec (Agent + LAPI)",
+    "version": ">=1.6",
+    "guide": "crowdsec-monitor-worker-guide.md"
+  },
+  "capabilities": [
+    {"verb": "query", "domain": "network.crowdsec.status", "description": "CrowdSec LAPI 헬스·시뮬레이션 모드·Bouncer 구성 상태를 조회합니다", "endpoint": "GET /status"},
+    {"verb": "query", "domain": "network.crowdsec.decisions", "description": "현재 차단(ban/captcha) 결정 목록을 조회합니다", "endpoint": "GET /decisions"},
+    {"verb": "receive", "domain": "network.crowdsec.alerts", "description": "CrowdSec 알림을 webhook 으로 수신·보관합니다", "endpoint": "POST /alerts"},
+    {"verb": "query", "domain": "network.crowdsec.alerts", "description": "수신된 알림을 시나리오 필터로 조회합니다", "endpoint": "GET /alerts"}
+  ],
+  "governance": {"isolation_required": false, "approval": "none"},
+  "base_agent": {"platform": "SeCuardian", "router": "router_crowdsec.py"},
+  "publisher": "edentns",
+  "license": "Proprietary"
+}

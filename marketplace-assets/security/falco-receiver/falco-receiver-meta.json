@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "agent_key": "falco-receiver",
+  "display_name": {"ko": "Falco 런타임 이벤트 수신기", "en": "Falco Runtime Event Receiver"},
+  "description": {
+    "ko": "Falco/Falcosidekick 런타임 보안 이벤트를 webhook 으로 수신해 인메모리에 보관하고 우선순위별 조회를 제공하는 컨테이너 런타임 탐지 에이전트(L2 Endpoint)입니다. 전용 화면이 없어 AI 어시스턴트 질의응답(runtime_alert)으로 사용합니다. SeCuardian 내장 router_falco 이식 — webhook 경로가 /api/addon/falco-receiver/events 로 변경되므로 Falcosidekick 설정을 갱신해야 합니다.",
+    "en": "Container-runtime detection agent (L2 Endpoint) that receives Falco/Falcosidekick security events via webhook, keeps them in memory, and serves priority-filtered queries. No dedicated screen — use via the AI Assistant (runtime_alert). Ported from SeCuardian built-in router_falco; the webhook path moves to /api/addon/falco-receiver/events, so update the Falcosidekick config."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "categories": ["security", "runtime", "endpoint"],
+  "has_front": false,
+  "dependencies": {"python": []},
+  "requires": {"core": ">=1.0.0", "sdk": ">=1.0.0", "agents": []},
+  "tables_owned": [],
+  "permissions": ["webhook.ingress"],
+  "required_env": ["FALCO_WEBHOOK_ENABLED"],
+  "optional_env": ["FALCO_SIDEKICK_URL", "FALCO_EVENTS_MAX"],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Falco + Falcosidekick",
+    "version": ">=0.37",
+    "guide": "falco-receiver-worker-guide.md"
+  },
+  "capabilities": [
+    {"verb": "receive", "domain": "runtime.falco.events", "description": "Falcosidekick webhook 이벤트를 수신·보관합니다", "endpoint": "POST /events"},
+    {"verb": "query", "domain": "runtime.falco.events", "description": "저장된 런타임 이벤트를 우선순위 필터로 조회합니다", "endpoint": "GET /events"},
+    {"verb": "query", "domain": "runtime.falco.status", "description": "webhook 활성 상태·이벤트 보관 현황을 조회합니다", "endpoint": "GET /status"}
+  ],
+  "governance": {"isolation_required": false, "approval": "none"},
+  "base_agent": {"platform": "SeCuardian", "router": "router_falco.py"},
+  "publisher": "edentns",
+  "license": "Proprietary"
+}

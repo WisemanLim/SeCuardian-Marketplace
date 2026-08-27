@@ -1,0 +1,36 @@
+{
+  "schema_version": 2,
+  "agent_key": "wazuh-siem",
+  "display_name": {"ko": "Wazuh SIEM 모니터", "en": "Wazuh SIEM Monitor"},
+  "description": {
+    "ko": "Wazuh Manager REST API 로 SIEM 헬스·버전·에이전트 현황을 조회하고, Wazuh integration webhook 알림을 수신·보관하는 탐지 계층(L5 Detection) 에이전트입니다. 전용 화면이 없어 AI 어시스턴트 질의응답(siem_query)으로 사용합니다. SeCuardian 내장 router_wazuh 이식 — webhook 경로가 /api/addon/wazuh-siem/alerts 로 변경되므로 ossec.conf integration hook_url 을 갱신해야 합니다.",
+    "en": "Detection-layer (L5) agent that queries Wazuh Manager REST API for SIEM health, version, and agent status, and receives/stores Wazuh integration webhook alerts. No dedicated screen — use via the AI Assistant (siem_query). Ported from SeCuardian built-in router_wazuh; the webhook path moves to /api/addon/wazuh-siem/alerts, so update the ossec.conf integration hook_url."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "categories": ["security", "siem", "detection"],
+  "has_front": false,
+  "dependencies": {"python": []},
+  "requires": {"core": ">=1.0.0", "sdk": ">=1.0.0", "agents": []},
+  "tables_owned": [],
+  "permissions": ["network.egress", "webhook.ingress"],
+  "required_env": ["WAZUH_API_URL", "WAZUH_API_PASSWORD"],
+  "optional_env": ["WAZUH_API_USER", "WAZUH_INDEXER_URL", "WAZUH_DASHBOARD_URL", "WAZUH_WEBHOOK_ENABLED", "WAZUH_ALERTS_MAX"],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Wazuh (Manager + Indexer + Dashboard)",
+    "version": ">=4.9",
+    "guide": "wazuh-siem-worker-guide.md"
+  },
+  "capabilities": [
+    {"verb": "query", "domain": "siem.wazuh.status", "description": "Wazuh Manager API 헬스·버전·에이전트 요약을 조회합니다", "endpoint": "GET /status"},
+    {"verb": "query", "domain": "siem.wazuh.agents", "description": "Wazuh 에이전트 목록을 상태별로 조회합니다", "endpoint": "GET /agents"},
+    {"verb": "receive", "domain": "siem.wazuh.alerts", "description": "Wazuh integration webhook 알림을 수신·보관합니다", "endpoint": "POST /alerts"},
+    {"verb": "query", "domain": "siem.wazuh.alerts", "description": "수신된 SIEM 알림을 조회합니다", "endpoint": "GET /alerts"}
+  ],
+  "governance": {"isolation_required": false, "approval": "none"},
+  "base_agent": {"platform": "SeCuardian", "router": "router_wazuh.py"},
+  "publisher": "edentns",
+  "license": "Proprietary"
+}

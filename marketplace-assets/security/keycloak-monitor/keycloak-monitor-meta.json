@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "agent_key": "keycloak-monitor",
+  "display_name": {"ko": "Keycloak IAM 모니터", "en": "Keycloak IAM Monitor"},
+  "description": {
+    "ko": "Keycloak IAM/SSO 서버의 헬스·OIDC 디스커버리·Realm·사용자 목록을 조회하는 신원 계층(L1 Identity) 모니터링 에이전트입니다. 전용 화면이 없어 AI 어시스턴트 질의응답(iam_query)으로 사용합니다. SeCuardian 내장 router_keycloak + core/keycloak.py 를 Addon 으로 이식했습니다.",
+    "en": "Identity-layer (L1) monitoring agent that queries Keycloak IAM/SSO health, OIDC discovery, realms, and users. No dedicated screen — use via the AI Assistant (iam_query). Ported from SeCuardian built-in router_keycloak + core/keycloak.py."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "categories": ["security", "identity", "iam"],
+  "has_front": false,
+  "dependencies": {"python": []},
+  "requires": {"core": ">=1.0.0", "sdk": ">=1.0.0", "agents": []},
+  "tables_owned": [],
+  "permissions": ["network.egress"],
+  "required_env": ["KEYCLOAK_URL", "KEYCLOAK_ADMIN_PASSWORD"],
+  "optional_env": ["KEYCLOAK_MGMT_URL", "KEYCLOAK_REALM", "KEYCLOAK_CLIENT_ID", "KEYCLOAK_ADMIN_USER"],
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Keycloak",
+    "version": ">=24",
+    "guide": "keycloak-monitor-worker-guide.md"
+  },
+  "capabilities": [
+    {"verb": "query", "domain": "iam.keycloak.status", "description": "Keycloak 헬스 + OIDC 디스커버리 상태를 조회합니다", "endpoint": "GET /status"},
+    {"verb": "query", "domain": "iam.keycloak.realms", "description": "Keycloak Realm 목록을 조회합니다 (Admin API)", "endpoint": "GET /realms"},
+    {"verb": "query", "domain": "iam.keycloak.users", "description": "Realm 사용자 목록을 검색·조회합니다 (Admin API)", "endpoint": "GET /users"}
+  ],
+  "governance": {"isolation_required": false, "approval": "none"},
+  "base_agent": {"platform": "SeCuardian", "router": "router_keycloak.py", "lib": "app/core/keycloak.py"},
+  "publisher": "edentns",
+  "license": "Proprietary"
+}
