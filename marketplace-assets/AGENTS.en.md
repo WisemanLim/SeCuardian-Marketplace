@@ -270,3 +270,10 @@ RAG, workflow).
   agent, roadmap unchanged. Detail: extra-agents/ADDON-AGENTS.en.md §1.12.
 - Fifth update: reviewed 11 new extra-agents links. gato-x (GitHub Actions CI/CD security) → **new candidate
   G `cicd-security-scan`** (§2.2, §4). The other 10 are AI/agent infra + dev tools. Detail: ADDON-AGENTS.en.md §1.13.
+- Sixth update: physically sorted the 125 root extra-agents links into `ai-soc/`, `orchestrator/`,
+  `ai-traffic-monitor/` folders. Reviewed 12 new links — no new candidate (A–G unchanged); vps-audit
+  reinforces `hardening-auditor`, agentbehavior the `ai-eval-gate`. Roadmap unchanged. Detail: ADDON-AGENTS.en.md §1.14.
+- Seventh update (2026-09-10): re-verified classification (ai-soc 95, orchestrator 53, ai-traffic-monitor 6)
+  + 28 new links (§1.15, recommend promoting candidate B). **Confirmed security assets expanded 13→21.**
+  Derived the agents-to-implement vs SeCMP-PRD → new doc **[AGENTS-GAP.en.md](./AGENTS-GAP.en.md)** (7 new
+  security agents A–G + 4 packaging items).

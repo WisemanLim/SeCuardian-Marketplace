@@ -249,3 +249,9 @@ extra-agents 최근 추가 링크 9건은 신규 보안 에이전트가 아닌 *
   상세: extra-agents/ADDON-AGENTS.md §1.12.
 - 5차 갱신: extra-agents 신규 링크 11건 검토. gato-x(GitHub Actions CI/CD 보안)로 **신규 후보 G
   `cicd-security-scan` 추가**(§2.2·§4). 나머지 10건=AI/에이전트 인프라·개발툴. 상세: ADDON-AGENTS.md §1.13.
+- 6차 갱신: extra-agents 루트 링크 125건을 `ai-soc/`·`orchestrator/`·`ai-traffic-monitor/` 3개 폴더로
+  물리 분류. 신규 링크 12건 검토 — 신규 후보 없음(A~G 유지), vps-audit→`hardening-auditor`·
+  agentbehavior→`ai-eval-gate` 강화. 로드맵 불변. 상세: ADDON-AGENTS.md §1.14.
+- 7차 갱신(2026-09-10): 분류 재검증(ai-soc 95·orchestrator 53·ai-traffic-monitor 6) + 신규 링크 28건
+  (§1.15, 후보 B 최우선 승격 권고). **security 자산 13→21종으로 확대 확인.** SeCMP-PRD 대비 구현 필요
+  에이전트 도출 → 별도 문서 **[AGENTS-GAP.md](./AGENTS-GAP.md)** 신설(보안 신규 7종 A~G + 패키징 4종).
