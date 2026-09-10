@@ -7,7 +7,10 @@
 승격 경로(PRD §7.7): 여기서 검증된 프롬프트/설정은 Workflow `llm` 노드 또는 Marketplace 게시로 이어진다.
 """
 import json
+import os
+import re
 import time
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -88,3 +91,127 @@ async def list_runs(limit: int = 50, user: dict = Depends(get_current_user)):
         (_tenant(), min(limit, 200)),
     )
     return {"runs": rows}
+
+
+# ─── 비용 추적 (E12/impl/56) — playground_runs 토큰 집계 × 모델 단가 ─────────────
+
+# 기본 단가 (USD / 1K 토큰) — PG_COST_RATES(JSON) 로 오버라이드. degraded 는 무료.
+_DEFAULT_RATES = {
+    "default": {"input": 0.0, "output": 0.0},  # 로컬 Ollama — 무료
+    "claude-opus-4-8": {"input": 0.015, "output": 0.075},
+    "claude-sonnet-5": {"input": 0.003, "output": 0.015},
+    "claude-haiku-4-5": {"input": 0.0008, "output": 0.004},
+}
+
+
+def _rates() -> dict:
+    raw = os.getenv("PG_COST_RATES", "").strip()
+    if raw:
+        try:
+            data = json.loads(raw)
+            if isinstance(data, dict):
+                return {**_DEFAULT_RATES, **data}
+        except ValueError:
+            pass
+    return _DEFAULT_RATES
+
+
+def _rate_for(model: str, provider: str, rates: dict) -> dict:
+    if provider == "degraded":
+        return {"input": 0.0, "output": 0.0}
+    return rates.get(model) or rates["default"]
+
+
+@router.get("/cost")
+async def cost_summary(user: dict = Depends(get_current_user)):
+    """playground_runs 토큰 사용량을 모델 단가로 환산한 비용 요약(모델별 + 총계)."""
+    rows = await fetch_all(
+        f"SELECT model, provider, COALESCE(SUM(input_tokens),0) AS i, COALESCE(SUM(output_tokens),0) AS o, "
+        f"COUNT(*) AS runs FROM playground_runs WHERE tenant_id = {_PH} GROUP BY model, provider",
+        (_tenant(),))
+    rates = _rates()
+    by_model = []
+    total_cost = 0.0
+    total_in = total_out = total_runs = 0
+    for r in rows:
+        model = r.get("model") or "default"
+        provider = r.get("provider") or ""
+        rt = _rate_for(model, provider, rates)
+        i, o, runs = int(r.get("i", 0)), int(r.get("o", 0)), int(r.get("runs", 0))
+        cost = round(i / 1000 * rt["input"] + o / 1000 * rt["output"], 6)
+        total_cost += cost
+        total_in += i
+        total_out += o
+        total_runs += runs
+        by_model.append({"model": model, "provider": provider, "runs": runs,
+                         "input_tokens": i, "output_tokens": o, "cost_usd": cost, "rate": rt})
+    return {
+        "by_model": by_model,
+        "totals": {"runs": total_runs, "input_tokens": total_in, "output_tokens": total_out,
+                   "cost_usd": round(total_cost, 6)},
+        "currency": "USD", "unit": "per 1K tokens", "note": "degraded(로컬 Ollama)=무료",
+    }
+
+
+# ─── Eval 실행 (E12/impl/56) — run 출력 vs assertions 평가 ─────────────────────
+
+class Assertion(BaseModel):
+    type: str            # contains | not_contains | regex | equals | min_length
+    value: str = ""
+
+
+class EvalRequest(BaseModel):
+    assertions: list[Assertion]
+    run_id: Optional[int] = None
+    output: Optional[str] = None
+
+
+def _eval_one(a: Assertion, text: str) -> dict:
+    t = a.type.strip().lower()
+    val = a.value or ""
+    if t == "contains":
+        ok = val in text
+    elif t == "not_contains":
+        ok = val not in text
+    elif t == "equals":
+        ok = text.strip() == val.strip()
+    elif t == "min_length":
+        try:
+            ok = len(text) >= int(val)
+        except ValueError:
+            ok = False
+    elif t == "regex":
+        try:
+            ok = re.search(val, text) is not None
+        except re.error:
+            raise HTTPException(status_code=422, detail=f"잘못된 정규식: {val!r}")
+    else:
+        raise HTTPException(status_code=422, detail=f"지원하지 않는 assertion type: {a.type!r}")
+    return {"type": t, "value": val[:200], "passed": ok}
+
+
+@router.post("/eval")
+async def run_eval(body: EvalRequest, user: dict = Depends(get_current_user)):
+    """run 출력(run_id 조회 또는 output 직접)을 assertions 로 평가한다."""
+    if not body.assertions:
+        raise HTTPException(status_code=422, detail="assertions 가 비어있습니다.")
+    if body.run_id is not None:
+        row = await fetch_one(
+            f"SELECT response_text FROM playground_runs WHERE tenant_id = {_PH} AND id = {_PH}",
+            (_tenant(), body.run_id))
+        if not row:
+            raise HTTPException(status_code=404, detail="run 없음")
+        text = row.get("response_text") or ""
+    elif body.output is not None:
+        text = body.output
+    else:
+        raise HTTPException(status_code=422, detail="run_id 또는 output 중 하나가 필요합니다.")
+
+    results = [_eval_one(a, text) for a in body.assertions]
+    passed = sum(1 for r in results if r["passed"])
+    return {
+        "results": results,
+        "score": {"passed": passed, "total": len(results),
+                  "pass_rate": round(passed / len(results), 3), "all_passed": passed == len(results)},
+        "source": "run_id" if body.run_id is not None else "output",
+    }

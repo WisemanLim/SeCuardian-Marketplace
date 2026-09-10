@@ -1,0 +1,42 @@
+{
+  "agent_type": "service",
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "API 취약점 스캐너",
+    "en": "API Vuln Scanner"
+  },
+  "description": {
+    "ko": "등록된 내부 API 의 OpenAPI/Swagger 스펙을 OWASP API Top 10 체크리스트(BOLA·취약인증·과다노출·자원제한·BFLA·설정오류·인젝션)로 정적 점검하고, AVS_ALLOWED_HOSTS 허용 대상에 한해 능동 HTTP 프로브 스캔을 수행하는 API 보안 에이전트입니다. 전용 화면이 없어 AI 어시스턴트로 사용하며, 능동 스캔은 supervisor/admin 만 가능합니다.",
+    "en": "API security agent that statically checks a registered API's OpenAPI/Swagger spec against the OWASP API Top 10 (BOLA, broken auth, excessive exposure, resource limits, BFLA, misconfig, injection) and runs active HTTP-probe scans limited to the AVS_ALLOWED_HOSTS allowlist. No dedicated screen — use via the AI Assistant; active scanning is supervisor/admin only."
+  },
+  "epic": "E25",
+  "layer": "L2 Endpoint",
+  "base_agent": null,
+  "capabilities": [
+    {
+      "verb": "inspect",
+      "domain": "security.api-vuln.analyze-spec",
+      "description": "OpenAPI/Swagger 스펙을 OWASP API Top10 으로 정적 점검합니다",
+      "input_schema": {"type": "object", "properties": {"spec": {"type": "object"}}, "required": ["spec"]},
+      "output_schema": {"type": "object", "properties": {"summary": {"type": "object"}, "findings": {"type": "array"}}},
+      "qos": {"max_latency_ms": 5000, "supports_async": false, "supports_streaming": false}
+    },
+    {
+      "verb": "inspect",
+      "domain": "security.api-vuln.scan",
+      "description": "허용 호스트에 대해 능동 HTTP 프로브 스캔을 수행합니다 (supervisor/admin)",
+      "input_schema": {"type": "object", "properties": {"base_url": {"type": "string"}, "paths": {"type": "array"}}, "required": ["base_url"]},
+      "output_schema": {"type": "object", "properties": {"results": {"type": "array"}}},
+      "qos": {"max_latency_ms": 60000, "supports_async": false, "supports_streaming": false}
+    }
+  ],
+  "governance": {
+    "data_classification": "internal",
+    "human_approval_required": true,
+    "audit_level": "high"
+  },
+  "required_env": [],
+  "optional_env": ["AVS_ALLOWED_HOSTS"],
+  "default_env": {},
+  "min_platform_version": "2.0.0"
+}

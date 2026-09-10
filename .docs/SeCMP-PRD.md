@@ -1027,6 +1027,25 @@ UI 언어 English 전환 시 내장 에이전트 화면들이 한국어로 남�
 - 스크립트: `scripts/db_reset.py`(drop_all+create_all+seed 내장 에이전트), `scripts/seed.py`(tbl_settings 기본값 + 비-prod 테스트 계정).
 - **local 실행 모델(SeCuardian 준용)**: `ecosystem.config.js`(pm2) 로 `secmp-api`(uvicorn, `APP_PORT`)·`secmp-fe`(vite, `FRONTEND_PORT`) 를 백그라운드 관리. local 은 SQLite 라 Postgres 컨테이너 불필요. Ollama 는 `OLLAMA_RUNTIME` 에 따라 옵션(cpu=docker, mlx=네이티브). pm2 미설치 시 `make run`(honcho) 대안 안내.
 
+### 7.13 보안 에이전트 자산 확장 (F-MP 확장, E9, impl/53) — extra-agents 후보 A~G
+
+[AGENTS-GAP.md](../marketplace-assets/AGENTS-GAP.md) 에서 도출한 신규 보안 ADDON 7종. `marketplace-assets/security/`
+에 자산으로 신규 구현(카탈로그 자동 시드). 전부 `service` 타입·화면 없음·AI 어시스턴트 질의응답. 1차는 도구
+미설치 환경에서도 안전한 **읽기 전용/정적 분석 + 도구 래핑(503 저하)** 우선(PRD §3 mock/simulator 원칙).
+
+| key | 요약 | 주요 엔드포인트 | 특권/거버넌스 |
+|---|---|---|---|
+| `agentic-threat-model` (B·최우선) | 자사 MCP/스킬/에이전트 설정 정적 위협모델 + (런타임) MCP tool-poisoning 감사 | `/status`·`/rules`·`POST /scan-config`·`POST /scan-mcp` | scan-mcp=supervisor/admin |
+| `attack-surface-recon` (A) | 자산 도메인 OSINT 정찰(서브도메인·DNS·WHOIS) + 포트스캔 | `/status`·`/targets`·`POST /recon`·`POST /scan` | scan(nmap)=supervisor/admin, **대상 allowlist** |
+| `api-vuln-scan` (C) | OpenAPI 스펙 OWASP API Top10 정적 점검 + 능동 스캔 | `/status`·`POST /analyze-spec`·`POST /scan` | scan=supervisor/admin, **대상 allowlist** |
+| `cicd-security-scan` (G) | GitHub Actions/GitLab CI 워크플로 정적 보안 감사 | `/status`·`/rules`·`POST /scan-workflows` | — (읽기 정적) |
+| `ad-security-scan` (F) | Active Directory 취약설정·공격경로 점검(도구 래핑) | `/status`·`POST /scan` | scan=supervisor/admin, **대상 allowlist** |
+| `malware-hunt` (D) | 공급망 위장 악성코드 IOC 대조(설치 패키지) | `/status`·`POST /check-packages`·`POST /hunt` | hunt=supervisor/admin |
+| `soc-intel-fusion` (E) | CVE/EPSS/KEV/ATT&CK 통합 조회(오프라인 폴백) | `/status`·`/sources`·`POST /lookup` | — (읽기) |
+
+공통 규약: `router` 노출, `from __future__ import annotations` 금지, `app.core.deps.get_current_user`/`require_role`
+사용, shell=False+argv 내부조립, 바이너리 allowlist, 입력 정규식/`ipaddress` 검증, 정수 클램프, 도구 미설치 503.
+
 ---
 
 ## 8. 실행 연결 — Epic / 로드맵 / 일정·리소스
@@ -1046,6 +1065,11 @@ UI 언어 English 전환 시 내장 에이전트 화면들이 한국어로 남�
 | **E6** | 거버넌스·보안(OWASP 통제·HITL 전면·감사로그·시크릿·SBOM) | F-GOV |
 | **E7** | 하드닝·엔터프라이즈(Qdrant 확장·`namespace` 멀티테넌시 구현·서명/스캔·loop/cron 검토) | NFR |
 | **E8** | **Guardrails Agent 전체 구현**(§7.8) — `router_guardrails.py`, `agent_guardrail_config`/`guardrails_domain_catalog`/`guardrails_decision_log` 3테이블, Orchestrator 훅(`guardrails_gate.py`), Playground `/api/guardrails/test` 연계, `global` 도메인 실판정 + 25종 카탈로그 표시 | F-GRD |
+| **E9** | **보안 에이전트 자산 확장**(§7.13, impl/53) — [AGENTS-GAP.md](../marketplace-assets/AGENTS-GAP.md) 도출 신규 보안 ADDON 7종을 `marketplace-assets/security/` 자산으로 신규 구현. 각 = `{key}-app.py`(FastAPI router, `/api/addon/{key}`) + `{key}-meta.json` + `.zip`, `seed_assets` 자동 스캔 편입. CLI 래핑 안전모델(shell=False·allowlist·입력검증·도구미설치 503·대상 allowlist)·`__future__` 금지 준수. 공격형 엔드포인트는 supervisor/admin + 대상 화이트리스트 거버넌스 | F-MP |
+| **E10** | **보안 에이전트 패키징**(impl/54) — 본 제품 SeCuardian 내장 라우터 4종(router_logto·istio·wireproxy·observability)을 `marketplace-assets/security/` ADDON 자산(logto-monitor·istio-mtls·wireproxy-ztna·observability-monitor)으로 이식. config 는 env(os.getenv)로 이식(marketplace settings 비의존), `__future__` 제거, 외부 미기동 시 우아한 저하 | F-MP |
+| **E11** | **거버넌스 — HITL 승인 + OWASP 스코어카드**(impl/55) — `router_governance`(`/api/governance`) 신규 + `tbl_hitl_approvals` 테이블(양 방언 01_init 멱등). write/delete/external HITL 승인 게이트(create/list/approve/reject, supervisor/admin)와 OWASP LLM Top10 통제 성숙도 스코어카드(플랫폼 실제 상태 기반). add-only(기존 무변경) | F-GOV |
+| **E12** | **Playground 비용 추적 + Eval**(impl/56) — `router_playground` add-only 엔드포인트 `GET /cost`(playground_runs 토큰×모델단가, degraded 무료)·`POST /eval`(run_id/output vs assertions: contains/regex/equals/min_length 평가·score) | F-PG |
+| **E13** | **Qdrant 벡터 백엔드 어댑터**(E7 부분, impl/57) — `vector_backend.py` 에 qdrant 경로 추가(resolve/ensure/write/dense) + config `qdrant_url/api_key/collection`. 단일 컬렉션(청크=포인트, payload.collection_id 필터). qdrant-client 선택 의존 — 미설치/서버 미기동 시 local 자동 폴백(무중단). add-only(pgvector·local 경로 무영향) | F-RAG |
 
 ### 8.2 로드맵 (Phase별 · 일정 · 리소스)
 
@@ -1125,11 +1149,17 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 | E2 Workflow 엔진 | 🟡 | impl/2+3: DAG 실행기·상태머신·retry·HITL·SSE+3테이블+a11y 폼 프론트(시험 21/21+tsc/build) |
 | E3 Workflow Designer | 🟡 | a11y 폼 노드/엣지 편집기 완료(impl/3, PRD §7.11 1차 요구사항 충족). **impl/25: 컴포넌트 팔레트**(에이전트별 API를 클릭 삽입), **impl/26: webhook 수신 트리거**(§7.2.4), **impl/27: 편집형 캔버스**(§7.2.5, 폼과 상태 공유), **impl/32: 풀스크린 빌더**(§7.2.8, 팔레트 drag&drop·인스펙터·기존 워크플로우 편집) 추가. code 노드는 로드맵 확장(§7.2.3·7.2.4) |
 | E3.5 Dify Import(P5) | 🟡 | **impl/28(물리 test/impl/26): 모드 A 착지**(§7.2.6) — 애초 P5 로드맵이었으나 사용자 요구로 조기 구현. 모드 B(Delegate)/C(Round-trip)는 여전히 로드맵 |
-| E4 RAG | 🟡 | impl/4: 청킹·해싱임베더·BM25·RRF+3테이블+프론트(시험 15/15+tsc). **impl/31: pgvector 실측 완료**(Recall@10=1.000·p95=20.8ms, §7.5.1). Qdrant·임베딩모델 교체(파라프레이즈 재평가)는 로드맵 |
+| E4 RAG | 🟡 | impl/4: 청킹·해싱임베더·BM25·RRF+3테이블+프론트(시험 15/15+tsc). **impl/31: pgvector 실측 완료**(Recall@10=1.000·p95=20.8ms, §7.5.1). **impl/57: Qdrant 어댑터 추가**(선택 의존·local 폴백, E13). 임베딩모델 교체(파라프레이즈 재평가)는 로드맵 |
+| E7 하드닝(부분) | 🟡 | impl/57: Qdrant 벡터 백엔드 어댑터(vector_backend.py qdrant 경로, 8/8 PASS). 잔여: namespace 멀티테넌시·서명/SBOM·loop/cron 은 유보(인프라/P5) |
 | E5 Playground | 🟡 | impl/5: LLM 폴백 실행+RAG 컨텍스트 주입+A/B 프론트(시험 13/13+tsc). cost 추적·eval 로드맵 |
 | E6 거버넌스 | 🟡 | `tbl_audit_log` + Guardrails 이중감사(`guardrails_decision_log`, impl/6). HITL 게이트(F-WF 내)는 있으나 별도 `tbl_hitl_approvals`·OWASP 스코어카드 없음 |
 | E7 하드닝 | ⬜ | — |
 | E8 Guardrails | 🟡 | impl/6+7+11: **global 13종 로컬 판정기**+3테이블+토글+decision log+프론트+**Orchestrator 게이트 실동작**+**block/escalate 승격**(시험 20/20+15/15+14/14). 잔여: MCP 프록시 연동, 25종 판정기(SeCMP 책임 밖) |
+| E9 보안 에이전트 자산 확장 | ✅ | impl/53: 신규 보안 ADDON 7종(agentic-threat-model·attack-surface-recon·api-vuln-scan·cicd-security-scan·ad-security-scan·malware-hunt·soc-intel-fusion) `marketplace-assets/security/` 신규 구현 + meta + zip, seed_assets 자동 발견, CLI 안전모델 준수. 시험 24/24 PASS, ruff clean. 잔여: 라이브 도구(nmap/bloodhound/malwoverview) 실환경 검증(1차 mock-first·503 폴백) |
+| E10 보안 에이전트 패키징 | ✅ | impl/54: 본 제품 라우터 4종(logto/istio/wireproxy/observability) → ADDON 자산 이식(env config·`__future__` 제거·우아한 저하). 시험 16/16 PASS, ruff clean. security 자산 28→32 에이전트 |
+| E11 거버넌스(HITL+OWASP) | ✅ | impl/55: `router_governance`+`tbl_hitl_approvals`(add-only). HITL create/list/approve/reject + OWASP LLM Top10 스코어카드. 시험 14/14 PASS, ruff clean, app 부팅 |
+| E12 Playground cost/eval | ✅ | impl/56: `router_playground` add-only `/cost`·`/eval`. 시험 14/14 PASS, ruff clean. cost 추적·eval 로드맵 해소(E5) |
+| 인프라 의존(유보) | ⬜ | Qdrant 확장(§8 로드맵·외부 서버 필요)·임베딩모델 교체(sentence-transformers 중량 의존·dual-write)·워크플로 code 노드(§3 하지않을것·샌드박스 선행)·loop/cron·namespace 멀티테넌시(P5)는 인프라/보안검토 선행 필요로 1차 유보 |
 
 ### 9.5 권장 다음 단계
 
@@ -1162,6 +1192,10 @@ impl/1~6 에서 Marketplace 의 hot-deploy seam(`tbl_agent_config` upsert)과 Pl
 
 | 날짜 | 버전 | 변경 |
 |---|---|---|
+| 2026-09-10 | v0.53 | **E13 Qdrant 벡터 백엔드 어댑터(impl/57, E7 부분)** — `app/services/vector_backend.py` 에 qdrant 경로(resolve/ensure_qdrant_collection/qdrant_upsert/qdrant_search) 추가, config `qdrant_url/api_key/collection` 3필드, `.env.example` 키, `rag_pipeline.write_embedding` 에 collection_id 전달(하위호환). 단일 컬렉션+payload.collection_id 필터. qdrant-client 선택 의존 — 미설치/서버 미기동 시 local 우아한 폴백. add-only(pgvector·local 무영향). 시험 8/8 PASS, ruff clean, impl/4 회귀 PASS. §8.1 E13·§9.4 갱신 | app/services/vector_backend.py, app/services/rag_pipeline.py, app/core/config.py, .env.example, test/impl/57 |
+| 2026-09-10 | v0.52 | **E10 자산 worker-guide 보강(SeCuardian-Basic 3rd_basic 벤치 발견)** — logto-monitor·istio-mtls·wireproxy-ztna·observability-monitor meta 가 `worker.required=true` 인데 `worker.guide=null`·guide 파일 미동봉 → Basic 설치 400. 4종에 `{key}-worker-guide.md` 추가, meta `worker.guide` 기재, zip 재패키징(3파일). 규약: worker.required=true 이면 guide 필수, 미정 문자열은 null 대신 생략 | marketplace-assets/security/{logto-monitor,istio-mtls,wireproxy-ztna,observability-monitor} |
+| 2026-09-10 | v0.51 | **E10 패키징 4종 + E11 거버넌스 + E12 Playground cost/eval** — ① E10(impl/54): 본 제품 라우터 4종(logto/istio/wireproxy/observability) → `marketplace-assets/security/` ADDON 자산 이식(env config·`__future__` 제거·datetime naive/aware 버그 견고화), 16/16 PASS. ② E11(impl/55): `router_governance`+`tbl_hitl_approvals`(add-only, 양 방언 01_init) — HITL 승인 게이트 + OWASP LLM Top10 스코어카드, 14/14 PASS. ③ E12(impl/56): `router_playground` add-only `/cost`(토큰×단가)·`/eval`(assertions), 14/14 PASS. 전부 ruff clean·app 부팅. 인프라 의존(Qdrant·임베딩교체·code노드) 유보. §8.1 E10~E12·§9.4 갱신 | marketplace-assets/security/{4종}, app/routers/router_governance.py, app/routers/router_playground.py, app/main.py, sql/{sqlite,pg}/01_init.sql, test/impl/{54,55,56} |
+| 2026-09-10 | v0.50 | **E9 보안 에이전트 자산 확장 7종(impl/53, §7.13)** — [AGENTS-GAP.md](../marketplace-assets/AGENTS-GAP.md) 도출 신규 보안 ADDON(agentic-threat-model·attack-surface-recon·api-vuln-scan·cicd-security-scan·ad-security-scan·malware-hunt·soc-intel-fusion)을 `marketplace-assets/security/` 에 신규 구현(각 app.py+meta.json+zip). CLI 래핑 안전모델·`__future__` 금지·공격형 supervisor/admin+대상 allowlist. 시험 24/24 PASS, ruff clean. §8.1 Epic E9·§7.13 신설 | marketplace-assets/security/{7종}, test/impl/53, PRD §7.13·§8.1·§9.4 |
 | 2026-07-10 | v0.49 | **builtin/guardrails.zip 재패키징 — data/guardrails 구조 누락 수정**(사용자 요구, v0.48 에서 보고된 기존 결함). 패키지 디렉터리(`marketplace-assets/builtin/guardrails/`)에는 `data/guardrails/*.json` 24종이 있었으나 zip 에는 `guardrails-app.py`+meta 2파일만 포함돼 있던 결함 — 도메인 룰 데이터 포함해 재빌드(28 엔트리, app/data/guardrails 와 IN-SYNC 확인). TC-36-06 포함 impl/36 전체 11/11 PASS | marketplace-assets/builtin/guardrails.zip |
 | 2026-07-10 | v0.48 | **impl/52(물리 `test/impl/50`) — UserManager 자산 utilities → addon 이관**(사용자 요구). ① `marketplace-assets/utilities/UserManager{,.zip}` → `marketplace-assets/addon/` 이동 — 카탈로그 시드 대상 제외(utilities 6→5종), 스캐폴드 템플릿 편입(templates list 5→6종), 시드 보호 해제(사용자 등록 시 deletable) ② `seed_assets` 에 `_cleanup_orphaned_seed_rows` 신설 — 시드 유래(블롭 uploaded_by='seed-assets') 행 중 시드 디렉터리 미보유 key 를 멱등 정리(사용자 등록 자산 불변·설치 중 스킵), dev DB usermanager 행 정리 완료 ③ 구 시험 정합 — impl/34(템플릿 6종)·impl/36(배치·다운로드, `*_worker` R22-4 필터)·impl/40(utilities 5종, impl/48 호출부 다행화 반영)·impl/45(UserManager=addon) 갱신, 전부 PASS. 잔존 기존 결함: TC-36-06 builtin/guardrails.zip 에 data/guardrails 구조 누락(본 건과 무관, 별도 수정 필요) | marketplace-assets/{addon,utilities}, scripts/seed_assets.py, test/impl/{34,36,40,45,50}, PRD §7.6.2-4·§7.6.3-1, README(.en) |
 | 2026-07-10 | v0.47 | **impl/51(물리 `test/impl/49`) — §7.6.6 개정: 중복 등록 사용자 확인 + 시드 보호 범위 축소 + 카탈로그 삭제 시 시드 자산 반환**(사용자 요구: ① 동일 에이전트도 별도 카탈로그로 등록 가능해야 — 이미 등록됨 정보를 보여주고 등록 여부는 사용자가 판단 ② `marketplace-assets/addon` 유래라도 사용자가 카탈로그 생성하며 등록한 자산은 삭제 가능해야). 수정 = ① `POST /catalog/zip` 중복 pre-check — `confirm` 없이 기존 key 존재 시 409 `{"code":"duplicate","assets":[…]}`, UI ConfirmDialog 확인 후 `confirm=true` 재요청 시 요청 카탈로그로 이동 등록 ② `deletable` 판정을 시드 카탈로그(`marketplace-assets/{security,utilities}`) 보유로 한정 — addon/builtin 유래 사용자 등록 자산 삭제 가능 ③ `DELETE /catalog-category` — 설치 중만 차단, 시드 보호 자산은 삭제 대신 원 시드 카탈로그로 반환(`returned_assets` 응답) → 사용자 카탈로그 항상 삭제 가능 | app/routers/router_marketplace.py, front(api/marketplace.ts·AssetRegisterModal.tsx·locales), PRD §7.6.6, README(.en), test/impl/49 |

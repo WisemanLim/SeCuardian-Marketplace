@@ -1,0 +1,34 @@
+{
+  "agent_type": "service",
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "SOC 인텔 융합",
+    "en": "SOC Intel Fusion"
+  },
+  "description": {
+    "ko": "CVE 식별자를 받아 NVD(CVSS)·FIRST(EPSS 악용확률)·CISA KEV(알려진 악용 여부)를 통합 조회하고 위험 우선순위를 융합해 제공하는 위협 인텔리전스 에이전트입니다. vasca-cve(자산 CVE)·agentic-soc(SOC 알림)를 보완합니다. httpx 미설치·SIF_OFFLINE 시 오프라인 구조 응답으로 무중단 저하합니다. 전용 화면이 없어 AI 어시스턴트로 사용합니다.",
+    "en": "Threat-intelligence agent that takes a CVE identifier and fuses NVD (CVSS), FIRST (EPSS exploit probability) and CISA KEV (known-exploited status) into a single risk priority. Complements vasca-cve (asset CVEs) and agentic-soc (SOC alerts). Degrades gracefully to an offline structural response when httpx is missing or SIF_OFFLINE is set. No dedicated screen — use via the AI Assistant."
+  },
+  "epic": "E29",
+  "layer": "L5",
+  "base_agent": null,
+  "capabilities": [
+    {
+      "verb": "query",
+      "domain": "security.soc-intel.lookup",
+      "description": "CVE 를 NVD·EPSS·KEV 로 통합 조회하고 위험도를 융합합니다",
+      "input_schema": {"type": "object", "properties": {"cve": {"type": "string"}}, "required": ["cve"]},
+      "output_schema": {"type": "object", "properties": {"fusion": {"type": "object"}}},
+      "qos": {"max_latency_ms": 30000, "supports_async": false, "supports_streaming": false}
+    }
+  ],
+  "governance": {
+    "data_classification": "internal",
+    "human_approval_required": false,
+    "audit_level": "medium"
+  },
+  "required_env": [],
+  "optional_env": ["SIF_OFFLINE"],
+  "default_env": {},
+  "min_platform_version": "2.0.0"
+}

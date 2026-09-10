@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "agent_key": "observability-monitor",
+  "display_name": {
+    "ko": "Observability 모니터",
+    "en": "Observability Monitor"
+  },
+  "description": {
+    "ko": "Prometheus·Grafana·Loki 스택의 헬스를 조회하고 PromQL instant query 를 프록시하며, 보안 알림 탐지/대응 이벤트로 MTTD/MTTR 를 집계하는 탐지·대응 계층(L5) 모니터링 에이전트입니다. 전용 화면이 없어 AI 어시스턴트 질의응답(observability_query)으로 사용합니다. SeCuardian 내장 router_observability 를 Addon 으로 이식했습니다.",
+    "en": "Detection/response-layer (L5) monitoring agent that checks Prometheus/Grafana/Loki health, proxies PromQL instant queries, and aggregates MTTD/MTTR from security detection/response events. No dedicated screen — use via the AI Assistant (observability_query). Ported from SeCuardian built-in router_observability."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "epic": "E06",
+  "layer": "L5",
+  "categories": [
+    "security",
+    "observability",
+    "detection"
+  ],
+  "has_front": false,
+  "permissions": [
+    "network.egress",
+    "webhook.ingress"
+  ],
+  "required_env": [],
+  "optional_env": [
+    "PROMETHEUS_URL",
+    "GRAFANA_URL",
+    "LOKI_URL"
+  ],
+  "default_env": {
+    "PROMETHEUS_URL": "http://localhost:9090",
+    "GRAFANA_URL": "http://localhost:3000",
+    "LOKI_URL": "http://localhost:3100"
+  },
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Prometheus/Grafana/Loki",
+    "version": ">=2.0",
+    "guide": "observability-monitor-worker-guide.md"
+  },
+  "capabilities": [
+    {
+      "verb": "query",
+      "domain": "observability.stack.status",
+      "description": "Prometheus/Grafana/Loki 헬스를 조회합니다",
+      "endpoint": "GET /status"
+    },
+    {
+      "verb": "query",
+      "domain": "observability.stack.metrics",
+      "description": "PromQL instant query 를 프록시합니다",
+      "endpoint": "GET /metrics"
+    },
+    {
+      "verb": "query",
+      "domain": "observability.stack.mttd",
+      "description": "MTTD/MTTR 집계 통계를 조회합니다",
+      "endpoint": "GET /mttd"
+    }
+  ],
+  "governance": {
+    "data_classification": "internal",
+    "human_approval_required": false,
+    "audit_level": "medium"
+  },
+  "min_platform_version": "2.0.0"
+}

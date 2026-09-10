@@ -30,6 +30,12 @@ SeCMP 는 SeCuardian 코어(중앙 Orchestrator + AI Assistant + ZIP 무중단 �
 
 > 5개 내장 에이전트 모두 백엔드+프론트 동작(시험 PASS). 🟡 = 확장 항목(원격 레지스트리·React Flow 캔버스·pgvector·MCP 프록시 등) 잔존. 상세: [PRD §9](.docs/SeCMP-PRD.md#9-구현-현황-implementation-status--2026-07-08-기준).
 >
+> **Qdrant 벡터 백엔드 어댑터(impl/57, E13/E7 부분)**: `app/services/vector_backend.py` 에 qdrant 경로(resolve/ensure/upsert/search) 추가 + config `qdrant_url/api_key/collection`. 단일 컬렉션(청크=포인트, `payload.collection_id` 필터). **qdrant-client 는 선택 의존** — 미설치/서버 미기동 시 **local 자동 폴백**(RAG 무중단). add-only(pgvector·local 경로 무영향). 시험 `test/impl/57` 8/8 PASS + impl/4 회귀 PASS.
+>
+> **패키징 4종 + 거버넌스 + Playground cost/eval(impl/54~56, E10~E12)**: ① **E10(impl/54)** 본 제품 SeCuardian 내장 라우터 4종을 `marketplace-assets/security/` ADDON 자산으로 이식 — `logto-monitor`·`istio-mtls`·`wireproxy-ztna`·`observability-monitor`(config=env, `__future__` 제거, 외부 미기동 시 우아한 저하). 16/16 PASS. ② **E11(impl/55)** `router_governance`(`/api/governance`) + `tbl_hitl_approvals`(양 방언, add-only) — write/delete/external **HITL 승인 게이트**(create/list/approve·reject, supervisor/admin) + **OWASP LLM Top10 스코어카드**(플랫폼 실제 상태 기반). 14/14 PASS. ③ **E12(impl/56)** `router_playground` add-only `GET /cost`(토큰×모델단가, degraded 무료)·`POST /eval`(run_id/output vs assertions). 14/14 PASS. 인프라 의존(Qdrant·임베딩교체·code노드)은 유보.
+>
+> **보안 에이전트 자산 확장 7종(impl/53, E9 §7.13)**: [AGENTS-GAP.md](marketplace-assets/AGENTS-GAP.md) 도출 신규 보안 ADDON 7종을 `marketplace-assets/security/` 에 신규 구현(카탈로그 자동 시드) — **`agentic-threat-model`**(자사 MCP/스킬/에이전트 설정 정적 위협모델 + 라이브 MCP tool-poisoning 감사)·**`attack-surface-recon`**(OSINT 정찰·nmap, 대상 allowlist)·**`api-vuln-scan`**(OWASP API Top10 스펙 정적점검+능동 프로브)·**`cicd-security-scan`**(GitHub Actions 워크플로 정적 감사)·**`ad-security-scan`**(AD 취약설정 정적 점검)·**`malware-hunt`**(공급망 IOC 대조)·**`soc-intel-fusion`**(CVE/EPSS/KEV 융합 조회). 전 에이전트 CLI 래핑 안전모델(shell=False·allowlist·입력검증·도구미설치 503·`__future__` 금지) 준수, 공격형 엔드포인트는 supervisor/admin + 대상 화이트리스트. 각 = `/api/addon/{key}/status·…` 마운트. 시험 `test/impl/53` 24/24 PASS.
+>
 > **설치·배포 경로 중복 확인 일원화 + worker↔에이전트 링크(물리 `test/impl/52`, SeCuardian R22-7 동일 적용, §7.6.7)**: 카탈로그 ZIP 등록·addon 업로드에는 있던 중복 확인이 **설치 경로에는 없어** 조용히 덮어쓰던 결함 수정. ① `POST /api/marketplace/install/{asset_key}` 에 `force`(기본 false) — 확인 없이 ⓐ `tbl_agent_config` 에 동일 키가 `nav_group≠marketplace`(내장·타출처)로 존재(`reason=agent_config_occupied`) ⓑ 동일 버전이 이미 활성 설치(`reason=already_installed`)면 409 `{"code":"install_conflict","overwritable":true,…}` → UI ConfirmDialog 확인 후 `force=true` 재요청 ② 원격 install 은 hot-deploy 를 무조건 `force=true` 로 호출하지 않고 요청의 `force` 를 전달하며, **409 를 흡수하지 않고**(카탈로그 편입 전) 그대로 반환 ③ `GET /api/addon-agents/key-check/{key}` — 스캐폴드 이름 단계 사전 중복 경고 + 배포 409 덮어쓰기 확인 배너 ④ worker 자산 meta `agent_key`(짝 에이전트)를 host 카탈로그 엔트리에 노출 — 클라이언트 worker 카드에서 에이전트 즉시 배포.
 >
 > **ADDON 등록 파이프라인 오류 수정 — 내장 키 중복·잔여 압축 해제(물리 `test/impl/51`, SeCuardian R22-6 동일 적용)**: ① 내장 에이전트 키와 중복되는 ZIP 이 조용히 `is_builtin=1` 로 등록되어 ADDON 목록(=`is_builtin=0` 필터)에서 사라지던 결함 → **등록 불가**(409 `builtin_conflict`, `overwritable=false`, force 로도 우회 불가, ZIP 파일명 변경 안내) — 업로드 성공분은 항상 ADDON 목록에 노출된다 ② 영문 원문 `already exists. Use force=true` → 구조화 detail(`code`/`overwritable`/한·영 메시지) + 프론트 덮어쓰기 확인 배너(일반 중복만) ③ 등록 불가 ZIP(worker 배포본 등)이 `addon-agents/deployed/` 에 압축 해제되던 문제 → **해제 前 검증**(경로 안전성·구성 파일 존재) + 라우터 로드 실패 시 롤백 ④ 활성 상태를 `tbl_agent_config.is_enabled` 와 동기(비활성 에이전트 라우터 무단 개방 차단) · 소스 없는 등록분 경고 스킵 · meta `type` 폴백.
@@ -414,6 +420,11 @@ python test/impl/6/test_guardrails.py       # F-GRD (fresh sqlite, 20 assert —
 python test/impl/7/test_guardrails_gate.py  # F-GRD Orchestrator 게이트 (fresh sqlite, 15 assert)
 python test/impl/9/test_marketplace_remote.py  # F-MP 원격 레지스트리 (fresh sqlite, 14 assert)
 python test/impl/10/test_remote_hotdeploy.py   # F-MP 실 ZIP hot-deploy §7.6 (fresh sqlite, 8 assert)
+python test/impl/53/run.py                     # E9  보안 에이전트 자산 7종 §7.13 (24 assert)
+python test/impl/54/run.py                     # E10 패키징 4종(logto/istio/wireproxy/observability) (16 assert)
+python test/impl/55/test_governance.py         # E11 거버넌스 HITL+OWASP 스코어카드 (fresh sqlite, 14 assert)
+python test/impl/56/test_playground_cost_eval.py  # E12 Playground cost/eval (fresh sqlite, 14 assert)
+python test/impl/57/test_qdrant_backend.py     # E13 Qdrant 벡터 백엔드 어댑터(local 폴백) (fresh sqlite, 8 assert)
 python test/impl/11/test_guardrails_escalation.py  # F-GRD block/escalate 승격 (fresh sqlite, 14 assert)
 python test/impl/13/test_guardrails_mcp.py     # F-GRD MCP Server 프록시 (6 assert)
 python test/impl/14/test_local_zip_deploy.py   # F-MP 로컬 실 ZIP 배포 (10 assert)

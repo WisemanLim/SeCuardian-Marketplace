@@ -308,6 +308,19 @@ tailcat (Tailscale netcat). → references for the `ai-traffic-monitor` agent's 
 > high priority**: SeCuardian is an MCP/A2A platform, so scanning its own MCP/skills/agent configs (B) has the
 > most direct utility. C reinforced by owasp-noir (Shadow API)/burp-ai-agent/owasp-top10-skills; F by AD-PathFinder.
 
+### 1.16 Eighth Batch (CTI depth — reinforces E·A, no new candidate)
+
+| Source | Link | Summary | Reinforces |
+|---|---|---|---|
+| 7onez/cti-expert | github.com/7onez/cti-expert | CTI/OSINT analysis skill (Claude Code/Codex) — 120+ commands, 57 techniques, **79 typed MCP tools**, deterministic case pipeline, **ICD-203 reports**, no API keys for core | **E** (soc-intel-fusion) CTI depth + **A** (OSINT) |
+
+> Bucket: `ai-soc`. Conclusion: **no new candidate.** It is a **CTI-depth reference implementation** for the
+> already-built **E `soc-intel-fusion`** (CVE/EPSS/KEV fusion, impl/53) — cti-expert extends into ATT&CK
+> technique mapping, a case pipeline and structured ICD-203 reporting. E already fills the "unified lookup"
+> gap, so this is not a re-implementation target; adopt it as the basis for E's **future extension** (ATT&CK
+> technique lookup + structured intel reports), where its ready MCP tools make the §3.4 `ToolProxyAgent`
+> proxy cheaper than building from scratch. Also assists A (attack-surface OSINT).
+
 **Already in progress**: the `ai-traffic-monitor/` folder has its own PRD
 ([PRD-ai-traffic-monitor.md](./ai-traffic-monitor/PRD-ai-traffic-monitor.md)) — an Addon Agent that observes
 traffic volume from browser-auto-connected AI assistants. It is a working example of the implementation
@@ -486,6 +499,9 @@ material fits an already-covered category or represents a genuinely new one.
   `ai-traffic-monitor/` (1) subfolders (§1 intro table). Analyzed 12 new links, added §1.14. No new
   candidate (A–G unchanged) — vps-audit → `hardening-auditor`, agentbehavior → `ai-eval-gate`, GhidraGPT →
   candidate D.
+- Eighth update (2026-09-10): analyzed 1 new link (7onez/cti-expert), added §1.16. Bucket `ai-soc`, **no new
+  candidate** — adopted as the CTI-depth reference (ATT&CK/ICD-203) for the built E (soc-intel-fusion), i.e. E's
+  future extension via a ToolProxyAgent proxy.
 - Seventh update (2026-09-10): **re-verified** classification — 17 misfiled security tools orchestrator→ai-soc,
   4 network tools → ai-traffic-monitor, agentops → orchestrator, removed 2 duplicates. Final: ai-soc 95,
   orchestrator 53, ai-traffic-monitor 6. Analyzed 28 new links, added §1.15. No new candidate — **recommend

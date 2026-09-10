@@ -385,3 +385,19 @@ CREATE TABLE IF NOT EXISTS guardrails_decision_log (
     created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_grd_decisions_agent ON guardrails_decision_log(agent_key, created_at);
+
+-- E11 (impl/55) HITL 승인 게이트 — write/delete/external 액션 사람 승인 (F-GOV/E6, LLM08)
+CREATE TABLE IF NOT EXISTS tbl_hitl_approvals (
+    id           SERIAL PRIMARY KEY,
+    tenant_id    VARCHAR(64)  NOT NULL DEFAULT 'default',
+    action       VARCHAR(32)  NOT NULL,
+    resource     VARCHAR(256) NOT NULL DEFAULT '',
+    payload      TEXT         DEFAULT '',
+    status       VARCHAR(16)  NOT NULL DEFAULT 'pending',
+    requested_by VARCHAR(128) NOT NULL DEFAULT '',
+    decided_by   VARCHAR(128) DEFAULT '',
+    reason       VARCHAR(512) DEFAULT '',
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    decided_at   TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_hitl_status ON tbl_hitl_approvals(tenant_id, status, created_at);

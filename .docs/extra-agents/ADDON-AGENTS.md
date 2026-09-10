@@ -300,6 +300,18 @@ tailcat(Tailscale netcat). → `ai-traffic-monitor` 에이전트 네트워크 �
 > MCP/A2A 플랫폼이므로 자기 자신의 MCP·스킬·에이전트 설정을 스캔하는 B의 효용이 가장 직접적이다.
 > C(API 취약점)는 owasp-noir(Shadow API)·burp-ai-agent·owasp-top10-skills 로, F(AD 보안)는 AD-PathFinder 로 보강.
 
+### 1.16 8차 추가분 (CTI 심화 — 후보 E·A 강화, 신규 후보 없음)
+
+| 소스 | 링크 | 요약 | 강화 대상 |
+|---|---|---|---|
+| 7onez/cti-expert | github.com/7onez/cti-expert | CTI/OSINT 분석 스킬(Claude Code/Codex) — 120+ 명령·57 기법·**79 typed MCP tools**·결정적 케이스 파이프라인·**ICD-203 리포트**, 코어는 API 키 불필요 | **E**(soc-intel-fusion) CTI 심화 + **A**(OSINT) |
+
+> 분류: `ai-soc`. 결론: **신규 후보 없음.** 기 구현 **E `soc-intel-fusion`**(CVE/EPSS/KEV 융합, impl/53)의
+> **CTI 심화 참조 구현**이다 — cti-expert 는 ATT&CK 기법 매핑·케이스 파이프라인·ICD-203 정형 리포트까지 확장한다.
+> E 는 현재 "통합 조회" 갭을 이미 충족하므로 재구현 대상 아님. E 의 **향후 확장(ATT&CK technique 조회 +
+> 정형 인텔 리포트)** 근거로 채택하고, MCP 도구가 이미 완성돼 있어 §3.4 방식(`ToolProxyAgent` 프록시)이
+> 자체 개발보다 효율적이다. A(공격표면 OSINT) 에도 보조.
+
 **이미 구현 착수됨**: `ai-traffic-monitor/` 폴더는 자체 PRD([PRD-ai-traffic-monitor.md](./ai-traffic-monitor/PRD-ai-traffic-monitor.md))가
 작성되어 있으며, 브라우저 자동연결 AI 도우미의 트래픽량을 관측하는 Addon Agent다. §3의 구현 가이드가 그대로
 이 PRD의 실제 작성 사례다.
@@ -461,3 +473,5 @@ extra-agents/에 추가할 때 "이미 다루는 카테고리인가, 새로운 �
   agentops→orchestrator, 중복 2건 제거. 최종 ai-soc 95·orchestrator 53·ai-traffic-monitor 6.
   신규 링크 28건 분석, §1.15 신설. 신규 후보 없음 — **후보 B(에이전틱 AI 보안)를 agentseal·hackagent로
   최우선 승격 권고**, C·F 보강.
+- 8차 갱신(2026-09-10): 신규 링크 1건(7onez/cti-expert) 분석, §1.16 신설. `ai-soc` 분류, **신규 후보 없음** —
+  기 구현 E(soc-intel-fusion)의 CTI 심화(ATT&CK·ICD-203) 참조 구현으로 채택(E 향후 확장, ToolProxyAgent 프록시 권장).

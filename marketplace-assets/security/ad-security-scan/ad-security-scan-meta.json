@@ -1,0 +1,42 @@
+{
+  "agent_type": "service",
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "AD 보안 점검",
+    "en": "AD Security Scan"
+  },
+  "description": {
+    "ko": "Active Directory 환경의 취약 설정(Kerberoasting 대상·AS-REP Roasting·무제약 위임·취약 ACL·비만료/오래된 암호)을 수집 데이터(JSON) 정적 분석으로 점검하는 계정·권한 보안 에이전트입니다. 라이브 수집(bloodhound-python)은 도메인 자격증명·격리 환경이 필요해 1차는 오프라인 수집→/analyze 정적 점검 우선입니다. 전용 화면이 없어 AI 어시스턴트로 사용하며, 라이브 수집은 supervisor/admin·대상 allowlist 만 가능합니다.",
+    "en": "Account/privilege security agent that checks Active Directory misconfigurations (Kerberoastable accounts, AS-REP roasting, unconstrained delegation, weak ACLs, non-expiring/stale passwords) via static analysis of collected object data (JSON). Live collection (bloodhound-python) needs domain credentials and an isolated environment, so the first cut favors offline collection → /analyze. No dedicated screen — use via the AI Assistant; live collection is supervisor/admin with a target allowlist."
+  },
+  "epic": "E27",
+  "layer": "L1 Identity",
+  "base_agent": null,
+  "capabilities": [
+    {
+      "verb": "inspect",
+      "domain": "security.ad.analyze",
+      "description": "수집된 AD 객체(JSON)를 정적 점검해 취약 설정을 산출합니다",
+      "input_schema": {"type": "object", "properties": {"objects": {"type": "array", "items": {"type": "object"}}}, "required": ["objects"]},
+      "output_schema": {"type": "object", "properties": {"summary": {"type": "object"}, "findings": {"type": "array"}}},
+      "qos": {"max_latency_ms": 10000, "supports_async": false, "supports_streaming": false}
+    },
+    {
+      "verb": "inspect",
+      "domain": "security.ad.scan",
+      "description": "라이브 AD 수집(bloodhound-python 래핑, 대상 allowlist) — supervisor/admin",
+      "input_schema": {"type": "object", "properties": {"domain": {"type": "string"}}, "required": ["domain"]},
+      "output_schema": {"type": "object", "properties": {"status": {"type": "string"}}},
+      "qos": {"max_latency_ms": 120000, "supports_async": false, "supports_streaming": false}
+    }
+  ],
+  "governance": {
+    "data_classification": "confidential",
+    "human_approval_required": true,
+    "audit_level": "high"
+  },
+  "required_env": [],
+  "optional_env": ["ADS_ALLOWED_DOMAINS"],
+  "default_env": {},
+  "min_platform_version": "2.0.0"
+}

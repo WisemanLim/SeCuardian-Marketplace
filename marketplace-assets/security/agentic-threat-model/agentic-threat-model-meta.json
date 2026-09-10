@@ -1,0 +1,42 @@
+{
+  "agent_type": "service",
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "에이전틱 위협 모델러",
+    "en": "Agentic Threat Modeler"
+  },
+  "description": {
+    "ko": "자사 AI 에이전트·MCP 서버·스킬 설정을 정적 분석해 하드코딩 시크릿·과도한 도구 권한·프롬프트 인젝션 취약점·무인증 엔드포인트를 위협 모델(표)로 산출하고, 라이브 MCP 서버의 tool-poisoning 지표를 감사하는 에이전틱 AI 보안 에이전트입니다. 전용 화면이 없어 AI 어시스턴트를 통해 질의응답으로 사용합니다. 라이브 MCP 프로브는 supervisor/admin 만 가능합니다.",
+    "en": "Agentic-AI security agent that statically analyzes your own AI agent / MCP server / skill configurations for hardcoded secrets, over-privileged tools, prompt-injection weaknesses and unauthenticated endpoints, producing a threat model, and audits live MCP servers for tool-poisoning indicators. No dedicated screen — use via the AI Assistant. Live MCP probing is supervisor/admin only."
+  },
+  "epic": "E23",
+  "layer": "L6 AI Security",
+  "base_agent": null,
+  "capabilities": [
+    {
+      "verb": "inspect",
+      "domain": "ai-security.threat-model.scan-config",
+      "description": "MCP/에이전트 설정 JSON 을 정적 분석해 위협 모델을 산출합니다",
+      "input_schema": {"type": "object", "properties": {"config": {"type": "object"}, "label": {"type": "string"}}, "required": ["config"]},
+      "output_schema": {"type": "object", "properties": {"summary": {"type": "object"}, "findings": {"type": "array"}}},
+      "qos": {"max_latency_ms": 5000, "supports_async": false, "supports_streaming": false}
+    },
+    {
+      "verb": "inspect",
+      "domain": "ai-security.threat-model.scan-mcp",
+      "description": "라이브 MCP 서버의 tools/list 를 조회해 tool-poisoning 지표를 감사합니다 (supervisor/admin)",
+      "input_schema": {"type": "object", "properties": {"url": {"type": "string"}}, "required": ["url"]},
+      "output_schema": {"type": "object", "properties": {"summary": {"type": "object"}, "findings": {"type": "array"}}},
+      "qos": {"max_latency_ms": 10000, "supports_async": false, "supports_streaming": false}
+    }
+  ],
+  "governance": {
+    "data_classification": "internal",
+    "human_approval_required": true,
+    "audit_level": "high"
+  },
+  "required_env": [],
+  "optional_env": [],
+  "default_env": {},
+  "min_platform_version": "2.0.0"
+}

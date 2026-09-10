@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "agent_key": "wireproxy-ztna",
+  "display_name": {
+    "ko": "WireProxy ZTNA 모니터",
+    "en": "WireProxy ZTNA Monitor"
+  },
+  "description": {
+    "ko": "WireProxy SOCKS5 기반 ZTNA 터널 상태(경유 외부 IP)를 조회하는 네트워크 계층(L3) 모니터링 에이전트입니다. 전용 화면이 없어 AI 어시스턴트 질의응답(ztna)으로 사용합니다. SeCuardian 내장 router_wireproxy 를 Addon 으로 이식했습니다.",
+    "en": "Network-layer (L3) monitoring agent that queries WireProxy SOCKS5-based ZTNA tunnel status (egress IP through the proxy). No dedicated screen — use via the AI Assistant (ztna). Ported from SeCuardian built-in router_wireproxy."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "epic": "E12",
+  "layer": "L3 Network",
+  "categories": [
+    "security",
+    "network",
+    "ztna"
+  ],
+  "has_front": false,
+  "permissions": [
+    "network.egress"
+  ],
+  "required_env": [],
+  "optional_env": [
+    "WIREPROXY_SOCKS5_HOST",
+    "WIREPROXY_SOCKS5_PORT"
+  ],
+  "default_env": {
+    "WIREPROXY_SOCKS5_HOST": "127.0.0.1",
+    "WIREPROXY_SOCKS5_PORT": "25344"
+  },
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "WireProxy",
+    "version": ">=1.0",
+    "guide": "wireproxy-ztna-worker-guide.md"
+  },
+  "capabilities": [
+    {
+      "verb": "query",
+      "domain": "network.wireproxy.status",
+      "description": "WireProxy SOCKS5 프록시 상태를 조회합니다",
+      "endpoint": "GET /status"
+    }
+  ],
+  "governance": {
+    "data_classification": "internal",
+    "human_approval_required": false,
+    "audit_level": "medium"
+  },
+  "min_platform_version": "2.0.0"
+}

@@ -46,7 +46,7 @@ async def index_document(tenant_id: str, collection_id: int, embedding_dim: int,
             (tenant_id, collection_id, document_id, ordinal, piece,
              json.dumps(vec), json.dumps(tf, ensure_ascii=False), sum(tf.values()), 1.0),
         )
-        await vector_backend.write_embedding(cid, vec)
+        await vector_backend.write_embedding(cid, vec, collection_id)
     return len(pieces)
 
 

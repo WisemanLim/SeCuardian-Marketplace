@@ -88,6 +88,9 @@ class Settings(BaseSettings):
     # ── SeCMP 내장 에이전트 (F-MP / F-RAG / F-GRD / 멀티테넌시) ────────────────────
     # Vector 백엔드 (F-RAG, §7.5)
     vector_backend: str = "pgvector"          # pgvector | qdrant
+    qdrant_url: str = "http://localhost:6333"  # VECTOR_BACKEND=qdrant 시 서버 URL (impl/57)
+    qdrant_api_key: str = ""                    # Qdrant Cloud/보호형 배포 API 키(선택)
+    qdrant_collection: str = "secmp_rag"        # 단일 컬렉션(청크=포인트, payload.collection_id 필터)
 
     # Marketplace 원격 레지스트리 (F-MP, §7.3)
     marketplace_remote_enabled: bool = False   # true 시 원격 카탈로그 병합 조회

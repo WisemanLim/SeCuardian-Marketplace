@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "agent_key": "logto-monitor",
+  "display_name": {
+    "ko": "Logto IAM 모니터",
+    "en": "Logto IAM Monitor"
+  },
+  "description": {
+    "ko": "Logto IAM 서버의 헬스·OIDC 디스커버리를 조회하는 신원 계층(L1 Identity) 모니터링 에이전트입니다(Keycloak 대안 IdP). 전용 화면이 없어 AI 어시스턴트 질의응답(iam_query)으로 사용합니다. SeCuardian 내장 router_logto 를 Addon 으로 이식했습니다.",
+    "en": "Identity-layer (L1) monitoring agent that queries Logto IAM health and OIDC discovery (an alternative IdP to Keycloak). No dedicated screen — use via the AI Assistant (iam_query). Ported from SeCuardian built-in router_logto."
+  },
+  "version": "1.0.0",
+  "agent_type": "service",
+  "epic": "E01",
+  "layer": "L1 Identity",
+  "categories": [
+    "security",
+    "identity",
+    "iam"
+  ],
+  "has_front": false,
+  "permissions": [
+    "network.egress"
+  ],
+  "required_env": [],
+  "optional_env": [
+    "LOGTO_ENDPOINT",
+    "LOGTO_ADMIN_URL"
+  ],
+  "default_env": {
+    "LOGTO_ENDPOINT": "http://localhost:3801",
+    "LOGTO_ADMIN_URL": "http://localhost:3802"
+  },
+  "worker": {
+    "required": true,
+    "kind": "external",
+    "name": "Logto",
+    "version": ">=1.0",
+    "guide": "logto-monitor-worker-guide.md"
+  },
+  "capabilities": [
+    {
+      "verb": "query",
+      "domain": "iam.logto.status",
+      "description": "Logto 헬스 + OIDC 디스커버리 상태를 조회합니다",
+      "endpoint": "GET /status"
+    }
+  ],
+  "governance": {
+    "data_classification": "internal",
+    "human_approval_required": false,
+    "audit_level": "medium"
+  },
+  "min_platform_version": "2.0.0"
+}

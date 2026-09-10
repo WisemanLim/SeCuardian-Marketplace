@@ -39,6 +39,7 @@ from app.routers import (
     router_a2a,
     router_mcp,
     router_mcp_config,
+    router_governance,    # 거버넌스: HITL 승인 + OWASP 스코어카드 (F-GOV/E6, impl/55)
     router_marketplace,   # Marketplace 내장 에이전트 (F-MP)
     router_marketplace_host,    # Marketplace-host 공개 카탈로그 API (§7.3.5)
     router_marketplace_remote,  # Marketplace 원격 레지스트리 클라이언트 (F-MP E1.5)
@@ -127,6 +128,7 @@ app.include_router(router_agent_registry.router)
 app.include_router(router_a2a.router)        # A2A Protocol v1.0 (F12)
 app.include_router(router_mcp.router)        # MCP JSON-RPC 2.0 (F12)
 app.include_router(router_mcp_config.router) # MCP Proxy 설정 관리 (F12)
+app.include_router(router_governance.router)   # 거버넌스: HITL + OWASP 스코어카드 (F-GOV/E6, impl/55)
 app.include_router(router_marketplace.router)  # Marketplace 내장 에이전트 (F-MP)
 app.include_router(router_marketplace_host.router)    # Marketplace-host 공개 카탈로그 API (§7.3.5)
 app.include_router(router_marketplace_remote.router)  # 원격 레지스트리 클라이언트 (F-MP E1.5)

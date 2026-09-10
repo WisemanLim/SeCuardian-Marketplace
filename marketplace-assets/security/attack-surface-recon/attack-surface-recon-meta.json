@@ -1,0 +1,42 @@
+{
+  "agent_type": "service",
+  "version": "1.0.0",
+  "display_name": {
+    "ko": "공격표면 정찰",
+    "en": "Attack Surface Recon"
+  },
+  "description": {
+    "ko": "자사 도메인을 대상으로 서브도메인(subfinder)·DNS(dig)·등록정보(whois)를 수동적으로 정찰하고, nmap 으로 능동 포트스캔해 외부 공격표면을 리포트하는 OSINT 정찰 에이전트입니다. 스캔 대상은 ASR_ALLOWED_DOMAINS allowlist 에 등록된 도메인만 허용합니다. 전용 화면이 없어 AI 어시스턴트를 통해 질의응답으로 사용하며, 능동 포트스캔은 supervisor/admin 만 가능합니다.",
+    "en": "OSINT reconnaissance agent that passively enumerates subdomains (subfinder), DNS (dig) and registration info (whois) for your own domains and actively port-scans with nmap to report the external attack surface. Targets are restricted to the ASR_ALLOWED_DOMAINS allowlist. No dedicated screen — use via the AI Assistant; active port scanning is supervisor/admin only."
+  },
+  "epic": "E24",
+  "layer": "L3 Network",
+  "base_agent": null,
+  "capabilities": [
+    {
+      "verb": "query",
+      "domain": "security.attack-surface.recon",
+      "description": "허용 도메인의 서브도메인·DNS·WHOIS 를 수동적으로 정찰합니다",
+      "input_schema": {"type": "object", "properties": {"domain": {"type": "string"}}, "required": ["domain"]},
+      "output_schema": {"type": "object", "properties": {"subdomains": {"type": "array"}, "a_records": {"type": "array"}}},
+      "qos": {"max_latency_ms": 60000, "supports_async": false, "supports_streaming": false}
+    },
+    {
+      "verb": "inspect",
+      "domain": "security.attack-surface.scan",
+      "description": "허용 도메인을 nmap 으로 능동 포트스캔합니다 (supervisor/admin)",
+      "input_schema": {"type": "object", "properties": {"domain": {"type": "string"}, "ports": {"type": "string"}}, "required": ["domain"]},
+      "output_schema": {"type": "object", "properties": {"open_ports": {"type": "array"}}},
+      "qos": {"max_latency_ms": 180000, "supports_async": false, "supports_streaming": false}
+    }
+  ],
+  "governance": {
+    "data_classification": "internal",
+    "human_approval_required": true,
+    "audit_level": "high"
+  },
+  "required_env": [],
+  "optional_env": ["ASR_ALLOWED_DOMAINS", "ASR_NMAP_PORTS"],
+  "default_env": {"ASR_NMAP_PORTS": "1-1024"},
+  "min_platform_version": "2.0.0"
+}
