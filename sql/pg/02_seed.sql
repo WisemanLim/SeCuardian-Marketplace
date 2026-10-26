@@ -1,14 +1,14 @@
 -- secuardian — 기본 시드 데이터 (idempotent, PostgreSQL)
 
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
-VALUES ('general', 'Orchestrator', 1, 1)
+VALUES ('general', 'Orchestrator', 1, 1, '기본 Agent', 0)
 ON CONFLICT (agent_key) DO NOTHING;
 UPDATE tbl_agent_config SET agent_name = 'Orchestrator', is_required = 1,
   agent_names = '{"ko": "Orchestrator", "en": "Orchestrator", "jp": "オーケストレーター"}',
   descriptions = '{"ko": "사용자 요청의 의도를 분류하고 적합한 에이전트로 라우팅·합성하는 중앙 오케스트레이터입니다.", "en": "Central orchestrator that classifies user intent and routes/synthesizes responses across the appropriate agents.", "jp": "ユーザー要求の意図を分類し、適切なエージェントへルーティング・統合する中央オーケストレーターです。"}' WHERE agent_key = 'general';
 
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
-VALUES ('chat', 'AI 어시스턴트', 1, 1)
+VALUES ('chat', 'AI 어시스턴트', 1, 1, '기본 Agent', 1)
 ON CONFLICT (agent_key) DO NOTHING;
 UPDATE tbl_agent_config SET agent_name = 'AI 어시스턴트', is_required = 1,
   agent_names = '{"ko": "AI 어시스턴트", "en": "AI Assistant", "jp": "AIアシスタント"}',
@@ -16,7 +16,7 @@ UPDATE tbl_agent_config SET agent_name = 'AI 어시스턴트', is_required = 1,
 
 -- 내장 에이전트: Marketplace (F-MP)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
-VALUES ('marketplace', '마켓플레이스', 1, 1)
+VALUES ('marketplace', '마켓플레이스', 1, 1, '내장 에이전트', 2)
 ON CONFLICT (agent_key) DO NOTHING;
 UPDATE tbl_agent_config SET agent_name = '마켓플레이스', nav_group = '내장 에이전트', is_required = 1,
   agent_names = '{"ko": "마켓플레이스", "en": "Marketplace", "jp": "マーケットプレイス"}',
@@ -24,7 +24,7 @@ UPDATE tbl_agent_config SET agent_name = '마켓플레이스', nav_group = '내�
 
 -- 내장 에이전트: Workflow (F-WF)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
-VALUES ('workflow', '워크플로우', 1, 1)
+VALUES ('workflow', '워크플로우', 1, 1, '내장 에이전트', 3)
 ON CONFLICT (agent_key) DO NOTHING;
 UPDATE tbl_agent_config SET agent_name = '워크플로우', nav_group = '내장 에이전트', is_required = 1,
   agent_names = '{"ko": "워크플로우", "en": "Workflow", "jp": "ワークフロー"}',
@@ -32,7 +32,7 @@ UPDATE tbl_agent_config SET agent_name = '워크플로우', nav_group = '내장 
 
 -- 내장 에이전트: RAG (F-RAG)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
-VALUES ('rag', 'RAG', 1, 1)
+VALUES ('rag', 'RAG', 1, 1, '내장 에이전트', 4)
 ON CONFLICT (agent_key) DO NOTHING;
 UPDATE tbl_agent_config SET agent_name = 'RAG', nav_group = '내장 에이전트', is_required = 1,
   agent_names = '{"ko": "RAG", "en": "RAG", "jp": "RAG"}',
@@ -40,7 +40,7 @@ UPDATE tbl_agent_config SET agent_name = 'RAG', nav_group = '내장 에이전트
 
 -- 내장 에이전트: Playground (F-PG)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
-VALUES ('playground', '플레이그라운드', 1, 1)
+VALUES ('playground', '플레이그라운드', 1, 1, '내장 에이전트', 5)
 ON CONFLICT (agent_key) DO NOTHING;
 UPDATE tbl_agent_config SET agent_name = '플레이그라운드', nav_group = '내장 에이전트', is_required = 1,
   agent_names = '{"ko": "플레이그라운드", "en": "Playground", "jp": "プレイグラウンド"}',
@@ -48,7 +48,7 @@ UPDATE tbl_agent_config SET agent_name = '플레이그라운드', nav_group = '�
 
 -- 내장 에이전트: Guardrails (F-GRD)
 INSERT INTO tbl_agent_config (agent_key, agent_name, is_enabled, is_required, nav_group, sort_order)
-VALUES ('guardrails', '가드레일', 1, 1)
+VALUES ('guardrails', '가드레일', 1, 1, '내장 에이전트', 6)
 ON CONFLICT (agent_key) DO NOTHING;
 UPDATE tbl_agent_config SET agent_name = '가드레일', nav_group = '내장 에이전트', is_required = 1,
   agent_names = '{"ko": "가드레일", "en": "Guardrails", "jp": "ガードレール"}',
