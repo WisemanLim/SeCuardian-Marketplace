@@ -133,7 +133,7 @@ test/impl/<Nth>/         구현 차수별 시험 시나리오·결과
 test/dev-env/            개발환경 표준 검증(최초 1회)
 ```
 
-**서비스(컨테이너)**: `postgres:17` · `redis:7.4` · `ollama` · `api`(profile `app`) · `web`(profile `web`).
+**서비스(컨테이너)**: `postgres:17` · `redis:7.4` · `ollama`(profile `ollama`, preflight 가 기동) · `api`(profile `app`) · `web`(profile `web`).
 
 ### 2.1 자산·Addon 에이전트 파일 저장 경로
 
@@ -193,13 +193,14 @@ make dev-fe         # 프론트만 (pnpm dev, :4100)
 
 ### B) docker compose (dev/staging/prod)
 ```bash
-make up             # 인프라만 (postgres+redis+ollama)
+make up             # 인프라만 (postgres+redis, ollama 는 OLLAMA_ENABLED=true·로컬 URL 일 때만)
 make dev-all        # .env.dev 로 전체 기동 (api profile=app + web)
 make dev-down
 make staging-all / make prod-all    # 각 .env.<env> 사용
 ```
 - 프로파일: 기본(`up`)=인프라, `app`=api, `web`=프론트 prod 이미지.
 - GPU: `OLLAMA_RUNTIME=gpu` 시 `docker-compose.gpu.yml` 자동 병합. macOS Apple Silicon=`mlx`(네이티브 Ollama).
+- Ollama 컨테이너는 `scripts/ollama_preflight.sh` 가 `OLLAMA_ENABLED=true` 이고 `OLLAMA_BASE_URL` 이 로컬 주소(localhost/127.0.0.1/host.docker.internal)일 때만 기동. 외부 서버 Ollama 사용 시 `OLLAMA_ENABLED=false` + `OLLAMA_BASE_URL=http://<외부IP>:11434` — compose 는 이 값을 api 컨테이너에 그대로 전달(컨테이너 내부 `localhost` 는 `host.docker.internal` 로 자동 치환).
 
 ### DB 초기화
 ```bash

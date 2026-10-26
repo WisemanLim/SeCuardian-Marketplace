@@ -134,7 +134,7 @@ test/impl/<Nth>/         per-iteration test scenario·result
 test/dev-env/            dev-env standard verification (once)
 ```
 
-**Services (containers)**: `postgres:17` · `redis:7.4` · `ollama` · `api` (profile `app`) · `web` (profile `web`).
+**Services (containers)**: `postgres:17` · `redis:7.4` · `ollama` (profile `ollama`, started by preflight) · `api` (profile `app`) · `web` (profile `web`).
 
 ### 2.1 Asset & Addon-agent file storage paths
 
@@ -194,13 +194,14 @@ make dev-fe         # frontend only (pnpm dev, :4100)
 
 ### B) docker compose (dev/staging/prod)
 ```bash
-make up             # infra only (postgres+redis+ollama)
+make up             # infra only (postgres+redis; ollama only when OLLAMA_ENABLED=true and the URL is local)
 make dev-all        # full stack with .env.dev (api profile=app + web)
 make dev-down
 make staging-all / make prod-all    # uses each .env.<env>
 ```
 - Profiles: default (`up`)=infra, `app`=api, `web`=frontend prod image.
 - GPU: `OLLAMA_RUNTIME=gpu` auto-merges `docker-compose.gpu.yml`. macOS Apple Silicon=`mlx` (native Ollama).
+- The Ollama container is started by `scripts/ollama_preflight.sh` only when `OLLAMA_ENABLED=true` and `OLLAMA_BASE_URL` is local (localhost/127.0.0.1/host.docker.internal). For an external Ollama server use `OLLAMA_ENABLED=false` + `OLLAMA_BASE_URL=http://<external-IP>:11434` — compose passes this value to the api container as-is (`localhost` inside containers is auto-rewritten to `host.docker.internal`).
 
 ### DB init
 ```bash
